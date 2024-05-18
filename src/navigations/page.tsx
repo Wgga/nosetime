@@ -1,0 +1,42 @@
+import React from "react";
+import { View } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ArticleDetail from "../pages/article/article-detail";
+import Login from "../pages/user/login";
+import Protocol from "../pages/user/protocol";
+import Search from "../pages/search/search";
+import SearchResult from "../pages/search/search-result";
+import ItemDetail from "../pages/item/item-detail";
+import SocialShequDetail from "../pages/social/social-shequ-detail";
+import UserDetail from "../pages/user/user-detail";
+import WikiDetail from "../pages/wiki/wiki-detail";
+import MediaListDetail from "../pages/media/media-list-detail";
+import PicList from "../pages/media/pic-list";
+import MallGroup from "../pages/mall/mall-group";
+import MallHeji from "../pages/mall/mall-heji";
+import MallItem from "../pages/mall/mall-item";
+
+const Stack = createNativeStackNavigator();
+
+function Page(): React.JSX.Element {
+	return (
+		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="ArticleDetail" component={ArticleDetail} />
+			<Stack.Screen name="Login" component={Login} />
+			<Stack.Screen name="Protocol" component={Protocol} />
+			<Stack.Screen name="Search" component={Search} />
+			<Stack.Screen name="SearchResult" component={SearchResult} />
+			<Stack.Screen name="ItemDetail" component={ItemDetail} />
+			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
+			<Stack.Screen name="UserDetail" component={UserDetail} />
+			<Stack.Screen name="WikiDetail" component={WikiDetail} />
+			<Stack.Screen name="MediaListDetail" component={MediaListDetail} />
+			<Stack.Screen name="PicList" component={PicList} />
+			<Stack.Screen name="MallGroup" component={MallGroup} />
+			<Stack.Screen name="MallHeji" component={MallHeji} />
+			<Stack.Screen name="MallItem" component={MallItem} />
+		</Stack.Navigator>
+	);
+}
+
+export default Page;
