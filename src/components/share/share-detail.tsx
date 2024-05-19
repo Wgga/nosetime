@@ -24,8 +24,8 @@ function ShareDetail({ navigation }: any): React.JSX.Element {
 		{ id: 1, icon: <WX width={56 * 0.65} height={56 * 0.65} />, text: "微信好友" },
 		{ id: 2, icon: <PYQ width={56 * 0.65} height={56 * 0.65} />, text: "朋友圈" },
 		{ id: 3, icon: <WEIBO width={56 * 0.65} height={56 * 0.65} />, text: "微博" },
-		{ id: 4, icon: <Link width={56 * 0.65} height={56 * 0.65} />, text: "复制链接" },
-		{ id: 5, icon: <QQ width={56 * 0.65} height={56 * 0.65} />, text: "QQ" },
+		// { id: 4, icon: <Link width={56 * 0.65} height={56 * 0.65} />, text: "复制链接" },
+		// { id: 5, icon: <QQ width={56 * 0.65} height={56 * 0.65} />, text: "QQ" },
 		// { id: 6, icon: <Download width={56 * 0.65} height={56 * 0.65} />, text: "下载" },
 	])
 	// 参数
@@ -62,10 +62,11 @@ const styles = StyleSheet.create({
 		fontFamily: "PingFang SC",
 	},
 	share_item_con: {
+		width: "100%",
 		flexDirection: "row",
 		paddingTop: 30,
 		paddingHorizontal: 25,
-		justifyContent: "space-between",
+		justifyContent: "space-around",
 	},
 	share_item: {
 		alignItems: "center",

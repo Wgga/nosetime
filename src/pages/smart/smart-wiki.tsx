@@ -10,6 +10,7 @@ import smartService from "../../services/smart-service/smart-service";
 import us from "../../services/user-service/user-service";
 
 import ListBottomTip from "../../components/listbottomtip";
+import SkewableView from "../../components/SkewableView";
 
 import cache from "../../hooks/storage/storage";
 
@@ -134,33 +135,61 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 					<View style={styles.wiki_header_con}>
 						<View style={styles.header_img_con}>
 							{wikilist.current.map((item: any, index: number) => {
+								let SkewViewW = 0;
+								if (index == 1) {
+									SkewViewW = width * 0.335;
+								} else if (index == 2) {
+									SkewViewW = width * 0.30;
+								} else if (index == 3) {
+									SkewViewW = width * 0.41;
+								} else {
+									SkewViewW = width * 0.275;
+								}
 								return (
-									<Pressable onPress={() => {
-										clicktab(item.text);
-									}} key={index} style={[
-										styles.header_img,
-										index == 1 ? styles.header_img2 : null,
-										index == 2 ? styles.header_img3 : null,
-										index == 3 ? styles.header_img4 : null,
-									]}>
-										{current_index.current == index && <View style={styles.image_con}>
-											<Image
-												style={{ width: "100%", height: "100%" }}
-												defaultSource={require("../../assets/images/nopic.png")}
-												source={item.img}
-											/>
-										</View>}
-										{(current_index.current != index) && <Grayscale style={styles.image_con}>
-											<Image
-												style={{ width: "100%", height: "100%" }}
-												defaultSource={require("../../assets/images/nopic.png")}
-												source={item.img}
-											/>
-										</Grayscale>}
-										<Text style={styles.header_img_tit}>{item.tit}</Text>
-										{(current_index.current != index) && <View style={styles.header_img_msk}></View>}
-									</Pressable>
-
+									<SkewableView
+										key={index}
+										skewDirection={"horizontal-right"}
+										style={[
+											styles.header_img,
+											index == 1 && { left: width * 0.218, zIndex: 6 },
+											index == 2 && { left: width * 0.49, zIndex: 8 },
+											index == 3 && { left: width * 0.71, zIndex: 2 },
+										]}
+										skewValue={index == 0 ? 0 : 10}
+										skewUnits={"deg"}
+										boundingBoxWidth={SkewViewW}
+										boundingBoxHeight={130}>
+										<Pressable onPress={() => {
+											clicktab(item.text);
+										}} style={[{
+											width: SkewViewW,
+											height: 130,
+											justifyContent: "flex-end",
+										}]}>
+											{current_index.current == index && <View style={styles.image_con}>
+												<Image
+													style={{ width: "100%", height: "100%" }}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={item.img}
+												/>
+											</View>}
+											{(current_index.current != index) && <Grayscale style={styles.image_con}>
+												<Image
+													style={{ width: "100%", height: "100%" }}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={item.img}
+												/>
+											</Grayscale>}
+											<Text style={[
+												styles.header_img_tit,
+												index == 0 && { left: SkewViewW * 0.22 },
+												index == 1 && { left: SkewViewW * 0.37 },
+												index == 2 && { left: SkewViewW * 0.26 },
+												index == 3 && { left: SkewViewW * 0.32 }
+											]}>{item.tit}</Text>
+											{(current_index.current != index) && <View style={styles.header_img_msk}></View>}
+										</Pressable>
+									</SkewableView>
 								)
 							})}
 						</View>
@@ -220,27 +249,9 @@ const styles = StyleSheet.create({
 	},
 	header_img: {
 		position: "absolute",
-		width: width * 0.27,
-		height: 130,
-		zIndex: 5,
+		top: 0,
 		left: 0,
-		alignItems: "center",
-		justifyContent: "flex-end",
-	},
-	header_img2: {
-		width: width * 0.32,
-		left: width * 0.218,
-		zIndex: 6,
-	},
-	header_img3: {
-		width: width * 0.285,
-		left: width * 0.49,
-		zIndex: 8,
-	},
-	header_img4: {
-		width: width * 0.41,
-		left: width * 0.71,
-		zIndex: 2,
+		zIndex: 5,
 	},
 	image_con: {
 		position: "absolute",
@@ -250,7 +261,7 @@ const styles = StyleSheet.create({
 	header_img_tit: {
 		color: theme.toolbarbg,
 		fontSize: 15,
-		marginBottom: "10%",
+		marginBottom: "7%",
 		textShadowColor: "#777",
 		textShadowRadius: 6,
 		textShadowOffset: {

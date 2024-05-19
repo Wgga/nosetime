@@ -4,15 +4,24 @@ import { Animated, ScrollView, View, Text, StyleSheet, StatusBar, Pressable, Nat
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import us from "../../services/user-service/user-service";
+
+import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
 
 import Icon from "../../assets/iconfont";
+
+import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
-import Header from "./header";
-
+import ToastCtrl from "../../components/toastctrl";
 import StickyHeader from "../../components/StickyHeader";
+
+import Header from "./header";
 import ArticleList from "../article/article-list";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const events = new NativeEventEmitter();
 
@@ -37,6 +46,7 @@ function Home({ navigation }: any): React.JSX.Element {
 		{ key: "smell", title: "寻味", pageheight: 2000, },
 		{ key: "knowledge", title: "知识", pageheight: 2000, },
 	]).current; // 文章列表Tab
+	let debounceTimer = React.useRef<any>(null); // 防抖定时器
 
 	// 动态背景透明度
 	const opacity = scrollY.interpolate({
@@ -59,6 +69,7 @@ function Home({ navigation }: any): React.JSX.Element {
 	};
 
 	React.useEffect(() => {
+		// init();
 		events.addListener("HomeHeaderHeight", (data: number) => {
 			if (data - searchHeight.current > 0) {
 				setContentHeight(data - searchHeight.current);
@@ -69,7 +80,90 @@ function Home({ navigation }: any): React.JSX.Element {
 		}
 	}, []);
 
-	let debounceTimer = React.useRef<any>(null);
+	const init = () => {
+		setTimeout(() => {
+			if (us.user.uid) {
+				//登录用户不显示协议
+				cache.saveItem("show_protocol", true, 3650 * 86400);
+				// events.emit("can_push", true);
+				lowPrice();
+
+				//首次登录（在登录处）
+				//次日登录，连续登录
+				http.post(ENV.points + "?uid=" + us.user.uid, { method: "increasetip", token: us.user.token }).then((resp_data: any) => {
+					if (resp_data.msg && resp_data.msg.indexOf('+') > 0) {
+						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast" });
+					}
+				});
+
+				http.post(ENV.mall + "?uid=" + us.user.uid, { method: "getunshowcoupon", token: us.user.token }).then((resp_data: any) => {
+					if (resp_data.title && resp_data.value) {
+						/* this.popoverCtrl.create({
+							component: MallCouponPopoverPage,
+							componentProps: resp_data,
+							cssClass: 'mallcoupon',
+							//event: ev,
+							translucent: true
+						}).then((popover) => { popover.present() }); */
+					}
+				});
+			} else {
+				//没有登录的用户显示协议
+				show_protocol()
+			}
+		}, 500);
+	};
+
+	const show_protocol = () => {
+		cache.getItem("show_protocol").then(() => {
+			events.emit("can_push", true);
+			lowPrice();
+		}).catch(() => {
+			/* this.alertCtrl.create({
+				header: '使用协议与隐私政策',
+				cssClass: 'cart_tip protocol_tip',
+				backdropDismiss: false,
+				message: "为更好的提供个性推荐、发布信息、购买商品、交流沟通等相关服务，我们会根据您使用服务的具体功能需要，收集您的设备信息、操作日志等个人信息。您可以在手机“设置”中查看、变更、删除个人信息并管理您的授权。" +
+					"<br>您可以阅读<span class='use_protocol protocol'>《使用协议》</span>和<span class='use_protocol private'>《隐私政" +
+					"策》</span>了解详细信息。如您同意，请点击" +
+					"“同意”开始接受我的服务。",
+				buttons: [
+					{
+						text: '暂不使用',
+						handler: () => {
+							navigator['app'].exitApp();
+						}
+					},
+					{
+						text: '同意',
+						handler: () => {
+							this.cache.saveItem('show_protocol', true, 'show_protocol', 3650 * 86400);
+							//20220901 shibo:发布可执行推送
+							this.events.publish('can_push', true);
+							this.lowPrice();
+						}
+					}
+				]
+			}).then((alertCtrl) => {
+				//yak
+				var _this = this;
+				alertCtrl.present()
+				var protocol_ele = alertCtrl.querySelector('.protocol');
+				var private_ele = alertCtrl.querySelector('.private');
+				protocol_ele.addEventListener('click', function () {
+					_this.popoverCtrl.create({ component: UserProtocolPage, componentProps: { type: 'protocol' }, cssClass: 'loginpopover' }).then((popover) => { popover.present() });
+				}, false)
+				private_ele.addEventListener('click', function () {
+					_this.popoverCtrl.create({ component: UserProtocolPage, componentProps: { type: 'privacy' }, cssClass: 'loginpopover' }).then((popover) => { popover.present() });
+				}, false)
+			}); */
+		});
+	}
+
+	const lowPrice = () => {
+
+	}
+
 
 	const changeIndex = (index: number) => {
 		if (debounceTimer.current) {

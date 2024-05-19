@@ -11,6 +11,8 @@ import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/toastctrl";
+import ShareDetail from "../../components/share/share-detail";
+import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import http from "../../utils/api/http";
 
@@ -226,6 +228,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
 	let footerZ = React.useRef(new Animated.Value(0)).current; // 底部层级动画
+	let share_popover = React.useRef<any>({}); // 分享弹窗
 
 	// 初始化数据
 	React.useEffect(() => {
@@ -418,7 +421,29 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				MenuChildren={() => {
 					return (
 						<>
-							<Pressable style={styles.menu_icon_con}>
+							<Pressable style={styles.menu_icon_con} onPress={() => {
+								share_popover.current = ModalPortal.show((
+									<ShareDetail />
+								), {
+									width: Winwidth,
+									height: 200,
+									rounded: false,
+									useNativeDriver: true,
+									modalAnimation: new SlideAnimation({
+										initialValue: 0,
+										slideFrom: "bottom",
+										useNativeDriver: true,
+									}),
+									onTouchOutside: () => {
+										ModalPortal.dismiss(share_popover.current);
+									},
+									swipeDirection: "down",
+									animationDuration: 300,
+									type: "bottomModal",
+									modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+								})
+								showMenu();
+							}}>
 								<Icon style={styles.menu_icon} name="share2" size={14} color={theme.text1} />
 								<Text style={styles.menu_text}>{"分享"}</Text>
 							</Pressable>

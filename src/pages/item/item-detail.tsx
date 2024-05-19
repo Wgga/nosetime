@@ -848,6 +848,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	let wikidata = React.useRef<any>({}); // 百科数据
 	let itemcolors = React.useRef<any>({}); // 单品页主题样式表
 	let issubscription_ = React.useRef<any>({}); // 是否订阅到货
+	let share_popover = React.useRef<any>({}); // 分享弹窗
 
 	React.useEffect(() => {
 		init();
@@ -997,7 +998,29 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 				MenuChildren={() => {
 					return (
 						<>
-							<Pressable style={[styles.menu_icon_con, {}]}>
+							<Pressable style={styles.menu_icon_con} onPress={() => {
+								share_popover.current = ModalPortal.show((
+									<ShareDetail />
+								), {
+									width,
+									height: 200,
+									rounded: false,
+									useNativeDriver: true,
+									modalAnimation: new SlideAnimation({
+										initialValue: 0,
+										slideFrom: "bottom",
+										useNativeDriver: true,
+									}),
+									onTouchOutside: () => {
+										ModalPortal.dismiss(share_popover.current);
+									},
+									swipeDirection: "down",
+									animationDuration: 300,
+									type: "bottomModal",
+									modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+								})
+								showMenu();
+							}}>
 								<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
 								<Text style={styles.menu_text}>{"分享"}</Text>
 							</Pressable>
@@ -1032,7 +1055,6 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>
-			<ShareDetail />
 			<ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
 				<ItemHeader itemid={id} navigation={navigation} />
 			</ScrollView>
