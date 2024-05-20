@@ -5,6 +5,7 @@ import { FlashList } from "@shopify/flash-list";
 
 import HeaderView from "../../components/headerview";
 import ListBottomTip from "../../components/listbottomtip";
+import RnImage from "../../components/RnImage";
 
 import searchService from "../../services/search-service/search-service";
 import us from "../../services/user-service/user-service";
@@ -377,12 +378,9 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 						{searchdata.perfumers.map((item: any, index: number) => {
 							return (
 								<View style={[styles.wiki_list_con, styles.item_flex]} key={item.id}>
-									{item.imgErr && <DefaultAvatar width={18} height={18} />}
-									<Image
-										style={styles.wiki_list_image}
-										defaultSource={require("../../assets/images/default_avatar.png")}
+									<RnImage style={styles.wiki_list_image}
 										source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
-										resizeMode="cover"
+										resizeMode="contain"
 									/>
 									<View style={styles.wiki_list_info}>
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>

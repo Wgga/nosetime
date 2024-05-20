@@ -51,7 +51,6 @@ function Home({ navigation }: any): React.JSX.Element {
 		{ key: "knowledge", title: "知识", pageheight: 2000, },
 	]).current; // 文章列表Tab
 	let debounceTimer = React.useRef<any>(null); // 防抖定时器
-	let protocol_popover = React.useRef<any>(null);
 
 	// 动态背景透明度
 	const opacity = scrollY.interpolate({
@@ -90,7 +89,7 @@ function Home({ navigation }: any): React.JSX.Element {
 		setTimeout(() => {
 			if (us.user.uid) {
 				//登录用户不显示协议
-				cache.saveItem("show_protocol", true, 3650 * 86400);
+				cache.saveItem("showProtocol", true, 3650 * 86400);
 				events.emit("can_push", true);
 				lowPrice();
 

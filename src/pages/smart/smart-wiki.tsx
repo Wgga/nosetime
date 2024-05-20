@@ -11,6 +11,7 @@ import us from "../../services/user-service/user-service";
 
 import ListBottomTip from "../../components/listbottomtip";
 import SkewableView from "../../components/SkewableView";
+import RnImage from "../../components/RnImage";
 
 import cache from "../../hooks/storage/storage";
 
@@ -209,8 +210,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 												source={{ uri: ENV.image + "/odor/" + (item.id % 100000) + ".jpg" }}
 												resizeMode="contain"
 											/>}
-											{current_tab.current == "perfumer" && <Image style={styles.like_avatar}
-												defaultSource={require("../../assets/images/perfumer.png")}
+											{current_tab.current == "perfumer" && <RnImage style={styles.like_avatar}
 												source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
 												resizeMode="contain"
 											/>}
