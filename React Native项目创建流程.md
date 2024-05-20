@@ -324,7 +324,7 @@ include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
 ```
 
-2. 在android/app/build.gradle文件中，添加 `:react-native-splash-screen` 启动屏幕项目作为编译时依赖项：
+2. 在 `android/app/build.gradle` 文件中，添加 `:react-native-splash-screen` 启动屏幕项目作为编译时依赖项：
 
 ```gradle
 ...
@@ -535,7 +535,7 @@ include ':react-native-video'
 project (':react-native-video').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-video/android')
 ```
 
-2. 在 `android/app/build.gradle` 文件中，添加 `:react-native-splash-screen` 启动屏幕项目作为编译时依赖项：
+2. 在 `android/app/build.gradle` 文件中，添加 `:react-native-video` 启动屏幕项目作为编译时依赖项：
 
 ```gradle
 ...
