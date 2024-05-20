@@ -12,22 +12,27 @@ import { NavigationContainer } from "@react-navigation/native";
 import SplashScreen from "react-native-splash-screen";
 import Orientation from "react-native-orientation-locker";
 import { ModalPortal } from "./src/components/modals";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import Route from "./src/navigations/route";
 
 function App(): React.JSX.Element {
 
 	React.useEffect(() => {
-		SplashScreen.hide();
+		setTimeout(() => {
+			SplashScreen.hide();
+		}, 1000);
 		// Orientation.lockToPortrait();
 	}, [])
 
 	return (
 		<React.Fragment>
-			<NavigationContainer>
-				<Route />
-			</NavigationContainer>
-			<ModalPortal />
+			<SafeAreaProvider>
+				<NavigationContainer>
+					<Route />
+				</NavigationContainer>
+				<ModalPortal />
+			</SafeAreaProvider>
 		</React.Fragment>
 	);
 }

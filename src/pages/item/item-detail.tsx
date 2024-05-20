@@ -9,7 +9,7 @@ import reactNativeTextSize from "react-native-text-size";
 import StickyHeader from "../../components/StickyHeader";
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
-import ShareDetail from "../../components/share/share-detail";
+import ShareDetail from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import HaveChecked from "../../assets//svg/itemdetail/have-checked.svg";
@@ -56,7 +56,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 	let innoselist = React.useRef<any[]>([]); // 包含它的香单数据
 	let inforeply = React.useRef<any>({}); // 评论回复数据
 	let maxtotal = React.useRef<number>(0); // 简介最大显示字数
-	let intro_popover = React.useRef<any>({}); // 简介弹窗
+	let intro_popover = React.useRef<any>(null); // 简介弹窗
 	let wanteditem = React.useRef<any>({}); // 用户收藏数据
 	let type2 = React.useRef<any>(""); // 收藏类型
 	let odor_vote = React.useRef<any>({}); // 用户气味投票数据
@@ -848,7 +848,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	let wikidata = React.useRef<any>({}); // 百科数据
 	let itemcolors = React.useRef<any>({}); // 单品页主题样式表
 	let issubscription_ = React.useRef<any>({}); // 是否订阅到货
-	let share_popover = React.useRef<any>({}); // 分享弹窗
+	let share_popover = React.useRef<any>(null); // 分享弹窗
 
 	React.useEffect(() => {
 		init();

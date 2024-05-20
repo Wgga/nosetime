@@ -11,7 +11,7 @@ import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/toastctrl";
-import ShareDetail from "../../components/share/share-detail";
+import ShareDetail from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import http from "../../utils/api/http";
@@ -228,7 +228,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
 	let footerZ = React.useRef(new Animated.Value(0)).current; // 底部层级动画
-	let share_popover = React.useRef<any>({}); // 分享弹窗
+	let share_popover = React.useRef<any>(null); // 分享弹窗
 
 	// 初始化数据
 	React.useEffect(() => {
@@ -250,9 +250,9 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 			// 根据文章内容判断状态栏颜色
 			if (articledata.current.mp4URL) {
-				StatusBar.setBarStyle("dark-content");
+				StatusBar.setBarStyle("dark-content", true);
 			} else {
-				StatusBar.setBarStyle("light-content");
+				StatusBar.setBarStyle("light-content", true);
 			}
 		})
 

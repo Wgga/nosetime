@@ -8,7 +8,7 @@ import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
 import HeaderView from "../../components/headerview";
-
+import { ModalPortal } from "../../components/modals";
 
 function Protocol({ navigation, route }: any): React.JSX.Element {
 
@@ -37,7 +37,7 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 					isShowSearch: false,
 				}}
 				method={{
-					back: () => { navigation.goBack() },
+					back: () => { navigation.goBack()},
 				}} />
 			<WebView
 				originWhitelist={["*"]}

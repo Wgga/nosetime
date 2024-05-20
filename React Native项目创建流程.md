@@ -185,21 +185,7 @@ npm install axios
 yarn add axios
 ```
 
-
-### 9. Pinar
-
-Pinar 是一个轻量级且可自定义的 React Native 轮播组件
-
-```bash
-# using npm
-npm install pinar
-
-# OR using Yarn
-yarn add pinar
-```
-
-
-### 10. React Native Gesture Handler
+### 9. React Native Gesture Handler
 
 Gesture Handler 旨在取代 React Native 的内置触摸系统
 
@@ -212,7 +198,7 @@ yarn add react-native-gesture-handler
 ```
 
 
-### 11. React Native Linear Gradient
+### 10. React Native Linear Gradient
 
 Linear Gradient 是一个为React Native项目提供渐变色的库
 

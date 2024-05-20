@@ -1,9 +1,8 @@
 import React from "react";
-import { useColorScheme, StyleSheet, StatusBar } from "react-native";
+import { StatusBar } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
