@@ -122,7 +122,7 @@ include ':react-native-vector-icons'
 project (':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
 ```
 
-2. 在 `android/app/build.gradle` 文件中，添加 `:react-native-splash-screen` 启动屏幕项目作为编译时依赖项：
+2. 在 `android/app/build.gradle` 文件中，添加 `:react-native-vector-icons` 启动屏幕项目作为编译时依赖项：
 
 ```gradle
 ...
@@ -211,7 +211,7 @@ yarn add react-native-linear-gradient
 ```
 
 
-### 12. React Native Orientation Locker
+### 11. React Native Orientation Locker
 
 一个 react-native 模块，可以监听设备的方向变化，获取当前方向，锁定到首选方向。
 
@@ -288,7 +288,7 @@ public class MainActivity extends ReactActivity {
   }
 ```
 
-### 13. React Native Reanimated
+### 12. React Native Reanimated
 
 React Native Reanimated 是由 Software Mansion 构建的强大动画库。
 
@@ -303,7 +303,7 @@ yarn add react-native-reanimated
 ```
 
 
-### 14. React Native Splash Screen
+### 13. React Native Splash Screen
 
 用于 react-native 的启动屏幕 API，它可以通过编程方式隐藏和显示启动屏幕。适用于 iOS 和 Android。
 
@@ -423,8 +423,12 @@ IOS
 #import "AppDelegate.h"
 
 #import <React/RCTBundleURLProvider.h>
+#import "RNSplashScreen.h"
+
 #import <React/RCTRootView.h>
-#import "RNSplashScreen.h"  // here
+#if RCT_NEW_ARCH_ENABLED
+#import <React/RCTFabricSurfaceHostingProxyRootView.h>
+#endif
 
 @implementation AppDelegate
 
@@ -432,10 +436,43 @@ IOS
 {
     // ...other code
 
-    [RNSplashScreen show];  // here
-    // or
-    //[RNSplashScreen showSplash:@"LaunchScreen" inRootView:rootView];
-    return YES;
+    bool didLaunchFinish = [super application:application didFinishLaunchingWithOptions:launchOptions];
+
+    if (didLaunchFinish) {
+        UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+
+        // Force disable dark mode
+        if (@available(iOS 13.0, *)) {
+        rootViewController.view.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+        }
+
+        // change rootView background
+        rootViewController.view.backgroundColor = [[UIColor alloc] initWithRed:0.0f green:0.0f blue:0.0f alpha:1];
+    }
+
+    [RNSplashScreen show];
+
+    return didLaunchFinish;
+}
+
+- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
+                          moduleName:(NSString *)moduleName
+                           initProps:(NSDictionary *)initProps
+{
+  UIView * view = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
+
+#if RCT_NEW_ARCH_ENABLED
+  RCTFabricSurfaceHostingProxyRootView * rootView = (RCTFabricSurfaceHostingProxyRootView *)view;
+#else
+  RCTRootView * rootView = (RCTRootView *)view;
+#endif
+
+  // workaround:
+  UIStoryboard *sb = [UIStoryboard storyboardWithName:@"LaunchScreen" bundle:nil];
+  UIViewController *vc = [sb instantiateInitialViewController];
+  rootView.loadingView = vc.view;
+
+  return rootView;
 }
 
 @end
@@ -449,7 +486,7 @@ IOS
 - [via LaunchScreen.storyboard Tutorial](https://github.com/crazycodeboy/react-native-splash-screen/blob/master/add-LaunchScreen-tutorial-for-ios.md)
 
 
-### 15. React Native Stars
+### 14. React Native Stars
 
 react-native-stars 是一个多功能的 React Native Star Review 组件，具有半星兼容性和自定义图像、星形大小、星数、星间距和值显示。
 
@@ -462,7 +499,7 @@ yarn add react-native-stars
 ```
 
 
-### 16. React Native Tab View
+### 15. React Native Tab View
 
 React Native Tab View 是 React Native 的跨平台 Tab View 组件。
 
@@ -477,7 +514,7 @@ yarn add react-native-pager-view
 ```
 
 
-### 17. React Native Video
+### 16. React Native Video
 
 React Native Video 是 React Native 的播放视频组件。
 
@@ -523,7 +560,7 @@ useExoplayerHls-启用HLS支持
 这些功能中的每一个都会增加APK的大小，所以只启用您需要的功能。默认情况下，启用的功能包括：`useExoplayerSmoothStreaming`、`useExopplayerDash`、`useExoplayerHls`
 
 
-### 18. React Native WebView
+### 17. React Native WebView
 
 React Native WebView 是 React Native 的社区维护的 WebView 组件。它旨在替代内置的 WebView
 
@@ -536,7 +573,7 @@ yarn add react-native-webview
 ```
 
 
-### 19. TS MD5
+### 18. TS MD5
 
 TypeScript 的 MD5 实现。
 
@@ -549,7 +586,7 @@ yarn add ts-md5
 ```
 
 
-### 20. @react-native-community/slider
+### 19. @react-native-community/slider
 
 @react-native-community/slider 是一个 React Native 进度条滑动组件。
 
@@ -562,7 +599,7 @@ yarn add @react-native-community/slider
 ```
 
 
-### 21. React Native Device Info
+### 20. React Native Device Info
 
 React Native Device Info 是一个用于获取有关设备的信息的 React Native 库
 
@@ -590,7 +627,7 @@ yarn add react-native-device-info
 -keep class com.google.android.gms.common.** {*;}
 ```
 
-### 22. @react-native-community/blur
+### 21. @react-native-community/blur
 
 @react-native-community/blur 是一个 React Native 模糊效果组件。
 
@@ -602,7 +639,7 @@ npm install @react-native-community/blur
 yarn add @react-native-community/blur
 ```
 
-### 23. @shopify/flash-list
+### 22. @shopify/flash-list
 
 @shopify/flash-list 是一个 快速和高性能的 React Native 列表组件。
 
@@ -614,7 +651,7 @@ npm install @shopify/flash-list
 yarn add @shopify/flash-list
 ```
 
-### 24. FastImage
+### 23. FastImage
 
 FastImage 是一个用于 React Native 的快速图像组件。在很大程度上像浏览器一样处理图像缓存。
 
@@ -626,7 +663,7 @@ npm install react-native-fast-image
 yarn add react-native-fast-image
 ```
 
-### 25. react-native-fast-shadow
+### 24. react-native-fast-shadow
 
 react-native-fast-shadow 是一个用于 React Native 的快速高质量Android阴影组件。
 
@@ -638,7 +675,7 @@ npm install react-native-fast-shadow
 yarn add react-native-fast-shadow
 ```
 
-### 26. react-native-image-viewing
+### 25. react-native-image-viewing
 
 react-native-image-viewing 是一个用于 React Native 的图像查看器组件。
 
@@ -650,7 +687,7 @@ npm install react-native-image-viewing
 yarn add react-native-image-viewing
 ```
 
-### 27. react-native-reanimated-carousel
+### 26. react-native-reanimated-carousel
 
 react-native-reanimated-carousel 是一个用于 React Native 的可定制的轮播组件。
 
@@ -662,7 +699,7 @@ npm install react-native-reanimated-carousel
 yarn add react-native-reanimated-carousel
 ```
 
-### 28. react-native-text-size
+### 27. react-native-text-size
 
 react-native-text-size 是一个用于 React Native 在布局之前准确测量文本，并从应用程序（Android和iOS）中获取字体信息组件。
 
