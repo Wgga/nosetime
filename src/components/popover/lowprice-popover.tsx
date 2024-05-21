@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
 
+import LinearGradient from "react-native-linear-gradient";
+
 import { ModalPortal } from "../../components/modals";
 
 import http from "../../utils/api/http";
@@ -11,7 +13,6 @@ import theme from "../../configs/theme";
 
 import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
-import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -25,13 +26,14 @@ function lowPricePopover({ modalparams }: any): React.JSX.Element {
 	// 状态
 
 	React.useEffect(() => {
+		console.log("%c Line:29 🍅 modalparams", "color:#e41a6a", modalparams);
 		setData(modalparams.modaldata);
 	}, []);
 
 	return (
 		<>
 			{data && <View style={styles.lowprice_con}>
-				{(data.isdit && data.isdiy == 1) && <Image style={styles.diypopup}
+				{(data.isdiy && data.isdiy == 1) && <Image style={styles.diypopup}
 					source={{ uri: ENV.image + data.img }}
 					resizeMode="contain"
 				/>}

@@ -165,8 +165,8 @@ function Home({ navigation }: any): React.JSX.Element {
 						cache.saveItem("showLowprice", 0, 6 * 3600);
 						open_popover({
 							modal_width: resp_data.isdiy ? width - 82 : width - 102,
-							modal_key: "lowprice_popover",
-							modal_component: (<LowPricePopover modalparams={{ modalkey: "lowprice_popover", modaldata: resp_data }} />),
+							modal_key: "lowprice_popover" + resp_data.id,
+							modal_component: (<LowPricePopover modalparams={{ modalkey: "lowprice_popover" + resp_data.id, modaldata: resp_data }} />),
 							onShow: () => {
 								http.post(ENV.mall + "?uid=" + us.user.uid, { token: us.user.token, method: "getpopup", did: us.did, page: resp_data.page, code: resp_data.code }).then(() => { });
 							},
@@ -174,7 +174,7 @@ function Home({ navigation }: any): React.JSX.Element {
 								showjifenpopup();
 							},
 							onTouchOutside: () => {
-								ModalPortal.dismiss("lowprice_popover");
+								ModalPortal.dismiss("lowprice_popover" + resp_data.id);
 							},
 							modal_style: { backgroundColor: "transparent" },
 						})
@@ -189,8 +189,8 @@ function Home({ navigation }: any): React.JSX.Element {
 	const showjifenpopup = () => {
 		cache.getItem("showJifen" + us.user.uid).catch(() => {
 			http.get(ENV.popup + "?method=getjifenpopup&uid=" + us.user.uid).then((resp_data: any) => {
-				if (resp_data.msg == 'ERR') return;
-				if (resp_data.msg == 'OK') {
+				if (resp_data.msg == "ERR") return;
+				if (resp_data.msg == "OK") {
 					cache.saveItem("showJifen" + us.user.uid, 0, resp_data.expires);
 					open_popover({
 						modal_width: width - 112,

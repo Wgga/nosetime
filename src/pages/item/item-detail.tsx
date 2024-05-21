@@ -275,7 +275,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		}).then((data: any) => {
 			maxtotal.current = data.lineInfo.start - 4;
 			setIntroContent(itemdata.current.intro.slice(0, maxtotal.current));
-		})
+		}).catch(()=>{});
 	}
 	// 显示全部简介
 	const showPopover = () => {
@@ -704,15 +704,14 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 						{(seltitstr == "intro" && ((itemdata.current.intro && itemdata.current.intro.length > 0) || itemdata.current.poster)) && <Pressable style={styles.intro_con}
 							onPress={showPopover}>
 							{itemdata.current.poster && <Image style={styles.intro_img} source={{ uri: ENV.image + "/post/" + itemdata.current.poster + ".jpg" }} />}
-							{itemdata.current.intro &&
-								<View style={{ flex: 1 }} onLayout={setIntrodata}>
-									<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
-									{itemdata.current.intro.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
-										<Text style={styles.intro_text}>{"..."}</Text>
-										<Text style={styles.intro_morebtn_text}>{"展开"}</Text>
-										<Icon style={{ transform: [{ translateY: 1 }] }} name="btmarrow" size={28} color={"rgba(255,255,255,0.3)"} />
-									</View>}
+							{itemdata.current.intro && <View style={{ flex: 1 }} onLayout={setIntrodata}>
+								<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
+								{itemdata.current.intro.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
+									<Text style={styles.intro_text}>{"..."}</Text>
+									<Text style={styles.intro_morebtn_text}>{"展开"}</Text>
+									<Icon style={{ transform: [{ translateY: 1 }] }} name="btmarrow" size={28} color={"rgba(255,255,255,0.3)"} />
 								</View>}
+							</View>}
 						</Pressable>}
 					</View>}
 					{(innoselist.current && innoselist.current.length > 0) && <View style={styles.marginV20}>

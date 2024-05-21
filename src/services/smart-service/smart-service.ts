@@ -1,5 +1,7 @@
 import { Dimensions, NativeEventEmitter } from "react-native";
 
+import reactNativeTextSize from "react-native-text-size";
+
 import cache from "../../hooks/storage/storage";
 import http from "../../utils/api/http";
 import { ENV } from "../../configs/ENV";
@@ -41,6 +43,26 @@ class SmartService {
 		var url = ENV.smart + "?type=" + type + "&page=" + this.page[type];
 		http.post(url, { uid: uid }).then((resp_data: any) => {
 			if (resp_data == null) resp_data = [];
+			if (resp_data.length > 0) {
+				resp_data.forEach((item: any) => {
+					if (item.type == "brand" && item.desc.length > 0) {
+						reactNativeTextSize.measure({
+							width: Winwidth - 32,
+							fontSize: 14,
+							fontFamily: "monospace",
+							fontWeight: "normal",
+							text: item.desc,
+							lineInfoForLine: 6
+						}).then((data: any) => {
+							item["desc2"] = item.desc.slice(0, data.lineInfo.start - 6);
+							item["isopen"] = false;
+						}).catch((error) => {
+							item["isopen"] = true;
+						});
+					}
+				});
+			}
+
 			if (this.page[type] == 1) {
 				this.smartlist[type] = resp_data;
 				cache.saveItem(this.factoryname + type + uid, this.smartlist[type], 600);

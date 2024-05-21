@@ -2,7 +2,6 @@ import React from "react";
 import { Text, Dimensions, View, StyleSheet, Pressable, ImageBackground } from "react-native";
 
 import Carousel from "react-native-reanimated-carousel";
-import Pagination from 'react-native-reanimated-carousel';
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -58,29 +57,6 @@ function Slider({ navigation, banner, setSliderHeight }: any): React.JSX.Element
 					<View key={item.code} style={[styles.dotstyle, { opacity: index === currentIndex ? 1 : 0.3 }]}></View>
 				))}
 			</View>
-			{/* <Carousel
-				loop
-				index={0}
-				width={width}
-				autoplay={false}
-				showsControls={false}
-				dotsContainerStyle={styles.indicatorContainer}
-				dotStyle={styles.dotstyle}
-				activeDotStyle={[styles.dotstyle, { opacity: 1 }]}
-				removeClippedSubviews={false}>
-				{banner.map((item: any, index: number) => (
-					<Pressable key={item.code} onPress={() => navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.code } })}>
-						<View style={styles.container}>
-							<ImageBackground style={styles.image_box}
-								source={{ uri: ENV.image + item.img, cache: "force-cache" }} resizeMode="cover" />
-							<View style={styles.title_box}>
-								<Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-								<Text style={styles.subtitle} numberOfLines={1}>{item.subtitle}</Text>
-							</View>
-						</View>
-					</Pressable>
-				))}
-			</Carousel> */}
 		</View>
 	);
 }

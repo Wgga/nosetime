@@ -12,6 +12,7 @@ import us from "../../services/user-service/user-service";
 import ListBottomTip from "../../components/listbottomtip";
 import SkewableView from "../../components/SkewableView";
 import RnImage from "../../components/RnImage";
+import { Globalstyles, handlestarLeft } from "../../configs/globalstyles";
 
 import cache from "../../hooks/storage/storage";
 
@@ -56,6 +57,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	]);
 	let favs = React.useRef<any>({}); // 用户喜欢的数据列表
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
+	let flashlistref = React.useRef<any>(null); // 列表组件
 	// 参数
 	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
 	// 状态
@@ -119,13 +121,18 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 		if (favs.current[tab] == undefined) getfavs(tab);
 	}
 
+	const gotodetail = (page: string, item: any) => {
+	}
+
 	const loadMore = () => {
 
 	}
 
 	return (
 		<>
-			{(wikilist.current[current_index.current].items && wikilist.current[current_index.current].items.length > 0) && <FlashList data={wikilist.current[current_index.current].items}
+			{(wikilist.current[current_index.current].items && wikilist.current[current_index.current].items.length > 0) && <FlashList ref={flashlistref.current}
+				data={wikilist.current[current_index.current].items}
+				extraData={isrender}
 				estimatedItemSize={100}
 				onEndReached={loadMore}
 				onEndReachedThreshold={0.1}
@@ -138,13 +145,13 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 							{wikilist.current.map((item: any, index: number) => {
 								let SkewViewW = 0;
 								if (index == 1) {
-									SkewViewW = width * 0.335;
+									SkewViewW = width * 0.35;
 								} else if (index == 2) {
-									SkewViewW = width * 0.30;
+									SkewViewW = width * 0.32;
 								} else if (index == 3) {
-									SkewViewW = width * 0.41;
+									SkewViewW = width * 0.38;
 								} else {
-									SkewViewW = width * 0.275;
+									SkewViewW = width * 0.27;
 								}
 								return (
 									<SkewableView
@@ -152,8 +159,8 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 										skewDirection={"horizontal-right"}
 										style={[
 											styles.header_img,
-											index == 1 && { left: width * 0.218, zIndex: 6 },
-											index == 2 && { left: width * 0.49, zIndex: 8 },
+											index == 1 && { left: width * 0.19, zIndex: 6 },
+											index == 2 && { left: width * 0.47, zIndex: 8 },
 											index == 3 && { left: width * 0.71, zIndex: 2 },
 										]}
 										skewValue={index == 0 ? 0 : 10}
@@ -225,7 +232,80 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.wiki_item_con}>
-
+							{item.type != "discuss" && <Pressable style={{ alignItems: "center" }} onPress={() => { gotodetail("wiki-detail", item) }}>
+								{item.type == "brand" && <Image style={styles.wiki_brand_img}
+									defaultSource={require("../../assets/images/nopic.png")}
+									source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }}
+									resizeMode="contain"
+								/>}
+								{item.type == "odor" && <Image style={styles.wiki_brand_img}
+									defaultSource={require("../../assets/images/nopic.png")}
+									source={{ uri: ENV.image + "/odor/" + (item.id % 100000) + ".jpg" }}
+									resizeMode="contain"
+								/>}
+								{item.type == "perfumer" && <RnImage style={styles.wiki_brand_img}
+									source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
+									resizeMode="contain"
+								/>}
+								{item.type == "fragrance" && <Image style={styles.wiki_brand_img}
+									defaultSource={require("../../assets/images/nopic.png")}
+									source={{ uri: ENV.image + "/fragrance/" + item.id + ".jpg" }}
+									resizeMode="contain"
+								/>}
+							</Pressable>}
+							{(wikilist.current[current_index.current].text == item.type) && <View style={styles.wiki_item_name_con}>
+								<Text style={styles.wiki_item_name}>{item.name}</Text>
+								<Icon name={like_.current[item.id] ? "fav" : "fav-outline"} size={22} color={like_.current[item.id] ? theme.redchecked : theme.tit2} />
+							</View>}
+							{item.type == "brand" && <View style={styles.desc_con}>
+								{item.desc && <Pressable onPress={() => {
+									if (item.desc2) {
+										item.isopen = !item.isopen;
+										setIsRender((val) => !val);
+									}
+								}}>
+									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
+									{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
+									{item.desc2 && <View style={styles.desc_morebtn_con}>
+										{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
+										{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
+										{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+									</View>}
+								</Pressable>}
+							</View>}
+							{item.type == "discuss" && <View style={styles.wiki_discuss_con}>
+								<Pressable style={{ marginLeft: 10 }} onPress={() => { gotodetail("item-detail", item) }} >
+									<Image style={styles.discuss_img}
+										defaultSource={require("../../assets/images/noxx.png")}
+										source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
+										resizeMode="contain"
+									/>
+								</Pressable>
+								<View style={{ flex: 1, marginRight: 10 }}>
+									<Pressable onPress={() => { gotodetail("item-detail", item) }}>
+										<Text numberOfLines={1} style={styles.discuss_name}>{item.cnname}</Text>
+										<Text numberOfLines={2} style={styles.discuss_name}>{item.enname}</Text>
+									</Pressable>
+									<View style={styles.discuss_uname}>
+										<Text style={styles.discuss_uname_text}>{item.uname}</Text>
+										{item.score > 0 && <View style={Globalstyles.star}>
+											<Image style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+												defaultSource={require("../../assets/images/nopic.png")}
+												source={require("../../assets/images/star/star.png")}
+											/>
+										</View>}
+									</View>
+									{(item.odors && item.odors.length > 0) && <View style={styles.discuss_tagodor_con}>
+										{item.odors.map((item2: any, index: number) => {
+											return (
+												<Image key={item2} style={styles.discuss_tagodor_img} defaultSource={require("../../assets/images/nopic.png")}
+													source={{ uri: ENV.image + "/odor/" + item2 + ".jpg" }} />
+											)
+										})}
+									</View>}
+									<Text style={styles.discuss_desc}>{item.desc}</Text>
+								</View>
+							</View>}
 						</View>
 					)
 				}}
@@ -299,7 +379,94 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.toolbarbg,
 	},
 	wiki_item_con: {
-
+		paddingTop: 11,
+		// alignItems: "center",
+	},
+	wiki_brand_img: {
+		width: width * 0.7,
+		height: 75,
+	},
+	wiki_item_name_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		marginTop: 12,
+		marginBottom: 20,
+		paddingHorizontal: 16,
+	},
+	wiki_item_name: {
+		fontSize: 16,
+		color: theme.tit2,
+		marginRight: 11,
+	},
+	desc_con: {
+		paddingHorizontal: 16,
+		paddingVertical: 14,
+		borderBottomWidth: 0.5,
+		borderBottomColor: "rgba(224,224,224,0.5)",
+	},
+	desc_text: {
+		fontSize: 14,
+		lineHeight: 20,
+		color: theme.text1,
+	},
+	desc_morebtn_con: {
+		position: "absolute",
+		right: 0,
+		bottom: 0,
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	desc_morebtn_text: {
+		fontSize: 14,
+		color: theme.text1,
+		marginLeft: 8,
+	},
+	wiki_discuss_con: {
+		flexDirection: "row",
+		paddingVertical: 14,
+		borderBottomWidth: 0.5,
+		borderBottomColor: "rgba(224,224,224,0.5)",
+	},
+	discuss_img_con: {
+	},
+	discuss_img: {
+		width: 50,
+		height: 50,
+		marginRight: 10,
+	},
+	discuss_name: {
+		color: theme.tit2,
+		fontSize: 14,
+	},
+	discuss_uname: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		alignItems: "center",
+		marginVertical: 5,
+	},
+	discuss_uname_text: {
+		color: theme.comment,
+		fontSize: 13,
+		marginRight: 2,
+	},
+	discuss_tagodor_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginTop: 2,
+	},
+	discuss_tagodor_img: {
+		width: 28,
+		height: 28,
+		borderRadius: 4,
+		overflow: "hidden",
+		opacity: 0.8,
+		marginRight: 6,
+	},
+	discuss_desc: {
+		fontSize: 14,
+		marginTop: 14,
+		color: theme.text2,
 	}
 });
 
