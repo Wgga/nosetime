@@ -10,7 +10,6 @@ import theme from "../../configs/theme";
 
 import Icon from "../../assets/iconfont";
 
-import HeaderView from "../../components/headerview";
 import { ModalPortal } from "../../components/modals";
 
 

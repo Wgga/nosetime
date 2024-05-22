@@ -77,6 +77,7 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 	return (
 		<>
 			{(smartlist.current && smartlist.current.length > 0) && <FlashList data={smartlist.current}
+				extraData={isrender}
 				estimatedItemSize={100}
 				onEndReached={loadMore}
 				onEndReachedThreshold={0.1}
@@ -144,7 +145,20 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 										)
 									})}
 								</View>}
-								<Text style={styles.item_desc}>{item.desc}</Text>
+								{item.desc && <Pressable style={{ marginTop: 14 }} onPress={() => {
+									if (item.desc2) {
+										item.isopen = !item.isopen;
+										setIsRender((val) => !val);
+									}
+								}}>
+									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
+									{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
+									{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
+										{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
+										{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
+										{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+									</View>}
+								</Pressable>}
 							</View>
 						</View>
 					)
@@ -261,10 +275,26 @@ const styles = StyleSheet.create({
 		opacity: 0.8,
 		marginRight: 6,
 	},
-	item_desc: {
+	desc_text: {
 		fontSize: 14,
-		marginTop: 14,
-		color: theme.text2,
-	}
+		lineHeight: 20,
+		color: theme.text1,
+	},
+	desc_morebtn_con: {
+		position: "absolute",
+		right: 0,
+		bottom: 0,
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	open_morebtn: {
+		position: "relative",
+		justifyContent: "flex-end",
+	},
+	desc_morebtn_text: {
+		fontSize: 14,
+		color: theme.text1,
+		marginLeft: 8,
+	},
 });
 export default SmartDiscuss;

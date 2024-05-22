@@ -60,12 +60,11 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 	}
 
 	const setmediadata = (items: any) => {
-		setIsRender(false);
 		total.current = parseInt(items.total);
 		if (cur_page.current == 1) {
 			photolist.current = items.medias;
 			if (items.vods.length > 0) {
-				items.vods.forEach((item: any) => {
+				items.vods.map((item: any) => {
 					item.vname = item.vname.replace(id, "").replace(".mp4", "").trim();
 					item["main_name"] = item.vname.split("：")[0];
 					item["sub_name"] = item.vname.split("：")[1];
@@ -77,7 +76,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 		}
 		let maxnum = total.current - vodlist.current.length;
 		noMore.current = !(photolist.current.length < maxnum);
-		setIsRender(true);
+		setIsRender((val) => !val);
 	}
 
 	return (

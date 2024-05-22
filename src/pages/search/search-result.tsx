@@ -75,7 +75,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		const keyTextArr = title.match(reg);
 		const restTextArr = title.split(reg);
 		const mainTextArr: any[] = [];
-		restTextArr.forEach((item, index) => {
+		restTextArr.map((item, index) => {
 			mainTextArr.push(item);
 			if (keyTextArr && keyTextArr[index]) {
 				mainTextArr.push(
@@ -91,7 +91,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 	const setvodData = () => {
 		let vods = searchService.getItems("vod", currentword);
 		const reg = new RegExp(currentword, "g");
-		vods.forEach((vod: any) => {
+		vods.map((vod: any) => {
 			vod["main_title"] = vod.name.split("：")[0]?.indexOf(currentword) >= 0 ? handletitle(vod.name.split("：")[0], reg) : vod.name.split("：")[0];
 			vod["sub_title"] = vod.name.split("：")[1]?.indexOf(currentword) >= 0 ? handletitle(vod.name.split("：")[1], reg) : vod.name.split("：")[1];
 		});
@@ -159,7 +159,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					searchService.fetchbuys(searchdata.malls, type, us.user.uid);
 					emptyimg["mall"] = !searchdata.malls || searchdata.malls.length == 0;
 				} else {
-					setIsRender(true);
+					setIsRender((val) => !val);
 					noMore[type] = !searchService.moreDataCanBeLoaded(type, currentword);
 				}
 			} else if (type == "topicv2") {
@@ -190,7 +190,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 
 	const loadMore = (type: string = "") => {
 		if (type) {
-			setIsRender(false);
+			setIsRender((val) => !val);
 			searchService.fetch(type, currentword);
 			return
 		}

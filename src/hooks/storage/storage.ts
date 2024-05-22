@@ -44,7 +44,11 @@ const cache = {
 		return storage.remove({
 			key,
 		});
-	}
+	},
+
+	clear: () => {
+		return AsyncStorage.clear();
+	},
 }
 
 export default cache;

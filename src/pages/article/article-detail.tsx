@@ -71,7 +71,7 @@ const HeaderWebView = React.memo(({ articleid }: any) => {
 		}
 		setTimeout(getHeight, 1000);
 		var allLinks = document.querySelectorAll("a");
-		allLinks.forEach((link)=>{
+		allLinks.map((link)=>{
 			link.addEventListener("click", (ev)=>{
 				let e = ev.srcElement || ev.target;
 				for (let i = 0; i < 3; ++i) {
@@ -245,8 +245,10 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 			let ids = [id];
 			islike(ids)
-			//统计商城UV，不要删
-			http.post(ENV.mall + "?uid=" + us.user.uid, { token: us.user.token, method: "getarticle", did: us.did, page: "article", code: id }).then(() => { }).catch(() => { });
+			// 统计商城UV，不要删
+			http.post(ENV.mall + "?uid=" + us.user.uid, {
+				token: us.user.token, method: "getarticle", did: us.did, page: "article", code: id
+			}).then(() => { }).catch(() => { });
 
 			// 根据文章内容判断状态栏颜色
 			if (articledata.current.mp4URL) {
@@ -281,14 +283,15 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				events.emit(classname + id + "setArticleData", articledata.current);
 				setTimeout(() => { setLoading(false) }, 1000);
 			}
-			setIsRender(false);
-			setIsRender(true);
+			setIsRender((val) => !val);
 		});
 	};
 
 	//获取用户曾点过的赞
 	const favs = (resp: any) => {
-		if (!us.user.uid) return;
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+		}
 		let favsid: any[] = [];
 		for (let i in resp.items) {
 			favsid.push(resp.items[i].id)
@@ -309,7 +312,9 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	// 获取用户是否收藏当前文章
 	const islike = (ids: any[]) => {
-		if (!us.user.uid) return;
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+		}
 		http.post(ENV.article, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (let i in resp_data) {
 				if (resp_data[i]) likelist.current[resp_data[i]] = true;
@@ -378,7 +383,9 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	// 收藏文章
 	const favarticle = () => {
 		showMenu();
-		if (!us.user.uid) { return }
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+		}
 		http.post(ENV.article + '?uid=' + us.user.uid, {
 			method: 'togglefav', aid: id, token: us.user.token
 		}).then((resp_data: any) => {
@@ -390,7 +397,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				ToastCtrl.show({ message: "已取消收藏", duration: 2000, viewstyle: 'short_toast' });
 			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
 				us.delUser();
-				return;
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			}
 			articledata.current.favcnt = resp_data.favcnt;
 		});

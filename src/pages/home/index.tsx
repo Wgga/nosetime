@@ -5,6 +5,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useFocusEffect } from "@react-navigation/native";
 
 import us from "../../services/user-service/user-service";
 
@@ -73,7 +74,6 @@ function Home({ navigation }: any): React.JSX.Element {
 	};
 
 	React.useEffect(() => {
-		init();
 		events.addListener("HomeHeaderHeight", (data: number) => {
 			if (data - searchHeight.current > 0) {
 				setContentHeight(data - searchHeight.current);
@@ -84,9 +84,9 @@ function Home({ navigation }: any): React.JSX.Element {
 		}
 	}, []);
 
-	// 初始化执行函数
-	const init = () => {
-		setTimeout(() => {
+	// 进入页面时执行函数
+	useFocusEffect(
+		React.useCallback(() => {
 			if (us.user.uid) {
 				//登录用户不显示协议
 				cache.saveItem("showProtocol", true, 3650 * 86400);
@@ -116,8 +116,8 @@ function Home({ navigation }: any): React.JSX.Element {
 				//没有登录的用户显示协议
 				show_protocol()
 			}
-		}, 500)
-	};
+		}, [])
+	);
 
 	// 打开弹窗
 	const open_popover = (params: any) => {
@@ -155,6 +155,7 @@ function Home({ navigation }: any): React.JSX.Element {
 		});
 	}
 
+	// 显示特价弹窗
 	const lowPrice = () => {
 		setTimeout(() => {
 			cache.getItem("showLowprice").then(() => {
@@ -166,9 +167,15 @@ function Home({ navigation }: any): React.JSX.Element {
 						open_popover({
 							modal_width: resp_data.isdiy ? width - 82 : width - 102,
 							modal_key: "lowprice_popover" + resp_data.id,
-							modal_component: (<LowPricePopover modalparams={{ modalkey: "lowprice_popover" + resp_data.id, modaldata: resp_data }} />),
+							modal_component: (<LowPricePopover
+								modalparams={{ modalkey: "lowprice_popover" + resp_data.id, modaldata: resp_data }}
+								navigation={navigation}
+							/>),
 							onShow: () => {
-								http.post(ENV.mall + "?uid=" + us.user.uid, { token: us.user.token, method: "getpopup", did: us.did, page: resp_data.page, code: resp_data.code }).then(() => { });
+								// 统计商城UV，不要删
+								http.post(ENV.mall + "?uid=" + us.user.uid, {
+									token: us.user.token, method: "getpopup", did: us.did, page: resp_data.page, code: resp_data.code
+								}).then(() => { }).catch(() => { });
 							},
 							onDismiss: () => {
 								showjifenpopup();
@@ -186,6 +193,7 @@ function Home({ navigation }: any): React.JSX.Element {
 		}, 300);
 	}
 
+	// 显示积分弹窗
 	const showjifenpopup = () => {
 		cache.getItem("showJifen" + us.user.uid).catch(() => {
 			http.get(ENV.popup + "?method=getjifenpopup&uid=" + us.user.uid).then((resp_data: any) => {
@@ -193,13 +201,16 @@ function Home({ navigation }: any): React.JSX.Element {
 				if (resp_data.msg == "OK") {
 					cache.saveItem("showJifen" + us.user.uid, 0, resp_data.expires);
 					open_popover({
-						modal_width: width - 112,
+						modal_width: width - 102,
 						modal_key: "jifen_popover",
-						modal_component: (<LowPricePopover modalparams={{ modalkey: "jifen_popover", modaldata: resp_data }} />),
+						modal_component: (<LowPricePopover
+							modalparams={{ modalkey: "jifen_popover", modaldata: resp_data }}
+							navigation={navigation}
+						/>),
 						onShow: () => { },
 						onDismiss: () => { },
 						onTouchOutside: () => {
-							ModalPortal.dismiss("lowprice_popover");
+							ModalPortal.dismiss("jifen_popover");
 						},
 						modal_style: { backgroundColor: "transparent" },
 					})

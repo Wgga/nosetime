@@ -118,9 +118,8 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 							createviewstyle();
 							startAnimation();
 						} else {
-							setIsRender(false);
 							titleWidth.current = viewWidth.current;
-							setIsRender(true);
+							setIsRender((val) => !val);
 						}
 					}} style={[
 						styles.title_text,

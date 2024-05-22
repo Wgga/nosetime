@@ -49,11 +49,10 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 
 	// 初始化首页数据
 	React.useEffect(() => {
-		setIsRender(false);
 		http.get(ENV.article + "?method=gethomearticles").then((resp_data: any) => {
 			Object.assign(homedataref.current, resp_data);
 			http.get(ENV.evaluate + "?method=gethomemorevod").then((resp_data2: any) => {
-				resp_data2.items_heji.forEach((item: any) => {
+				resp_data2.items_heji.map((item: any) => {
 					item["maintit"] = item["name"].split("：")[0];
 					item["subtit"] = item["name"].split("：")[1];
 				});
@@ -63,13 +62,13 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				} else {
 					homedataref.current.newvod = resp_data2.items_heji[0];
 				}
-				setIsRender(true);
+				setIsRender((val) => !val);
 				cache.saveItem("newitemid", [resp_data.newitem.id, homedataref.current.newvod.viid], 12 * 3600);
 			}).catch((error: any) => { });
 		}).catch((error: any) => { });
 
 		http.get(ENV.evaluate + "?method=gethotvod").then((resp_data: any) => {
-			resp_data.forEach((item: any) => {
+			resp_data.map((item: any) => {
 				item["maintit"] = item["name"].split("：")[0];
 				item["subtit"] = item["name"].split("：")[1];
 			});

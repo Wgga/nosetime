@@ -213,7 +213,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 						resolve(0);
 					} else {
 						odor_vote.current = resp_data;
-						resp_data.forEach((item: any) => {
+						resp_data.map((item: any) => {
 							odor_name.current[item.uoodor] = parseInt(item.uocnt);
 						})
 						resolve(1);
@@ -246,10 +246,9 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 
 	// 获取其他数据
 	const getotherdata = () => {
-		setIsRender(false);
 		Promise.all([getReplyData(), getSimilarData(), getMediaData(), getInnoseData(), getWantedData(), getOdorVoteData(), getIsBuy()]).then((data) => {
 			if (data.length == 7) {
-				setIsRender(true);
+				setIsRender((val) => !val);
 			}
 		})
 
@@ -275,12 +274,12 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		}).then((data: any) => {
 			maxtotal.current = data.lineInfo.start - 4;
 			setIntroContent(itemdata.current.intro.slice(0, maxtotal.current));
-		}).catch(()=>{});
+		}).catch(() => { });
 	}
 	// 显示全部简介
 	const showPopover = () => {
 		let intro_list = itemdata.current.intro.split("\n");
-		intro_list.forEach((item: string, index: number) => {
+		intro_list.map((item: string, index: number) => {
 			intro_list[index] = (<Text key={index} style={styles.intro_popover_intro}>{item}</Text>)
 		})
 		intro_popover.current = ModalPortal.show((
@@ -329,9 +328,8 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 
 	const vote = (x: any) => {
 		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "单品页" } });
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 		}
-		setIsRender(false);
 		if (!odor_name.current[x.uoodor]) odor_name.current[x.uoodor] = 0;
 		if (odor_name.current[x.uoodor] < 3) {
 			odor_name.current[x.uoodor] = odor_name.current[x.uoodor] + 1;
@@ -341,25 +339,25 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 			x.cnt = parseInt(x.cnt) - 3;
 		}
 		allodorcnt.current = 0;
-		itemdata.current.mainodor.forEach((item: any) => {
+		itemdata.current.mainodor.map((item: any) => {
 			allodorcnt.current += parseInt(item.cnt);
 		});
 		let pct = 0;
-		itemdata.current.mainodor.forEach((item: any) => {
+		itemdata.current.mainodor.map((item: any) => {
 			pct = Math.round(((parseInt(item.cnt) / allodorcnt.current) * 100) * 10) / 10;
 			odorpct.current[item.uoodor] = pct < 1 ? pct.toFixed(1) + "%" : pct.toFixed(0) + "%";
 		});
 		let params: any = [];
-		Object.keys(odor_name.current).forEach((item: any) => {
+		Object.keys(odor_name.current).map((item: any) => {
 			params.push({ uoodor: item, uocnt: odor_name.current[item].toString() });
 		})
 		http.post(ENV.item + "?method=postodor&id=" + itemid + "&uid=" + us.user.uid, { token: us.user.token, voteodor: params }).then((resp_data: any) => {
 			if (resp_data.msg == "OK") {
-				setIsRender(true);
+				setIsRender((val) => !val);
 				ToastCtrl.show({ message: "再次点击，可调整投票数：0～3", duration: 1000, viewstyle: "superior_toast" });
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {//20240229 shibo:处理token失效
 				us.delUser();
-				return;
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 			}
 		})
 	}
@@ -376,7 +374,8 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 				{(itemcolors.current && itemcolors.current.itembgcolor) && <LinearGradient
 					colors={[theme.toolbarbg, itemcolors.current.itembgcolor]}
 					start={{ x: 0, y: 0 }}
-					end={{ x: 0, y: 0.5 }}
+					end={{ x: 0, y: 1 }}
+					locations={[0.03, 0.35]}
 					style={styles.header_con_bg}
 				></LinearGradient>}
 				{itemdata.current && <View style={styles.header_info_con_top}>
@@ -506,9 +505,10 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 							<View style={[styles.notes_info_con, styles.fragrance_info_con, { backgroundColor: itemcolors.current.itemcolor }]}>
 								{(itemdata.current.top && itemdata.current.top.length > 0) && <View style={styles.fragrance_info_item_con}>
 									<LinearGradient
-										colors={["transparent", "rgba(255,255,255,0.4)", "transparent"]}
+										colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.05)"]}
 										start={{ x: 0, y: 0 }}
 										end={{ x: 1, y: 0 }}
+										locations={[0, 0.5, 1]}
 										style={styles.fragrance_item_border}
 									></LinearGradient>
 									<View style={styles.notes_info_item}>
@@ -526,9 +526,10 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 								</View>}
 								{(itemdata.current.middle && itemdata.current.middle.length > 0) && <View style={styles.fragrance_info_item_con}>
 									<LinearGradient
-										colors={["transparent", "rgba(255,255,255,0.4)", "transparent"]}
+										colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.05)"]}
 										start={{ x: 0, y: 0 }}
 										end={{ x: 1, y: 0 }}
+										locations={[0, 0.5, 1]}
 										style={styles.fragrance_item_border}
 									></LinearGradient>
 									<View style={styles.notes_info_item}>
@@ -587,8 +588,9 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 								{(itemcolors.current && itemcolors.current.itemcolor && itemcolors.current.itemcolor04) && <ShadowedView style={[styles.odor_inbar, { width: `${itemdata.current.ptimevote}%` }]}>
 									<LinearGradient
 										colors={[itemcolors.current.itemcolor, itemcolors.current.itemcolor04]}
-										start={{ x: 0.1, y: 0 }}
+										start={{ x: 0, y: 0 }}
 										end={{ x: 1, y: 0 }}
+										locations={[0.2, 1]}
 										style={styles.odor_inbar_bg}
 									>
 									</LinearGradient>
@@ -604,10 +606,11 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 								return (
 									<View key={index} style={[styles.odor_vote_item_con, { width: (57 + 26) * Math.ceil(item.length / 2) - 26 }]}>
 										{index == 0 && <LinearGradient
-											colors={["transparent", "rgba(255,255,255,0.4)", "transparent"]}
+											colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.05)"]}
 											start={{ x: 0, y: 0 }}
-											end={{ x: 0, y: 1 }}
-											style={styles.odor_vote_line}
+											end={{ x: 1, y: 0 }}
+											locations={[0, 0.5, 1]}
+											style={styles.fragrance_item_border}
 										></LinearGradient>}
 										{(item && item.length > 0) && item.map((item2: any, index: number) => {
 											return (
@@ -864,7 +867,6 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 
 	// 页面初始化
 	const init = () => {
-		setIsRender(false);
 		http.get(ENV.item + "?id=" + id).then((resp_data: any) => {
 			initdata();
 			if (!resp_data.title) return;
@@ -891,12 +893,12 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			setitemcolors(resp_data.color);
 
 			if (itemdata.current.mainodor.length > 0) {
-				itemdata.current.mainodor.forEach((item: any) => {
+				itemdata.current.mainodor.map((item: any) => {
 					allodorcnt.current += parseInt(item.cnt);
 					odorpct.current[item.uoodor] = "0%";
 				});
 				let pct = 0;
-				itemdata.current.mainodor.forEach((item: any) => {
+				itemdata.current.mainodor.map((item: any) => {
 					pct = Math.round(((parseInt(item.cnt) / allodorcnt.current) * 100) * 10) / 10;
 					odorpct.current[item.uoodor] = pct < 1 ? pct.toFixed(1) + "%" : pct.toFixed(0) + "%";
 				});
@@ -929,18 +931,18 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	// 获取用户是否订阅当前商品到货
 	const getIsSubscribe = () => {
 		if (!us.user.uid) {
-			setIsRender(true);
+			setIsRender((val) => !val);
 			return;
 		}
 		http.post(ENV.mall + "?uid=" + us.user.uid, { method: "issubscription", ids: [id], token: us.user.token }).then((resp_data: any) => {
 			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
-				return;
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 			}
 			for (var i in resp_data) {
 				issubscription_.current[resp_data[i]] = 1;
 			}
-			setIsRender(true);
+			setIsRender((val) => !val);
 		});
 	}
 

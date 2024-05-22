@@ -44,21 +44,51 @@ class SmartService {
 		http.post(url, { uid: uid }).then((resp_data: any) => {
 			if (resp_data == null) resp_data = [];
 			if (resp_data.length > 0) {
-				resp_data.forEach((item: any) => {
-					if (item.type == "brand" && item.desc.length > 0) {
-						reactNativeTextSize.measure({
-							width: Winwidth - 32,
-							fontSize: 14,
-							fontFamily: "monospace",
-							fontWeight: "normal",
-							text: item.desc,
-							lineInfoForLine: 6
-						}).then((data: any) => {
-							item["desc2"] = item.desc.slice(0, data.lineInfo.start - 6);
-							item["isopen"] = false;
-						}).catch((error) => {
-							item["isopen"] = true;
-						});
+				resp_data.map((item: any) => {
+					item["desc2"] = "";
+					item["isopen"] = true;
+					if (item.desc.length > 0) {
+						if (item.type == "brand") {
+							reactNativeTextSize.measure({
+								width: Winwidth - 32,
+								fontSize: 14,
+								fontFamily: "monospace",
+								fontWeight: "normal",
+								text: item.desc,
+								lineInfoForLine: 6
+							}).then((data: any) => {
+								if (data.lineCount < 6) {
+									item["desc2"] = "";
+									item["isopen"] = true;
+								} else {
+									item["desc2"] = item.desc.slice(0, data.lineInfo.start - 10);
+									item["isopen"] = false;
+								}
+							}).catch((error) => {
+								item["desc2"] = "";
+								item["isopen"] = true;
+							});
+						} else if (item.type == "discuss") {
+							reactNativeTextSize.measure({
+								width: type == "discuss" ? Winwidth - 89 : Winwidth - 80,
+								fontSize: 14,
+								fontFamily: "monospace",
+								fontWeight: "normal",
+								text: item.desc,
+								lineInfoForLine: 9
+							}).then((data: any) => {
+								if (data.lineCount < 9) {
+									item["desc2"] = "";
+									item["isopen"] = true;
+								} else {
+									item["desc2"] = item.desc.slice(0, data.lineInfo.start - 10);
+									item["isopen"] = false;
+								}
+							}).catch((error) => {
+								item["desc2"] = "";
+								item["isopen"] = true;
+							});
+						}
 					}
 				});
 			}

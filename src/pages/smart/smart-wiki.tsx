@@ -57,7 +57,6 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	]);
 	let favs = React.useRef<any>({}); // 用户喜欢的数据列表
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
-	let flashlistref = React.useRef<any>(null); // 列表组件
 	// 参数
 	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
 	// 状态
@@ -70,7 +69,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 			if (current_tab.current != type) return;
 			wikilist.current[current_index.current].items = smartService.getItems(type);
 			wikilist.current[current_index.current].noMore = !smartService.moreDataCanBeLoaded(type);
-			var ids = [];
+			let ids = [];
 			for (var i in wikilist.current[current_index.current].items) {
 				ids.push(wikilist.current[current_index.current].items[i].id);
 			}
@@ -125,13 +124,31 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	}
 
 	const loadMore = () => {
+		smartService.fetch(current_tab.current, us.user.uid, "loadMore");
+	}
 
+	const togglefav = (wid: number) => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
+		}
+		http.post(ENV.wiki + "?uid=" + us.user.uid, {
+			method: "togglefav", wid: wid, token: us.user.token
+		}).then((resp_data: any) => {
+			if (resp_data.msg == 'ADD') {
+				like_.current[wid] = true;
+			} else if (resp_data.msg == 'REMOVE') {
+				like_.current[wid] = false;
+			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
+			}
+			setIsRender((val) => !val);
+		});
 	}
 
 	return (
 		<>
-			{(wikilist.current[current_index.current].items && wikilist.current[current_index.current].items.length > 0) && <FlashList ref={flashlistref.current}
-				data={wikilist.current[current_index.current].items}
+			{(wikilist.current[current_index.current].items && wikilist.current[current_index.current].items.length > 0) && <FlashList data={wikilist.current[current_index.current].items}
 				extraData={isrender}
 				estimatedItemSize={100}
 				onEndReached={loadMore}
@@ -140,7 +157,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 				keyExtractor={(item: any) => item.id}
 				ListHeaderComponent={(
-					<View style={styles.wiki_header_con}>
+					<>
 						<View style={styles.header_img_con}>
 							{wikilist.current.map((item: any, index: number) => {
 								let SkewViewW = 0;
@@ -227,7 +244,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 								<Icon name="r-return" size={15} color={theme.tit2} />
 							</View>
 						</View>}
-					</View>
+					</>
 				)}
 				renderItem={({ item, index }: any) => {
 					return (
@@ -255,7 +272,9 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 							</Pressable>}
 							{(wikilist.current[current_index.current].text == item.type) && <View style={styles.wiki_item_name_con}>
 								<Text style={styles.wiki_item_name}>{item.name}</Text>
-								<Icon name={like_.current[item.id] ? "fav" : "fav-outline"} size={22} color={like_.current[item.id] ? theme.redchecked : theme.tit2} />
+								<Pressable onPress={() => { togglefav(item.id); }}>
+									<Icon name={like_.current[item.id] ? "fav" : "fav-outline"} size={22} color={like_.current[item.id] ? theme.redchecked : theme.tit2} />
+								</Pressable>
 							</View>}
 							{item.type == "brand" && <View style={styles.desc_con}>
 								{item.desc && <Pressable onPress={() => {
@@ -266,7 +285,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 								}}>
 									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
 									{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
-									{item.desc2 && <View style={styles.desc_morebtn_con}>
+									{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
 										{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
 										{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
 										{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
@@ -303,7 +322,20 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 											)
 										})}
 									</View>}
-									<Text style={styles.discuss_desc}>{item.desc}</Text>
+									{item.desc && <Pressable style={{ marginTop: 14 }} onPress={() => {
+										if (item.desc2) {
+											item.isopen = !item.isopen;
+											setIsRender((val) => !val);
+										}
+									}}>
+										{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
+										{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
+										{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
+											{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
+											{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
+											{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+										</View>}
+									</Pressable>}
 								</View>
 							</View>}
 						</View>
@@ -316,9 +348,6 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 })
 
 const styles = StyleSheet.create({
-	wiki_header_con: {
-
-	},
 	header_img_con: {
 		position: "relative",
 		height: 130,
@@ -417,6 +446,10 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 	},
+	open_morebtn: {
+		position: "relative",
+		justifyContent: "flex-end",
+	},
 	desc_morebtn_text: {
 		fontSize: 14,
 		color: theme.text1,
@@ -427,8 +460,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 14,
 		borderBottomWidth: 0.5,
 		borderBottomColor: "rgba(224,224,224,0.5)",
-	},
-	discuss_img_con: {
 	},
 	discuss_img: {
 		width: 50,

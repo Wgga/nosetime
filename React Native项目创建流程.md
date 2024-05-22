@@ -627,16 +627,16 @@ yarn add react-native-device-info
 -keep class com.google.android.gms.common.** {*;}
 ```
 
-### 21. @react-native-community/blur
+### 21. react-native-blurhash
 
-@react-native-community/blur 是一个 React Native 模糊效果组件。
+react-native-blurhash 是一个 React Native 模糊效果组件。
 
 ```bash
 # using npm
-npm install @react-native-community/blur
+npm install react-native-blurhash
 
 # OR using Yarn
-yarn add @react-native-community/blur
+yarn add react-native-blurhash
 ```
 
 ### 22. @shopify/flash-list

@@ -34,7 +34,7 @@ function SmartCatalog({ navigation }: any): React.JSX.Element {
 		}).catch(() => {
 			http.get(ENV.smart + "?method=gettags").then((resp_data: any) => {
 				if (resp_data && resp_data.length > 1) {
-					resp_data.forEach((item: any) => {
+					resp_data.map((item: any) => {
 						if (item.img && item.img.indexOf(".svg") > -1) {
 							item["imgname"] = item.img.split('/').pop().replace(".svg", "");
 						}
