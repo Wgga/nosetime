@@ -17,6 +17,15 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import Waitpay from "../../assets/svg/user/waitpay.svg";
+import Transport from "../../assets/svg/user/transport.svg";
+import Completed from "../../assets/svg/user/completed.svg";
+import Order from "../../assets/svg/user/order.svg";
+import Message from "../../assets/svg/user/message.svg";
+import Wishlist from "../../assets/svg/user/wishlist.svg";
+import Usercart from "../../assets/svg/user/usercart.svg";
+import Giftcode from "../../assets/svg/user/giftcode.svg";
+import Setting from "../../assets/svg/user/setting.svg";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -151,7 +160,7 @@ function User({ navigation }: any): React.JSX.Element {
 							</View>
 						</View>
 					</Brightness>
-					<View style={styles.user_btn_con}>
+					<View style={styles.user_page_btn}>
 						<Pressable onPress={() => { cache.clear() }} style={[styles.btn_item, { marginRight: 7.5 }]}>
 							<Text style={styles.item_main_tit}>{"积分集市"}</Text>
 							<View style={styles.item_sub_tit_con}>
@@ -165,6 +174,29 @@ function User({ navigation }: any): React.JSX.Element {
 								<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
 								<Icon name="r-return" size={12} color={theme.comment} />
 							</View>
+						</View>
+					</View>
+					<View style={styles.user_btns_con}>
+						<View style={styles.btns_item_con}>
+							<View style={styles.btns_item}>
+								<Waitpay width={20} height={20} />
+								<Text style={styles.waitpay_text}>{"待付款"}</Text>
+							</View>
+							<View style={styles.btns_item}>
+								<Transport width={20} height={20} />
+								<Text style={styles.waitpay_text}>{"进行中"}</Text>
+							</View>
+							<View style={styles.btns_item}>
+								<Completed width={20} height={20} />
+								<Text style={styles.waitpay_text}>{"已完成"}</Text>
+							</View>
+							<View style={styles.btns_item}>
+								<Order width={20} height={20} />
+								<Text style={styles.waitpay_text}>{"全部订单"}</Text>
+							</View>
+						</View>
+						<View style={styles.btns_item_con}>
+
 						</View>
 					</View>
 				</View>
@@ -250,7 +282,7 @@ const styles = StyleSheet.create({
 		color: theme.toolbarbg,
 		marginRight: 5,
 	},
-	user_btn_con: {
+	user_page_btn: {
 		marginTop: 18,
 		marginHorizontal: 20,
 		marginBottom: 18,
@@ -278,6 +310,28 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: theme.comment,
 		marginRight: 5,
-	}
+	},
+	user_btns_con: {
+		marginHorizontal: 20,
+	},
+	btns_item_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-around",
+		marginTop: 18,
+		backgroundColor: theme.toolbarbg,
+		borderRadius: 10,
+		overflow: "hidden",
+	},
+	btns_item: {
+		paddingVertical: 18,
+		alignItems: "center",
+	},
+	waitpay: {
+
+	},
+	waitpay_text: {
+		fontSize: 12,
+	},
 });
 export default User;
