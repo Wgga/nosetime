@@ -243,6 +243,7 @@ const Account = React.memo(() => {
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"更改邮箱"}</Text>
 					<View style={styles.item_msg}>
+						<Text style={styles.item_msg_text}>{us.user.mobile}</Text>
 						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 					</View>
 				</Pressable>}
