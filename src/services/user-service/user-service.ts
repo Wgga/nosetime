@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import DeviceInfo from "react-native-device-info";
+import { Blurhash } from "react-native-blurhash";
 
 import cache from "../../hooks/storage/storage";
 import http from "../../utils/api/http";
@@ -267,8 +268,15 @@ class UserService {
 
 	saveUser(user: any) {
 		if (user.uid > 0) {
-			this.user = user;//20180108这样复制有问题
-			cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600 * 1000);
+			Blurhash.encode(ENV.avatar + user.uid + ".jpg?" + user.uface, 4, 3).then((blurhash_data: any) => {
+				user["blurhash"] = blurhash_data;
+				this.user = user;
+				cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600 * 1000);
+			}).catch(()=>{
+				user["blurhash"] = "LOSiT=oI.AozxvayROf6%$ofR4ax";
+				this.user = user;
+				cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600 * 1000);
+			})
 		}
 	}
 

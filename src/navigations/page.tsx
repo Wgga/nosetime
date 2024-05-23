@@ -8,6 +8,7 @@ import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
 import UserDetail from "../pages/user/user-detail";
 import UserJifen from "../pages/user/user-jifen";
+import UserSetting from "../pages/user/user-setting";
 
 import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
@@ -36,6 +37,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="Protocol" component={Protocol} />
 			<Stack.Screen name="UserDetail" component={UserDetail} />
 			<Stack.Screen name="UserJifen" component={UserJifen} />
+			<Stack.Screen name="UserSetting" component={UserSetting} />
 
 			<Stack.Screen name="Search" component={Search} />
 			<Stack.Screen name="SearchResult" component={SearchResult} />

@@ -141,7 +141,7 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 
 		http.post(ENV.user, { method: "registerv2", mobile: mobile, pwd: pwd, name: name, gender: user.gender, from: "app" }).then((resp_data: any) => {
 			if (resp_data.msg == "OK") {
-				ToastCtrl.show({ message: "恭喜！您已注册成功", duration: 2000, viewstyle: "medium_toast" });
+				ToastCtrl.show({ message: "恭喜！您已注册成功", duration: 2000, viewstyle: "medium_toast", key: "register_toast" });
 				login(mobile, user.pwd);
 			} else if (resp_data.msg == "verify") {
 				setstep("verify");
@@ -421,7 +421,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			data = { method: type, step: 1, mobile: mobile };
 		} else if (step.current === "2") {
 			if (!user.code) {
-				ToastCtrl.show({ message: "请输入验证码", duration: 2000, viewstyle: "medium_toast" });
+				ToastCtrl.show({ message: "请输入验证码", duration: 2000, viewstyle: "medium_toast", key: "step2_toast" });
 				return;
 			}
 			if (parseInt(user.code) < 1000 || parseInt(user.code) > 999999) {
@@ -474,9 +474,9 @@ function Login({ route, navigation }: any): React.JSX.Element {
 				//登录后处理，参考LoginCtrl
 				if (step.current == "1") {
 					if (isemail(mobile)) {
-						ToastCtrl.show({ message: "验证码已发送到您的邮箱", duration: 1000, viewstyle: "superior_toast" });
+						ToastCtrl.show({ message: "验证码已发送到您的邮箱", duration: 1000, viewstyle: "superior_toast", key: "email_toast" });
 					} else {
-						ToastCtrl.show({ message: "验证码已发送到您的手机", duration: 1000, viewstyle: "superior_toast" });
+						ToastCtrl.show({ message: "验证码已发送到您的手机", duration: 1000, viewstyle: "superior_toast", key: "photo_toast" });
 					}
 					wait.current = 60;
 					clearInterval(cachehandle.current);
@@ -596,7 +596,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			console.log("resp_data=", resp_data);
 			if (resp_data.msg == "OK") {
 				//登录后处理，需要同步修改RegisterCtrl相关代码
-				ToastCtrl.show({ message: "您已成功登录", duration: 1000, viewstyle: "medium_toast" });
+				ToastCtrl.show({ message: "您已成功登录", duration: 1000, viewstyle: "medium_toast", key: "login_toast" });
 
 				us.saveUser(resp_data);
 				us.setMobile(mobile);
@@ -610,7 +610,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 				http.post(ENV.points + "?uid=" + us.user.uid, { method: "increasetip", token: us.user.token }).then((resp_data: any) => {
 					console.log("resp_data=", resp_data);
 					if (resp_data.msg && resp_data.msg.indexOf("+") > 0) {
-						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast" });
+						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "login_increasetip_toast" });
 					}
 					goBackAfterLogin();
 				});
@@ -736,7 +736,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 		<>
 			<ImageBackground style={{ width: "100%", height: "100%" }} source={require("../../assets/images/bg/login.jpg")}>
 				<Pressable style={[styles.leftback, { marginTop: insets.top }]} onPress={goback}>
-					<Icon name="leftarrow" style={styles.backicon} />
+					<Icon name="leftarrow" size={20} color={theme.toolbarbg} style={styles.backicon} />
 				</Pressable>
 				<View style={styles.centerbox}>
 					<Image style={[styles.logo, { marginTop: insets.top + 44 }]} resizeMode="contain" source={require("../../assets/images/bg/nlogo.png")} />
@@ -800,8 +800,6 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
-		color: theme.toolbarbg,
-		fontSize: 20,
 		fontWeight: "bold",
 	},
 	logo: {

@@ -1,6 +1,7 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
+
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import TabOption from "./TabOption";
 import Home from "../pages/home";
@@ -11,11 +12,10 @@ import User from "../pages/user/user";
 import us from "../services/user-service/user-service";
 
 const Tab = createBottomTabNavigator();
-function Tabs({ navigation }: any): React.JSX.Element {
+function Tabs({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<>
-
 			<Tab.Navigator
 				screenOptions={({ route }: any) => ({
 					...TabOption(route),

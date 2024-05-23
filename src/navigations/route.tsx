@@ -1,19 +1,29 @@
 import React from "react";
-import { StatusBar } from "react-native";
+import { View, Text, BackHandler, StatusBar, StyleSheet, Dimensions } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
+import ToastCtrl from "../components/toastctrl";
+import { ModalPortal } from "../components/modals";
+
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
+import theme from "../configs/theme";
 
+const { width, height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
+
 function Route(): React.JSX.Element {
-	const [isDarkMode, setIsDarkMode] = React.useState(false);
+	const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false);
+	let exit = React.useRef<boolean>(false);
+	let toast = React.useRef<any>(null);
 
 	let navigation = useNavigation() as any;
+
 	useFocusEffect(
 		React.useCallback(() => {
+			// 监听路由变化改变状态栏颜色
 			const urlRegex = ["ItemDetail", "Login", "MallHeji", "MallBrand", "User", "Home", "MallGroup", "Lottery", "MallOrderDetail"];
 			const unsubscribe = navigation.addListener("state", () => {
 				let isMatched = urlRegex.find((item) => { return item == navigation.getCurrentRoute().name });
@@ -25,8 +35,43 @@ function Route(): React.JSX.Element {
 				}
 			});
 
-			return unsubscribe;
-		}, [])
+			// 监听Android物理返回按键
+			const TabsRegex = ["Home", "Smart", "Social", "Mall", "User"];
+			const onBackPress = () => {
+				let isTabs = TabsRegex.find((item) => { return item == navigation.getCurrentRoute().name });
+				if (isTabs != undefined) {
+					if (exit.current) {
+						exit.current = false;
+						BackHandler.exitApp();
+					}
+					if (!toast.current) {
+						toast.current = ToastCtrl.show({
+							message: "再次返回退出香水时代",
+							duration: 2000,
+							viewstyle: "medium_toast",
+							key: "exit_toast",
+							onShow: () => { exit.current = true; },
+							onDismiss: () => {
+								exit.current = false;
+								toast.current = null;
+							},
+							onTouchOutside: () => { },
+							hasOverlay: false,
+							modalStyle: { backgroundColor: "transparent" },
+						});
+					}
+				} else {
+					navigation.goBack();
+				}
+				return true;
+			}
+			const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+			return () => {
+				unsubscribe();
+				backHandler.remove();
+			};
+		}, [isDarkMode])
 	);
 
 	return (

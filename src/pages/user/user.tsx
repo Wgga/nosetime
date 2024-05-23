@@ -6,6 +6,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { Blurhash } from "react-native-blurhash";
 import { useFocusEffect } from "@react-navigation/native";
+import { ShadowedView } from "react-native-fast-shadow";
+
+import ToastCtrl from "../../components/toastctrl";
 
 import http from "../../utils/api/http";
 
@@ -38,8 +41,8 @@ function User({ navigation }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	// 数据
 	let userinfo = React.useRef<any>({}); // 用户信息
-	let blurhash = React.useRef<string>(""); // 模糊图
 	let pointval = React.useRef<number>(0); // 积分
+	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 	// 参数
 	// 状态
 	useFocusEffect(
@@ -64,11 +67,10 @@ function User({ navigation }: any): React.JSX.Element {
 				getmoredata("init");
 			})
 		});
-
 	};
 
 	// 获取头像模糊图
-	const getavatarblur = () => {
+	/* const getavatarblur = () => {
 		return new Promise((resolve, reject) => {
 			cache.getItem(classname + us.user.uid + "avatarblur").then((cacheobj: any) => {
 				if (cacheobj) {
@@ -83,7 +85,7 @@ function User({ navigation }: any): React.JSX.Element {
 				})
 			})
 		})
-	}
+	} */
 
 	// 获取用户积分
 	const getjifenval = () => {
@@ -100,15 +102,33 @@ function User({ navigation }: any): React.JSX.Element {
 	}
 
 	const getmoredata = (type: string) => {
-		Promise.all([getjifenval(), getavatarblur()]).then((data: any) => {
-			console.log("%c Line:96 🍺 data", "color:#33a5ff", data, blurhash.current);
-			if (data.length == 2) {
+		events.addListener("usershowgiftcode", (result) => {
+			showgiftcode.current = result && result.showgiftcode == 1 ? true : false;
+		})
+		cache.getItem("usershowgiftcode").then((cacheobj) => {
+			showgiftcode.current = cacheobj && cacheobj.showgiftcode == 1 ? true : false;
+		}).catch(() => { });
+
+		Promise.all([getjifenval()]).then((data: any) => {
+			if (data.length == 1) {
 				setIsRender((val) => !val);
 			}
 		})
 	}
 
-
+	const gotodetail = (page: string) => {
+		if (!page) {
+			ToastCtrl.show({ message: "该功能暂未开放，敬请期待", duration: 1000, viewstyle: "superior_toast", key: "user_btn_toast" });
+			return;
+		}
+		if (page == "user-setting") {
+			navigation.navigate("Page", { screen: "UserSetting", params: { src: "我的页面" } })
+		} else if (page == "mall-cart") {
+		} else if (page == "mall-order") {
+		} else if (page == "social-xiaoxi") {
+		} else {
+		}
+	}
 
 	return (
 		<ScrollView contentContainerStyle={styles.user_con} showsVerticalScrollIndicator={false}>
@@ -122,7 +142,7 @@ function User({ navigation }: any): React.JSX.Element {
 						style={styles.linear_bg}
 					></LinearGradient>
 					<Blurhash style={styles.header_bg}
-						blurhash={blurhash.current}
+						blurhash={us.user.blurhash}
 						decodeWidth={32}
 						decodeHeight={32}
 						decodePunch={1}
@@ -142,7 +162,7 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 					<Brightness amount={0.85} style={styles.user_page_con}>
 						<Blurhash style={styles.user_page_bg}
-							blurhash={blurhash.current}
+							blurhash={us.user.blurhash}
 							decodeWidth={32}
 							decodeHeight={32}
 							decodePunch={1}
@@ -161,14 +181,14 @@ function User({ navigation }: any): React.JSX.Element {
 						</View>
 					</Brightness>
 					<View style={styles.user_page_btn}>
-						<Pressable onPress={() => { cache.clear() }} style={[styles.btn_item, { marginRight: 7.5 }]}>
+						<Pressable onPress={() => { cache.clear() }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
 							<Text style={styles.item_main_tit}>{"积分集市"}</Text>
 							<View style={styles.item_sub_tit_con}>
 								<Text style={styles.item_sub_tit}>{"我的积分 " + pointval.current}</Text>
 								<Icon name="r-return" size={12} color={theme.comment} />
 							</View>
 						</Pressable>
-						<View style={[styles.btn_item, { marginLeft: 7.5 }]}>
+						<View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
 							<Text style={styles.item_main_tit}>{"香水学院"}</Text>
 							<View style={styles.item_sub_tit_con}>
 								<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
@@ -176,27 +196,48 @@ function User({ navigation }: any): React.JSX.Element {
 							</View>
 						</View>
 					</View>
-					<View style={styles.user_btns_con}>
+					<View>
 						<View style={styles.btns_item_con}>
-							<View style={styles.btns_item}>
-								<Waitpay width={20} height={20} />
-								<Text style={styles.waitpay_text}>{"待付款"}</Text>
-							</View>
-							<View style={styles.btns_item}>
-								<Transport width={20} height={20} />
-								<Text style={styles.waitpay_text}>{"进行中"}</Text>
-							</View>
-							<View style={styles.btns_item}>
-								<Completed width={20} height={20} />
-								<Text style={styles.waitpay_text}>{"已完成"}</Text>
-							</View>
-							<View style={styles.btns_item}>
-								<Order width={20} height={20} />
-								<Text style={styles.waitpay_text}>{"全部订单"}</Text>
-							</View>
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Waitpay width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"待付款"}</Text>
+							</Pressable>
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Transport width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"进行中"}</Text>
+							</Pressable>
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Completed width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"已完成"}</Text>
+							</Pressable>
+							<Pressable onPress={() => { }}>
+								<ShadowedView style={[styles.btn_item, styles.order_btn_item]}>
+									<Order width={24} height={24} style={styles.btn_item_icon} />
+									<Text style={styles.btn_item_text}>{"全部订单"}</Text>
+								</ShadowedView>
+							</Pressable>
 						</View>
 						<View style={styles.btns_item_con}>
-
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Message width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"消息"}</Text>
+							</Pressable>
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Wishlist width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"愿望单"}</Text>
+							</Pressable>
+							<Pressable onPress={() => { }} style={styles.btn_item}>
+								<Usercart width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"购物车"}</Text>
+							</Pressable>
+							{showgiftcode.current && <Pressable onPress={() => { }} style={styles.btn_item}>
+								<Giftcode width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"礼品码兑换"}</Text>
+							</Pressable>}
+							<Pressable onPress={() => { gotodetail("user-setting") }} style={styles.btn_item}>
+								<Setting width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"设置"}</Text>
+							</Pressable>
 						</View>
 					</View>
 				</View>
@@ -206,7 +247,6 @@ function User({ navigation }: any): React.JSX.Element {
 }
 const styles = StyleSheet.create({
 	user_con: {
-		flex: 1,
 		backgroundColor: theme.bg
 	},
 	linear_bg: {
@@ -233,11 +273,11 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: theme.toolbarbg,
 		borderRadius: 30,
-		marginLeft: 25,
 		marginRight: 20,
 	},
 	user_info_con: {
-
+		marginHorizontal: 20,
+		marginBottom: 50,
 	},
 	user_name: {
 		fontSize: 18,
@@ -251,7 +291,6 @@ const styles = StyleSheet.create({
 	},
 	user_page_con: {
 		marginTop: 15,
-		marginHorizontal: 20,
 		borderRadius: 10,
 		overflow: "hidden",
 	},
@@ -284,12 +323,10 @@ const styles = StyleSheet.create({
 	},
 	user_page_btn: {
 		marginTop: 18,
-		marginHorizontal: 20,
-		marginBottom: 18,
 		flexDirection: "row",
 		alignItems: "center",
 	},
-	btn_item: {
+	page_btn_item: {
 		flex: 1,
 		padding: 22.5,
 		backgroundColor: theme.toolbarbg,
@@ -311,27 +348,40 @@ const styles = StyleSheet.create({
 		color: theme.comment,
 		marginRight: 5,
 	},
-	user_btns_con: {
-		marginHorizontal: 20,
-	},
 	btns_item_con: {
 		flexDirection: "row",
+		flexWrap: "wrap",
 		alignItems: "center",
-		justifyContent: "space-around",
+		// justifyContent: "space-around",
 		marginTop: 18,
 		backgroundColor: theme.toolbarbg,
 		borderRadius: 10,
 		overflow: "hidden",
 	},
-	btns_item: {
+	btn_item: {
+		width: (width - 40) / 4,
 		paddingVertical: 18,
 		alignItems: "center",
+		backgroundColor: theme.toolbarbg,
+	},
+	order_btn_item: {
+		shadowColor: "rgba(142,152,230,0.1)",
+		shadowOpacity: 1,
+		shadowRadius: 10,
+		shadowOffset: {
+			width: -2,
+			height: 0,
+		},
+	},
+	btn_item_icon: {
+		marginBottom: 15,
 	},
 	waitpay: {
 
 	},
-	waitpay_text: {
+	btn_item_text: {
 		fontSize: 12,
+		color: theme.tit2,
 	},
 });
 export default User;

@@ -56,7 +56,6 @@ function lowPricePopover({ modalparams, navigation }: any): React.JSX.Element {
 		if (!data.val) {
 			word = (data.newprice && data.newprice.indexOf("分装") > -1) ? 2 : 1
 		}
-		console.log("%c Line:60 🍕 screen", "color:#2eafb0", screen);
 		if (screen) {
 			navigation.navigate("Page", { screen, params: { src: "App特价弹窗", word } });
 			// 统计商城UV，不要删

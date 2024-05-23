@@ -354,7 +354,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		http.post(ENV.item + "?method=postodor&id=" + itemid + "&uid=" + us.user.uid, { token: us.user.token, voteodor: params }).then((resp_data: any) => {
 			if (resp_data.msg == "OK") {
 				setIsRender((val) => !val);
-				ToastCtrl.show({ message: "再次点击，可调整投票数：0～3", duration: 1000, viewstyle: "superior_toast" });
+				ToastCtrl.show({ message: "再次点击，可调整投票数：0～3", duration: 1000, viewstyle: "superior_toast", key: "vote_toast" });
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {//20240229 shibo:处理token失效
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });

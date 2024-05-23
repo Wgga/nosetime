@@ -386,16 +386,16 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 		}
-		http.post(ENV.article + '?uid=' + us.user.uid, {
-			method: 'togglefav', aid: id, token: us.user.token
+		http.post(ENV.article + "?uid=" + us.user.uid, {
+			method: "togglefav", aid: id, token: us.user.token
 		}).then((resp_data: any) => {
-			if (resp_data.msg == 'ADD') {
+			if (resp_data.msg == "ADD") {
 				likelist.current[id] = true;
-				ToastCtrl.show({ message: "收藏成功", duration: 2000, viewstyle: 'short_toast' });
-			} else if (resp_data.msg == 'REMOVE') {
+				ToastCtrl.show({ message: "收藏成功", duration: 2000, viewstyle: "short_toast", key: "fav_add_toast" });
+			} else if (resp_data.msg == "REMOVE") {
 				likelist.current[id] = false;
-				ToastCtrl.show({ message: "已取消收藏", duration: 2000, viewstyle: 'short_toast' });
-			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+				ToastCtrl.show({ message: "已取消收藏", duration: 2000, viewstyle: "short_toast", key: "fav_remove_toast" });
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			}

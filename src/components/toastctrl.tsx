@@ -1,97 +1,65 @@
-import React from "react";
-import {
-	Modal,
-	StyleSheet,
-	Text,
-	View,
-	AppRegistry,
-	Dimensions
-} from "react-native";
 
+import { View, Text, BackHandler, StatusBar, StyleSheet, Dimensions } from "react-native";
+
+import { ModalPortal } from "./modals";
 import theme from "../configs/theme";
 
-/**
- * 自定义toast弹框
- *
- * @param {Boolean} show - 控制toast是否显示
- * @param {Function} close - 关闭toast的方法
- * @param {any} toastdata - 要显示的toast数据
- * @param {Element} children - 类似插槽 自定义组件(待定)
- */
 
-let toastCtrlInstance: ToastCtrl | undefined = undefined;
 const { width, height } = Dimensions.get("window");
-class ToastCtrl extends React.Component {
 
-	constructor(props: any) {
-		super(props);
-		toastCtrlInstance = this;
-	}
 
-	public readonly state: any = {
-		visible: false,
+class Toast {
+	private toast: any = null;
+	private toast_data: any = {
 		message: "这是一个Toast组件",
-		timer: null,
 		duration: 2000,
-		btnbg: theme.text2,
-		viewstyle: "medium_toast"
-	};
-
-	public static show = (props: any) => {
-		toastCtrlInstance!.setState({ ...props, visible: true });
-		if (toastCtrlInstance!.state.timer) {
-			clearTimeout(toastCtrlInstance!.state.timer);
-			toastCtrlInstance!.state.timer = null;
-		}
-		toastCtrlInstance!.state.timer = setTimeout(() => {
-			toastCtrlInstance!.setState({ visible: false });
-		}, toastCtrlInstance!.state.duration);
+		viewstyle: "medium_toast",
+		key: "toast",
+		onShow: () => { },
+		onDismiss: () => { },
+		onTouchOutside: () => { },
+		hasOverlay: false,
+		animationDuration: 300,
+		modalStyle: { backgroundColor: "transparent" },
 	}
 
-	public render() {
-		const { visible, message }: any = this.state;
-		return (
-			visible && (
-				<Modal
-					animationType="fade"
-					visible={true}
-					transparent
-					statusBarTranslucent
-					presentationStyle="overFullScreen"
-				>
-					<View style={styles.containerView}>
-						<View style={[styles.toast_wrapper,styles[this.state.viewstyle]]}>
-							<Text style={styles.toast_text}>{message}</Text>
-						</View>
-					</View>
-				</Modal>
-			)
-		)
+	show(toastdata: any) {
+		if (toastdata) {
+			Object.assign(this.toast_data, toastdata);
+		}
+		this.toast = ModalPortal.show((
+			<View style={styles.containerView}>
+				<View style={[styles.toast_wrapper, styles[this.toast_data.viewstyle]]}>
+					<Text style={styles.toast_text}>{this.toast_data.message}</Text>
+				</View>
+			</View>
+		), {
+			key: this.toast_data.key,
+			width: width,
+			height: height,
+			rounded: false,
+			useNativeDriver: true,
+			onShow: this.toast_data.onShow,
+			onDismiss: () => {
+				this.toast_data.onDismiss();
+				this.toast = null;
+			},
+			onTouchOutside: this.toast_data.onTouchOutside,
+			hasOverlay: this.toast_data.hasOverlay,
+			animationDuration: this.toast_data.animationDuration,
+			modalStyle: this.toast_data.modalStyle,
+		})
+		if (this.toast_data.duration > 0) {
+			setTimeout(() => {
+				ModalPortal.dismiss(this.toast_data.key);
+				this.toast = null;
+			}, this.toast_data.duration);
+		}
+		return this.toast;
 	}
 }
 
-const registerComponentOld = AppRegistry.registerComponent;
-
-AppRegistry.registerComponent = (appKey, component) => {
-	const createRootApp = () => {
-		const OriginAppComponent = component(); // 获取原来的App根组件
-
-		return () => (
-			<View style={styles.container}>
-				<OriginAppComponent />
-				<ToastCtrl />
-			</View>
-		);
-	};
-
-	return registerComponentOld(appKey, createRootApp);
-};
-
 const styles: any = StyleSheet.create({
-	container: {
-		position: "relative",
-		flex: 1,
-	},
 	containerView: {
 		flex: 1,
 		alignItems: "center",
@@ -126,4 +94,5 @@ const styles: any = StyleSheet.create({
 	}
 })
 
+const ToastCtrl = new Toast();
 export default ToastCtrl;

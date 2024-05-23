@@ -53,6 +53,7 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 							activeColor={theme.tit}
 							inactiveColor={theme.text2}
 							indicatorStyle={{ backgroundColor: theme.tit, width: 15, height: 1, bottom: 11, left: "10.5%" }}
+							android_ripple={{ color: "transparent" }}
 							indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
 							labelStyle={{ fontSize: 16, fontWeight: "bold" }}
 							style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}

@@ -97,7 +97,7 @@ function Home({ navigation }: any): React.JSX.Element {
 				//次日登录，连续登录
 				http.post(ENV.points + "?uid=" + us.user.uid, { method: "increasetip", token: us.user.token }).then((resp_data: any) => {
 					if (resp_data.msg && resp_data.msg.indexOf("+") > 0) {
-						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast" });
+						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "home_increasetip_toast" });
 					}
 				});
 
