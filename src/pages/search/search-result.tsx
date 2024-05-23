@@ -18,7 +18,6 @@ import http from "../../utils/api/http";
 
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
-import DefaultAvatar from "../../assets/svg/default_avatar.svg";
 import Sale from "../../assets/svg/sale.svg";
 import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
@@ -37,11 +36,8 @@ const tabs: any = [
 const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 
 	// 数据
-	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 	const [isbuy, setIsBuy] = React.useState<any>({}); // 是否购买过
 	const [canbuy, setCanBuy] = React.useState<any>({}); // 是否可购买
-
-	// 变量
 	let searchdata = React.useRef<any>({
 		items: null,
 		articles: null,
@@ -69,6 +65,10 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		vod: false,
 		collection: false,
 	}).current; // 是否显示空图
+	// 状态
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
+
+	// 变量
 
 	// 高亮搜索关键字
 	const handletitle = (title: string, reg: RegExp) => {

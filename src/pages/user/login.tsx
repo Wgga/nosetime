@@ -93,7 +93,7 @@ const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 
 const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, login }: any) => {
 
-	// 数据
+	// 状态
 	const [agree, setagree] = React.useState(false);
 
 	const register = () => {
@@ -359,6 +359,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 
 	// 参数
 	const { src } = route.params;
+	let cachehandle = React.useRef<any>(null); // 倒计时句柄
 
 	// 数据
 	const [user, setuser] = React.useState<any>({
@@ -370,14 +371,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 		code: "",
 		step: "login",
 	}); // 用户信息
+	// 变量
 	const [waitbtnsz, setwaitbtnsz] = React.useState<string>("获取验证码"); // 验证码按钮文字
 	const [prelogin, setPrelogin] = React.useState<any>(null); // 预登录
 	const [result, setResult] = React.useState<string>(""); // 登录结果
-
-	// 变量
 	let step = React.useRef<string>("login"); // 步骤
 	let wait = React.useRef<number>(0); // 倒计时
-	let cachehandle = React.useRef<any>(null); // 倒计时句柄
 
 	const countdown = () => {
 		if (wait.current > 0) {

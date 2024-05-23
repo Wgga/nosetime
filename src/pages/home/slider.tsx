@@ -13,6 +13,7 @@ function Slider({ navigation, banner, setSliderHeight }: any): React.JSX.Element
 
 	// 控件
 	const ref = React.useRef<any>(null);
+	// 变量
 	const [currentIndex, setCurrentIndex] = React.useState<number>(0);
 
 	const onLayout = (event: any) => {

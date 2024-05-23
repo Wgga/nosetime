@@ -28,13 +28,13 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 
 	// 变量
 	const [index, setIndex] = React.useState(0);
+	// 数据
 	const [routes] = React.useState([
 		{ key: "discuss", title: "新鲜事" },
 		{ key: "vod", title: "视频" },
 		{ key: "wiki", title: "百科" },
 		{ key: "catalog", title: "排行" },
 	]);
-	// 数据
 	// 参数
 	// 状态
 	return (

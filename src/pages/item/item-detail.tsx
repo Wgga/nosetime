@@ -37,13 +37,19 @@ const classname = "ItemDetailPage";
 
 const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 
-	// 数据
+	// 变量
 	const [seltitstr, setSeltitstr] = React.useState<any>("media"); // 选中的标题，值为photo(影像记录)和intro(官方简介)，默认为photo(影像记录)
 	const [seltitstr2, setSeltitstr2] = React.useState<any>("innose"); // 选中的标题2，值为innose(包含它的香单)和inarticle(相关文章)，默认为innose(包含它的香单)
 	const [seltitstr3, setSeltitstr3] = React.useState<any>("similar"); // 选中的标题3，值为similar(味道相似)和like(喜欢它的人也喜欢)，默认为similar(味道相似)
 	const [introcontent, setIntroContent] = React.useState<string>(""); // 简介数据
+	let maxtotal = React.useRef<number>(0); // 简介最大显示字数
+	let type2 = React.useRef<any>(""); // 收藏类型
+	let allodorcnt = React.useRef<number>(0); // 所有气味数量
+
+	// 状态
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
+	// 数据
 	let itemdata = React.useRef<any>({}); // 单品页数据
 	let wikidata = React.useRef<any>({}); // 百科数据
 	let odorpct = React.useRef<any>({}); // 气味百分比
@@ -55,14 +61,10 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 	let vodlist = React.useRef<any[]>([]); // 视频影像数据
 	let innoselist = React.useRef<any[]>([]); // 包含它的香单数据
 	let inforeply = React.useRef<any>({}); // 评论回复数据
-	let maxtotal = React.useRef<number>(0); // 简介最大显示字数
-	let intro_popover = React.useRef<any>(null); // 简介弹窗
 	let wanteditem = React.useRef<any>({}); // 用户收藏数据
-	let type2 = React.useRef<any>(""); // 收藏类型
 	let odor_vote = React.useRef<any>({}); // 用户气味投票数据
 	let odor_name = React.useRef<any>({}); // 投票后气味名称数据
 	let isbuy_ = React.useRef<any>({}); // 是否购买
-	let allodorcnt = React.useRef<number>(0); // 所有气味数量
 
 	React.useEffect(() => {
 		events.addListener(classname + itemid + "itemdatas", (data: any) => {
@@ -81,7 +83,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		return () => {
 			events.removeAllListeners(classname + itemid + "itemdatas");
 			events.removeAllListeners(classname + itemid + "itemcolors");
-			ModalPortal.dismiss(intro_popover.current);
+			ModalPortal.dismiss("intro_popover");
 		}
 	}, []);
 
@@ -282,10 +284,10 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		intro_list.map((item: string, index: number) => {
 			intro_list[index] = (<Text key={index} style={styles.intro_popover_intro}>{item}</Text>)
 		})
-		intro_popover.current = ModalPortal.show((
+		ModalPortal.show((
 			<View style={styles.intro_popover_con}>
 				<Pressable style={styles.intro_popover_close} onPress={() => {
-					ModalPortal.dismiss(intro_popover.current);
+					ModalPortal.dismiss("intro_popover");
 				}}>
 					<Icon name="close" size={25} color={theme.placeholder} />
 				</Pressable>
@@ -307,6 +309,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 				</ScrollView>}
 			</View>
 		), {
+			key: "intro_popover",
 			width,
 			height: height * 0.7,
 			rounded: false,
@@ -317,7 +320,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 				useNativeDriver: true,
 			}),
 			onTouchOutside: () => {
-				ModalPortal.dismiss(intro_popover.current);
+				ModalPortal.dismiss("intro_popover");
 			},
 			swipeDirection: "down",
 			animationDuration: 300,
@@ -838,19 +841,19 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	// 参数
 	const { id, title } = route.params;
 
-	// 数据
+	// 状态
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	// 变量
-	let itemdata = React.useRef<any>({}); // 单品页数据
 	let allodorcnt = React.useRef<number>(0); // 所有气味数量
+	//数据
+	let itemdata = React.useRef<any>({}); // 单品页数据
 	let odorpct = React.useRef<any>({}); // 气味百分比
 	let odorlist = React.useRef<any[]>([]); // 气味列表
 	let wikidata = React.useRef<any>({}); // 百科数据
 	let itemcolors = React.useRef<any>({}); // 单品页主题样式表
 	let issubscription_ = React.useRef<any>({}); // 是否订阅到货
-	let share_popover = React.useRef<any>(null); // 分享弹窗
 
 	React.useEffect(() => {
 		init();
@@ -1000,9 +1003,10 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 					return (
 						<>
 							<Pressable style={styles.menu_icon_con} onPress={() => {
-								share_popover.current = ModalPortal.show((
+								ModalPortal.show((
 									<ShareDetail />
 								), {
+									key: "share_popover",
 									width,
 									height: 200,
 									rounded: false,
@@ -1013,7 +1017,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 										useNativeDriver: true,
 									}),
 									onTouchOutside: () => {
-										ModalPortal.dismiss(share_popover.current);
+										ModalPortal.dismiss("share_popover");
 									},
 									swipeDirection: "down",
 									animationDuration: 300,

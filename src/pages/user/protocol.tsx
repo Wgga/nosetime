@@ -15,7 +15,7 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 	// 参数
 	const { type, title } = route.params;
 
-	// 数据
+	// 变量
 	const [protocol, setProtocol] = React.useState<string>(""); // 协议
 
 	React.useEffect(() => {

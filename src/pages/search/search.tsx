@@ -19,12 +19,12 @@ function Search({ navigation, route }: any): React.JSX.Element {
 	// 控件
 
 	// 数据
-	const [placeholder, setPlaceholder] = React.useState<string>(""); // 搜索框placeholder
 	const [history, setHistory] = React.useState<string[]>([]); // 搜索历史
 	const [hotlist, setHotlist] = React.useState<string[]>([]); // 热搜榜
-	const [word, setWord] = React.useState<string>(""); // 搜索框内容
 
 	// 变量
+	const [placeholder, setPlaceholder] = React.useState<string>(""); // 搜索框placeholder
+	const [word, setWord] = React.useState<string>(""); // 搜索框内容
 	let from = React.useRef<string>(""); // 来源
 	let cid = React.useRef<string>(""); // 分类id
 

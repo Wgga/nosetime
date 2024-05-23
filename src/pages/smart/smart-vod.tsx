@@ -18,7 +18,6 @@ const classname = 'SmartEvaluatePage';
 const SmartVod = React.memo(({ navigation }: any) => {
 	// 控件
 	// 变量
-	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	// 数据
 	let vodlist = React.useRef<any[]>([]); // 单品视频列表
 	let hjvodlist = React.useRef<any[]>([]); // 合集视频列表
@@ -26,6 +25,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 	let smartvodlist = React.useRef<any[]>([]); // 发现页视频列表
 	// 参数
 	// 状态
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 
 	React.useEffect(() => {
 		init();

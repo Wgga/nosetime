@@ -28,10 +28,8 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		require("../../assets/images/discussBg/bac05.png"),
 	];
 
-	// 数据
+	// 状态
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
-
-	// 变量
 	let homedataref = React.useRef<any>({
 		banner: [],
 		newitem: {},
@@ -40,6 +38,8 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		newvod: {},
 		topiclist: []
 	}); // 首页数据
+
+	// 变量
 
 	// 获取顶部内容高度
 	const onLayout = (event: any) => {

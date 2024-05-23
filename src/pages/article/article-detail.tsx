@@ -29,11 +29,15 @@ const classname = "ArticleDetail";
 
 const HeaderWebView = React.memo(({ articleid }: any) => {
 
-	const [webheight, setWebHeight] = React.useState<number>(600);
-	const [articledata, setArticledata] = React.useState<any>({});
-	const [hotarticle, setHotarticle] = React.useState<any[]>([]);
-	const [isfull, setIsfull] = React.useState<boolean>(false);
-	const webview = React.useRef(null);
+	// 控件
+	const webview = React.useRef(null); // webview Ref
+	// 变量
+	const [webheight, setWebHeight] = React.useState<number>(600); // webview高度
+	// 数据
+	const [articledata, setArticledata] = React.useState<any>({}); // 文章数据
+	const [hotarticle, setHotarticle] = React.useState<any[]>([]); // 热门文章
+	// 状态
+	const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏
 
 	React.useEffect(() => {
 		// 监听文章内视频是否全屏显示
@@ -208,27 +212,27 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	// 控件
 
-	// 数据
+	// 状态
 	const [loading, setLoading] = React.useState<boolean>(true); // 是否加载中
 	const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏显示
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
-	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
 	const [isfocus, setIsFocus] = React.useState<boolean>(false); // 是否获取焦点
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
+	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
+	let isShowFooter = React.useRef<boolean>(false); // 是否显示底部
+	let noMore = React.useRef<boolean>(false); // 是否有更多数据
 
 	// 变量
+	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
+	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
+	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
+	let footerZ = React.useRef(new Animated.Value(0)).current; // 底部层级动画
+	// 数据
 	let articledata = React.useRef<any>({}); // 文章数据
 	let replydata = React.useRef<any>({}); // 评论数据
 	let likelist = React.useRef<any>({}); // 是否收藏文章
 	let likefavs = React.useRef<any>({}); // 点赞列表
-	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
-	let isShowFooter = React.useRef<boolean>(false); // 是否显示底部
-	let noMore = React.useRef<boolean>(false); // 是否有更多数据
 	let page = React.useRef<number>(1); // 当前页数
-	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
-	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
-	let footerZ = React.useRef(new Animated.Value(0)).current; // 底部层级动画
-	let share_popover = React.useRef<any>(null); // 分享弹窗
 
 	// 初始化数据
 	React.useEffect(() => {
@@ -429,9 +433,10 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 					return (
 						<>
 							<Pressable style={styles.menu_icon_con} onPress={() => {
-								share_popover.current = ModalPortal.show((
+								ModalPortal.show((
 									<ShareDetail />
 								), {
+									key: "share_popover",
 									width: Winwidth,
 									height: 200,
 									rounded: false,
@@ -442,7 +447,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 										useNativeDriver: true,
 									}),
 									onTouchOutside: () => {
-										ModalPortal.dismiss(share_popover.current);
+										ModalPortal.dismiss("share_popover");
 									},
 									swipeDirection: "down",
 									animationDuration: 300,

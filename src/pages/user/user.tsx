@@ -37,14 +37,15 @@ const classname = "UserPage";
 function User({ navigation }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
+	// 参数
 	// 变量
-	const [isrender, setIsRender] = React.useState(false); // 是否渲染
+	let pointval = React.useRef<number>(0); // 积分
 	// 数据
 	let userinfo = React.useRef<any>({}); // 用户信息
-	let pointval = React.useRef<number>(0); // 积分
-	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
-	// 参数
 	// 状态
+	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
+
 	useFocusEffect(
 		React.useCallback(() => {
 			init();

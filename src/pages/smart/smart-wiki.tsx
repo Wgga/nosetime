@@ -26,10 +26,13 @@ const events = new NativeEventEmitter();
 
 const SmartWiki = React.memo(({ navigation }: any) => {
 	// 控件
+	// 参数
+	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
 	// 变量
-	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	let current_tab = React.useRef<string>("brand"); // 当前tab
 	let current_index = React.useRef<number>(0); // 当前tab的索引
+	// 状态
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	// 数据
 	let wikilist = React.useRef<any[]>([
 		{ tit: "品牌", text: "brand", code: 2, items: [], noMore: false, img: require("../../assets/images/tab1-1.jpg") },
@@ -57,9 +60,8 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	]);
 	let favs = React.useRef<any>({}); // 用户喜欢的数据列表
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
-	// 参数
-	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
-	// 状态
+
+
 
 
 	React.useEffect(() => {

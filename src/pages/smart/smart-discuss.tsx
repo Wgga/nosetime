@@ -24,15 +24,15 @@ const events = new NativeEventEmitter();
 function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 	// 控件
 	// 变量
-	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	const [perfumelist, setPerfumeList] = React.useState<any[]>([]); // 香单广场部分数据
+	let word = React.useRef<any>("discuss"); // 当前新鲜事评论数据
 	// 数据
 	let talenttop = React.useRef<any[]>([]); // 资深评论家部分数据
 	let smartlist = React.useRef<any[]>([]); // 新鲜事评论数据
-	let word = React.useRef<any>("discuss"); // 当前新鲜事评论数据
-	let noMore = React.useRef<any>(false); // 是否还有更多新鲜事评论数据
 	// 参数
 	// 状态
+	let noMore = React.useRef<any>(false); // 是否还有更多新鲜事评论数据
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 
 	React.useEffect(() => {
 		init();

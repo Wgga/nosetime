@@ -17,9 +17,9 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 
 	// 数据
 	const [listdata, setListData] = React.useState<any[]>([]); // 文章列表数据
+	let items = React.useRef<any[]>([]); // 过滤最新视频和最新文章的文章列表数据
 
 	// 变量
-	let items = React.useRef<any[]>([]); // 过滤最新视频和最新文章的文章列表数据
 	let hiddenid = React.useRef<number>(0); // 隐藏文章id
 
 	React.useEffect(() => {

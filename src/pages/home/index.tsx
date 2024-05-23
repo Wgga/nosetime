@@ -34,24 +34,24 @@ function Home({ navigation }: any): React.JSX.Element {
 
 	// 控件
 	const insets = useSafeAreaInsets();
+	let debounceTimer = React.useRef<any>(null); // 防抖定时器
 
-	// 数据
+	// 变量
 	const [sliderHeight, setSliderHeight] = React.useState<number>(0); // 轮播图高度
 	const [contentHeight, setContentHeight] = React.useState<number>(0); // 顶部内容高度
 	const [listH, setListH] = React.useState<number>(2000); // 列表高度
-
-	// 变量
 	let scrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 滚动值
 	let HeaderScrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 顶部滚动动画
 	let searchHeight = React.useRef<number>(0); // 顶部搜索框高度
 	let currentindex = React.useRef<number>(0); // 当前页面索引
+
+	// 数据
 	let pages = React.useRef<any[]>([
 		{ key: "new", title: "最新", pageheight: 2000, },
 		{ key: "subject", title: "专题", pageheight: 2000, },
 		{ key: "smell", title: "寻味", pageheight: 2000, },
 		{ key: "knowledge", title: "知识", pageheight: 2000, },
 	]).current; // 文章列表Tab
-	let debounceTimer = React.useRef<any>(null); // 防抖定时器
 
 	// 动态背景透明度
 	const opacity = scrollY.interpolate({

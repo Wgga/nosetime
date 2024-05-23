@@ -21,17 +21,17 @@ const classname = "PicListPage";
 
 function PicList({ route, navigation }: any): React.JSX.Element {
 	// 控件
-	// 变量
-	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
-	// 数据
-	let cur_page = React.useRef<number>(1); // 当前页码
-	let total = React.useRef<number>(0); // 总页码
-	let photolist = React.useRef<any[]>([]); // 媒体数据
-	let vodlist = React.useRef<any[]>([]); // 视频数据
-	let noMore = React.useRef<boolean>(false); // 是否还有更多
 	// 参数
 	const { id } = route.params;
+	// 变量
+	let cur_page = React.useRef<number>(1); // 当前页码
+	let total = React.useRef<number>(0); // 总页码
+	// 数据
+	let photolist = React.useRef<any[]>([]); // 媒体数据
+	let vodlist = React.useRef<any[]>([]); // 视频数据
 	// 状态
+	let noMore = React.useRef<boolean>(false); // 是否还有更多
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
 		init()

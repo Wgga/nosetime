@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
+import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,6 +7,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { Blurhash } from "react-native-blurhash";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { ShadowedView } from "react-native-fast-shadow";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 
 import http from "../../utils/api/http";
 
@@ -18,14 +19,17 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { GestureHandlerRootView, TextInput } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
 const Person = React.memo(() => {
 
+	// 控件
+	// 变量
 	const [isrender, setisRender] = React.useState(false); // 是否渲染
+
+	// 数据
 	let fullname = React.useRef<string>(""); // 签名香名称
 	let signperfume = React.useRef<any>({}); // 签名香数据
 
@@ -53,79 +57,197 @@ const Person = React.memo(() => {
 		}
 	}, [])
 
+	// 更改头像
+	const changeAvatar = () => {
+		console.log("%c Line:61 🥓", "color:#e41a6a", "changeAvatar");
+	}
+
+	// 更改昵称
+	const changeName = () => {
+		console.log("%c Line:71 🥓", "color:#e41a6a", "changeName");
+	}
+
+	// 更改性别
+	const changeGender = () => {
+		console.log("%c Line:81 🥓", "color:#e41a6a", "changeGender");
+	}
+
+	// 更改地区
+	const changeLocation = () => {
+		console.log("%c Line:91 🥓", "color:#e41a6a", "changeLocation");
+	}
+
+	// 更改签名香
+	const changePerfume = () => {
+		console.log("%c Line:101 🥓", "color:#e41a6a", "changePerfume");
+	}
+
+	// 更改简介
+	const changeIntro = () => {
+		console.log("%c Line:111 🥓", "color:#e41a6a", "changeIntro");
+	}
+
 	return (
-		<ScrollView contentContainerStyle={styles.setting_list_con}
-			showsVerticalScrollIndicator={false}
-			nestedScrollEnabled={true}>
-			<ShadowedView style={styles.list_item_con}>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"头像"}</Text>
-					<View style={styles.item_msg}>
-						<Image style={styles.item_user_avatar}
-							source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
-						/>
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"昵称"}</Text>
-					<View style={styles.item_msg}>
-						{us.user.uname && <Text style={styles.item_msg_text}>{us.user.uname}</Text>}
-						{!us.user.uname && <Text style={styles.item_msg_text}>{"请设置昵称"}</Text>}
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"性别"}</Text>
-					<View style={styles.item_msg}>
-						{us.user.ugender == "m" && <Text style={styles.item_msg_text}>{"男"}</Text>}
-						{us.user.ugender == "f" && <Text style={styles.item_msg_text}>{"女"}</Text>}
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"地区"}</Text>
-					<View style={styles.item_msg}>
-						{us.user.ulocation && <Text style={styles.item_msg_text}>{us.user.ulocation}</Text>}
-						{!us.user.ulocation && <Text style={styles.item_msg_text}>{"无"}</Text>}
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-			</ShadowedView>
-			<ShadowedView style={styles.list_item_con}>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"签名香"}</Text>
-					<View style={styles.item_msg}>
-						{fullname.current && <Text style={styles.item_msg_text}>{"修改"}</Text>}
-						{!fullname.current && <Text style={styles.item_msg_text}>{"无"}</Text>}
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				<Text style={styles.fullname_con}>{fullname.current}</Text>
-			</ShadowedView>
-			<ShadowedView style={styles.list_item_con}>
-				<View style={styles.list_item}>
-					<Text style={styles.item_title}>{"简介"}</Text>
-					<View style={styles.item_msg}>
-						{!us.user.udesc && <Text style={styles.item_msg_text}>{"未填写"}</Text>}
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				{us.user.udesc && <GestureHandlerRootView>
-					<TextInput style={[styles.fullname_con]}
-						editable={false}
-						multiline={true}
-						value={us.user.udesc}
-					/>
-				</GestureHandlerRootView>}
-			</ShadowedView>
-		</ScrollView >
+		<GestureHandlerRootView>
+			<ScrollView contentContainerStyle={styles.setting_list_con}
+				showsVerticalScrollIndicator={false}>
+				<ShadowedView style={styles.list_item_con}>
+					<Pressable onPress={changeAvatar} style={styles.list_item}>
+						<Text style={styles.item_title}>{"头像"}</Text>
+						<View style={styles.item_msg}>
+							<Image style={styles.item_user_avatar}
+								source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
+							/>
+							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+						</View>
+					</Pressable>
+					<Pressable onPress={changeName} style={styles.list_item}>
+						<Text style={styles.item_title}>{"昵称"}</Text>
+						<View style={styles.item_msg}>
+							{us.user.uname && <Text style={styles.item_msg_text}>{us.user.uname}</Text>}
+							{!us.user.uname && <Text style={styles.item_msg_text}>{"请设置昵称"}</Text>}
+							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+						</View>
+					</Pressable>
+					<Pressable onPress={changeGender} style={styles.list_item}>
+						<Text style={styles.item_title}>{"性别"}</Text>
+						<View style={styles.item_msg}>
+							{us.user.ugender == "m" && <Text style={styles.item_msg_text}>{"男"}</Text>}
+							{us.user.ugender == "f" && <Text style={styles.item_msg_text}>{"女"}</Text>}
+							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+						</View>
+					</Pressable>
+					<Pressable onPress={changeLocation} style={styles.list_item}>
+						<Text style={styles.item_title}>{"地区"}</Text>
+						<View style={styles.item_msg}>
+							{us.user.ulocation && <Text style={styles.item_msg_text}>{us.user.ulocation}</Text>}
+							{!us.user.ulocation && <Text style={styles.item_msg_text}>{"无"}</Text>}
+							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+						</View>
+					</Pressable>
+				</ShadowedView>
+				<ShadowedView style={styles.list_item_con}>
+					<Pressable onPress={changePerfume}>
+						<View style={styles.list_item}>
+							<Text style={styles.item_title}>{"签名香"}</Text>
+							<View style={styles.item_msg}>
+								{fullname.current && <Text style={styles.item_msg_text}>{"修改"}</Text>}
+								{!fullname.current && <Text style={styles.item_msg_text}>{"无"}</Text>}
+								<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+							</View>
+						</View>
+						<View style={styles.item_info_text_con}>
+							<Text style={styles.item_info_text}>{fullname.current}</Text>
+						</View>
+					</Pressable>
+				</ShadowedView>
+				<ShadowedView style={styles.list_item_con}>
+					<Pressable onPress={changeIntro}>
+						<View style={styles.list_item}>
+							<Text style={styles.item_title}>{"简介"}</Text>
+							<View style={styles.item_msg}>
+								{!us.user.udesc && <Text style={styles.item_msg_text}>{"未填写"}</Text>}
+								<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+							</View>
+						</View>
+						{us.user.udesc && <ScrollView showsVerticalScrollIndicator={false}
+							style={styles.item_info_text_con}>
+							<Text style={styles.item_info_text}>{us.user.udesc}</Text>
+						</ScrollView>}
+					</Pressable>
+				</ShadowedView>
+			</ScrollView>
+		</GestureHandlerRootView>
 	)
 })
 
 const Account = React.memo(() => {
+
+	// 数据
+	// 状态
+	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
+
+	// 跳转页面
+	const gotodetail = (page: string, item: any = null) => {
+		console.log("%c Line:171 🍐", "color:#e41a6a");
+	}
+
+	// 兑换礼品
+	const exchange = () => {
+		console.log("%c Line:175 🥟", "color:#b03734", "exchange");
+	}
+
 	return (
-		<View></View>
+		<RNScrollView contentContainerStyle={styles.setting_list_con}
+			showsVerticalScrollIndicator={false}>
+			<ShadowedView style={styles.list_item_con}>
+				<Pressable onPress={() => {
+					gotodetail("mall-address");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"管理收货地址"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+				<Pressable onPress={() => {
+					gotodetail("mall-idcard-edit");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"跨境购物实名认证"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+				<Pressable onPress={() => {
+					gotodetail("mall-coupon");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"优惠券"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+				{showgiftcode && <Pressable onPress={exchange} style={styles.list_item}>
+					<Text style={styles.item_title}>{"礼品码兑换"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>}
+			</ShadowedView>
+			<ShadowedView style={styles.list_item_con}>
+				{us.user.showmodifypass && <Pressable onPress={() => {
+					gotodetail("user-change-pass", "modify");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"修改密码"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>}
+				{us.user.showsetmobile && <Pressable onPress={() => {
+					gotodetail("user-change-account", "set");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"绑定手机"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>}
+				{us.user.showmodifymobile && <Pressable onPress={() => {
+					gotodetail("user-change-account", "set");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"更改手机"}</Text>
+					<View style={styles.item_msg}>
+						<Text style={styles.item_msg_text}>{us.user.mobile}</Text>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>}
+				{us.user.showmodifyemail && <Pressable onPress={() => {
+					gotodetail("user-change-account", "modify");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"更改邮箱"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>}
+			</ShadowedView>
+		</RNScrollView>
 	)
 })
 
@@ -295,7 +417,7 @@ const styles = StyleSheet.create({
 	setting_list_con: {
 		paddingTop: 5,
 		paddingHorizontal: 20,
-		paddingBottom: 50,
+		paddingBottom: 100,
 	},
 	list_item_con: {
 		paddingVertical: 5,
@@ -342,12 +464,14 @@ const styles = StyleSheet.create({
 		height: 32,
 		borderRadius: 50,
 	},
-	fullname_con: {
-		marginHorizontal: 20,
+	item_info_text_con: {
 		maxHeight: 80,
+		marginBottom: 10,
+	},
+	item_info_text: {
+		marginHorizontal: 20,
 		color: theme.comment,
 		fontSize: 12,
-		marginBottom: 10,
 	},
 });
 export default UserSetting;
