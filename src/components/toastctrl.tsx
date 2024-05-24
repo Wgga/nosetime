@@ -1,13 +1,14 @@
 
-import { View, Text, BackHandler, StatusBar, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 import { ModalPortal } from "./modals";
-import theme from "../configs/theme";
 
+import theme from "../configs/theme";
 
 const { width, height } = Dimensions.get("window");
 
 
+// 自定义Toast组件
 class Toast {
 	private toast: any = null;
 	private toast_data: any = {

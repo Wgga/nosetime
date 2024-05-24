@@ -1,117 +1,86 @@
 import React from "react";
-import {
-	Modal,
-	StyleSheet,
-	Text,
-	TouchableHighlight,
-	View,
-	AppRegistry,
-	Pressable
-} from "react-native";
+import { Modal, StyleSheet, Text, TouchableHighlight, View, AppRegistry, Pressable, Dimensions } from "react-native";
+
+import { ModalPortal } from "./modals";
 
 import theme from "../configs/theme";
 
-/**
- * 自定义Alert弹框
- *
- * @param {Boolean} show - 控制Alert是否显示
- * @param {Function} close - 关闭Alert的方法
- * @param {any} alertdata - 要显示的弹窗数据
- * @param {Element} children - 类似插槽 自定义组件(待定)
- */
+const { width, height } = Dimensions.get("window");
 
-let alertCtrlInstance: AlertCtrl | undefined = undefined;
-
-class AlertCtrl extends React.Component {
-
-	constructor(props: any) {
-		super(props);
-		alertCtrlInstance = this;
-	}
-
-	public readonly state: any = {
-		visible: false,
+// 自定义Alert弹框
+class Alert {
+	private alert_data: any = {
 		header: "这是一个Alert组件",
+		key: "alert",
 		message: "这是Alert组件的一串描述",
 		buttons: [],
-		btnbg: theme.text2
-	};
-
-	public static show = (props: any) => {
-		alertCtrlInstance!.setState({ ...props, visible: true });
+		btnbg: theme.text2,
+		onShow: () => { },
+		onDismiss: () => { },
+		onTouchOutside: () => { },
+		animationDuration: 300,
+		modalStyle: { backgroundColor: "transparent" },
 	}
 
-	public static close = () => {
-		alertCtrlInstance!.setState({ visible: false });
-	}
-
-	public render() {
-		const { visible, header, message, buttons }: any = this.state;
-		return (
-			visible && (
-				<Modal
-					animationType="fade"
-					visible={true}
-					transparent
-					statusBarTranslucent
-					presentationStyle="overFullScreen"
-					onRequestClose={() => {
-						AlertCtrl.close();
-					}}
-				>
-					<Pressable style={{ flex: 1 }} onPress={(e) => { AlertCtrl.close(); }}>
-						<View style={styles.containerView}>
-							<Pressable onPress={(e) => { e.stopPropagation() }}>
-								<View style={styles.alert_wrapper}>
-									<View>
-										{header && <Text style={[styles.alert_head, message ? styles.alert_showmsg_head : styles.alert_hidemsg_head]}>{header}</Text>}
-										{message && <Text style={styles.alert_message}>{message}</Text>}
-									</View>
-									<View style={styles.alert_button_group}>
-										{
-											buttons && buttons.map((item: any, index: number) => {
-												return (
-													<TouchableHighlight key={index} style={styles.alert_button}
-														onPress={() => {
-															this.setState({ ...this.state, btnbg: theme.text2 });
-															item.handler();
-														}}
-														onShowUnderlay={() => {
-															this.setState({ ...this.state, btnbg: theme.tit });
-														}}
-														underlayColor="rgba(0,0,0,.1)">
-														<Text style={[{ color: this.state.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
-													</TouchableHighlight>
-												)
-											})
-										}
-									</View>
-								</View>
-							</Pressable>
+	show(alertdata: any) {
+		if (alertdata) {
+			Object.assign(this.alert_data, alertdata);
+		}
+		ModalPortal.show((
+			<View style={styles.containerView}>
+				<Pressable onPress={(e) => { e.stopPropagation() }}>
+					<View style={styles.alert_wrapper}>
+						<View>
+							{this.alert_data.header && <Text style={[styles.alert_head, this.alert_data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head]}>{this.alert_data.header}</Text>}
+							{this.alert_data.message && <Text style={styles.alert_message}>{this.alert_data.message}</Text>}
 						</View>
-					</Pressable>
-				</Modal>
-			)
-		)
+						<View style={styles.alert_button_group}>
+							{
+								this.alert_data.buttons && this.alert_data.buttons.map((item: any, index: number) => {
+									return (
+										<TouchableHighlight key={index} style={[styles.alert_button, index == 1 && {
+											borderLeftWidth: 1,
+											borderLeftColor: theme.bg,
+										}]}
+											onPress={() => {
+												this.alert_data.btnbg = theme.text2;
+												item.handler();
+											}}
+											onShowUnderlay={() => {
+												this.alert_data.btnbg = theme.tit;
+											}}
+											underlayColor="rgba(0,0,0,.1)">
+											<Text style={[{ color: this.alert_data.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
+										</TouchableHighlight>
+									)
+								})
+							}
+						</View>
+					</View>
+				</Pressable>
+			</View>
+		), {
+			key: this.alert_data.key,
+			width: width,
+			height: height,
+			rounded: false,
+			useNativeDriver: true,
+			onShow: this.alert_data.onShow,
+			onDismiss: () => {
+				this.alert_data.onDismiss();
+			},
+			onTouchOutside: this.alert_data.onTouchOutside,
+			animationDuration: this.alert_data.animationDuration,
+			modalStyle: this.alert_data.modalStyle,
+		})
+	}
+
+	close(key: string) {
+		if (key) {
+			ModalPortal.dismiss(key);
+		}
 	}
 }
-
-const registerComponentOld = AppRegistry.registerComponent;
-
-AppRegistry.registerComponent = (appKey, component) => {
-	const createRootApp = () => {
-		const OriginAppComponent = component(); // 获取原来的App根组件
-
-		return () => (
-			<View style={styles.container}>
-				<OriginAppComponent />
-				<AlertCtrl />
-			</View>
-		);
-	};
-
-	return registerComponentOld(appKey, createRootApp);
-};
 
 const styles = StyleSheet.create({
 	container: {
@@ -159,10 +128,10 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		borderTopWidth: 1,
-		borderTopColor: "#F5F5F5"
+		borderTopColor: theme.bg
 	},
 	alert_button: {
-		width: "100%",
+		flex: 1,
 		height: 44,
 	},
 	alert_button_inner: {
@@ -174,4 +143,5 @@ const styles = StyleSheet.create({
 	},
 })
 
+const AlertCtrl = new Alert();
 export default AlertCtrl;

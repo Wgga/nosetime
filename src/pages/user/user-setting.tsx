@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
+import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, Platform, Linking } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,6 +8,10 @@ import { Blurhash } from "react-native-blurhash";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { ShadowedView } from "react-native-fast-shadow";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import AlertCtrl from "../../components/alertctrl";
+import ToastCtrl from "../../components/toastctrl";
 
 import http from "../../utils/api/http";
 
@@ -22,8 +26,9 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
+const AppVersion = ENV.AppMainVersion + '.' + ENV.AppMiniVersion + '.' + ENV.AppBuildVersion;
 
-const Person = React.memo(() => {
+const Person = React.memo(({ navigation }: any) => {
 
 	// 控件
 	// 变量
@@ -150,8 +155,7 @@ const Person = React.memo(() => {
 								<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 							</View>
 						</View>
-						{us.user.udesc && <ScrollView showsVerticalScrollIndicator={false}
-							style={styles.item_info_text_con}>
+						{us.user.udesc && <ScrollView style={styles.item_info_text_con}>
 							<Text style={styles.item_info_text}>{us.user.udesc}</Text>
 						</ScrollView>}
 					</Pressable>
@@ -161,11 +165,10 @@ const Person = React.memo(() => {
 	)
 })
 
-const Account = React.memo(() => {
+const Account = React.memo(({ navigation, showgiftcode }: any) => {
 
 	// 数据
 	// 状态
-	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 
 	// 跳转页面
 	const gotodetail = (page: string, item: any = null) => {
@@ -175,6 +178,13 @@ const Account = React.memo(() => {
 	// 兑换礼品
 	const exchange = () => {
 		console.log("%c Line:175 🥟", "color:#b03734", "exchange");
+	}
+
+	const logout = () => {
+		http.post(ENV.user, { method: "logout", id: us.user.uid, token: us.user.token }).then(() => { }).catch(() => { });
+		us.delUser();
+		events.emit("nosetime_userlogout");
+		navigation.navigate("Tabs", { screen: "Home" });
 	}
 
 	return (
@@ -248,13 +258,184 @@ const Account = React.memo(() => {
 					</View>
 				</Pressable>}
 			</ShadowedView>
+			<Pressable onPress={logout} style={styles.logout_btn}>
+				<LinearGradient
+					colors={["#81B4EC", "#9BA6F5"]}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 0 }}
+					locations={[0, 1]}
+					style={[styles.logout_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
+				></LinearGradient>
+				<LinearGradient
+					colors={["#61A2E9", "#95A0EB"]}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 0 }}
+					locations={[0, 1]}
+					style={styles.logout_btn_bg}
+				></LinearGradient>
+				<Text style={styles.logout_btn_text}>{"退出登录"}</Text>
+			</Pressable>
+			<View style={styles.about_list_con}>
+				<View style={styles.protocol_con}>
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "Protocol", params: { title: "香水时代使用协议", type: "protocol" } })
+					}}>
+						<Text style={styles.protocol_text}>{"使用协议"}</Text>
+					</Pressable>
+					<Text style={styles.protocol_text_line}>{"|"}</Text>
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "Protocol", params: { title: "香水时代隐私政策", type: "privacy" } })
+					}}>
+						<Text style={styles.protocol_text}>{"隐私政策"}</Text>
+					</Pressable>
+				</View>
+			</View>
 		</RNScrollView>
 	)
 })
 
-const System = React.memo(() => {
+const System = React.memo(({ navigation, copyrightyear }: any) => {
+	// 变量
+	const [cacheSize, setCacheSize] = React.useState("0.00MB");
+	let filterkeys = React.useRef<any>([]);
+
+	// 跳转页面
+	const gotodetail = (page: string, item: any = null) => {
+		switch (page) {
+			case "user-unregister":
+				navigation.navigate("Page", { screen: "UserUnregister" })
+				break;
+			case "user-feedback":
+				navigation.navigate("Page", { screen: "UserFeedback", params: { title: "用户反馈" } })
+				break;
+			case "protocol":
+				navigation.navigate("Page", { screen: "Protocol", params: { title: "香水时代使用协议", type: "protocol" } })
+				break;
+			case "privacy":
+				navigation.navigate("Page", { screen: "Protocol", params: { title: "香水时代使用协议", type: "privacy" } })
+				break;
+			default:
+				break;
+		}
+	}
+
+	React.useEffect(() => {
+		getCacheSize().then((size: string) => {
+			setCacheSize(size);
+		})
+	}, [])
+
+	// 获取缓存大小
+	const getCacheSize = async () => {
+		try {
+			const keys = await AsyncStorage.getAllKeys();
+			filterkeys.current = keys.filter((key: string) => key.indexOf("UserService") === -1);
+			const cacheData = await AsyncStorage.multiGet(keys);
+			let cacheSize = 0;
+
+			cacheData.forEach(([key, value]: any) => {
+				cacheSize += key.length;
+				cacheSize += value.length;
+			});
+
+			return (cacheSize / 1024 / 1024).toFixed(2) + "MB";
+		} catch (error) {
+			return "0.00MB";
+		}
+	}
+
+	// 清除缓存
+	const clearCache = () => {
+		AlertCtrl.show({
+			header: "你确定要清除缓存吗？",
+			key: "clear_cache_alert",
+			message: "",
+			buttons: [{
+				text: '取消',
+				handler: () => {
+					AlertCtrl.close("clear_cache_alert");
+				}
+			}, {
+				text: "确定",
+				handler: () => {
+					AlertCtrl.close("clear_cache_alert");
+					cache.clear(filterkeys.current);
+					setCacheSize("0.00MB");
+					http.post(ENV.update, { uid: us.user.uid, did: us.did, ver: AppVersion }).then((resp_data: any) => {
+						cache.saveItem('userupdate', resp_data, 24 * 3600);
+					})
+					ToastCtrl.show({ message: "清除成功", duration: 2000, viewstyle: "short_toast", key: "clear_cache_toast" });
+				}
+			}]
+		})
+	}
+
+	// 更新版本
+	const checkUpdate = () => {
+		if (!(Platform.OS == "android")) return;
+		http.get(ENV.update + "?brand=" + us.deviceinfo.brand).then((resp_data: any) => {
+			if (parseInt(resp_data.nversion) > parseFloat(ENV.AppNVersion)) {
+				Linking.openURL(resp_data.scheme);
+			} else {
+				ToastCtrl.show({ message: "当前版本已是最新版本", duration: 2000, viewstyle: "medium_toast", key: "new_version_toast" });
+			}
+		})
+	}
+
 	return (
-		<View></View>
+		<RNScrollView contentContainerStyle={styles.setting_list_con}
+			showsVerticalScrollIndicator={false}>
+			<ShadowedView style={styles.list_item_con}>
+				<Pressable onPress={() => {
+					gotodetail("user-feedback");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"意见反馈"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+				<Pressable onPress={() => {
+					gotodetail("user-unregister");
+				}} style={styles.list_item}>
+					<Text style={styles.item_title}>{"注销账户"}</Text>
+					<View style={styles.item_msg}>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+				<Pressable onPress={clearCache} style={styles.list_item}>
+					<Text style={styles.item_title}>{"清除缓存"}</Text>
+					<View style={styles.item_msg}>
+						<Text style={styles.item_msg_text}>{cacheSize}</Text>
+					</View>
+				</Pressable>
+				<Pressable onPress={checkUpdate} style={styles.list_item}>
+					<Text style={styles.item_title}>{"版本更新"}</Text>
+					<View style={styles.item_msg}>
+						<Text style={styles.item_msg_text}>{"V" + AppVersion}</Text>
+						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
+					</View>
+				</Pressable>
+			</ShadowedView>
+			<View style={styles.about_list_con}>
+				<View style={styles.protocol_con}>
+					<Pressable onPress={() => {
+						gotodetail("protocol");
+					}}>
+						<Text style={styles.protocol_text}>{"使用协议"}</Text>
+					</Pressable>
+					<Text style={styles.protocol_text_line}>{"|"}</Text>
+					<Pressable onPress={() => {
+						gotodetail("privacy");
+					}}>
+						<Text style={styles.protocol_text}>{"隐私政策"}</Text>
+					</Pressable>
+				</View>
+				<Text style={styles.about_text}>{"Copyright © 2014-" + copyrightyear}</Text>
+				<Text style={styles.about_text}>{" 郑州美芬计算机科技有限公司 "}</Text>
+				<Text style={styles.about_text}>{"NoseTime.com 版权所有"}</Text>
+				<Text style={styles.about_text}>{"豫ICP备14010206号-3A"}</Text>
+			</View>
+		</RNScrollView>
 	)
 })
 
@@ -263,7 +444,10 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 	// 变量
 	const [index, setIndex] = React.useState(0);
+	let copyrightyear = React.useRef<string>("");
 	// 数据
+	// 状态
+	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 	const [routes] = React.useState([
 		{ key: "person", title: "个人" },
 		{ key: "account", title: "账户" },
@@ -276,6 +460,32 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 		require("../../assets/images/setting/system.png"),
 	];
 	// 状态
+
+	React.useEffect(() => {
+		events.addListener("userupdatedata", (result: any) => {
+			if (result) {
+				showgiftcode.current = result.showgiftcode == 1 ? true : false;
+				copyrightyear.current = result.copyrightyear;
+			} else {
+				showgiftcode.current = false;
+				copyrightyear.current = new Date().getFullYear().toString();
+			}
+		})
+
+		cache.getItem("userupdatedata").then((cacheobj) => {
+			if (cacheobj) {
+				showgiftcode.current = cacheobj.showgiftcode == 1 ? true : false;
+				copyrightyear.current = cacheobj.copyrightyear;
+			} else {
+				showgiftcode.current = false;
+				copyrightyear.current = new Date().getFullYear().toString();
+			}
+		}).catch(() => { });
+
+		return () => {
+			events.removeAllListeners("userupdatedata");
+		}
+	}, [])
 
 	return (
 		<View style={styles.setting_con}>
@@ -308,9 +518,9 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 			<TabView style={{ backgroundColor: "transparent", marginTop: 20 }}
 				navigationState={{ index, routes }}
 				renderScene={SceneMap({
-					person: Person,
-					account: Account,
-					system: System,
+					person: () => <Person navigation={navigation} />,
+					account: () => <Account navigation={navigation} showgiftcode={showgiftcode.current} />,
+					system: () => <System navigation={navigation} copyrightyear={copyrightyear.current} />,
 				})}
 				renderTabBar={(props: any) => {
 					return (
@@ -336,12 +546,13 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 						</View>
 					)
 				}}
-				onIndexChange={setIndex}
+				onIndexChange={() => { }}
 				initialLayout={{ width }}
 			/>
 		</View>
 	);
 }
+
 const styles = StyleSheet.create({
 	setting_con: {
 		height: height,
@@ -466,7 +677,7 @@ const styles = StyleSheet.create({
 		borderRadius: 50,
 	},
 	item_info_text_con: {
-		maxHeight: 80,
+		maxHeight: 100,
 		marginBottom: 10,
 	},
 	item_info_text: {
@@ -474,5 +685,51 @@ const styles = StyleSheet.create({
 		color: theme.comment,
 		fontSize: 12,
 	},
+	logout_btn: {
+		marginTop: 25,
+		marginBottom: 20,
+		padding: 12,
+		borderRadius: 30,
+		overflow: "hidden",
+		alignItems: "center",
+	},
+	logout_btn_text: {
+		fontSize: 16,
+		color: theme.toolbarbg,
+		zIndex: 2,
+	},
+	logout_btn_bg: {
+		...StyleSheet.absoluteFillObject,
+		borderRadius: 30,
+		zIndex: 0,
+	},
+	about_list_con: {
+		alignItems: "center",
+	},
+	protocol_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginTop: 27,
+	},
+	protocol_text: {
+		fontSize: 12,
+		color: "#7189DD",
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
+		lineHeight: 23,
+	},
+	protocol_text_line: {
+		fontSize: 12,
+		transform: [{ scale: 0.8 }],
+		marginHorizontal: 5,
+		color: theme.border,
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
+	},
+	about_text: {
+		fontSize: 12,
+		color: theme.placeholder,
+		lineHeight: 23,
+	}
 });
 export default UserSetting;

@@ -1,7 +1,7 @@
 $BuildType = $args[0]
-# $apkDebugPath = "D:\Desktop\nosetimeapp\android\app\build\outputs\apk\debug\app-debug.apk"
-$apkReleasePath = "D:\Desktop\nosetimeapp\android\app\build\outputs\apk\release\app-release-unsigned.apk"
-# $signedApkPath = "nosetimeapp.apk"
+# $apkDebugPath = "D:\Desktop\nosetime\android\app\build\outputs\apk\debug\app-debug.apk"
+$apkReleasePath = "D:\Desktop\nosetime\android\app\build\outputs\apk\release\app-release-unsigned.apk"
+# $signedApkPath = "nosetime.apk"
 # $keystorePath = "plugins.keystore"
 # $keystorePassword = "f5c919ffe6ecbb5190841e3cf9feebf3"
 
@@ -19,7 +19,7 @@ if ($buildType -eq "release") {
 
 	# 构建APK
 	Write-Output "Starting build"
-	cd D:\Desktop\nosetimeapp\android
+	cd D:\Desktop\nosetime\android
 	./gradlew assembleRelease
 	cd ..
 	Write-Output "Build successful"
@@ -30,6 +30,6 @@ if ($buildType -eq "release") {
 	Write-Output "Sign successful" #>
 
 	# 打开APK文件夹
-	Invoke-Item "D:\Desktop\nosetimeapp\android\app\build\outputs\apk\release"
+	Invoke-Item "D:\Desktop\nosetime\android\app\build\outputs\apk\release"
 }
 # jarsigner -verbose -keystore plugins.keystore -storepass f5c919ffe6ecbb5190841e3cf9feebf3 -signedjar plugins.apk platforms\android\app\build\outputs\apk\release\app-release-unsigned.apk plugins.keystore

@@ -127,11 +127,12 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 		if (errmsg != "") {
 			AlertCtrl.show({
 				header: header,
+				key: "register_alert",
 				message: errmsg.replace(/\n/g, ""),
 				buttons: [{
 					text: "确定",
 					handler: () => {
-						AlertCtrl.close()
+						AlertCtrl.close("register_alert");
 					}
 				}]
 			})
@@ -149,11 +150,12 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 			} else {
 				AlertCtrl.show({
 					header: "注册失败",
+					key: "register_err_alert",
 					message: resp_data.msg,
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("register_err_alert");
 						}
 					}]
 				})
@@ -407,11 +409,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			if (!isemail(mobile) && !ismobile(mobile)) {
 				AlertCtrl.show({
 					header: "输入错误",
+					key:"photo_err_alert",
 					message: "手机号/Email格式不正确。",
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("photo_err_alert");
 						}
 					}]
 				});
@@ -426,11 +429,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			if (parseInt(user.code) < 1000 || parseInt(user.code) > 999999) {
 				AlertCtrl.show({
 					header: "输入错误",
+					key: "code_err_alert",
 					message: "验证码格式不正确。",
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("code_err_alert");
 						}
 					}]
 				});
@@ -452,11 +456,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			if (errmsg != "") {
 				AlertCtrl.show({
 					header: "输入错误",
+					key: "pwd_err_alert",
 					message: errmsg,
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("pwd_err_alert");
 						}
 					}]
 				});
@@ -499,11 +504,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 				}
 				AlertCtrl.show({
 					header: "失败",
+					key: "reset_err_alert",
 					message: resp_data.msg,
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("reset_err_alert")
 						}
 					}]
 				})
@@ -592,7 +598,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 	const post = (mobile: string, pwd: string, token: string) => {
 		// console.log("method=login&mobile="+mobile+"&pwd="+pwd+"&token="+token);
 		http.post(ENV.user, { method: "login", mobile: mobile, pwd: pwd, token: token }).then((resp_data: any) => {
-			console.log("resp_data=", resp_data);
+			console.log("login resp_data= ", resp_data);
 			if (resp_data.msg == "OK") {
 				//登录后处理，需要同步修改RegisterCtrl相关代码
 				ToastCtrl.show({ message: "您已成功登录", duration: 1000, viewstyle: "medium_toast", key: "login_toast" });
@@ -607,7 +613,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 				//console.log("login =>request");
 				//2020-3-11yak这个http请求会让页面跳转延迟
 				http.post(ENV.points + "?uid=" + us.user.uid, { method: "increasetip", token: us.user.token }).then((resp_data: any) => {
-					console.log("resp_data=", resp_data);
+					console.log("increasetip resp_data=", resp_data);
 					if (resp_data.msg && resp_data.msg.indexOf("+") > 0) {
 						ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "login_increasetip_toast" });
 					}
@@ -616,11 +622,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			} else {
 				AlertCtrl.show({
 					header: "登录失败!",
+					key: "login_err_alert",
 					message: resp_data.msg,
 					buttons: [{
 						text: "确定",
 						handler: () => {
-							AlertCtrl.close()
+							AlertCtrl.close("login_err_alert")
 						}
 					}]
 				});
@@ -629,10 +636,11 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			AlertCtrl.show({
 				header: error,
 				message: "",
+				key: "post_err_alert",
 				buttons: [{
 					text: "确定",
 					handler: () => {
-						AlertCtrl.close()
+						AlertCtrl.close("post_err_alert")
 					}
 				}]
 			});
@@ -674,11 +682,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 					} else {
 						AlertCtrl.show({
 							header: "用户名或密码错误",
+							key: "user_pwd_err_alert",
 							message: "",
 							buttons: [{
 								text: "确定",
 								handler: () => {
-									AlertCtrl.close()
+									AlertCtrl.close("user_pwd_err_alert")
 								}
 							}]
 						});
@@ -688,11 +697,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 					// this.loadingCtrl.dismiss();
 					AlertCtrl.show({
 						header: "请查看是否连上网络",
+						key: "network_err_alert",
 						message: error,
 						buttons: [{
 							text: "确定",
 							handler: () => {
-								AlertCtrl.close()
+								AlertCtrl.close("network_err_alert")
 							}
 						}]
 					});
@@ -702,11 +712,12 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			console.log("Sign-In 5");
 			AlertCtrl.show({
 				header: "用户名或密码错误",
+				key: "user_pwd_err_alert",
 				message: "",
 				buttons: [{
 					text: "确定",
 					handler: () => {
-						AlertCtrl.close()
+						AlertCtrl.close("user_pwd_err_alert")
 					}
 				}]
 			});

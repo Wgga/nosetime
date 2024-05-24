@@ -22,7 +22,7 @@ const storage = new Storage({
 
 const cache = {
 	saveItem: (key: string, data: any, expires?: number) => {
-		return storage.save({
+		storage.save({
 			key,
 			data,
 			expires: expires ? 1000 * expires : null, //没有传递就是null永不过期
@@ -41,13 +41,17 @@ const cache = {
 	},
 
 	removeItem: (key: string) => {
-		return storage.remove({
+		storage.remove({
 			key,
 		});
 	},
 
-	clear: () => {
-		return AsyncStorage.clear();
+	clear: async (keys: Array<string> = []) => {
+		if (keys && keys.length > 0) {
+			await AsyncStorage.multiRemove(keys);
+		} else {
+			await AsyncStorage.clear();
+		}
 	},
 }
 

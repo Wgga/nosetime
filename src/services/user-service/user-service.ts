@@ -1,10 +1,12 @@
-import { Platform } from "react-native";
+import { Platform, NativeEventEmitter } from "react-native";
 import DeviceInfo from "react-native-device-info";
 import { Blurhash } from "react-native-blurhash";
 
 import cache from "../../hooks/storage/storage";
 import http from "../../utils/api/http";
 import { ENV } from "../../configs/ENV";
+
+const events = new NativeEventEmitter();
 
 class UserService {
 	private factoryname: string = "UserService";
@@ -36,22 +38,23 @@ class UserService {
 		//TODO:if(this.isios)
 		//TODO:	this.jpush.resetBadge();
 
-		// this.events.subscribe("nosetime_userlogin", () => {
-		// 	//console.log("this.events.subscribe("nosetime_userlogin");
-		// 	this.userlogin();
-		// });
-		// //退出时设置别名为空
-		// this.events.subscribe("nosetime_userlogout", () => {
-		// 	console.log("setAlias-00");
-		// 	//20181020 退出后清空推送消息
-		// 	//TODO:if(this.isandroid)
-		// 	//TODO:	this.jpush.clearAllNotification();
+		events.addListener("nosetime_userlogin", () => {
+			//console.log("this.events.subscribe("nosetime_userlogin");
+			this.userlogin();
+		});
 
-		// 	if (this.saveddeviceinfo["uid"] == undefined || this.saveddeviceinfo["uid"] != 0) {
-		// 		this.deviceinfo["uid"] = 0;
-		// 		this.savedeviceinfo();
-		// 	}
-		// });
+		//退出时设置别名为空
+		events.addListener("nosetime_userlogout", () => {
+			console.log("setAlias-00");
+			//20181020 退出后清空推送消息
+			//TODO:if(this.isandroid)
+			//TODO:	this.jpush.clearAllNotification();
+
+			if (this.saveddeviceinfo["uid"] == undefined || this.saveddeviceinfo["uid"] != 0) {
+				this.deviceinfo["uid"] = 0;
+				this.savedeviceinfo();
+			}
+		});
 	}
 	init() {
 		//从缓存获取用户信息
@@ -80,6 +83,12 @@ class UserService {
 		cache.getItem(this.factoryname + "gender").then((cacheobj) => {
 			if (cacheobj) {
 				this.gender = cacheobj;
+			}
+		}).catch(() => { });
+
+		cache.getItem(this.factoryname + "blurhash").then((cacheobj) => {
+			if (cacheobj) {
+				this.user.blurhash = cacheobj;
 			}
 		}).catch(() => { });
 
@@ -221,19 +230,20 @@ class UserService {
 		} else {
 			cache.getItem(this.factoryname + "showreq").then((cacheobj) => {
 			}).catch(() => {
-				http.post(ENV.user, { method: "showreq", uid: this.user.uid, token: this.user.token, brand: this.deviceinfo.brand, did: this.did })
-					.then((resp_data: any) => {
-						if (resp_data.msg == "O") {
-							this._showreq();
-						}
-					})
+				http.post(ENV.user, {
+					method: "showreq", uid: this.user.uid, token: this.user.token, brand: this.deviceinfo.brand, did: this.did
+				}).then((resp_data: any) => {
+					if (resp_data.msg == "O") {
+						this._showreq();
+					}
+				})
 			});
 		}
 	}
 
 	_showreq() {
 		//console.log("SAVE saveItem deviceinfo==="+JSON.stringify(this.deviceinfo));
-		cache.saveItem(this.factoryname + "showreq", 1, 7 * 24 * 3600 * 1000);
+		cache.saveItem(this.factoryname + "showreq", 1, 7 * 24 * 3600);
 		/* this.alertCtrl.create({
 			header: "开通通知权限",
 			cssClass: "cart_tip protocol_tip",
@@ -268,16 +278,21 @@ class UserService {
 
 	saveUser(user: any) {
 		if (user.uid > 0) {
-			Blurhash.encode(ENV.avatar + user.uid + ".jpg?" + user.uface, 4, 3).then((blurhash_data: any) => {
-				user["blurhash"] = blurhash_data;
-				this.user = user;
-				cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600 * 1000);
-			}).catch(()=>{
-				user["blurhash"] = "LOSiT=oI.AozxvayROf6%$ofR4ax";
-				this.user = user;
-				cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600 * 1000);
-			})
+			this.user = user;
+			cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600);
+			this.setblurhash();
 		}
+	}
+
+	// 设置用户头像模糊图
+	setblurhash() {
+		Blurhash.encode(ENV.avatar + us.user.uid + ".jpg?" + us.user.uface, 4, 3).then((blurhash_data: any) => {
+			this.user.blurhash = blurhash_data;
+			cache.saveItem(this.factoryname + "blurhash", blurhash_data, 30 * 24 * 3600);
+		}).catch(() => {
+			this.user.blurhash = "LOSiT=oI.AozxvayROf6%$ofR4ax";
+			cache.saveItem(this.factoryname + "blurhash", "LOSiT=oI.AozxvayROf6%$ofR4ax", 30 * 24 * 3600);
+		})
 	}
 
 	delUser() {
@@ -289,12 +304,12 @@ class UserService {
 		this.gender = gender;
 		//20220811 shibo:修复修改性别不生效
 		this.user.ugender = gender;
-		cache.saveItem(this.factoryname + "gender", this.gender, 30 * 24 * 3600 * 1000);
+		cache.saveItem(this.factoryname + "gender", this.gender, 30 * 24 * 3600);
 	}
 
 	setMobile(mobile: string) {
 		this.mobile = mobile;
-		cache.saveItem(this.factoryname + "mobile", this.mobile, 30 * 24 * 3600 * 1000);
+		cache.saveItem(this.factoryname + "mobile", this.mobile, 30 * 24 * 3600);
 	}
 
 	getUID(len: number) {

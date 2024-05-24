@@ -32,7 +32,7 @@ class SearchService {
 		if (idx >= 0)
 			this.search_history.splice(idx, 1);
 		this.search_history.unshift(x);
-		cache.saveItem("SearchHistory", this.search_history, 30 * 24 * 3600 * 1000);
+		cache.saveItem("SearchHistory", this.search_history, 30 * 24 * 3600);
 	}
 
 	clearHistory() {

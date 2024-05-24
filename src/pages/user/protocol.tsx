@@ -30,14 +30,14 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<View style={{ width: "100%", height: "100%" }}>
+		<View style={styles.protocol_con}>
 			<HeaderView
 				data={{
 					title,
 					isShowSearch: false,
 				}}
 				method={{
-					back: () => { navigation.goBack()},
+					back: () => { navigation.goBack() },
 				}} />
 			<WebView
 				originWhitelist={["*"]}
@@ -50,6 +50,10 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
+	protocol_con: {
+		flex: 1,
+		backgroundColor: theme.toolbarbg,
+	}
 })
 
 export default Protocol;
