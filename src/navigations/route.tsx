@@ -79,6 +79,7 @@ function Route(): React.JSX.Element {
 			<StatusBar
 				barStyle={isDarkMode ? "light-content" : "dark-content"}
 				backgroundColor="transparent"
+				animated={true}
 				translucent={true}
 			/>
 			<Stack.Navigator screenOptions={{ headerShown: false }}>

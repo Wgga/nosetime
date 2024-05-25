@@ -711,6 +711,17 @@ npm install react-native-text-size
 yarn add react-native-text-size
 ```
 
+### 28. react-native-system-navigation-bar
+
+react-native-system-navigation-bar 是一个用于 React Native 的系统导航栏组件, 允许您自定义 Android 的系统导航栏。
+
+```bash
+# using npm
+npm install react-native-system-navigation-bar
+
+# OR using Yarn
+yarn add react-native-system-navigation-bar
+```
 
 
 # 三、 打包 release APK

@@ -1,4 +1,4 @@
-import React, { Children } from "react";
+import React from "react";
 import {
 	View,
 	Dimensions,
@@ -130,53 +130,52 @@ export default class VideoPlayer extends React.Component<PropsType> {
 				{(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
 					<ActivityIndicator size="large" color="#fff" />
 				</View>}
-				{this.state.showControl &&
-					<LinearGradient
-						colors={["transparent", "rgba(0,0,0,0.8)"]}
-						start={{ x: 0.5, y: 0 }}
-						end={{ x: 0.5, y: 1 }}
-						style={[styles.control, { width: this.state.videoWidth }]}
-					>
-						<View style={styles.control_btn}>
-							<TouchableOpacity activeOpacity={0.3} onPress={() => { this.onControlPlayPress() }}
-								style={{ padding: 7 }}>
-								{this.state.isPlaying ? <Icon name="pause1" size={24} color="#fff" /> : <Icon name="play1" size={24} color="#fff" />}
-							</TouchableOpacity>
-							<Text style={styles.time}>{formatTime(this.state.currentTime)} / </Text>
-							<Text style={styles.time}>{formatTime(this.state.duration)}</Text>
-						</View>
-						<View style={styles.control_btn}>
-							<TouchableOpacity style={styles.setting1} activeOpacity={0.3} onPress={() => { this.onControlMenuPress() }}>
-								<Icon name="setting1" size={18} color="#fff" />
-							</TouchableOpacity>
-							{this.state.isShowMenu &&
-								<Animated.View entering={ZoomIn} exiting={ZoomOut} style={styles.setting_con}>
-									<View>
-										<View style={styles.setting_item}>
-											<Text style={styles.setting_label}>{"速度"}</Text>
-											<Icon name="r-return" size={16} color={"#fff"} />
-										</View>
-										<View style={styles.setting_item}>
-											<Text style={styles.setting_label}>{"洗脑循环"}</Text>
-										</View>
+				{this.state.showControl && <LinearGradient
+					colors={["transparent", "rgba(0,0,0,0.8)"]}
+					start={{ x: 0.5, y: 0 }}
+					end={{ x: 0.5, y: 1 }}
+					style={[styles.control, { width: this.state.videoWidth, zIndex: 1 }]}
+				>
+					<View style={styles.control_btn}>
+						<TouchableOpacity activeOpacity={0.3} onPress={() => { this.onControlPlayPress() }}
+							style={{ padding: 7 }}>
+							{this.state.isPlaying ? <Icon name="pause1" size={24} color="#fff" /> : <Icon name="play1" size={24} color="#fff" />}
+						</TouchableOpacity>
+						<Text style={styles.time}>{formatTime(this.state.currentTime)} / </Text>
+						<Text style={styles.time}>{formatTime(this.state.duration)}</Text>
+					</View>
+					<View style={styles.control_btn}>
+						<TouchableOpacity style={styles.setting1} activeOpacity={0.3} onPress={() => { this.onControlMenuPress() }}>
+							<Icon name="setting1" size={18} color="#fff" />
+						</TouchableOpacity>
+						{this.state.isShowMenu &&
+							<Animated.View entering={ZoomIn} exiting={ZoomOut} style={styles.setting_con}>
+								<View>
+									<View style={styles.setting_item}>
+										<Text style={styles.setting_label}>{"速度"}</Text>
+										<Icon name="r-return" size={16} color={"#fff"} />
 									</View>
-								</Animated.View>
-							}
-							<TouchableOpacity activeOpacity={0.3} onPress={() => { this.onControlShrinkPress() }}>
-								{this.state.isFullScreen ? <Icon name="exitfull" size={18} color="#fff" /> : <Icon name="full" size={18} color="#fff" />}
-							</TouchableOpacity>
-						</View>
-						<Slider
-							style={styles.slider_con}
-							maximumTrackTintColor={"#999999"}
-							minimumTrackTintColor={"#00c06d"}
-							thumbImage={require("../assets/images/player/icon_slider.png")}
-							value={this.state.currentTime}
-							minimumValue={0}
-							maximumValue={this.state.duration}
-							onValueChange={(currentTime) => { this.onSliderValueChanged(currentTime) }}
-						/>
-					</LinearGradient>
+									<View style={styles.setting_item}>
+										<Text style={styles.setting_label}>{"洗脑循环"}</Text>
+									</View>
+								</View>
+							</Animated.View>
+						}
+						<TouchableOpacity activeOpacity={0.3} onPress={() => { this.onControlShrinkPress() }}>
+							{this.state.isFullScreen ? <Icon name="exitfull" size={18} color="#fff" /> : <Icon name="full" size={18} color="#fff" />}
+						</TouchableOpacity>
+					</View>
+					<Slider
+						style={styles.slider_con}
+						maximumTrackTintColor={"#999999"}
+						minimumTrackTintColor={"#00c06d"}
+						thumbImage={require("../assets/images/player/icon_slider.png")}
+						value={this.state.currentTime}
+						minimumValue={0}
+						maximumValue={this.state.duration}
+						onValueChange={(currentTime) => { this.onSliderValueChanged(currentTime) }}
+					/>
+				</LinearGradient>
 				}
 			</View>
 		)
@@ -231,19 +230,16 @@ export default class VideoPlayer extends React.Component<PropsType> {
 				showControl: false,
 			})
 		} else {
-			this.setState(
-				{
-					showControl: true,
-				},
-				// 5秒后自动隐藏工具栏
-				() => {
-					// setTimeout(() => {
-					// 	this.setState({
-					// 		showControl: false
-					// 	})
-					// }, 5000)
-				}
-			)
+			// 5秒后自动隐藏工具栏
+			this.setState({
+				showControl: true,
+			}, () => {
+				// setTimeout(() => {
+				// 	this.setState({
+				// 		showControl: false
+				// 	})
+				// }, 5000)
+			})
 		}
 	}
 

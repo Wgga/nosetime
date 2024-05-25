@@ -12,7 +12,9 @@ import User from "../pages/user/user";
 import us from "../services/user-service/user-service";
 
 const Tab = createBottomTabNavigator();
+
 function Tabs({ navigation, route }: any): React.JSX.Element {
+	// 控件
 
 	return (
 		<>
@@ -24,7 +26,7 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 						borderColor: "transparent",
 					},
 					tabBarItemStyle: {
-						borderColor: "red",
+						borderColor: "transparent",
 						flexDirection: "column",
 					},
 				})}>

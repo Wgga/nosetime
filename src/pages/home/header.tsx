@@ -1,6 +1,8 @@
 import React from "react";
 import { FlatList, View, Text, StyleSheet, Image, VirtualizedList, NativeEventEmitter, Pressable, ImageBackground, Dimensions } from "react-native";
 
+import FastImage from "react-native-fast-image";
+
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
@@ -9,8 +11,6 @@ import http from "../../utils/api/http";
 import Slider from "./slider";
 
 import cache from "../../hooks/storage/storage";
-
-
 
 const events = new NativeEventEmitter();
 const { width, height } = Dimensions.get("window");
@@ -93,6 +93,8 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		}
 	}
 
+	const [isvisible, setIsVisible] = React.useState(false);
+
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
 	return (
 		<View onLayout={onLayout}>
@@ -122,7 +124,14 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							<View style={styles.itemContainer}>
 								<Pressable onPress={() => { gotoArticle(item.id) }}>
 									<View style={styles.itemImg}>
-										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) && <Image style={styles.itemImg} source={{ uri: ENV.image + item?.pic, cache: "force-cache" }} />}
+										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) &&
+											<FastImage
+												style={styles.itemImg}
+												source={{
+													uri: ENV.image + item.pic,
+												}}
+												resizeMode={FastImage.resizeMode.cover}
+											/>}
 									</View>
 									<Text numberOfLines={1} style={[styles.smellitemtit2]}>{item.title2}</Text>
 									<Text numberOfLines={1} style={[styles.smellitemtit3]}>{item.title3}</Text>
@@ -164,7 +173,15 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							<View style={styles.itemContainer}>
 								<Pressable onPress={() => { gotoVod(item) }}>
 									<View style={styles.itemImg}>
-										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) && <Image style={styles.itemImg} source={{ uri: item.vpicurl, cache: "force-cache" }} />}
+										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) &&
+											<FastImage
+												style={styles.itemImg}
+												source={{
+													uri: item.vpicurl,
+												}}
+												resizeMode={FastImage.resizeMode.cover}
+											/>
+										}
 										<ImageBackground style={styles.triangle}
 											source={require("../../assets/images/player/play.png")}
 											resizeMode="cover"
@@ -188,15 +205,18 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 					keyExtractor={(item: any) => item.id}
 					renderItem={({ item, index }: any) => {
 						return (
-							<View style={styles.topicitem}>
+							<Pressable onPress={() => {
+								setIsVisible(true)
+							}} style={styles.topicitem}>
 								<View style={styles.topicitemImg}>
-									{(homedataref.current.topiclist && homedataref.current.topiclist.length > 0) && <Image style={styles.topicitemImg} source={(imagelist[(index % 5)])} />}
+									{(homedataref.current.topiclist && homedataref.current.topiclist.length > 0) &&
+										<Image style={styles.topicitemImg} source={(imagelist[(index % 5)])} />}
 								</View>
 								<View style={styles.topic_title_box}>
 									<Text numberOfLines={2} style={styles.topicitemtit}>{item.title}</Text>
 									<Text style={[styles.topicitemcnt]}>- {item.cnt} 人互动 -</Text>
 								</View>
-							</View>
+							</Pressable>
 						)
 					}}
 				/>

@@ -427,7 +427,14 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 					}
 				}}
 				method={{
-					back: () => { navigation.goBack(); Orientation.lockToPortrait(); },
+					back: () => {
+						navigation.goBack();
+						Orientation.getOrientation((orientation: any) => {
+							if (orientation == "LANDSCAPE") {
+								Orientation.lockToPortrait();
+							}
+						})
+					},
 				}}
 				MenuChildren={() => {
 					return (

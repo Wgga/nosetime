@@ -1,8 +1,8 @@
 package com.nosetime
 
-import android.os.Bundle;
-import android.content.Intent;
-import android.content.res.Configuration;
+import android.os.Bundle
+import android.content.Intent
+import android.content.res.Configuration
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -32,9 +32,9 @@ class MainActivity : ReactActivity() {
   }
 
   override fun onConfigurationChanged(newConfig : Configuration) {
-	super.onConfigurationChanged(newConfig);
-	val intent = Intent("onConfigurationChanged")
-	intent.putExtra("newConfig", newConfig)
-	sendBroadcast(intent)
+    super.onConfigurationChanged(newConfig);
+    val intent = Intent("onConfigurationChanged");
+    intent.putExtra("newConfig", newConfig);
+    sendBroadcast(intent);
   }
 }

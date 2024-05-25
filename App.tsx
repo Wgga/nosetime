@@ -12,7 +12,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import SplashScreen from "react-native-splash-screen";
 import Orientation from "react-native-orientation-locker";
 import { ModalPortal } from "./src/components/modals";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import SystemNavigationBar from "react-native-system-navigation-bar";
 
 import Route from "./src/navigations/route";
 
@@ -35,6 +36,8 @@ function App(): React.JSX.Element {
 	}, [])
 
 	const initializeApp = () => {
+		SystemNavigationBar.setFitsSystemWindows(false);
+		SystemNavigationBar.setNavigationColor("transparent");
 		let AppVersion = ENV.AppMainVersion + '.' + ENV.AppMiniVersion + '.' + ENV.AppBuildVersion;
 		http.post(ENV.api + ENV.update, { uid: us.user.uid, did: us.did, ver: AppVersion }).then((resp_data: any) => {
 			events.emit("userupdatedata", resp_data);
@@ -43,14 +46,14 @@ function App(): React.JSX.Element {
 	}
 
 	return (
-		<React.Fragment>
-			<SafeAreaProvider>
+		<SafeAreaProvider>
+			<React.Fragment>
 				<NavigationContainer>
 					<Route />
 				</NavigationContainer>
 				<ModalPortal />
-			</SafeAreaProvider>
-		</React.Fragment>
+			</React.Fragment>
+		</SafeAreaProvider>
 	);
 }
 

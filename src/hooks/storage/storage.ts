@@ -29,7 +29,7 @@ const cache = {
 		})
 	},
 
-	getItem: (key: string) => {
+	getItem: async (key: string) => {
 		return storage.load({
 			key,
 			autoSync: true, // 设置为false的话，则等待sync方法提供的最新数据(当然会需要更多时间)。
@@ -40,8 +40,8 @@ const cache = {
 		})
 	},
 
-	removeItem: (key: string) => {
-		storage.remove({
+	removeItem: async (key: string) => {
+		await storage.remove({
 			key,
 		});
 	},
@@ -53,6 +53,10 @@ const cache = {
 			await AsyncStorage.clear();
 		}
 	},
+
+	getAllKeys: async () => {
+		return await AsyncStorage.getAllKeys();
+	}
 }
 
 export default cache;

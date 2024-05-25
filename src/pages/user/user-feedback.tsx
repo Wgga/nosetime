@@ -33,10 +33,21 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 					back: () => { navigation.goBack() },
 				}} />
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.feedback_con}>
-				<TextInput style={styles.feedback_textarea}
-					multiline
-					placeholder={"请留下您的宝贵意见或建议，商务合作请发邮件至contact@nosetime.com"}
-				/>
+				<View style={styles.feedback_textarea_con}>
+					<TextInput style={styles.textarea}
+						multiline={true}
+						placeholderTextColor={theme.placeholder}
+						placeholder={"请留下您的宝贵意见或建议，商务合作请发邮件至contact@nosetime.com"}
+					/>
+				</View>
+				<View style={styles.feedback_img_list}>
+					<Text style={styles.img_tit}>{"添加相关截图"}</Text>
+					<View>
+						<View>
+							
+						</View>
+					</View>
+				</View>
 			</ScrollView>
 		</View>
 	);
@@ -50,13 +61,27 @@ const styles = StyleSheet.create({
 		paddingTop: 26,
 		paddingHorizontal: 27,
 	},
-	feedback_textarea: {
+	feedback_textarea_con: {
 		width: "100%",
 		backgroundColor: theme.bg,
 		borderRadius: 6,
 		height: 180,
-		fontSize: 14,
 		padding: 10,
+	},
+	textarea: {
+		width: "100%",
+		fontSize: 14,
+		padding: 0,
+	},
+	feedback_img_list: {
+		marginTop: 26,
+	},
+	img_tit: {
+		color: theme.tit2,
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
+		fontSize: 16,
+		marginBottom: 23,
 	},
 });
 export default UserFeedback;
