@@ -185,12 +185,12 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 										skewValue={index == 0 ? 0 : 10}
 										skewUnits={"deg"}
 										boundingBoxWidth={SkewViewW}
-										boundingBoxHeight={130}>
+										boundingBoxHeight={width / 3.2}>
 										<Pressable onPress={() => {
 											clicktab(item.text);
 										}} style={[{
 											width: SkewViewW,
-											height: 130,
+											height: width / 3.2,
 											justifyContent: "flex-end",
 										}]}>
 											{current_index.current == index && <View style={styles.image_con}>
@@ -352,7 +352,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 const styles = StyleSheet.create({
 	header_img_con: {
 		position: "relative",
-		height: 130,
+		height: width / 3.2,
 		paddingTop: 5,
 		flexDirection: "row",
 		alignItems: "center",

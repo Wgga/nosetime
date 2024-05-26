@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions } from "react-native";
+import { View, Text, Pressable, NativeEventEmitter, Dimensions } from "react-native";
 
+import { StyleSheet } from "../../utils/adaptiveStyleSheet";
 import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";

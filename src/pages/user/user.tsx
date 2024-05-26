@@ -70,24 +70,6 @@ function User({ navigation }: any): React.JSX.Element {
 		});
 	};
 
-	// 获取头像模糊图
-	/* const getavatarblur = () => {
-		return new Promise((resolve, reject) => {
-			cache.getItem(classname + us.user.uid + "avatarblur").then((cacheobj: any) => {
-				if (cacheobj) {
-					blurhash.current = cacheobj;
-					resolve(1);
-				}
-			}).catch(() => {
-				Blurhash.encode(ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface, 4, 3).then((blurhash_data: any) => {
-					blurhash.current = blurhash_data;
-					cache.saveItem(classname + us.user.uid + "avatarblur", blurhash_data, 24 * 3600);
-					resolve(1);
-				})
-			})
-		})
-	} */
-
 	// 获取用户积分
 	const getjifenval = () => {
 		return new Promise((resolve, reject) => {

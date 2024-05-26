@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, StatusBar, Pressable, Image, FlatList, NativeEventEmitter, Keyboard, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, StatusBar, Pressable, Image, FlatList, NativeEventEmitter, Keyboard, Dimensions, Animated, Easing } from "react-native";
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
@@ -15,6 +15,7 @@ import ShareDetail from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import http from "../../utils/api/http";
+import { StyleSheet, pxToDp } from "../../utils/adaptiveStyleSheet";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -24,6 +25,7 @@ import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
 
 const Winwidth = Dimensions.get("window").width;
+const Winheight = Dimensions.get("window").height;
 const events = new NativeEventEmitter();
 const classname = "ArticleDetail";
 
@@ -445,7 +447,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 								), {
 									key: "share_popover",
 									width: Winwidth,
-									height: 200,
+									height: pxToDp(200),
 									rounded: false,
 									useNativeDriver: true,
 									modalAnimation: new SlideAnimation({

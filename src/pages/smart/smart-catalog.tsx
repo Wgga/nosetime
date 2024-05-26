@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
 	},
 	ranking_top: {
 		width: width - 40,
-		height: 167,
+		height: (width - 40) / 2,
 		borderRadius: 4,
 		overflow: "hidden",
 		marginBottom: 10,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 	},
 	ranking_btm: {
-		height: 199,
+		height: (width - 40) / 2,
 		flexDirection: "row",
 	},
 	ranking_btm_con: {
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
 	},
 	salonpic: {
 		position: "absolute",
-		width: 199 / 532 * 750,
+		width: ((width - 40) / 2) / 532 * 750,
 		height: "100%",
 		left: -((199 / 532 * 750) * 0.13),
 	},
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
 	},
 	btm_right_con: {
 		width: (width - 40 - 10) / 2,
-		height: (199 - 10) / 2,
+		height: (((width - 40) / 2) - 10) / 2,
 		borderRadius: 4,
 		overflow: "hidden",
 		justifyContent: "flex-end",
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
 		height: ((width - 40 - 10) / 2) / 750 * 532,
 	},
 	recentpic: {
-		top: -(((199 - 10) / 2) * 0.06),
+		top: -(((((width - 40) / 2) - 10) / 2) * 0.06),
 	},
 	btm_right_tit: {
 		marginLeft: 10,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 		marginBottom: 9,
 	},
 	affordablepic: {
-		top: -(((199 - 10) / 2) * 0.22),
+		top: -(((((width - 40) / 2) - 10) / 2) * 0.22),
 	},
 	catalog_btm_con: {
 		marginTop: 10
