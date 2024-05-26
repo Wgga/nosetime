@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Pressable, Image, FlatList, NativeEventEmitter, Keyboard, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, NativeEventEmitter, Keyboard, Dimensions, Animated, Easing } from "react-native";
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
@@ -15,7 +15,6 @@ import ShareDetail from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import http from "../../utils/api/http";
-import { StyleSheet, pxToDp } from "../../utils/adaptiveStyleSheet";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -447,7 +446,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 								), {
 									key: "share_popover",
 									width: Winwidth,
-									height: pxToDp(200),
+									height: 200,
 									rounded: false,
 									useNativeDriver: true,
 									modalAnimation: new SlideAnimation({

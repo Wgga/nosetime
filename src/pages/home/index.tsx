@@ -1,5 +1,5 @@
 import React from "react";
-import { Animated, ScrollView, View, Text, StyleSheet, Dimensions, Pressable, NativeEventEmitter } from "react-native";
+import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable, NativeEventEmitter } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"

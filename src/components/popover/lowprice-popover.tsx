@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
+import { View, Text, Pressable, StyleSheet, NativeEventEmitter, Dimensions, Image } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
 	},
 	diypopup: {
 		width: width - 82,
-		height: (width - 82) * 1.5,
+		height: 310,
 	},
 	popup_con: {
 		width: width - 102,
