@@ -99,6 +99,10 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 		});
 	}
 
+	const gotodetail = (item: any) => {
+		navigation.navigate("Page", { screen: "MallAddressEdit", params: { item, cnt: address_list.current.length } });
+	}
+
 	return (
 		<View style={styles.address_con}>
 			<HeaderView
@@ -113,11 +117,12 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					},
 				}}>
 				<Pressable style={styles.title_text_con} onPress={() => { setEdit(val => !val) }}>
-					<Text style={styles.title_text}>{"编辑"}</Text>
+					{!edit && <Text style={styles.title_text}>{"编辑"}</Text>}
+					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			{(address_list.current && address_list.current.length > 0) && <ScrollView >
-				<View style={[styles.address_list]}>
+			{(address_list.current && address_list.current.length > 0) && <ScrollView>
+				<View style={styles.address_list}>
 					{address_list.current.map((item: any, index: number) => {
 						return (
 							<View key={item.maid} style={styles.address_item}>
@@ -141,7 +146,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 								{edit && <View style={styles.edit_con}>
 									<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
 										{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
-										{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} />}
+										{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} style={styles.selected_icon} />}
 										<Text style={styles.default_btn_text}>{"默认地址"}</Text>
 									</Pressable>
 									<Pressable onPress={() => { deladdress(item) }}>
@@ -154,7 +159,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 				</View>
 			</ScrollView>}
 			<View style={styles.footer_con}>
-				<Pressable onPress={() => { }} style={styles.add_address_btn}>
+				<Pressable onPress={() => { gotodetail(null) }} style={styles.add_address_btn}>
 					<LinearGradient
 						colors={["#81B4EC", "#9BA6F5"]}
 						start={{ x: 0, y: 0 }}
@@ -207,7 +212,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	default_bg: {
-		paddingVertical: 3,
 		paddingHorizontal: 8,
 		marginRight: 14,
 		borderRadius: 20,
@@ -246,6 +250,12 @@ const styles = StyleSheet.create({
 	default_btn: {
 		flexDirection: "row",
 		alignItems: "center",
+	},
+	selected_icon: {
+		width: 18,
+		height: 18.8,
+		paddingTop: 1,
+		paddingLeft: 1
 	},
 	default_btn_text: {
 		fontSize: 13,
