@@ -37,8 +37,8 @@ function App(): React.JSX.Element {
 
 	const initializeApp = () => {
 		if (SystemNavigationBar) {
-			SystemNavigationBar.setFitsSystemWindows(false);
-			SystemNavigationBar.setNavigationColor("transparent");
+			// SystemNavigationBar.setFitsSystemWindows(false);
+			// SystemNavigationBar.setNavigationColor("transparent");
 		}
 		let AppVersion = ENV.AppMainVersion + '.' + ENV.AppMiniVersion + '.' + ENV.AppBuildVersion;
 		http.post(ENV.api + ENV.update, { uid: us.user.uid, did: us.did, ver: AppVersion }).then((resp_data: any) => {

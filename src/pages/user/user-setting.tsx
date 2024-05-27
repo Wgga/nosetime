@@ -552,7 +552,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 							<TabBar {...props}
 								activeColor={theme.tit2}
 								inactiveColor="rgba(46,46,46,0.6)"
-								indicatorStyle={{ backgroundColor: "#444", width: 20, height: 2, bottom: 9, left: "14%" }}
+								indicatorStyle={{ backgroundColor: "#444", width: 20, height: 2, bottom: 9, left: (((width - 40) / 3) - 20) / 2 }}
 								android_ripple={{ color: "transparent" }}
 								indicatorContainerStyle={{ backgroundColor: "transparent" }}
 								labelStyle={{ fontSize: 15, fontWeight: "500" }}

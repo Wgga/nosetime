@@ -116,46 +116,68 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					<Text style={styles.title_text}>{"编辑"}</Text>
 				</Pressable>
 			</HeaderView>
-			{(address_list.current && address_list.current.length > 0) && <ScrollView style={styles.address_list}>
-				{address_list.current.map((item: any, index: number) => {
-					return (
-						<View key={item.maid} style={styles.address_item}>
-							<View style={styles.item_city}>
-								{item.madefault == 1 && <LinearGradient style={styles.default_bg}
-									colors={["#81B4EC", "#9BA6F5"]}
-									start={{ x: 0, y: 0 }}
-									end={{ x: 1, y: 0 }}
-									locations={[0, 1]}
-								>
-									<Text style={styles.default_text}>{"默认"}</Text>
-								</LinearGradient>}
-								<Text style={styles.item_text}>{item.maprov + " " + item.macity + " " + item.maregion + " " + item.mastreet}</Text>
+			{(address_list.current && address_list.current.length > 0) && <ScrollView >
+				<View style={[styles.address_list]}>
+					{address_list.current.map((item: any, index: number) => {
+						return (
+							<View key={item.maid} style={styles.address_item}>
+								<View style={styles.item_city}>
+									{item.madefault == 1 && <LinearGradient style={styles.default_bg}
+										colors={["#81B4EC", "#9BA6F5"]}
+										start={{ x: 0, y: 0 }}
+										end={{ x: 1, y: 0 }}
+										locations={[0, 1]}
+									>
+										<Text style={styles.default_text}>{"默认"}</Text>
+									</LinearGradient>}
+									<Text style={styles.item_text}>{item.maprov + " " + item.macity + " " + item.maregion + " " + item.mastreet}</Text>
+								</View>
+								<Text style={styles.item_address_text}>{item.maaddress}</Text>
+								<View style={styles.item_uinfo}>
+									<Text style={[styles.item_text, { marginRight: 25 }]}>{item.maname}</Text>
+									<Text style={styles.item_text}>{item.mamobile}</Text>
+								</View>
+								<Icon name="edit1" size={20} color={theme.placeholder} style={styles.edit_icon} />
+								{edit && <View style={styles.edit_con}>
+									<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
+										{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
+										{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} />}
+										<Text style={styles.default_btn_text}>{"默认地址"}</Text>
+									</Pressable>
+									<Pressable onPress={() => { deladdress(item) }}>
+										<Text style={styles.del_btn_text}>{"删除"}</Text>
+									</Pressable>
+								</View>}
 							</View>
-							<Text style={styles.item_address_text}>{item.maaddress}</Text>
-							<View style={styles.item_uinfo}>
-								<Text style={[styles.item_text, { marginRight: 25 }]}>{item.maname}</Text>
-								<Text style={styles.item_text}>{item.mamobile}</Text>
-							</View>
-							<Icon name="edit1" size={20} color={theme.placeholder} style={styles.edit_icon} />
-							{edit && <View style={styles.edit_con}>
-								<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
-									{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
-									{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} />}
-									<Text style={styles.default_btn_text}>{"默认地址"}</Text>
-								</Pressable>
-								<Pressable onPress={() => { deladdress(item) }}>
-									<Text style={styles.del_btn_text}>{"删除"}</Text>
-								</Pressable>
-							</View>}
-						</View>
-					)
-				})}
+						)
+					})}
+				</View>
 			</ScrollView>}
+			<View style={styles.footer_con}>
+				<Pressable onPress={() => { }} style={styles.add_address_btn}>
+					<LinearGradient
+						colors={["#81B4EC", "#9BA6F5"]}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 1, y: 0 }}
+						locations={[0, 1]}
+						style={[styles.add_address_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
+					/>
+					<LinearGradient
+						colors={["#61A2E9", "#95A0EB"]}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 1, y: 0 }}
+						locations={[0, 1]}
+						style={styles.add_address_btn_bg}
+					/>
+					<Text style={styles.add_address_btn_text}>{"+ 添加新地址"}</Text>
+				</Pressable>
+			</View>
 		</View>
 	);
 }
 const styles = StyleSheet.create({
 	address_con: {
+		height: "100%",
 		backgroundColor: theme.bg,
 	},
 	title_text_con: {
@@ -169,6 +191,7 @@ const styles = StyleSheet.create({
 	},
 	address_list: {
 		paddingTop: 15,
+		paddingBottom: 50
 	},
 	address_item: {
 		marginHorizontal: 20,
@@ -232,6 +255,27 @@ const styles = StyleSheet.create({
 	del_btn_text: {
 		fontSize: 13,
 		color: theme.text2,
-	}
+	},
+	footer_con: {
+		paddingHorizontal: 40,
+		paddingVertical: 21,
+		backgroundColor: theme.toolbarbg,
+	},
+	add_address_btn: {
+		padding: 12,
+		borderRadius: 30,
+		overflow: "hidden",
+		alignItems: "center",
+	},
+	add_address_btn_text: {
+		fontSize: 16,
+		color: theme.toolbarbg,
+		zIndex: 2,
+	},
+	add_address_btn_bg: {
+		...StyleSheet.absoluteFillObject,
+		borderRadius: 30,
+		zIndex: 0,
+	},
 });
 export default MallAddress;
