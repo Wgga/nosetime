@@ -26,7 +26,7 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
-const AppVersion = ENV.AppMainVersion + '.' + ENV.AppMiniVersion + '.' + ENV.AppBuildVersion;
+const AppVersion = ENV.AppMainVersion + "." + ENV.AppMiniVersion + "." + ENV.AppBuildVersion;
 
 const Person = React.memo(({ navigation }: any) => {
 
@@ -57,7 +57,7 @@ const Person = React.memo(({ navigation }: any) => {
 		} else {
 			// 20230516 shibo:修复删除签名香后退出重进数据未更新
 			signperfume.current = { iid: null };
-			fullname.current = '';
+			fullname.current = "";
 			setisRender(val => !val);
 		}
 	}, [])
@@ -172,6 +172,21 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 
 	// 跳转页面
 	const gotodetail = (page: string, item: any = null) => {
+		switch (page) {
+			case "mall-address":
+				navigation.navigate("Page", { screen: "MallAddress" })
+				break;
+			case "mall-idcard-edit":
+				break;
+			case "mall-coupon":
+				break;
+			case "user-change-pass":
+				break;
+			case "user-change-account":
+				break;
+			default:
+				break;
+		}
 		console.log("%c Line:171 🍐", "color:#e41a6a");
 	}
 
@@ -265,14 +280,14 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 					end={{ x: 1, y: 0 }}
 					locations={[0, 1]}
 					style={[styles.logout_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
-				></LinearGradient>
+				/>
 				<LinearGradient
 					colors={["#61A2E9", "#95A0EB"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
 					locations={[0, 1]}
 					style={styles.logout_btn_bg}
-				></LinearGradient>
+				/>
 				<Text style={styles.logout_btn_text}>{"退出登录"}</Text>
 			</Pressable>
 			<View style={styles.about_list_con}>
@@ -351,7 +366,7 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 			key: "clear_cache_alert",
 			message: "",
 			buttons: [{
-				text: '取消',
+				text: "取消",
 				handler: () => {
 					AlertCtrl.close("clear_cache_alert");
 				}
@@ -362,11 +377,14 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 					cache.clear(filterkeys.current);
 					setCacheSize("0.00MB");
 					http.post(ENV.update, { uid: us.user.uid, did: us.did, ver: AppVersion }).then((resp_data: any) => {
-						cache.saveItem('userupdate', resp_data, 24 * 3600);
+						cache.saveItem("userupdate", resp_data, 24 * 3600);
 					})
 					ToastCtrl.show({ message: "清除成功", duration: 2000, viewstyle: "short_toast", key: "clear_cache_toast" });
 				}
-			}]
+			}],
+			onTouchOutside: () => {
+				AlertCtrl.close("clear_cache_alert");
+			}
 		})
 	}
 
@@ -398,9 +416,6 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 					gotodetail("user-unregister");
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"注销账户"}</Text>
-					<View style={styles.item_msg}>
-						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
-					</View>
 				</Pressable>
 				<Pressable onPress={clearCache} style={styles.list_item}>
 					<Text style={styles.item_title}>{"清除缓存"}</Text>
@@ -499,7 +514,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 					end={{ x: 0, y: 1 }}
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
-				></LinearGradient>
+				/>
 				<Blurhash style={styles.header_bg}
 					blurhash={us.user.blurhash}
 					decodeWidth={32}

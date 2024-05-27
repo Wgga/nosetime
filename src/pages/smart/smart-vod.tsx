@@ -10,9 +10,9 @@ import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
-const classname = 'SmartEvaluatePage';
+const classname = "SmartEvaluatePage";
 
 
 const SmartVod = React.memo(({ navigation }: any) => {
@@ -67,8 +67,8 @@ const SmartVod = React.memo(({ navigation }: any) => {
 
 	const setitems = (src: string, resp: any, type: string) => {
 		resp[type].map((item: any) => {
-			item['mainname'] = item['name'] ? item['name'].split('：')[0] : '';
-			item['subname'] = item['name'] ? item['name'].split('：')[1] : '';
+			item["mainname"] = item["name"] ? item["name"].split("：")[0] : "";
+			item["subname"] = item["name"] ? item["name"].split("：")[1] : "";
 		});
 		if (src == "singlevod") {
 			vodlist.current = resp.items.slice(1, 5);

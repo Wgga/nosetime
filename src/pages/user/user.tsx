@@ -41,7 +41,11 @@ function User({ navigation }: any): React.JSX.Element {
 	// 变量
 	let pointval = React.useRef<number>(0); // 积分
 	// 数据
-	let userinfo = React.useRef<any>({}); // 用户信息
+	let userinfo = React.useRef<any>({
+		uname: "",
+		all: 0,
+		days: 0,
+	}); // 用户信息
 	// 状态
 	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 	const [isrender, setIsRender] = React.useState(false); // 是否渲染
@@ -74,7 +78,7 @@ function User({ navigation }: any): React.JSX.Element {
 	const getjifenval = () => {
 		return new Promise((resolve, reject) => {
 			http.post(ENV.points + "?uid=" + us.user.uid, { method: "mypoints", token: us.user.token }).then((resp_data: any) => {
-				if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+				if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 					us.delUser();
 					resolve(0);
 				}
@@ -123,7 +127,7 @@ function User({ navigation }: any): React.JSX.Element {
 						end={{ x: 0, y: 1 }}
 						locations={[0.5, 1]}
 						style={styles.linear_bg}
-					></LinearGradient>
+					/>
 					<Blurhash style={styles.header_bg}
 						blurhash={us.user.blurhash}
 						decodeWidth={32}

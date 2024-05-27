@@ -380,7 +380,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 					end={{ x: 0, y: 1 }}
 					locations={[0.03, 0.35]}
 					style={styles.header_con_bg}
-				></LinearGradient>}
+				/>}
 				{itemdata.current && <View style={styles.header_info_con_top}>
 					<View style={{ paddingHorizontal: 16 }}>
 						<Text style={styles.info_cnname}>{itemdata.current.cnname}</Text>
@@ -513,7 +513,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 										end={{ x: 1, y: 0 }}
 										locations={[0, 0.5, 1]}
 										style={styles.fragrance_item_border}
-									></LinearGradient>
+									/>
 									<View style={styles.notes_info_item}>
 										<Text style={styles.fragrance_item_title}>{"前调："}</Text>
 										{itemdata.current.top.map((item: any, index: number) => {
@@ -534,7 +534,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 										end={{ x: 1, y: 0 }}
 										locations={[0, 0.5, 1]}
 										style={styles.fragrance_item_border}
-									></LinearGradient>
+									/>
 									<View style={styles.notes_info_item}>
 										<Text style={styles.fragrance_item_title}>{"中调："}</Text>
 										{itemdata.current.middle.map((item: any, index: number) => {
@@ -595,8 +595,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 										end={{ x: 1, y: 0 }}
 										locations={[0.2, 1]}
 										style={styles.odor_inbar_bg}
-									>
-									</LinearGradient>
+									/>
 									<Icon name="odortime" size={16} color={itemcolors.current.itemcolor} style={styles.odor_time_icon} />
 								</ShadowedView>}
 							</View>
@@ -614,7 +613,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 											end={{ x: 1, y: 0 }}
 											locations={[0, 0.5, 1]}
 											style={styles.fragrance_item_border}
-										></LinearGradient>}
+										/>}
 										{(item && item.length > 0) && item.map((item2: any, index: number) => {
 											return (
 												<View key={item2.wid} style={{

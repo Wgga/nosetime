@@ -2,6 +2,7 @@ import React from "react";
 import { FlatList, View, Text, StyleSheet, Image, VirtualizedList, NativeEventEmitter, Pressable, ImageBackground, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
+import ImageView from "react-native-image-viewing";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
@@ -198,8 +199,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 			</View>
 			<View style={styles.homepart}>
 				<Text style={styles.title}>热门讨论</Text>
-				<FlatList
-					data={homedataref.current.topiclist}
+				<FlatList data={homedataref.current.topiclist}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={styles.topicContent}
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		marginBottom: 10,
 		color: theme.toolbarbg,
-		textAlign: 'center',
+		textAlign: "center",
 	},
 	topicitemcnt: {
 		fontSize: 12,

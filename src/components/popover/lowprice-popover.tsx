@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
 	},
 	diypopup: {
 		width: width - 82,
-		height: 310,
+		height: (width - 82) * 1.5,
 	},
 	popup_con: {
 		width: width - 102,

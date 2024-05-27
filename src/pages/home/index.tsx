@@ -106,7 +106,7 @@ function Home({ navigation }: any): React.JSX.Element {
 						/* this.popoverCtrl.create({
 							component: MallCouponPopoverPage,
 							componentProps: resp_data,
-							cssClass: 'mallcoupon',
+							cssClass: "mallcoupon",
 							//event: ev,
 							translucent: true
 						}).then((popover) => { popover.present() }); */

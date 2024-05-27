@@ -321,6 +321,18 @@ class UserService {
 		return out;
 	}
 
+	isemail(email: string){
+		if (!email || email.length < 7) return false;
+		var regex = /^[a-z0-9]+([\+_\-\.]?[a-z0-9]+)*@([a-z0-9]+[\-]?[a-z0-9]*\.)+[a-z]{2,6}$/i;
+		return regex.test(email);
+	}
+
+	ismobile(mobile: string){
+		if (!mobile || mobile.length != 11) return false;
+		var regex = /^1[3-9]\d{9}$/;
+		return regex.test(mobile);
+	}
+
 	// setLastshowtime(lastshowtime){
 	// 	this.lastshowtime=lastshowtime;
 	// 	this.cache.saveItem(this.factoryname+"lastshowtime",this.lastshowtime,this.factoryname,30*24*3600);

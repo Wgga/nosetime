@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, StyleSheet, Text, TouchableHighlight, View, AppRegistry, Pressable, Dimensions } from "react-native";
+import { StyleSheet, Text, TouchableHighlight, View, Pressable, Dimensions, TextInput } from "react-native";
 
 import { ModalPortal } from "./modals";
 
@@ -11,6 +11,7 @@ const { width, height } = Dimensions.get("window");
 class Alert {
 	private alert_data: any = {
 		header: "这是一个Alert组件",
+		headstyle: {},
 		key: "alert",
 		message: "这是Alert组件的一串描述",
 		buttons: [],
@@ -28,41 +29,43 @@ class Alert {
 		}
 		ModalPortal.show((
 			<View style={styles.containerView}>
-				<Pressable onPress={(e) => { e.stopPropagation() }}>
-					<View style={styles.alert_wrapper}>
-						<View>
-							{this.alert_data.header && <Text style={[styles.alert_head, this.alert_data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head]}>{this.alert_data.header}</Text>}
-							{this.alert_data.message && <Text style={styles.alert_message}>{this.alert_data.message}</Text>}
-						</View>
-						<View style={styles.alert_button_group}>
-							{
-								this.alert_data.buttons && this.alert_data.buttons.map((item: any, index: number) => {
-									return (
-										<TouchableHighlight key={index} style={[styles.alert_button, index == 1 && {
-											borderLeftWidth: 1,
-											borderLeftColor: theme.bg,
-										}]}
-											onPress={() => {
-												this.alert_data.btnbg = theme.text2;
-												item.handler();
-											}}
-											onShowUnderlay={() => {
-												this.alert_data.btnbg = theme.tit;
-											}}
-											underlayColor="rgba(0,0,0,.1)">
-											<Text style={[{ color: this.alert_data.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
-										</TouchableHighlight>
-									)
-								})
-							}
-						</View>
+				<View style={styles.alert_wrapper}>
+					<View>
+						{this.alert_data.header && <Text style={[
+							styles.alert_head,
+							this.alert_data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head,
+							this.alert_data.headstyle && this.alert_data.headstyle
+						]}>{this.alert_data.header}</Text>}
+						{this.alert_data.message && <Text style={styles.alert_message}>{this.alert_data.message}</Text>}
 					</View>
-				</Pressable>
+					<View style={styles.alert_button_group}>
+						{
+							this.alert_data.buttons && this.alert_data.buttons.map((item: any, index: number) => {
+								return (
+									<TouchableHighlight key={index} style={[styles.alert_button, index == 1 && {
+										borderLeftWidth: 1,
+										borderLeftColor: "rgba(224,224,224,0.3333)",
+									}]}
+										onPress={() => {
+											this.alert_data.btnbg = theme.text2;
+											item.handler();
+										}}
+										onShowUnderlay={() => {
+											this.alert_data.btnbg = theme.tit;
+										}}
+										underlayColor="rgba(0,0,0,.1)">
+										<Text style={[{ color: this.alert_data.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
+									</TouchableHighlight>
+								)
+							})
+						}
+					</View>
+				</View>
 			</View>
 		), {
 			key: this.alert_data.key,
 			width: width,
-			height: height,
+			height: 200,
 			rounded: false,
 			useNativeDriver: true,
 			onShow: this.alert_data.onShow,
@@ -83,14 +86,9 @@ class Alert {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		position: "relative",
-		flex: 1,
-	},
 	containerView: {
 		flex: 1,
 		alignItems: "center",
-		backgroundColor: "rgba(0,0,0,.5)",
 		justifyContent: "center",
 	},
 	alert_wrapper: {
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		borderTopWidth: 1,
-		borderTopColor: theme.bg
+		borderTopColor: "rgba(224,224,224,0.3333)"
 	},
 	alert_button: {
 		flex: 1,

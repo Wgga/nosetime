@@ -136,11 +136,11 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 		http.post(ENV.wiki + "?uid=" + us.user.uid, {
 			method: "togglefav", wid: wid, token: us.user.token
 		}).then((resp_data: any) => {
-			if (resp_data.msg == 'ADD') {
+			if (resp_data.msg == "ADD") {
 				like_.current[wid] = true;
-			} else if (resp_data.msg == 'REMOVE') {
+			} else if (resp_data.msg == "REMOVE") {
 				like_.current[wid] = false;
-			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
 			}

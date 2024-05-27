@@ -28,19 +28,6 @@ import ToastCtrl from "../../components/toastctrl";
 const { height, width } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
-
-const isemail = (email: string) => {
-	if (!email || email.length < 7) return false;
-	var regex = /^[a-z0-9]+([\+_\-\.]?[a-z0-9]+)*@([a-z0-9]+[\-]?[a-z0-9]*\.)+[a-z]{2,6}$/i;
-	return regex.test(email);
-}
-
-const ismobile = (mobile: string) => {
-	if (!mobile || mobile.length != 11) return false;
-	var regex = /^1[3-9]\d{9}$/;
-	return regex.test(mobile);
-}
-
 const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 	return (
 		<>
@@ -104,7 +91,7 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 		var pwd2 = user.pwd2;
 		var errmsg = "";
 		var header = "输入错误";
-		if (!isemail(mobile) && !ismobile(mobile))
+		if (!us.isemail(mobile) && !us.ismobile(mobile))
 			errmsg += "手机号/Email格式不正确\n";
 		else if (name.length < 2)
 			errmsg += "昵称长度不足\n";
@@ -406,10 +393,10 @@ function Login({ route, navigation }: any): React.JSX.Element {
 		let p1;
 		if (step.current === "1") {
 			if (wait.current > 0) return;
-			if (!isemail(mobile) && !ismobile(mobile)) {
+			if (!us.isemail(mobile) && !us.ismobile(mobile)) {
 				AlertCtrl.show({
 					header: "输入错误",
-					key:"photo_err_alert",
+					key: "photo_err_alert",
 					message: "手机号/Email格式不正确。",
 					buttons: [{
 						text: "确定",
@@ -477,7 +464,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			if (resp_data.msg == "OK") {
 				//登录后处理，参考LoginCtrl
 				if (step.current == "1") {
-					if (isemail(mobile)) {
+					if (us.isemail(mobile)) {
 						ToastCtrl.show({ message: "验证码已发送到您的邮箱", duration: 1000, viewstyle: "superior_toast", key: "email_toast" });
 					} else {
 						ToastCtrl.show({ message: "验证码已发送到您的手机", duration: 1000, viewstyle: "superior_toast", key: "photo_toast" });
@@ -651,7 +638,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 	const signIn = () => {
 		console.log("Sign-In", user.mobile, user.pwd);
 		let pwd = "";
-		if ((isemail(user.mobile) || ismobile(user.mobile)) && user.pwd.length >= 6) {
+		if ((us.isemail(user.mobile) || us.ismobile(user.mobile)) && user.pwd.length >= 6) {
 			console.log("Sign-In 1");
 			if (prelogin !== null) {
 				console.log("Sign-In 2", prelogin);
@@ -694,7 +681,6 @@ function Login({ route, navigation }: any): React.JSX.Element {
 						setPrelogin(null);
 					}
 				}).catch((error: any) => {
-					// this.loadingCtrl.dismiss();
 					AlertCtrl.show({
 						header: "请查看是否连上网络",
 						key: "network_err_alert",
