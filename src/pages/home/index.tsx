@@ -144,7 +144,7 @@ function Home({ navigation }: any): React.JSX.Element {
 			lowPrice();
 		}).catch(() => {
 			open_popover({
-				modal_width: width - 112,
+				modal_width: 280,
 				modal_key: "home_protocol_popover",
 				modal_component: (<HomeProtocolPopover method={{ lowPrice }} />),
 				onShow: () => { },

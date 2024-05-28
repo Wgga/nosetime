@@ -711,19 +711,7 @@ npm install react-native-text-size
 yarn add react-native-text-size
 ```
 
-### 28. react-native-system-navigation-bar
-
-react-native-system-navigation-bar 是一个用于 React Native 的系统导航栏组件, 允许您自定义 Android 的系统导航栏。
-
-```bash
-# using npm
-npm install react-native-system-navigation-bar
-
-# OR using Yarn
-yarn add react-native-system-navigation-bar
-```
-
-### 29. react-native-permissions
+### 28. react-native-permissions
 
 
 react-native-permissions 是一个适用于 iOS、Android 和 Windows 上的 React Native 的统一权限 API 组件。
@@ -924,6 +912,19 @@ setup_permissions([
 
 </manifest>
 ```
+
+### 29. react-native-image-crop-picker
+
+react-native-image-crop-picker 是一个用于在 React Native 应用中裁剪和选择图片的库。
+
+```bash
+# using npm
+npm install react-native-image-crop-picker
+
+# OR using Yarn
+yarn add react-native-image-crop-picker
+```
+
 
 # 三、 打包 release APK
 ```bash

@@ -6,6 +6,9 @@
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
         <!--设置透明背景-->
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
     <style name="SplashScreenTheme" parent="SplashScreen_SplashTheme">
         <item name="colorPrimary">@color/status_bar_color</item>

@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
 		height: (width - 40 - 20) / 3,
 		borderRadius: 8,
 		overflow: "hidden",
+		backgroundColor: theme.bg,
 	},
 	perfume_item_desc: {
 		marginTop: 8,

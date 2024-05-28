@@ -172,7 +172,7 @@ function User({ navigation }: any): React.JSX.Element {
 						style={styles.linear_bg}
 					/>
 					<Blurhash style={styles.header_bg}
-						blurhash={us.user.blurhash}
+						blurhash={us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0"}
 						decodeWidth={32}
 						decodeHeight={32}
 						decodePunch={1}
@@ -194,7 +194,7 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 					<Brightness amount={0.85} style={styles.user_page_con}>
 						<Blurhash style={styles.user_page_bg}
-							blurhash={us.user.blurhash}
+							blurhash={us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0"}
 							decodeWidth={32}
 							decodeHeight={32}
 							decodePunch={1}

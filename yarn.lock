@@ -6450,11 +6450,6 @@ react-native-svg@^15.3.0:
     css-select "^5.1.0"
     css-tree "^1.1.3"
 
-react-native-system-navigation-bar@^2.6.4:
-  version "2.6.4"
-  resolved "https://registry.npmmirror.com/react-native-system-navigation-bar/-/react-native-system-navigation-bar-2.6.4.tgz#34edee7051dea01531ff2be95dc14f9fa8a540b7"
-  integrity sha512-4pysgADW53PiuHv+2glzNLJnHSxqDszZvLoitLFI5os4D+gCDfxmR36VSET4EnXkzSf8X9mbeFkHYDypDHJyZA==
-
 react-native-tab-view@^3.5.2:
   version "3.5.2"
   resolved "https://registry.npmmirror.com/react-native-tab-view/-/react-native-tab-view-3.5.2.tgz#2789b8af6148b16835869566bf13dc3b0e6c1b46"

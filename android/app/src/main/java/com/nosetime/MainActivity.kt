@@ -3,6 +3,7 @@ package com.nosetime
 import android.os.Bundle
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.core.view.WindowCompat
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -29,6 +30,7 @@ class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState : Bundle?) {
       SplashScreen.show(this, R.style.SplashScreenTheme, true);
       super.onCreate(savedInstanceState);
+      WindowCompat.setDecorFitsSystemWindows(window, false)
   }
 
   override fun onConfigurationChanged(newConfig : Configuration) {
