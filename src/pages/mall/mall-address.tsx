@@ -14,6 +14,7 @@ import Icon from "../../assets/iconfont";
 
 import HeaderView from "../../components/headerview";
 import AlertCtrl from "../../components/alertctrl";
+import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";
 
@@ -121,7 +122,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			{(address_list.current && address_list.current.length > 0) && <ScrollView>
+			{(address_list.current && address_list.current.length > 0) && <ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.address_list}>
 					{address_list.current.map((item: any, index: number) => {
 						return (
@@ -158,25 +159,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					})}
 				</View>
 			</ScrollView>}
-			<View style={styles.footer_con}>
-				<Pressable onPress={() => { gotodetail(null) }} style={styles.add_address_btn}>
-					<LinearGradient
-						colors={["#81B4EC", "#9BA6F5"]}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 0 }}
-						locations={[0, 1]}
-						style={[styles.add_address_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
-					/>
-					<LinearGradient
-						colors={["#61A2E9", "#95A0EB"]}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 0 }}
-						locations={[0, 1]}
-						style={styles.add_address_btn_bg}
-					/>
-					<Text style={styles.add_address_btn_text}>{"+ 添加新地址"}</Text>
-				</Pressable>
-			</View>
+			<LinearButton containerStyle={styles.footer_con} text="+ 添加新地址" onPress={() => { gotodetail(null) }} />
 		</View>
 	);
 }
@@ -270,22 +253,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 40,
 		paddingVertical: 21,
 		backgroundColor: theme.toolbarbg,
-	},
-	add_address_btn: {
-		padding: 12,
-		borderRadius: 30,
-		overflow: "hidden",
-		alignItems: "center",
-	},
-	add_address_btn_text: {
-		fontSize: 16,
-		color: theme.toolbarbg,
-		zIndex: 2,
-	},
-	add_address_btn_bg: {
-		...StyleSheet.absoluteFillObject,
-		borderRadius: 30,
-		zIndex: 0,
 	},
 });
 export default MallAddress;

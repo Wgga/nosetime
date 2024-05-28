@@ -41,8 +41,7 @@ class ActionSheet {
 										underlayColor="rgba(255,255,255,0.8)">
 										<Text style={[
 											styles.action_sheet_button_inner,
-											item.style,
-											index == 2 ? styles.button_color_tit : styles.button_color_tit2
+											item.style
 										]}>{item.text}</Text>
 									</TouchableHighlight>
 								)

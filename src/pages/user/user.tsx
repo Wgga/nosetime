@@ -9,10 +9,12 @@ import { useFocusEffect } from "@react-navigation/native";
 import { ShadowedView } from "react-native-fast-shadow";
 
 import ToastCtrl from "../../components/toastctrl";
+import ActionSheetCtrl from "../../components/actionsheetctrl";
 
 import http from "../../utils/api/http";
 
 import us from "../../services/user-service/user-service";
+import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import cache from "../../hooks/storage/storage";
 
@@ -117,6 +119,47 @@ function User({ navigation }: any): React.JSX.Element {
 		}
 	}
 
+	const changeAvatar = () => {
+		let params = {
+			index: 0,
+			quality: 0.9,
+			includeBase64: true,
+			maxWidth: 400,
+			maxHeight: 400,
+			src: "useravatar",
+			classname,
+			isCrop: true,
+		}
+		ActionSheetCtrl.show({
+			key: "avatar_action_sheet",
+			buttons: [{
+				text: "拍照",
+				style: { color: theme.redchecked },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					setTimeout(() => { upService.buttonClicked(params) }, 300);
+				}
+			}, {
+				text: "从相册选择",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					params["index"] = 1;
+					setTimeout(() => { upService.buttonClicked(params) }, 300);
+				}
+			}, {
+				text: "取消",
+				style: { color: theme.tit },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+				}
+			}],
+			onTouchOutside: () => {
+				ActionSheetCtrl.close("avatar_action_sheet");
+			},
+		})
+	}
+
 	return (
 		<ScrollView contentContainerStyle={styles.user_con} showsVerticalScrollIndicator={false}>
 			{userinfo.current && <>
@@ -139,9 +182,11 @@ function User({ navigation }: any): React.JSX.Element {
 				</Brightness>
 				<View style={styles.user_info_con}>
 					<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
-						<Image style={styles.user_avatar}
-							source={{ uri: ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
-						/>
+						<Pressable onPress={changeAvatar}>
+							<Image style={styles.user_avatar}
+								source={{ uri: ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
+							/>
+						</Pressable>
 						<View>
 							<Text style={styles.user_name}>{userinfo.current.uname}</Text>
 							<Text style={styles.user_days}>{"已入住 " + userinfo.current.days + "，记录了 " + userinfo.current.all + " 款香水"}</Text>

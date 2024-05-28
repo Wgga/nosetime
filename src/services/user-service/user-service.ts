@@ -27,10 +27,7 @@ class UserService {
 	public isios: boolean = false;
 	public isnewinstall: boolean = false;
 
-	constructor(
-	) {
-		// console.log("user-service constructor");
-
+	constructor() {
 		Platform.OS == "android" ? this.isandroid = true : this.isios = true;
 
 		this.init();
@@ -321,13 +318,13 @@ class UserService {
 		return out;
 	}
 
-	isemail(email: string){
+	isemail(email: string) {
 		if (!email || email.length < 7) return false;
 		var regex = /^[a-z0-9]+([\+_\-\.]?[a-z0-9]+)*@([a-z0-9]+[\-]?[a-z0-9]*\.)+[a-z]{2,6}$/i;
 		return regex.test(email);
 	}
 
-	ismobile(mobile: string){
+	ismobile(mobile: string) {
 		if (!mobile || mobile.length != 11) return false;
 		var regex = /^1[3-9]\d{9}$/;
 		return regex.test(mobile);

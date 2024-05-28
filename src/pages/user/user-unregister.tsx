@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions } from "react-native";
 
 import { Md5 } from "ts-md5";
-import LinearGradient from "react-native-linear-gradient";
 
 import http from "../../utils/api/http";
 
@@ -18,6 +17,7 @@ import AlertCtrl from "../../components/alertctrl";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import { ModalPortal } from "../../components/modals";
 import ToastCtrl from "../../components/toastctrl";
+import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";
 
@@ -263,23 +263,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 					back: () => { navigation.goBack() },
 				}} />
 			<View style={styles.unregister_con}>{terms}</View>
-			<Pressable onPress={() => { unregister_alert("mobile") }} style={styles.unregister_btn}>
-				<LinearGradient
-					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={[styles.unregister_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
-				/>
-				<LinearGradient
-					colors={["#61A2E9", "#95A0EB"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={styles.unregister_btn_bg}
-				/>
-				<Text style={styles.unregister_btn_text}>{"继续注销"}</Text>
-			</Pressable>
+			<LinearButton containerStyle={styles.footer_btn} text="继续注销" onPress={() => { unregister_alert("mobile") }} />
 		</View>
 	);
 })
@@ -303,23 +287,9 @@ const styles = StyleSheet.create({
 		color: theme.comment,
 		marginBottom: 10,
 	},
-	unregister_btn: {
+	footer_btn: {
 		marginTop: 63,
-		padding: 12,
-		borderRadius: 30,
-		overflow: "hidden",
-		alignItems: "center",
 		marginHorizontal: 35,
-	},
-	unregister_btn_text: {
-		fontSize: 16,
-		color: theme.toolbarbg,
-		zIndex: 2,
-	},
-	unregister_btn_bg: {
-		...StyleSheet.absoluteFillObject,
-		borderRadius: 30,
-		zIndex: 0,
-	},
+	}
 });
 export default UserUnregister;

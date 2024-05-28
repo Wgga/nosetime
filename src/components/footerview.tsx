@@ -41,13 +41,12 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 			</View>
 			<View style={styles.footer_con_right}>
 				{children}
-				{isfocus &&
-					<LinearGradient
-						colors={["#81B4EC", "#9BA6F5"]}
-						start={{ x: 0, y: 0.5 }}
-						end={{ x: 1, y: 0.5 }}
-						style={styles.footer_publish}
-					><Text style={styles.publish_text}>{"发布"}</Text></LinearGradient>}
+				{isfocus && <LinearGradient style={styles.footer_publish}
+					colors={["#81B4EC", "#9BA6F5"]}
+					start={{ x: 0, y: 0.5 }}
+					end={{ x: 1, y: 0.5 }}>
+					<Text style={styles.publish_text}>{"发布"}</Text>
+				</LinearGradient>}
 			</View>
 		</Animated.View>
 	);

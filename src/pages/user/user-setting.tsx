@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import AlertCtrl from "../../components/alertctrl";
 import ToastCtrl from "../../components/toastctrl";
+import LinearButton from "../../components/linearbutton";
 
 import http from "../../utils/api/http";
 
@@ -273,23 +274,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 					</View>
 				</Pressable>}
 			</ShadowedView>
-			<Pressable onPress={logout} style={styles.logout_btn}>
-				<LinearGradient
-					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={[styles.logout_btn_bg, { zIndex: 1, transform: [{ translateY: -2 }, { translateX: -2 }] }]}
-				/>
-				<LinearGradient
-					colors={["#61A2E9", "#95A0EB"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={styles.logout_btn_bg}
-				/>
-				<Text style={styles.logout_btn_text}>{"退出登录"}</Text>
-			</Pressable>
+			<LinearButton containerStyle={styles.footer_btn} text="退出登录" onPress={logout} />
 			<View style={styles.about_list_con}>
 				<View style={styles.protocol_con}>
 					<Pressable onPress={() => {
@@ -700,23 +685,9 @@ const styles = StyleSheet.create({
 		color: theme.comment,
 		fontSize: 12,
 	},
-	logout_btn: {
+	footer_btn: {
 		marginTop: 25,
 		marginBottom: 20,
-		padding: 12,
-		borderRadius: 30,
-		overflow: "hidden",
-		alignItems: "center",
-	},
-	logout_btn_text: {
-		fontSize: 16,
-		color: theme.toolbarbg,
-		zIndex: 2,
-	},
-	logout_btn_bg: {
-		...StyleSheet.absoluteFillObject,
-		borderRadius: 30,
-		zIndex: 0,
 	},
 	about_list_con: {
 		alignItems: "center",

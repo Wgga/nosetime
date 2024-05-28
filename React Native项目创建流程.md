@@ -723,6 +723,207 @@ npm install react-native-system-navigation-bar
 yarn add react-native-system-navigation-bar
 ```
 
+### 29. react-native-permissions
+
+
+react-native-permissions 是一个适用于 iOS、Android 和 Windows 上的 React Native 的统一权限 API 组件。
+
+```bash
+# using npm
+npm install react-native-permissions
+
+# OR using Yarn
+yarn add react-native-permissions
+```
+
+#### IOS
+
+1. 默认情况下，没有可用的权限。首先，需要 `Podfile` 中的设置脚本：
+
+如果您使用的是 React Native 0.72+:
+
+```Podfile
+# Transform this into a `node_require` generic function:
+- # Resolve react_native_pods.rb with node to allow for hoisting
+- require Pod::Executable.execute_command('node', ['-p',
+-   'require.resolve(
+-     "react-native/scripts/react_native_pods.rb",
+-     {paths: [process.argv[1]]},
+-   )', __dir__]).strip
+
++ def node_require(script)
++   # Resolve script with node to allow for hoisting
++   require Pod::Executable.execute_command('node', ['-p',
++     "require.resolve(
++       '#{script}',
++       {paths: [process.argv[1]]},
++     )", __dir__]).strip
++ end
+
+# Use it to require both react-native's and this package's scripts:
++ node_require('react-native/scripts/react_native_pods.rb')
++ node_require('react-native-permissions/scripts/setup.rb')
+```
+
+如果您使用的是 React Native < 0.72:
+
+```
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+# Add a require_relative for this package's script:
++ require_relative '../node_modules/react-native-permissions/scripts/setup'
+```
+
+2. 在同一个 `Podfile` 中，使用所需的权限调用 `setup_permissions` 。将仅添加此处指定的权限:
+
+```
+# …
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+# ⬇️ uncomment the permissions you need
+setup_permissions([
+  # 'AppTrackingTransparency',
+  # 'Bluetooth',
+  # 'Calendars',
+  # 'CalendarsWriteOnly',
+  # 'Camera',
+  # 'Contacts',
+  # 'FaceID',
+  # 'LocationAccuracy',
+  # 'LocationAlways',
+  # 'LocationWhenInUse',
+  # 'MediaLibrary',
+  # 'Microphone',
+  # 'Motion',
+  # 'Notifications',
+  # 'PhotoLibrary',
+  # 'PhotoLibraryAddOnly',
+  # 'Reminders',
+  # 'Siri',
+  # 'SpeechRecognition',
+  # 'StoreKit',
+])
+
+# …
+```
+
+3. 然后在 `ios` 目录中执行 `pod install` （📌 请注意，每次更新此配置时都必须重新执行它）.
+4. 最后，将相应的权限使用说明添加到 `Info.plist` 中。例如
+
+```plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+  <!-- 🚨 Keep only the permissions specified in `setup_permissions` 🚨 -->
+
+  <key>NSAppleMusicUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSCameraUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSContactsUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSFaceIDUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSLocationTemporaryUsageDescriptionDictionary</key>
+  <dict>
+    <key>YOUR-PURPOSE-KEY</key>
+    <string>[REASON]</string>
+  </dict>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSMotionUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSRemindersFullAccessUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSSiriUsageDescription</key>
+  <string>[REASON]</string>
+  <key>NSUserTrackingUsageDescription</key>
+  <string>[REASON]</string>
+
+  <!-- … -->
+
+</dict>
+</plist>
+```
+
+#### Android
+
+将所有需要的权限添加到您的应用程序文件：`android/app/src/main/AndroidManifest.xml`
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <!-- 🚨 Keep only the permissions used in your app 🚨 -->
+
+  <uses-permission android:name="android.permission.ACCEPT_HANDOVER" />
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+  <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+  <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
+  <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+  <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+  <uses-permission android:name="android.permission.BODY_SENSORS" />
+  <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND" />
+  <uses-permission android:name="android.permission.CALL_PHONE" />
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+  <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+  <uses-permission android:name="android.permission.READ_CALENDAR" />
+  <uses-permission android:name="android.permission.READ_CALL_LOG" />
+  <uses-permission android:name="android.permission.READ_CONTACTS" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+  <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+  <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.READ_SMS" />
+  <uses-permission android:name="android.permission.RECEIVE_MMS" />
+  <uses-permission android:name="android.permission.RECEIVE_SMS" />
+  <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.SEND_SMS" />
+  <uses-permission android:name="android.permission.USE_SIP" />
+  <uses-permission android:name="android.permission.UWB_RANGING" />
+  <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+  <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+  <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  <!-- … -->
+
+</manifest>
+```
 
 # 三、 打包 release APK
 ```bash

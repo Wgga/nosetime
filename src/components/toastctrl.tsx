@@ -1,6 +1,8 @@
 
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 
+import { ShadowedView } from "react-native-fast-shadow";
+
 import { ModalPortal } from "./modals";
 
 import theme from "../configs/theme";
@@ -14,6 +16,7 @@ class Toast {
 	private toast_data: any = {
 		message: "这是一个Toast组件",
 		duration: 2000,
+		position: "center",
 		viewstyle: "medium_toast",
 		key: "toast",
 		onShow: () => { },
@@ -22,6 +25,7 @@ class Toast {
 		hasOverlay: false,
 		animationDuration: 300,
 		modalStyle: { backgroundColor: "transparent" },
+		textStyle: {},
 	}
 
 	show(toastdata: any) {
@@ -30,14 +34,17 @@ class Toast {
 		}
 		this.toast = ModalPortal.show((
 			<View style={styles.containerView}>
-				<View style={[styles.toast_wrapper, styles[this.toast_data.viewstyle]]}>
+				{this.toast_data.key != "permission_toast" && <View style={[styles.toast_wrapper, this.toast_data.viewstyle && styles[this.toast_data.viewstyle]]}>
 					<Text style={styles.toast_text}>{this.toast_data.message}</Text>
-				</View>
+				</View>}
+				{this.toast_data.key == "permission_toast" && <ShadowedView style={styles.toast_permission_wrapper}>
+					<Text style={styles.toast_permission_text}>{this.toast_data.message}</Text>
+				</ShadowedView>}
 			</View>
 		), {
 			key: this.toast_data.key,
 			width: width,
-			height: height,
+			height: 200,
 			rounded: false,
 			useNativeDriver: true,
 			onShow: this.toast_data.onShow,
@@ -49,6 +56,7 @@ class Toast {
 			hasOverlay: this.toast_data.hasOverlay,
 			animationDuration: this.toast_data.animationDuration,
 			modalStyle: this.toast_data.modalStyle,
+			style: { justifyContent: this.toast_data.position == "top" ? "flex-start" : "center" }
 		})
 		if (this.toast_data.duration > 0) {
 			setTimeout(() => {
@@ -57,6 +65,12 @@ class Toast {
 			}, this.toast_data.duration);
 		}
 		return this.toast;
+	}
+
+	close(key: string) {
+		if (key) {
+			ModalPortal.dismiss(key);
+		}
 	}
 }
 
@@ -71,6 +85,23 @@ const styles: any = StyleSheet.create({
 		borderRadius: 5,
 		overflow: "hidden",
 		padding: 15,
+	},
+	toast_permission_wrapper: {
+		backgroundColor: theme.toolbarbg,
+		paddingVertical: 14,
+		paddingHorizontal: 16,
+		marginHorizontal: 8,
+		borderRadius: 5,
+		shadowOpacity: 0.2,
+		shadowRadius: 10,
+		shadowOffset: {
+			width: 0,
+			height: 0,
+		},
+	},
+	toast_permission_text:{
+		color: theme.text2,
+		fontSize: 16,
 	},
 	toast_text: {
 		color: theme.toolbarbg,
