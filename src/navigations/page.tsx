@@ -29,6 +29,8 @@ import MallHeji from "../pages/mall/mall-heji";
 import MallItem from "../pages/mall/mall-item";
 import MallAddress from "../pages/mall/mall-address";
 import MallAddressEdit from "../pages/mall/mall-address-edit";
+import MallIdcardEdit from "../pages/mall/mall-idcard-edit";
+import MallCoupon from "../pages/mall/mall-coupon";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +64,8 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="MallItem" component={MallItem} />
 			<Stack.Screen name="MallAddress" component={MallAddress} />
 			<Stack.Screen name="MallAddressEdit" component={MallAddressEdit} />
+			<Stack.Screen name="MallIdcardEdit" component={MallIdcardEdit} />
+			<Stack.Screen name="MallCoupon" component={MallCoupon} />
 		</Stack.Navigator>
 	);
 }

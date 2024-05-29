@@ -41,7 +41,9 @@ function User({ navigation }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 	// 参数
 	// 变量
-	let pointval = React.useRef<number>(0); // 积分
+	let pointval = React.useRef<number>(0); // 积分-
+	let avatar = React.useRef<string>(""); // 头像
+	let blurhash = React.useRef<string>(""); // 头像模糊图
 	// 数据
 	let userinfo = React.useRef<any>({
 		uname: "",
@@ -59,6 +61,20 @@ function User({ navigation }: any): React.JSX.Element {
 	);
 
 	React.useEffect(() => {
+		events.addListener("change_avatar", (data: any) => {
+			if (data) {
+				avatar.current = data.avatar;
+				blurhash.current = data.blurhash;
+				setIsRender((val) => !val);
+			}
+		})
+		events.addListener("userupdatedata", (result) => {
+			showgiftcode.current = result && result.showgiftcode == 1 ? true : false;
+		})
+		return () => {
+			events.removeAllListeners("change_avatar");
+			events.removeAllListeners("userupdatedata");
+		}
 	}, []);
 
 	const init = () => {
@@ -91,15 +107,12 @@ function User({ navigation }: any): React.JSX.Element {
 	}
 
 	const getmoredata = (type: string) => {
-		events.addListener("usershowgiftcode", (result) => {
-			showgiftcode.current = result && result.showgiftcode == 1 ? true : false;
-		})
-		cache.getItem("usershowgiftcode").then((cacheobj) => {
+		cache.getItem("userupdatedata").then((cacheobj) => {
 			showgiftcode.current = cacheobj && cacheobj.showgiftcode == 1 ? true : false;
 		}).catch(() => { });
-
 		Promise.all([getjifenval()]).then((data: any) => {
 			if (data.length == 1) {
+				blurhash.current = us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
 				setIsRender((val) => !val);
 			}
 		})
@@ -162,118 +175,116 @@ function User({ navigation }: any): React.JSX.Element {
 
 	return (
 		<ScrollView contentContainerStyle={styles.user_con} showsVerticalScrollIndicator={false}>
-			{userinfo.current && <>
-				<Brightness amount={0.85} style={styles.header_bg_con}>
-					<LinearGradient
-						colors={["transparent", theme.bg]}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 0, y: 1 }}
-						locations={[0.5, 1]}
-						style={styles.linear_bg}
-					/>
-					<Blurhash style={styles.header_bg}
-						blurhash={us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0"}
-						decodeWidth={32}
-						decodeHeight={32}
+			<Brightness amount={0.85} style={styles.header_bg_con}>
+				<LinearGradient
+					colors={["transparent", theme.bg]}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 0, y: 1 }}
+					locations={[0.5, 1]}
+					style={styles.linear_bg}
+				/>
+				<Blurhash style={styles.header_bg}
+					blurhash={blurhash.current}
+					decodeWidth={16}
+					decodeHeight={16}
+					decodePunch={1}
+					resizeMode="cover"
+					decodeAsync={true}
+				/>
+			</Brightness>
+			{userinfo.current && <View style={styles.user_info_con}>
+				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
+					<Pressable onPress={changeAvatar}>
+						<Image style={styles.user_avatar}
+							source={{ uri: avatar.current ? avatar.current : ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
+						/>
+					</Pressable>
+					<View>
+						<Text style={styles.user_name}>{userinfo.current.uname}</Text>
+						<Text style={styles.user_days}>{"已入住 " + userinfo.current.days + "，记录了 " + userinfo.current.all + " 款香水"}</Text>
+					</View>
+				</View>
+				<Brightness amount={0.85} style={styles.user_page_con}>
+					<Blurhash style={styles.user_page_bg}
+						blurhash={blurhash.current}
+						decodeWidth={16}
+						decodeHeight={16}
 						decodePunch={1}
 						resizeMode="cover"
 						decodeAsync={true}
 					/>
+					<Image style={styles.user_page_msk}
+						source={require("../../assets/images/user/userpage.png")}
+					/>
+					<View style={styles.page_text_con}>
+						<Text style={styles.page_main_text}>{"个人主页"}</Text>
+						<View style={styles.page_sub_text_con}>
+							<Text style={styles.sub_text}>{"我的香路历程"}</Text>
+							<Icon name="r-return" size={14} color={theme.toolbarbg} />
+						</View>
+					</View>
 				</Brightness>
-				<View style={styles.user_info_con}>
-					<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
-						<Pressable onPress={changeAvatar}>
-							<Image style={styles.user_avatar}
-								source={{ uri: ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
-							/>
-						</Pressable>
-						<View>
-							<Text style={styles.user_name}>{userinfo.current.uname}</Text>
-							<Text style={styles.user_days}>{"已入住 " + userinfo.current.days + "，记录了 " + userinfo.current.all + " 款香水"}</Text>
+				<View style={styles.user_page_btn}>
+					<Pressable onPress={() => { cache.clear() }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
+						<Text style={styles.item_main_tit}>{"积分集市"}</Text>
+						<View style={styles.item_sub_tit_con}>
+							<Text style={styles.item_sub_tit}>{"我的积分 " + pointval.current}</Text>
+							<Icon name="r-return" size={12} color={theme.comment} />
 						</View>
-					</View>
-					<Brightness amount={0.85} style={styles.user_page_con}>
-						<Blurhash style={styles.user_page_bg}
-							blurhash={us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0"}
-							decodeWidth={32}
-							decodeHeight={32}
-							decodePunch={1}
-							resizeMode="cover"
-							decodeAsync={true}
-						/>
-						<Image style={styles.user_page_msk}
-							source={require("../../assets/images/user/userpage.png")}
-						/>
-						<View style={styles.page_text_con}>
-							<Text style={styles.page_main_text}>{"个人主页"}</Text>
-							<View style={styles.page_sub_text_con}>
-								<Text style={styles.sub_text}>{"我的香路历程"}</Text>
-								<Icon name="r-return" size={14} color={theme.toolbarbg} />
-							</View>
-						</View>
-					</Brightness>
-					<View style={styles.user_page_btn}>
-						<Pressable onPress={() => { cache.clear() }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
-							<Text style={styles.item_main_tit}>{"积分集市"}</Text>
-							<View style={styles.item_sub_tit_con}>
-								<Text style={styles.item_sub_tit}>{"我的积分 " + pointval.current}</Text>
-								<Icon name="r-return" size={12} color={theme.comment} />
-							</View>
-						</Pressable>
-						<View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
-							<Text style={styles.item_main_tit}>{"香水学院"}</Text>
-							<View style={styles.item_sub_tit_con}>
-								<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
-								<Icon name="r-return" size={12} color={theme.comment} />
-							</View>
-						</View>
-					</View>
-					<View>
-						<View style={styles.btns_item_con}>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Waitpay width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"待付款"}</Text>
-							</Pressable>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Transport width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"进行中"}</Text>
-							</Pressable>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Completed width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"已完成"}</Text>
-							</Pressable>
-							<Pressable onPress={() => { }}>
-								<ShadowedView style={[styles.btn_item, styles.order_btn_item]}>
-									<Order width={24} height={24} style={styles.btn_item_icon} />
-									<Text style={styles.btn_item_text}>{"全部订单"}</Text>
-								</ShadowedView>
-							</Pressable>
-						</View>
-						<View style={styles.btns_item_con}>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Message width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"消息"}</Text>
-							</Pressable>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Wishlist width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"愿望单"}</Text>
-							</Pressable>
-							<Pressable onPress={() => { }} style={styles.btn_item}>
-								<Usercart width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"购物车"}</Text>
-							</Pressable>
-							{showgiftcode.current && <Pressable onPress={() => { }} style={styles.btn_item}>
-								<Giftcode width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"礼品码兑换"}</Text>
-							</Pressable>}
-							<Pressable onPress={() => { gotodetail("user-setting") }} style={styles.btn_item}>
-								<Setting width={24} height={24} style={styles.btn_item_icon} />
-								<Text style={styles.btn_item_text}>{"设置"}</Text>
-							</Pressable>
+					</Pressable>
+					<View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
+						<Text style={styles.item_main_tit}>{"香水学院"}</Text>
+						<View style={styles.item_sub_tit_con}>
+							<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
+							<Icon name="r-return" size={12} color={theme.comment} />
 						</View>
 					</View>
 				</View>
-			</>}
+				<View>
+					<View style={styles.btns_item_con}>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Waitpay width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"待付款"}</Text>
+						</Pressable>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Transport width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"进行中"}</Text>
+						</Pressable>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Completed width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"已完成"}</Text>
+						</Pressable>
+						<Pressable onPress={() => { }}>
+							<ShadowedView style={[styles.btn_item, styles.order_btn_item]}>
+								<Order width={24} height={24} style={styles.btn_item_icon} />
+								<Text style={styles.btn_item_text}>{"全部订单"}</Text>
+							</ShadowedView>
+						</Pressable>
+					</View>
+					<View style={styles.btns_item_con}>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Message width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"消息"}</Text>
+						</Pressable>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Wishlist width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"愿望单"}</Text>
+						</Pressable>
+						<Pressable onPress={() => { }} style={styles.btn_item}>
+							<Usercart width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"购物车"}</Text>
+						</Pressable>
+						{showgiftcode.current && <Pressable onPress={() => { }} style={styles.btn_item}>
+							<Giftcode width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"礼品码兑换"}</Text>
+						</Pressable>}
+						<Pressable onPress={() => { gotodetail("user-setting") }} style={styles.btn_item}>
+							<Setting width={24} height={24} style={styles.btn_item_icon} />
+							<Text style={styles.btn_item_text}>{"设置"}</Text>
+						</Pressable>
+					</View>
+				</View>
+			</View>}
 		</ScrollView>
 	);
 }
@@ -287,6 +298,8 @@ const styles = StyleSheet.create({
 	},
 	header_bg_con: {
 		position: "absolute",
+		top: 0,
+		bottom: 0,
 		width: width,
 		height: height * 0.6,
 		overflow: "hidden",

@@ -24,6 +24,8 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import { ModalPortal } from "../../components/modals";
+import AlertInputPopover from "../../components/popover/alertinput-popover";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -169,6 +171,7 @@ const Person = React.memo(({ navigation }: any) => {
 const Account = React.memo(({ navigation, showgiftcode }: any) => {
 
 	// 数据
+	let giftcode = React.useRef<string>("");
 	// 状态
 
 	// 跳转页面
@@ -178,8 +181,10 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 				navigation.navigate("Page", { screen: "MallAddress" })
 				break;
 			case "mall-idcard-edit":
+				navigation.navigate("Page", { screen: "MallIdcardEdit" })
 				break;
 			case "mall-coupon":
+				navigation.navigate("Page", { screen: "MallCoupon" })
 				break;
 			case "user-change-pass":
 				break;
@@ -193,7 +198,70 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 
 	// 兑换礼品
 	const exchange = () => {
-		console.log("%c Line:175 🥟", "color:#b03734", "exchange");
+		let params = { giftcode: giftcode.current };
+		http.post(ENV.giftcode + '?uid=' + us.user.uid, { method: 'exchange', token: us.user.token, data: params }).then((resp_data: any) => {
+			if (resp_data.msg == 'OK') {
+				/* this.popoverCtrl.create({
+					component: GiftcodeFullscreenPage,
+					componentProps: { data: resp_data },
+					cssClass: 'giftcode fullwidth-popover',
+					backdropDismiss: true,
+					translucent: true
+				}).then((popover) => { popover.present(); this.alertCtrl.dismiss(); }); */
+			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {//20240229 shibo:处理token失效
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "gifcode_exchange_toast" });
+			}
+		})
+	}
+
+	const opengiftcode = () => {
+		ModalPortal.show((
+			<AlertInputPopover data={{
+				header: "礼品码兑换",
+				message: "",
+				inputs: [{
+					type: "text",
+					value: giftcode.current,
+					onChangeText: (value: any) => {
+						giftcode.current = value;
+					},
+					placeholder: "请输入要兑换的礼品码",
+				}],
+				buttons: [{
+					text: "取消",
+					handler: () => {
+						ModalPortal.dismiss("giftcode_alert");
+						giftcode.current = "";
+					}
+				}, {
+					text: "确认",
+					handler: () => {
+						if (giftcode.current == '') {
+							ToastCtrl.show({ message: "礼品码不能为空", duration: 1000, viewstyle: "medium_toast", key: "gifcode_empty_toast" });
+						} else {
+							exchange();
+						}
+					}
+				}],
+			}}
+			/>
+		), {
+			key: "giftcode_alert",
+			width: width,
+			height: 200,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("giftcode_alert");
+				giftcode.current = "";
+
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
 	}
 
 	const logout = () => {
@@ -362,7 +430,7 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 					cache.clear(filterkeys.current);
 					setCacheSize("0.00MB");
 					http.post(ENV.update, { uid: us.user.uid, did: us.did, ver: AppVersion }).then((resp_data: any) => {
-						cache.saveItem("userupdate", resp_data, 24 * 3600);
+						cache.saveItem("userupdatedata", resp_data, 24 * 3600);
 					})
 					ToastCtrl.show({ message: "清除成功", duration: 2000, viewstyle: "short_toast", key: "clear_cache_toast" });
 				}
@@ -433,7 +501,9 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 				<Text style={styles.about_text}>{"Copyright © 2014-" + copyrightyear}</Text>
 				<Text style={styles.about_text}>{" 郑州美芬计算机科技有限公司 "}</Text>
 				<Text style={styles.about_text}>{"NoseTime.com 版权所有"}</Text>
-				<Text style={styles.about_text}>{"豫ICP备14010206号-3A"}</Text>
+				<Pressable onPress={() => { Linking.openURL("https://beian.miit.gov.cn") }}>
+					<Text style={[styles.about_text, { color: "#7189DD" }]}>{"豫ICP备14010206号-3A"}</Text>
+				</Pressable>
 			</View>
 		</RNScrollView>
 	)

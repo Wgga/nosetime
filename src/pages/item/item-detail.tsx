@@ -280,9 +280,8 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 	}
 	// 显示全部简介
 	const showPopover = () => {
-		let intro_list = itemdata.current.intro.split("\n");
-		intro_list.map((item: string, index: number) => {
-			intro_list[index] = (<Text key={index} style={styles.intro_popover_intro}>{item}</Text>)
+		let intro_list = itemdata.current.intro.split(/\n/g).map((item: string, index: number) => {
+			return (<Text key={index} style={styles.intro_popover_intro}>{item}</Text>)
 		})
 		ModalPortal.show((
 			<View style={styles.intro_popover_con}>
@@ -610,9 +609,9 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 										{index == 0 && <LinearGradient
 											colors={["rgba(255,255,255,0.05)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.05)"]}
 											start={{ x: 0, y: 0 }}
-											end={{ x: 1, y: 0 }}
+											end={{ x: 0, y: 1 }}
 											locations={[0, 0.5, 1]}
-											style={styles.fragrance_item_border}
+											style={styles.odor_vote_line}
 										/>}
 										{(item && item.length > 0) && item.map((item2: any, index: number) => {
 											return (

@@ -1,6 +1,7 @@
 import { Platform, AppState, NativeEventEmitter } from "react-native";
 
 import ImagePicker from "react-native-image-crop-picker";
+import { Blurhash } from "react-native-blurhash";
 
 import ToastCtrl from "../../components/toastctrl";
 import AlertCtrl from "../../components/alertctrl";
@@ -63,13 +64,24 @@ class UploadPhotoService {
 		}
 	}
 
+	async emitavatar() {
+		let blurhash = "";
+		try {
+			blurhash = await Blurhash.encode(this.myImage, 4, 3);
+		} catch (e) {
+			blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
+		}
+		let params = { avatar: this.myImage, blurhash };
+		events.emit("change_avatar", params);
+	}
+
 	changeAvatar() {
 		http.post(ENV.user, { method: "changepic", id: us.user.uid, token: us.user.token, Filedata: this.myImage }).then((resp_data: any) => {
 			if (parseFloat(resp_data.msg) > 0) {
 				ToastCtrl.show({ message: "头像已修改", duration: 2000, viewstyle: "short_toast", key: "changeAvatar_success_alert" });
 				us.user.uface = resp_data.msg;
 				us.saveUser(us.user);
-				events.emit("change_avatar", this.myImage);
+				this.emitavatar();
 			} else {
 				AlertCtrl.show({
 					header: "头像修改失败",

@@ -37,15 +37,8 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 
 	React.useEffect(() => {
 		http.get(ENV.terms + "?method=" + type.current, "text").then((resp_data: any) => {
-			let term_list = resp_data.trim().split("\n");
-			term_list.map((item: any, index: number) => {
-				if (item) {
-					if (index > 0) {
-						term_list[index] = (<Text key={index} style={styles.unregister_text}>{item}</Text>);
-					} else {
-						term_list[index] = (<Text key={index} style={styles.unregister_title}>{item}</Text>);
-					}
-				}
+			let term_list = resp_data.trim().split("\n").map((item: any, index: number) => {
+				return index > 0 ? (<Text key={index} style={styles.unregister_text}>{item}</Text>) : (<Text key={index} style={styles.unregister_title}>{item}</Text>);
 			})
 			setTerms(term_list);
 		});

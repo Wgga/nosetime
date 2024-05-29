@@ -72,19 +72,10 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 
 	// 高亮搜索关键字
 	const handletitle = (title: string, reg: RegExp) => {
-		const keyTextArr = title.match(reg);
-		const restTextArr = title.split(reg);
-		const mainTextArr: any[] = [];
-		restTextArr.map((item, index) => {
-			mainTextArr.push(item);
-			if (keyTextArr && keyTextArr[index]) {
-				mainTextArr.push(
-					<Text key={index} style={{ color: "#6983DA" }}>{keyTextArr[index]}</Text>
-				);
-			}
+		const restText = title.trim().split(reg).map((item: any, index: number) => {
+			return index == 1 ? (<Text key={index}><Text style={{ color: "#6983DA" }}>{currentword}</Text>{item}</Text>) : item
 		});
-
-		return mainTextArr;
+		return restText;
 	}
 
 	// 设置视频tab下数据
@@ -239,8 +230,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 	return (
 		<>
 			{tab == "item" && <View style={styles.search_con}>
-				{emptyimg.item && <Image
-					style={styles.emptyimg}
+				{emptyimg.item && <Image style={styles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.items && searchdata.items.length > 0 && <View style={styles.item_list}>
@@ -296,8 +286,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				</View>}
 			</View>}
 			{tab == "wiki" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.wiki && <Image
-					style={styles.emptyimg}
+				{emptyimg.wiki && <Image style={styles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.articles && <View>
@@ -397,8 +386,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "mall" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.mall && <Image
-					style={styles.emptyimg}
+				{emptyimg.mall && <Image style={styles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.malls && searchdata.malls.length > 0 && searchdata.malls.map((item: any, index: number) => {
@@ -448,8 +436,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "social" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.social && <Image
-					style={styles.emptyimg}
+				{emptyimg.social && <Image style={styles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.topics && <View>
@@ -509,8 +496,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "vod" && <View style={styles.search_con}>
-				{emptyimg.vod && <Image
-					style={styles.emptyimg}
+				{emptyimg.vod && <Image style={styles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.vods && searchdata.vods.length > 0 && <View style={styles.item_list}>

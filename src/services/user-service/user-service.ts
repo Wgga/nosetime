@@ -84,10 +84,13 @@ class UserService {
 		}).catch(() => { });
 
 		cache.getItem(this.factoryname + "blurhash").then((cacheobj) => {
+			console.log("%c Line:87 🍑 cacheobj", "color:#e41a6a", cacheobj);
 			if (cacheobj) {
 				this.user.blurhash = cacheobj;
 			}
-		}).catch(() => { });
+		}).catch(() => {
+			console.log("%c Line:93 🍡", "color:#2eafb0");
+		});
 
 		cache.getItem(this.factoryname + "mobile").then((cacheobj) => {
 			if (cacheobj) {
@@ -277,19 +280,19 @@ class UserService {
 		if (user.uid > 0) {
 			this.user = user;
 			cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600);
-			this.setblurhash();
+			this.setblurhash(user);
 		}
 	}
 
 	// 设置用户头像模糊图
-	setblurhash() {
-		Blurhash.encode(ENV.avatar + us.user.uid + ".jpg?" + us.user.uface, 4, 3).then((blurhash_data: any) => {
-			this.user.blurhash = blurhash_data;
-			cache.saveItem(this.factoryname + "blurhash", blurhash_data, 30 * 24 * 3600);
-		}).catch(() => {
-			this.user.blurhash = "LOSiT=oI.AozxvayROf6%$ofR4ax";
-			cache.saveItem(this.factoryname + "blurhash", "LOSiT=oI.AozxvayROf6%$ofR4ax", 30 * 24 * 3600);
-		})
+	async setblurhash(user: any) {
+		try {
+			this.user.blurhash = await Blurhash.encode(ENV.avatar + user.uid + ".jpg?" + user.uface, 4, 3);
+		} catch (e) {
+			this.user.blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
+		}
+		console.log("%c Line:291 🍣", "color:#ed9ec7", this.user.blurhash);
+		cache.saveItem(this.factoryname + "blurhash", this.user.blurhash, 30 * 24 * 3600);
 	}
 
 	delUser() {

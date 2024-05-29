@@ -255,12 +255,12 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.toolbarbg,
 	},
 	feedback_con: {
+		flex: 1,
 		paddingTop: 26,
 		paddingHorizontal: 27,
 		paddingBottom: 50,
 	},
 	feedback_textarea_con: {
-		width: "100%",
 		backgroundColor: theme.bg,
 		borderRadius: 6,
 		height: 180,

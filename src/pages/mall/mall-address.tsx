@@ -105,7 +105,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.address_con}>
+		<View style={styles.address_container}>
 			<HeaderView
 				data={{
 					title: "管理收获地址",
@@ -122,50 +122,48 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			{(address_list.current && address_list.current.length > 0) && <ScrollView showsVerticalScrollIndicator={false}>
-				<View style={styles.address_list}>
-					{address_list.current.map((item: any, index: number) => {
-						return (
-							<View key={item.maid} style={styles.address_item}>
-								<View style={styles.item_city}>
-									{item.madefault == 1 && <LinearGradient style={styles.default_bg}
-										colors={["#81B4EC", "#9BA6F5"]}
-										start={{ x: 0, y: 0 }}
-										end={{ x: 1, y: 0 }}
-										locations={[0, 1]}
-									>
-										<Text style={styles.default_text}>{"默认"}</Text>
-									</LinearGradient>}
-									<Text style={styles.item_text}>{item.maprov + " " + item.macity + " " + item.maregion + " " + item.mastreet}</Text>
-								</View>
-								<Text style={styles.item_address_text}>{item.maaddress}</Text>
-								<View style={styles.item_uinfo}>
-									<Text style={[styles.item_text, { marginRight: 25 }]}>{item.maname}</Text>
-									<Text style={styles.item_text}>{item.mamobile}</Text>
-								</View>
-								<Icon name="edit1" size={20} color={theme.placeholder} style={styles.edit_icon} />
-								{edit && <View style={styles.edit_con}>
-									<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
-										{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
-										{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} style={styles.selected_icon} />}
-										<Text style={styles.default_btn_text}>{"默认地址"}</Text>
-									</Pressable>
-									<Pressable onPress={() => { deladdress(item) }}>
-										<Text style={styles.del_btn_text}>{"删除"}</Text>
-									</Pressable>
-								</View>}
+			{(address_list.current && address_list.current.length > 0) && <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.address_list}>
+				{address_list.current.map((item: any, index: number) => {
+					return (
+						<View key={item.maid} style={styles.address_item}>
+							<View style={styles.item_city}>
+								{item.madefault == 1 && <LinearGradient style={styles.default_bg}
+									colors={["#81B4EC", "#9BA6F5"]}
+									start={{ x: 0, y: 0 }}
+									end={{ x: 1, y: 0 }}
+									locations={[0, 1]}
+								>
+									<Text style={styles.default_text}>{"默认"}</Text>
+								</LinearGradient>}
+								<Text style={styles.item_text}>{item.maprov + " " + item.macity + " " + item.maregion + " " + item.mastreet}</Text>
 							</View>
-						)
-					})}
-				</View>
+							<Text style={styles.item_address_text}>{item.maaddress}</Text>
+							<View style={styles.item_uinfo}>
+								<Text style={[styles.item_text, { marginRight: 25 }]}>{item.maname}</Text>
+								<Text style={styles.item_text}>{item.mamobile}</Text>
+							</View>
+							<Icon name="edit1" size={20} color={theme.placeholder} style={styles.edit_icon} />
+							{edit && <View style={styles.edit_con}>
+								<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
+									{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
+									{item.madefault == 1 && <Icon name="right" size={16} color={theme.text1} style={styles.selected_icon} />}
+									<Text style={styles.default_btn_text}>{"默认地址"}</Text>
+								</Pressable>
+								<Pressable onPress={() => { deladdress(item) }}>
+									<Text style={styles.del_btn_text}>{"删除"}</Text>
+								</Pressable>
+							</View>}
+						</View>
+					)
+				})}
 			</ScrollView>}
 			<LinearButton containerStyle={styles.footer_con} text="+ 添加新地址" onPress={() => { gotodetail(null) }} />
 		</View>
 	);
 }
 const styles = StyleSheet.create({
-	address_con: {
-		height: "100%",
+	address_container: {
+		flex: 1,
 		backgroundColor: theme.bg,
 	},
 	title_text_con: {
