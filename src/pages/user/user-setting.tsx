@@ -299,7 +299,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 					</View>
 				</Pressable>
-				{showgiftcode && <Pressable onPress={exchange} style={styles.list_item}>
+				{showgiftcode && <Pressable onPress={opengiftcode} style={styles.list_item}>
 					<Text style={styles.item_title}>{"礼品码兑换"}</Text>
 					<View style={styles.item_msg}>
 						<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
