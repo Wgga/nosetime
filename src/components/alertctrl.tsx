@@ -24,37 +24,35 @@ class Alert {
 	}
 
 	show(alertdata: any) {
-		if (alertdata) {
-			Object.assign(this.alert_data, alertdata);
-		}
+		let data: any = { ...Object.assign(this.alert_data, alertdata) };
 		ModalPortal.show((
 			<View style={styles.containerView}>
 				<View style={styles.alert_wrapper}>
 					<View>
-						{this.alert_data.header && <Text style={[
+						{data.header && <Text style={[
 							styles.alert_head,
-							this.alert_data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head,
-							this.alert_data.headstyle && this.alert_data.headstyle
-						]}>{this.alert_data.header}</Text>}
-						{this.alert_data.message && <Text style={styles.alert_message}>{this.alert_data.message}</Text>}
+							data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head,
+							data.headstyle && data.headstyle
+						]}>{data.header}</Text>}
+						{data.message && <Text style={styles.alert_message}>{data.message}</Text>}
 					</View>
 					<View style={styles.alert_button_group}>
 						{
-							this.alert_data.buttons && this.alert_data.buttons.map((item: any, index: number) => {
+							data.buttons && data.buttons.map((item: any, index: number) => {
 								return (
 									<TouchableHighlight key={index} style={[styles.alert_button, index == 1 && {
 										borderLeftWidth: 1,
 										borderLeftColor: "rgba(224,224,224,0.3333)",
 									}]}
 										onPress={() => {
-											this.alert_data.btnbg = theme.text2;
+											data.btnbg = theme.text2;
 											item.handler();
 										}}
 										onShowUnderlay={() => {
-											this.alert_data.btnbg = theme.tit;
+											data.btnbg = theme.tit;
 										}}
 										underlayColor="rgba(0,0,0,.1)">
-										<Text style={[{ color: this.alert_data.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
+										<Text style={[{ color: data.btnbg }, styles.alert_button_inner]}>{item.text}</Text>
 									</TouchableHighlight>
 								)
 							})
@@ -63,18 +61,17 @@ class Alert {
 				</View>
 			</View>
 		), {
-			key: this.alert_data.key,
+			key: data.key,
 			width: width,
-			height: 200,
 			rounded: false,
 			useNativeDriver: true,
-			onShow: this.alert_data.onShow,
+			onShow: data.onShow,
 			onDismiss: () => {
-				this.alert_data.onDismiss();
+				data.onDismiss();
 			},
-			onTouchOutside: this.alert_data.onTouchOutside,
-			animationDuration: this.alert_data.animationDuration,
-			modalStyle: this.alert_data.modalStyle,
+			onTouchOutside: data.onTouchOutside,
+			animationDuration: data.animationDuration,
+			modalStyle: data.modalStyle,
 		})
 	}
 
@@ -87,7 +84,6 @@ class Alert {
 
 const styles = StyleSheet.create({
 	containerView: {
-		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 	},

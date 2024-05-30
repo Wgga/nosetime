@@ -274,7 +274,7 @@ function User({ navigation }: any): React.JSX.Element {
 							<Usercart width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"购物车"}</Text>
 						</Pressable>
-						{showgiftcode.current && <Pressable onPress={() => { }} style={styles.btn_item}>
+						{showgiftcode.current && <Pressable onPress={() => {}} style={styles.btn_item}>
 							<Giftcode width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"礼品码兑换"}</Text>
 						</Pressable>}

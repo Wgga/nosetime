@@ -13,10 +13,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AlertCtrl from "../../components/alertctrl";
 import ToastCtrl from "../../components/toastctrl";
 import LinearButton from "../../components/linearbutton";
+import ActionSheetCtrl from "../../components/actionsheetctrl";
+import { ModalPortal } from "../../components/modals";
+import AlertInputPopover from "../../components/popover/alertinput-popover";
+import GiftcodePopover from "../../components/popover/giftcode-popover";
 
 import http from "../../utils/api/http";
 
 import us from "../../services/user-service/user-service";
+import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import cache from "../../hooks/storage/storage";
 
@@ -24,14 +29,12 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { ModalPortal } from "../../components/modals";
-import AlertInputPopover from "../../components/popover/alertinput-popover";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 const AppVersion = ENV.AppMainVersion + "." + ENV.AppMiniVersion + "." + ENV.AppBuildVersion;
 
-const Person = React.memo(({ navigation }: any) => {
+const Person = React.memo(({ navigation, changeAvatar }: any) => {
 
 	// 控件
 	// 变量
@@ -40,6 +43,7 @@ const Person = React.memo(({ navigation }: any) => {
 	// 数据
 	let fullname = React.useRef<string>(""); // 签名香名称
 	let signperfume = React.useRef<any>({}); // 签名香数据
+	let uname = React.useRef<string>(""); // 用户名
 
 	React.useEffect(() => {
 		if (us.user.uiid > 0) {
@@ -65,14 +69,55 @@ const Person = React.memo(({ navigation }: any) => {
 		}
 	}, [])
 
-	// 更改头像
-	const changeAvatar = () => {
-		console.log("%c Line:61 🥓", "color:#e41a6a", "changeAvatar");
-	}
+	const opendlg = (data: any) => {
+		ModalPortal.show((
+			<AlertInputPopover data={{
+				header: data.header,
+				message: "",
+				inputs: [{
+					type: "text",
+					value: data.value,
+					onChangeText: (value: any) => {
+						data.value = value;
+					},
+					placeholder: data.placeholder,
+				}],
+				buttons: [{
+					text: "取消",
+					handler: () => {
+						ModalPortal.dismiss(data.key);
+						data.value = "";
+					}
+				}, {
+					text: "确认",
+					handler: data.sure
+				}],
+			}}
+			/>
+		), {
+			key: data.key,
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss(data.key);
+				data.value = "";
 
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
 	// 更改昵称
 	const changeName = () => {
-		console.log("%c Line:71 🥓", "color:#e41a6a", "changeName");
+		opendlg({
+			header: "修改昵称",
+			value: uname.current,
+			placeholder: "您的新昵称",
+			sure: () => {
+
+			}
+		})
 	}
 
 	// 更改性别
@@ -175,7 +220,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 	// 状态
 
 	// 跳转页面
-	const gotodetail = (page: string, item: any = null) => {
+	const gotodetail = (page: string, type: string = "", modify: string = "") => {
 		switch (page) {
 			case "mall-address":
 				navigation.navigate("Page", { screen: "MallAddress" })
@@ -186,9 +231,8 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			case "mall-coupon":
 				navigation.navigate("Page", { screen: "MallCoupon" })
 				break;
-			case "user-change-pass":
-				break;
-			case "user-change-account":
+			case "user-change-info":
+				navigation.navigate("Page", { screen: "UserChangeInfo", params: { type, modify } })
 				break;
 			default:
 				break;
@@ -196,27 +240,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 		console.log("%c Line:171 🍐", "color:#e41a6a");
 	}
 
-	// 兑换礼品
-	const exchange = () => {
-		let params = { giftcode: giftcode.current };
-		http.post(ENV.giftcode + '?uid=' + us.user.uid, { method: 'exchange', token: us.user.token, data: params }).then((resp_data: any) => {
-			if (resp_data.msg == 'OK') {
-				/* this.popoverCtrl.create({
-					component: GiftcodeFullscreenPage,
-					componentProps: { data: resp_data },
-					cssClass: 'giftcode fullwidth-popover',
-					backdropDismiss: true,
-					translucent: true
-				}).then((popover) => { popover.present(); this.alertCtrl.dismiss(); }); */
-			} else if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {//20240229 shibo:处理token失效
-				us.delUser();
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
-			} else {
-				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "gifcode_exchange_toast" });
-			}
-		})
-	}
-
+	// 打开礼品码兑换输入框
 	const opengiftcode = () => {
 		ModalPortal.show((
 			<AlertInputPopover data={{
@@ -239,7 +263,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 				}, {
 					text: "确认",
 					handler: () => {
-						if (giftcode.current == '') {
+						if (giftcode.current == "") {
 							ToastCtrl.show({ message: "礼品码不能为空", duration: 1000, viewstyle: "medium_toast", key: "gifcode_empty_toast" });
 						} else {
 							exchange();
@@ -251,7 +275,6 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 		), {
 			key: "giftcode_alert",
 			width: width,
-			height: 200,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
@@ -261,6 +284,38 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	// 兑换礼品
+	const exchange = () => {
+		let params = { giftcode: giftcode.current };
+		http.post(ENV.giftcode + "?uid=" + us.user.uid, { method: "exchange", token: us.user.token, data: params }).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				showgiftcodepopover(resp_data);
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "gifcode_exchange_toast" });
+			}
+		})
+	}
+
+	// 兑换结果弹窗
+	const showgiftcodepopover = (data: any) => {
+		ModalPortal.show((
+			<GiftcodePopover data={data} />
+		), {
+			key: "giftcode_popover_alert",
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("giftcode_popover_alert");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },
 		})
 	}
 
@@ -308,7 +363,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			</ShadowedView>
 			<ShadowedView style={styles.list_item_con}>
 				{us.user.showmodifypass && <Pressable onPress={() => {
-					gotodetail("user-change-pass", "modify");
+					gotodetail("user-change-info", "pass", "modify");
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"修改密码"}</Text>
 					<View style={styles.item_msg}>
@@ -316,7 +371,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 					</View>
 				</Pressable>}
 				{us.user.showsetmobile && <Pressable onPress={() => {
-					gotodetail("user-change-account", "set");
+					gotodetail("user-change-info", "mobile", "set");
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"绑定手机"}</Text>
 					<View style={styles.item_msg}>
@@ -324,7 +379,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 					</View>
 				</Pressable>}
 				{us.user.showmodifymobile && <Pressable onPress={() => {
-					gotodetail("user-change-account", "set");
+					gotodetail("user-change-info", "mobile", "modify");
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"更改手机"}</Text>
 					<View style={styles.item_msg}>
@@ -333,7 +388,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 					</View>
 				</Pressable>}
 				{us.user.showmodifyemail && <Pressable onPress={() => {
-					gotodetail("user-change-account", "modify");
+					gotodetail("user-change-info", "email", "modify");
 				}} style={styles.list_item}>
 					<Text style={styles.item_title}>{"更改邮箱"}</Text>
 					<View style={styles.item_msg}>
@@ -512,6 +567,7 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 function UserSetting({ navigation }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
+	const classname = "UserSettingPage";
 	// 变量
 	const [index, setIndex] = React.useState(0);
 	let copyrightyear = React.useRef<string>("");
@@ -557,6 +613,47 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 		}
 	}, [])
 
+	const changeAvatar = () => {
+		let params = {
+			index: 0,
+			quality: 0.9,
+			includeBase64: true,
+			maxWidth: 400,
+			maxHeight: 400,
+			src: "useravatar",
+			classname,
+			isCrop: true,
+		}
+		ActionSheetCtrl.show({
+			key: "avatar_action_sheet",
+			buttons: [{
+				text: "拍照",
+				style: { color: theme.redchecked },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					setTimeout(() => { upService.buttonClicked(params) }, 300);
+				}
+			}, {
+				text: "从相册选择",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					params["index"] = 1;
+					setTimeout(() => { upService.buttonClicked(params) }, 300);
+				}
+			}, {
+				text: "取消",
+				style: { color: theme.tit },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+				}
+			}],
+			onTouchOutside: () => {
+				ActionSheetCtrl.close("avatar_action_sheet");
+			},
+		})
+	}
+
 	return (
 		<View style={styles.setting_con}>
 			<Pressable style={[styles.leftback, { marginTop: insets.top }]} onPress={() => { navigation.goBack(); }}>
@@ -580,15 +677,17 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 				/>
 			</Brightness>
 			<View style={[styles.setting_header, { paddingTop: insets.top ? insets.top + 30 : 55 }]}>
-				<Image style={styles.user_avatar}
-					source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
-				/>
+				<Pressable onPress={changeAvatar}>
+					<Image style={styles.user_avatar}
+						source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
+					/>
+				</Pressable>
 				<Text style={styles.setting_text}>{"个人设置"}</Text>
 			</View>
 			<TabView style={{ backgroundColor: "transparent", marginTop: 20 }}
 				navigationState={{ index, routes }}
 				renderScene={SceneMap({
-					person: () => <Person navigation={navigation} />,
+					person: () => <Person navigation={navigation} changeAvatar={changeAvatar} />,
 					account: () => <Account navigation={navigation} showgiftcode={showgiftcode.current} />,
 					system: () => <System navigation={navigation} copyrightyear={copyrightyear.current} />,
 				})}

@@ -11,7 +11,7 @@ import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/toastctrl";
-import ShareDetail from "../../components/popover/share-popover";
+import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import http from "../../utils/api/http";
@@ -442,7 +442,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 						<>
 							<Pressable style={styles.menu_icon_con} onPress={() => {
 								ModalPortal.show((
-									<ShareDetail />
+									<SharePopover />
 								), {
 									key: "share_popover",
 									width: Winwidth,

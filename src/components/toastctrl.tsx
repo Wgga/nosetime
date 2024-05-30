@@ -12,7 +12,6 @@ const { width, height } = Dimensions.get("window");
 
 // 自定义Toast组件
 class Toast {
-	private toast: any = null;
 	private toast_data: any = {
 		message: "这是一个Toast组件",
 		duration: 2000,
@@ -29,42 +28,37 @@ class Toast {
 	}
 
 	show(toastdata: any) {
-		if (toastdata) {
-			Object.assign(this.toast_data, toastdata);
-		}
-		this.toast = ModalPortal.show((
+		let data: any = { ...Object.assign(this.toast_data, toastdata) };
+		ModalPortal.show((
 			<View style={styles.containerView}>
-				{this.toast_data.key != "permission_toast" && <View style={[styles.toast_wrapper, this.toast_data.viewstyle && styles[this.toast_data.viewstyle]]}>
-					<Text style={styles.toast_text}>{this.toast_data.message}</Text>
+				{data.key != "permission_toast" && <View style={[styles.toast_wrapper, data.viewstyle && styles[data.viewstyle]]}>
+					<Text style={styles.toast_text}>{data.message}</Text>
 				</View>}
-				{this.toast_data.key == "permission_toast" && <ShadowedView style={styles.toast_permission_wrapper}>
-					<Text style={styles.toast_permission_text}>{this.toast_data.message}</Text>
+				{data.key == "permission_toast" && <ShadowedView style={styles.toast_permission_wrapper}>
+					<Text style={styles.toast_permission_text}>{data.message}</Text>
 				</ShadowedView>}
 			</View>
 		), {
-			key: this.toast_data.key,
+			key: data.key,
 			width: width,
-			height: 200,
 			rounded: false,
 			useNativeDriver: true,
-			onShow: this.toast_data.onShow,
+			onShow: data.onShow,
 			onDismiss: () => {
-				this.toast_data.onDismiss();
-				this.toast = null;
+				data.onDismiss();
 			},
-			onTouchOutside: this.toast_data.onTouchOutside,
-			hasOverlay: this.toast_data.hasOverlay,
-			animationDuration: this.toast_data.animationDuration,
-			modalStyle: this.toast_data.modalStyle,
-			style: { justifyContent: this.toast_data.position == "top" ? "flex-start" : "center" }
+			onTouchOutside: data.onTouchOutside,
+			hasOverlay: data.hasOverlay,
+			animationDuration: data.animationDuration,
+			modalStyle: data.modalStyle,
+			style: { justifyContent: data.position == "top" ? "flex-start" : "center" }
 		})
-		if (this.toast_data.duration > 0) {
+		if (data.duration > 0) {
 			setTimeout(() => {
-				ModalPortal.dismiss(this.toast_data.key);
-				this.toast = null;
-			}, this.toast_data.duration);
+				ModalPortal.dismiss(data.key);
+			}, data.duration);
 		}
-		return this.toast;
+		return data.key;
 	}
 
 	close(key: string) {
@@ -76,7 +70,6 @@ class Toast {
 
 const styles: any = StyleSheet.create({
 	containerView: {
-		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 	},

@@ -16,7 +16,7 @@ import Download from "../../assets/svg/share/download.svg";
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
-function ShareDetail({ navigation }: any): React.JSX.Element {
+function SharePopover({ navigation }: any): React.JSX.Element {
 	// 控件
 	// 变量
 	// 数据
@@ -50,9 +50,9 @@ function ShareDetail({ navigation }: any): React.JSX.Element {
 }
 const styles = StyleSheet.create({
 	share_con: {
-		height: 200,
 		backgroundColor: theme.bg,
 		alignItems: "center",
+		paddingBottom: 50,
 	},
 	share_title: {
 		fontSize: 17,
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
 		color: theme.comment
 	}
 });
-export default ShareDetail;
+export default SharePopover;

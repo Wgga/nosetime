@@ -20,6 +20,9 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 	// 参数
 	const {
 		title,
+		backicon,
+		backiconsize,
+		backiconcolor,
 		placeholder,
 		word,
 		isShowSearch,
@@ -83,7 +86,11 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 	return (
 		<View style={[styles.title_con, style, { paddingTop: insets.top }]}>
 			<Pressable style={{ zIndex: 1 }} onPress={back}>
-				<Icon name="leftarrow" size={20} color={theme.text2} style={[styles.title_icon, childrenstyle?.headercolor]} />
+				<Icon name={backicon ? backicon : "leftarrow"}
+					size={backiconsize ? backiconsize : 20}
+					color={backiconcolor ? backiconcolor : theme.text2}
+					style={[styles.title_icon, childrenstyle?.headercolor]}
+				/>
 			</Pressable>
 			{isShowSearch && <View style={styles.searchbar_con}>
 				<TextInput

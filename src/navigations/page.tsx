@@ -11,6 +11,7 @@ import UserJifen from "../pages/user/user-jifen";
 import UserSetting from "../pages/user/user-setting";
 import UserUnregister from "../pages/user/user-unregister";
 import UserFeedback from "../pages/user/user-feedback";
+import UserChangeInfo from "../pages/user/user-change-info";
 
 import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
@@ -46,6 +47,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserSetting" component={UserSetting} />
 			<Stack.Screen name="UserUnregister" component={UserUnregister} />
 			<Stack.Screen name="UserFeedback" component={UserFeedback} />
+			<Stack.Screen name="UserChangeInfo" component={UserChangeInfo} />
 
 			<Stack.Screen name="Search" component={Search} />
 			<Stack.Screen name="SearchResult" component={SearchResult} />

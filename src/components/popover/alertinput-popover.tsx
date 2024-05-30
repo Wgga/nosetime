@@ -79,7 +79,6 @@ const AlertInputPopover = React.memo(({ data }: any) => {
 
 const styles = StyleSheet.create({
 	containerView: {
-		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
 	},

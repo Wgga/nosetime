@@ -336,7 +336,7 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 								onChange(name, "idcardname");
 							}}
 							placeholder="付款人身份证姓名"
-							placeholderTextColor={theme.toolbarbg}
+							placeholderTextColor={theme.placeholder}
 						/>
 					</View>
 					<View style={styles.idcard_input}>
@@ -347,7 +347,7 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 								onChange(no, "idcardno");
 							}}
 							placeholder="付款人身份证号"
-							placeholderTextColor={theme.toolbarbg}
+							placeholderTextColor={theme.placeholder}
 						/>
 					</View>
 				</View>
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
 	},
 	idcard_img: {
 		flex: 1,
-		height: 130,
+		aspectRatio: 149 / 95,
 		borderRadius: 2,
 		backgroundColor: theme.bg
 	},

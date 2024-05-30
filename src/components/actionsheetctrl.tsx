@@ -21,15 +21,13 @@ class ActionSheet {
 	}
 
 	show(actionsheetdata: any) {
-		if (actionsheetdata) {
-			Object.assign(this.action_sheet_data, actionsheetdata);
-		}
+		let data: any = { ...Object.assign(this.action_sheet_data, actionsheetdata) };
 		ModalPortal.show((
 			<View style={styles.containerView}>
 				<View style={styles.action_sheet_wrapper}>
 					<View style={styles.action_sheet_button_group}>
 						{
-							this.action_sheet_data.buttons && this.action_sheet_data.buttons.map((item: any, index: number) => {
+							data.buttons && data.buttons.map((item: any, index: number) => {
 								return (
 									<TouchableHighlight key={index} style={[
 										styles.action_sheet_button,
@@ -51,9 +49,9 @@ class ActionSheet {
 				</View>
 			</View>
 		), {
-			key: this.action_sheet_data.key,
+			key: data.key,
 			width: width,
-			height: (57 + 10) * this.action_sheet_data.buttons.length,
+			height: (57 + 10) * data.buttons.length,
 			rounded: false,
 			useNativeDriver: true,
 			modalAnimation: new SlideAnimation({
@@ -63,13 +61,13 @@ class ActionSheet {
 			}),
 			swipeDirection: "down",
 			type: "bottomModal",
-			onShow: this.action_sheet_data.onShow,
+			onShow: data.onShow,
 			onDismiss: () => {
-				this.action_sheet_data.onDismiss();
+				data.onDismiss();
 			},
-			onTouchOutside: this.action_sheet_data.onTouchOutside,
-			animationDuration: this.action_sheet_data.animationDuration,
-			modalStyle: this.action_sheet_data.modalStyle,
+			onTouchOutside: data.onTouchOutside,
+			animationDuration: data.animationDuration,
+			modalStyle: data.modalStyle,
 		})
 	}
 

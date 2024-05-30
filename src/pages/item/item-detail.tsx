@@ -9,7 +9,7 @@ import reactNativeTextSize from "react-native-text-size";
 import StickyHeader from "../../components/StickyHeader";
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
-import ShareDetail from "../../components/popover/share-popover";
+import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import HaveChecked from "../../assets//svg/itemdetail/have-checked.svg";
@@ -1002,11 +1002,10 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 						<>
 							<Pressable style={styles.menu_icon_con} onPress={() => {
 								ModalPortal.show((
-									<ShareDetail />
+									<SharePopover />
 								), {
 									key: "share_popover",
 									width,
-									height: 200,
 									rounded: false,
 									useNativeDriver: true,
 									modalAnimation: new SlideAnimation({

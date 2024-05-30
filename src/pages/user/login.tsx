@@ -8,7 +8,6 @@ import {
 	TextInput,
 	Pressable,
 	Dimensions,
-	BackHandler,
 	NativeEventEmitter
 } from "react-native";
 

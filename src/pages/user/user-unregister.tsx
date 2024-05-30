@@ -86,7 +86,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 			), {
 				key: type + "_alert",
 				width: width,
-				height: 200,
 				rounded: false,
 				useNativeDriver: true,
 				onTouchOutside: () => {
