@@ -10,6 +10,9 @@ import { ShadowedView } from "react-native-fast-shadow";
 
 import ToastCtrl from "../../components/toastctrl";
 import ActionSheetCtrl from "../../components/actionsheetctrl";
+import { ModalPortal } from "../../components/modals";
+import AlertInputPopover from "../../components/popover/alertinput-popover";
+import GiftcodePopover from "../../components/popover/giftcode-popover";
 
 import us from "../../services/user-service/user-service";
 import upService from "../../services/upload-photo-service/upload-photo-service";
@@ -44,6 +47,7 @@ function User({ navigation }: any): React.JSX.Element {
 	let pointval = React.useRef<number>(0); // 积分-
 	let avatar = React.useRef<string>(""); // 头像
 	let blurhash = React.useRef<string>(""); // 头像模糊图
+	let giftcode = React.useRef<string>("");
 	// 数据
 	let userinfo = React.useRef<any>({
 		uname: "",
@@ -123,12 +127,9 @@ function User({ navigation }: any): React.JSX.Element {
 			ToastCtrl.show({ message: "该功能暂未开放，敬请期待", duration: 1000, viewstyle: "superior_toast", key: "user_btn_toast" });
 			return;
 		}
-		if (page == "user-setting") {
-			navigation.navigate("Page", { screen: "UserSetting", params: { src: "我的页面" } })
-		} else if (page == "mall-cart") {
-		} else if (page == "mall-order") {
-		} else if (page == "social-xiaoxi") {
+		if (page == "mall-order") {
 		} else {
+			navigation.navigate("Page", { screen: page })
 		}
 	}
 
@@ -170,6 +171,85 @@ function User({ navigation }: any): React.JSX.Element {
 			onTouchOutside: () => {
 				ActionSheetCtrl.close("avatar_action_sheet");
 			},
+		})
+	}
+
+	// 打开礼品码兑换输入框
+	const opengiftcode = () => {
+		ModalPortal.show((
+			<AlertInputPopover data={{
+				header: "礼品码兑换",
+				message: "",
+				inputs: [{
+					type: "text",
+					value: giftcode.current,
+					onChangeText: (value: any) => {
+						giftcode.current = value;
+					},
+					placeholder: "请输入要兑换的礼品码",
+				}],
+				buttons: [{
+					text: "取消",
+					handler: () => {
+						ModalPortal.dismiss("giftcode_inputalert");
+						giftcode.current = "";
+					}
+				}, {
+					text: "确认",
+					handler: () => {
+						if (giftcode.current == "") {
+							ToastCtrl.show({ message: "礼品码不能为空", duration: 1000, viewstyle: "medium_toast", key: "gifcode_empty_toast" });
+						} else {
+							exchange();
+						}
+					}
+				}],
+			}}
+			/>
+		), {
+			key: "giftcode_inputalert",
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("giftcode_inputalert");
+				giftcode.current = "";
+
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	// 兑换礼品
+	const exchange = () => {
+		let params = { giftcode: giftcode.current };
+		http.post(ENV.giftcode + "?uid=" + us.user.uid, { method: "exchange", token: us.user.token, data: params }).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				showgiftcodepopover(resp_data);
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "gifcode_exchange_toast" });
+			}
+		})
+	}
+
+	// 兑换结果弹窗
+	const showgiftcodepopover = (data: any) => {
+		ModalPortal.show((
+			<GiftcodePopover data={data} />
+		), {
+			key: "giftcode_popover_alert",
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("giftcode_popover_alert");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },
 		})
 	}
 
@@ -225,7 +305,7 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 				</Brightness>
 				<View style={styles.user_page_btn}>
-					<Pressable onPress={() => { cache.clear() }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
+					<Pressable onPress={() => { gotodetail("UserJifen") }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
 						<Text style={styles.item_main_tit}>{"积分集市"}</Text>
 						<View style={styles.item_sub_tit_con}>
 							<Text style={styles.item_sub_tit}>{"我的积分 " + pointval.current}</Text>
@@ -266,19 +346,19 @@ function User({ navigation }: any): React.JSX.Element {
 							<Message width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"消息"}</Text>
 						</Pressable>
-						<Pressable onPress={() => { }} style={styles.btn_item}>
+						<Pressable onPress={() => { gotodetail("MallWishList") }} style={styles.btn_item}>
 							<Wishlist width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"愿望单"}</Text>
 						</Pressable>
-						<Pressable onPress={() => { }} style={styles.btn_item}>
+						<Pressable onPress={() => { gotodetail("UserCart") }} style={styles.btn_item}>
 							<Usercart width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"购物车"}</Text>
 						</Pressable>
-						{showgiftcode.current && <Pressable onPress={() => {}} style={styles.btn_item}>
+						{showgiftcode.current && <Pressable onPress={opengiftcode} style={styles.btn_item}>
 							<Giftcode width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"礼品码兑换"}</Text>
 						</Pressable>}
-						<Pressable onPress={() => { gotodetail("user-setting") }} style={styles.btn_item}>
+						<Pressable onPress={() => { gotodetail("UserSetting") }} style={styles.btn_item}>
 							<Setting width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"设置"}</Text>
 						</Pressable>

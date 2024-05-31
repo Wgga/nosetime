@@ -14,6 +14,7 @@ import UserFeedback from "../pages/user/user-feedback";
 import UserChangeInfo from "../pages/user/user-change-info";
 import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
 import UserChangeDesc from "../pages/user/user-change-desc";
+import UserCart from "../pages/user/user-cart";
 
 import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
@@ -34,6 +35,7 @@ import MallAddress from "../pages/mall/mall-address";
 import MallAddressEdit from "../pages/mall/mall-address-edit";
 import MallIdcardEdit from "../pages/mall/mall-idcard-edit";
 import MallCoupon from "../pages/mall/mall-coupon";
+import MallWishList from "../pages/mall/mall-wishlist";
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +54,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserChangeInfo" component={UserChangeInfo} />
 			<Stack.Screen name="UserChangeSignPerfume" component={UserChangeSignPerfume} />
 			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
+			<Stack.Screen name="UserCart" component={UserCart} />
 
 			<Stack.Screen name="Search" component={Search} />
 			<Stack.Screen name="SearchResult" component={SearchResult} />
@@ -72,6 +75,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="MallAddressEdit" component={MallAddressEdit} />
 			<Stack.Screen name="MallIdcardEdit" component={MallIdcardEdit} />
 			<Stack.Screen name="MallCoupon" component={MallCoupon} />
+			<Stack.Screen name="MallWishList" component={MallWishList} />
 		</Stack.Navigator>
 	);
 }

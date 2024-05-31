@@ -24,7 +24,12 @@ function Route(): React.JSX.Element {
 	useFocusEffect(
 		React.useCallback(() => {
 			// 监听路由变化改变状态栏颜色
-			const urlRegex = ["ItemDetail", "Login", "MallHeji", "MallBrand", "User", "Home", "MallGroup", "Lottery", "MallOrderDetail", "MallCoupon"];
+			const urlRegex = [
+				"ItemDetail",
+				"Login", "User",
+				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
+				"Home", "Lottery",
+			];
 			const unsubscribe = navigation.addListener("state", () => {
 				let isMatched = urlRegex.find((item) => { return item == navigation.getCurrentRoute().name });
 				// 根据当前路由的URL来动态改变StatusBar的颜色

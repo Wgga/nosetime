@@ -84,67 +84,69 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 	}
 
 	return (
-		<View style={[styles.title_con, style, { paddingTop: insets.top }]}>
-			<Pressable style={{ zIndex: 1 }} onPress={back}>
-				<Icon name={backicon ? backicon : "leftarrow"}
-					size={backiconsize ? backiconsize : 20}
-					color={backiconcolor ? backiconcolor : theme.text2}
-					style={[styles.title_icon, childrenstyle?.headercolor]}
-				/>
-			</Pressable>
-			{isShowSearch && <View style={styles.searchbar_con}>
-				<TextInput
-					ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
-					style={styles.searchbar}
-					placeholder={placeholder}
-					autoFocus={isautoFocus}
-					onChangeText={text => {
-						setWord(text)
-					}}
-					value={word}
-					onKeyPress={(e) => {
-						if (e.nativeEvent.key === "Enter") {
-							Search(word);
-						}
-					}}
-				/>
-				<View style={styles.search_icon_con}>
-					{word && <Pressable style={{ paddingRight: 7 }} onPress={fun}>
-						<Icon name="close1" size={16} color={theme.placeholder2} style={styles.search_icon} />
-					</Pressable>}
-					<Pressable style={{ borderLeftWidth: 1, borderLeftColor: theme.border, marginRight: 5, }} onPress={() => { Search(word) }}>
-						<Icon name="search2" size={16} color={theme.text2} style={styles.search_icon} />
-					</Pressable>
-				</View>
-			</View>}
-			{title && <Animated.View style={[styles.title_text_con, childrenstyle?.headertitle]}>
-				<Animated.View style={viewstyle.current}>
-					<Text onLayout={(e) => {
-						if (title.length * 16 > viewWidth.current) {
-							titleWidth.current = title.length * 16 + 50;
-							createviewstyle();
-							startAnimation();
-						} else {
-							titleWidth.current = viewWidth.current;
-							setIsRender((val) => !val);
-						}
-					}} style={[
-						styles.title_text,
-						childrenstyle?.headercolor,
-						{ width: titleWidth.current, textAlign: title.length * 16 > viewWidth.current ? "left" : "center" }
-					]}>{title}</Text>
-					{title.length * 16 > viewWidth.current && <Text style={[
-						styles.title_text,
-						childrenstyle?.headercolor,
-						{ width: titleWidth.current }
-					]}>{title}</Text>}
-				</Animated.View>
-			</Animated.View>}
-			{children}
+		<>
+			<View style={[styles.title_con, style, { paddingTop: insets.top }]}>
+				<Pressable style={{ zIndex: 1 }} onPress={back}>
+					<Icon name={backicon ? backicon : "leftarrow"}
+						size={backiconsize ? backiconsize : 20}
+						color={backiconcolor ? backiconcolor : theme.text2}
+						style={[styles.title_icon, childrenstyle?.headercolor]}
+					/>
+				</Pressable>
+				{isShowSearch && <View style={styles.searchbar_con}>
+					<TextInput
+						ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
+						style={styles.searchbar}
+						placeholder={placeholder}
+						autoFocus={isautoFocus}
+						onChangeText={text => {
+							setWord(text)
+						}}
+						value={word}
+						onKeyPress={(e) => {
+							if (e.nativeEvent.key === "Enter") {
+								Search(word);
+							}
+						}}
+					/>
+					<View style={styles.search_icon_con}>
+						{word && <Pressable style={{ paddingRight: 7 }} onPress={fun}>
+							<Icon name="close1" size={16} color={theme.placeholder2} style={styles.search_icon} />
+						</Pressable>}
+						<Pressable style={{ borderLeftWidth: 1, borderLeftColor: theme.border, marginRight: 5, }} onPress={() => { Search(word) }}>
+							<Icon name="search2" size={16} color={theme.text2} style={styles.search_icon} />
+						</Pressable>
+					</View>
+				</View>}
+				{title && <Animated.View style={[styles.title_text_con, childrenstyle?.headertitle]}>
+					<Animated.View style={viewstyle.current}>
+						<Text onLayout={(e) => {
+							if (title.length * 16 > viewWidth.current) {
+								titleWidth.current = title.length * 16 + 50;
+								createviewstyle();
+								startAnimation();
+							} else {
+								titleWidth.current = viewWidth.current;
+								setIsRender((val) => !val);
+							}
+						}} style={[
+							styles.title_text,
+							childrenstyle?.headercolor,
+							{ width: titleWidth.current, textAlign: title.length * 16 > viewWidth.current ? "left" : "center" }
+						]}>{title}</Text>
+						{title.length * 16 > viewWidth.current && <Text style={[
+							styles.title_text,
+							childrenstyle?.headercolor,
+							{ width: titleWidth.current }
+						]}>{title}</Text>}
+					</Animated.View>
+				</Animated.View>}
+				{children}
+			</View>
 			{MenuChildren && <ShadowedView style={[styles.menu_con, { marginTop: insets.top + 40, display: showmenu ? "flex" : "none" }]}>
 				<MenuChildren />
 			</ShadowedView>}
-		</View >
+		</>
 	);
 })
 
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
 			width: 0,
 			height: 0,
 		},
+		zIndex: 2,
 	},
 	menu_icon_con: {
 		paddingLeft: 5,

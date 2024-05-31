@@ -31,7 +31,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 		init();
 	}, [])
 
-	const getvodlist = () => {
+	const getVodlist = () => {
 		return new Promise((resolve, reject) => {
 			cache.getItem(classname + "vodlist").then((cacheobj: any) => {
 				if (cacheobj) {
@@ -48,7 +48,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 		})
 	}
 
-	const gethjvodlist = () => {
+	const getHjVodlist = () => {
 		return new Promise((resolve, reject) => {
 			cache.getItem(classname + "hjvodlist").then((cacheobj) => {
 				if (cacheobj) {
@@ -79,7 +79,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 	}
 
 	const init = () => {
-		Promise.all([getvodlist(), gethjvodlist()]).then((data) => {
+		Promise.all([getVodlist(), getHjVodlist()]).then((data) => {
 			if (data.length == 2) {
 				smartvodlist.current = [
 					{ id: "hejivod", title: "视频合辑", items: hjvodlist.current, firstvod: firstvod.current["hejivod"] },
