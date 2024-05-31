@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, FlatList, Animated } from "react-native";
 
 import { GestureHandlerRootView, RectButton, Swipeable } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
 
@@ -24,6 +25,7 @@ const events = new NativeEventEmitter();
 function MallWishList({ navigation }: any): React.JSX.Element {
 	// 控件
 	let swipeable = React.useRef<any>(null);
+	const insets = useSafeAreaInsets();
 	// 变量
 	const [edit, setEdit] = React.useState<boolean>(false); // 是否编辑
 	const [tab, setTab] = React.useState<string>("wishlist"); // 当前tab
@@ -107,7 +109,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<View style={styles.header_bg}>
+				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/wishlistbg.jpg")}
 					/>
@@ -197,7 +199,6 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-		height: 90,
 		overflow: "hidden"
 	},
 	wishlist_title: {

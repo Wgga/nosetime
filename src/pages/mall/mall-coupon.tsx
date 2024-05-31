@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView } from "react-native";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import HeaderView from "../../components/headerview";
 import us from "../../services/user-service/user-service";
 import ToastCtrl from "../../components/toastctrl";
@@ -19,6 +21,7 @@ const events = new NativeEventEmitter();
 
 function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	// 控件
+	const insets = useSafeAreaInsets();
 	// 参数
 	// 变量
 	let coupons = React.useRef<any>({
@@ -95,7 +98,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<View style={styles.header_bg}>
+				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/couponbg.jpg")}
 					/>
@@ -155,7 +158,6 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-		height: 90,
 		overflow: "hidden"
 	},
 	coupon_con: {
@@ -176,14 +178,15 @@ const styles = StyleSheet.create({
 	},
 	coupon_item_con: {
 		marginTop: 15,
-		height: 110,
+		width: width - 18,
+		height: (width - 18) / 900 * 260,
 		flexDirection: "row",
 		alignItems: "center",
 	},
 	coupon_img: {
 		position: "absolute",
-		width: width - 18,
-		height: (width - 18) / 900 * 260,
+		width: "100%",
+		height: "100%",
 	},
 	coupon_value: {
 		width: (width - 18) * 0.303,

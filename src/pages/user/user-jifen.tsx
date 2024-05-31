@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, Image } from "react-native";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import HeaderView from "../../components/headerview";
 
 import http from "../../utils/api/http";
@@ -17,6 +19,7 @@ const events = new NativeEventEmitter();
 
 function UserJifen({ navigation }: any): React.JSX.Element {
 	// 控件
+	const insets = useSafeAreaInsets();
 	// 变量
 	let showmenu = React.useRef<boolean>(false); // 是否显示菜单
 	// 数据
@@ -60,7 +63,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 					</>
 				)
 			}}>
-				<View style={styles.header_bg}>
+				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/jfmallbg.jpg")}
 					/>
