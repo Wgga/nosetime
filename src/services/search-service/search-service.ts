@@ -1,7 +1,9 @@
 import { NativeEventEmitter } from "react-native";
 
 import http from "../../utils/api/http";
+
 import cache from "../../hooks/storage/storage";
+
 import { ENV } from "../../configs/ENV";
 
 class SearchService {
@@ -167,7 +169,7 @@ class SearchService {
 				if (!this.searchlist[word].vod || resp_data.vod.cnt <= this.searchlist[word].vod.length)
 					this.moredata[word]["vod"] = false;
 
-				this.events.emit("nosetime_searchlistUpdated", { items: resp_data.item.data, type, word });
+				this.events.emit("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "item" || type == "tag") {
 				if (resp_data.item.cnt == 0) {
 					this.moredata[word][type] = false;
@@ -180,7 +182,7 @@ class SearchService {
 
 				if (resp_data.item.cnt <= this.searchlist[word].item.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { items: resp_data.item.data, type, word });
+				this.events.emit("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "vod") {
 				if (resp_data.vod.cnt == 0) {
 					this.moredata[word][type] = false;

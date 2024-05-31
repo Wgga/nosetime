@@ -12,27 +12,26 @@ import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
-import HaveChecked from "../../assets//svg/itemdetail/have-checked.svg";
-import WantChecked from "../../assets//svg/itemdetail/want-checked.svg";
-import SmeltChecked from "../../assets//svg/itemdetail/smelt-checked.svg";
-import Yimai from "../../assets/svg/itemdetail/yimai.svg";
-import OpenAll from "../../assets/svg/itemdetail/openall.svg";
+import us from "../../services/user-service/user-service";
+import itemService from "../../services/item-service/item-service";
 
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
-
-import us from "../../services/user-service/user-service";
-import itemService from "../../services/item-service/item-service";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlestarLeft, handlereplystarLeft } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
+import HaveChecked from "../../assets/svg/itemdetail/have-checked.svg";
+import WantChecked from "../../assets/svg/itemdetail/want-checked.svg";
+import SmeltChecked from "../../assets/svg/itemdetail/smelt-checked.svg";
+import Yimai from "../../assets/svg/itemdetail/yimai.svg";
+import OpenAll from "../../assets/svg/itemdetail/openall.svg";
 
-const events = new NativeEventEmitter();
 const { width, height } = Dimensions.get("window");
+const events = new NativeEventEmitter();
 const classname = "ItemDetailPage";
 
 const ItemHeader = React.memo(({ itemid, navigation }: any) => {
@@ -983,76 +982,73 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 
 	return (
 		<>
-			<HeaderView
-				data={{
-					title,
-					isShowSearch: false,
-					showmenu,
-					style: { backgroundColor: itemcolors.current.itembgcolor },
-					childrenstyle: {
-						headercolor: { color: theme.toolbarbg },
-						headertitle: { opacity: 1 },
-					}
-				}}
-				method={{
-					back: () => { navigation.goBack(); },
-				}}
-				MenuChildren={() => {
-					return (
-						<>
-							<Pressable style={styles.menu_icon_con} onPress={() => {
-								ModalPortal.show((
-									<SharePopover />
-								), {
-									key: "share_popover",
-									width,
-									rounded: false,
+			<HeaderView data={{
+				title,
+				isShowSearch: false,
+				showmenu,
+				style: { backgroundColor: itemcolors.current.itembgcolor },
+				childrenstyle: {
+					headercolor: { color: theme.toolbarbg },
+					headertitle: { opacity: 1 },
+				}
+			}} method={{
+				back: () => { navigation.goBack(); },
+			}} MenuChildren={() => {
+				return (
+					<>
+						<Pressable style={styles.menu_icon_con} onPress={() => {
+							ModalPortal.show((
+								<SharePopover />
+							), {
+								key: "share_popover",
+								width,
+								rounded: false,
+								useNativeDriver: true,
+								modalAnimation: new SlideAnimation({
+									initialValue: 0,
+									slideFrom: "bottom",
 									useNativeDriver: true,
-									modalAnimation: new SlideAnimation({
-										initialValue: 0,
-										slideFrom: "bottom",
-										useNativeDriver: true,
-									}),
-									onTouchOutside: () => {
-										ModalPortal.dismiss("share_popover");
-									},
-									swipeDirection: "down",
-									animationDuration: 300,
-									type: "bottomModal",
-									modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
-								})
-								showMenu();
-							}}>
-								<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"分享"}</Text>
-							</Pressable>
-							<Pressable style={styles.menu_icon_con} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="shopcart" size={15} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"去购买"}</Text>
-							</Pressable>
-							<Pressable style={styles.menu_icon_con} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="edit" size={14} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"编辑香评"}</Text>
-							</Pressable>
-							<Pressable style={styles.menu_icon_con} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="addlist" size={16} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"加入香单"}</Text>
-							</Pressable>
-							{issubscription_.current[id] && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="star2-checked" size={16} color={theme.star} />
-								<Text style={styles.menu_text}>{"取消到货提醒"}</Text>
-							</Pressable>}
-							{(!issubscription_.current[id] && !itemdata.current.onsale) && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="star2" size={16} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"订阅到货提醒"}</Text>
-							</Pressable>}
-							<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={() => { }}>
-								<Icon style={styles.menu_icon} name="cancelfav1" size={14} color={theme.tit2} />
-								<Text style={styles.menu_text}>{"删除红心标记"}</Text>
-							</Pressable>
-						</>
-					)
-				}}>
+								}),
+								onTouchOutside: () => {
+									ModalPortal.dismiss("share_popover");
+								},
+								swipeDirection: "down",
+								animationDuration: 300,
+								type: "bottomModal",
+								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+							})
+							showMenu();
+						}}>
+							<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"分享"}</Text>
+						</Pressable>
+						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="shopcart" size={15} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"去购买"}</Text>
+						</Pressable>
+						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="edit" size={14} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"编辑香评"}</Text>
+						</Pressable>
+						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="addlist" size={16} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"加入香单"}</Text>
+						</Pressable>
+						{issubscription_.current[id] && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="star2-checked" size={16} color={theme.star} />
+							<Text style={styles.menu_text}>{"取消到货提醒"}</Text>
+						</Pressable>}
+						{(!issubscription_.current[id] && !itemdata.current.onsale) && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="star2" size={16} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"订阅到货提醒"}</Text>
+						</Pressable>}
+						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={() => { }}>
+							<Icon style={styles.menu_icon} name="cancelfav1" size={14} color={theme.tit2} />
+							<Text style={styles.menu_text}>{"删除红心标记"}</Text>
+						</Pressable>
+					</>
+				)
+			}}>
 				<Pressable style={{ zIndex: 1 }} onPress={showMenu}>
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>

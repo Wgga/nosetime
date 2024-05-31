@@ -3,6 +3,10 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Scro
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import HeaderView from "../../components/headerview";
+import Switch from "../../components/switch";
+import LinearButton from "../../components/linearbutton";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -12,9 +16,6 @@ import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-import HeaderView from "../../components/headerview";
-import Switch from "../../components/switch";
-import LinearButton from "../../components/linearbutton";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();

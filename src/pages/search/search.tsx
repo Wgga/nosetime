@@ -3,13 +3,18 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter } from "react-nat
 
 import { useFocusEffect } from "@react-navigation/native";
 
-import theme from "../../configs/theme";
-import Icon from "../../assets/iconfont";
-import searchService from "../../services/search-service/search-service";
-import cache from "../../hooks/storage/storage";
 import HeaderView from "../../components/headerview";
+
+import searchService from "../../services/search-service/search-service";
+
 import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
+
+import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+
+import Icon from "../../assets/iconfont";
 
 const events = new NativeEventEmitter();
 const classname = "Search";
@@ -121,20 +126,18 @@ function Search({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.search_con}>
-			<HeaderView
-				data={{
-					title: "",
-					placeholder,
-					word,
-					isShowSearch: true,
-					isautoFocus: true
-				}}
-				method={{
-					fun: () => { setWord("") },
-					setWord,
-					Search,
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title: "",
+				placeholder,
+				word,
+				isShowSearch: true,
+				isautoFocus: true
+			}} method={{
+				fun: () => { setWord("") },
+				setWord,
+				Search,
+				back: () => { navigation.goBack() },
+			}} />
 			{(history && history.length > 0) &&
 				<View>
 					<View style={styles.list_title}>

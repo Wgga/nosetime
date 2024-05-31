@@ -3,6 +3,13 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Text
 
 import { Md5 } from "ts-md5";
 
+import HeaderView from "../../components/headerview";
+import LinearButton from "../../components/linearbutton";
+import AlertCtrl from "../../components/alertctrl";
+import ToastCtrl from "../../components/toastctrl";
+
+import us from "../../services/user-service/user-service";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -11,13 +18,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-import us from "../../services/user-service/user-service";
-
-import HeaderView from "../../components/headerview";
-import LinearButton from "../../components/linearbutton";
-import AlertCtrl from "../../components/alertctrl";
-import ToastCtrl from "../../components/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -409,17 +409,15 @@ function UserChangeInfo({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.changeinfo_container}>
-			<HeaderView
-				data={{
-					title: "",
-					backicon: "close",
-					backiconsize: 30,
-					backiconcolor: theme.comment,
-					isShowSearch: false,
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title: "",
+				backicon: "close",
+				backiconsize: 30,
+				backiconcolor: theme.comment,
+				isShowSearch: false,
+			}} method={{
+				back: () => { navigation.goBack() },
+			}} />
 			<View style={styles.changeinfo_con}>
 				{type == "pass" && <View>
 					<Text style={styles.change_title}>{title.current}</Text>

@@ -1,9 +1,12 @@
 import { Platform, NativeEventEmitter } from "react-native";
+
 import DeviceInfo from "react-native-device-info";
 import { Blurhash } from "react-native-blurhash";
 
-import cache from "../../hooks/storage/storage";
 import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
+
 import { ENV } from "../../configs/ENV";
 
 const events = new NativeEventEmitter();
@@ -84,7 +87,6 @@ class UserService {
 		}).catch(() => { });
 
 		cache.getItem(this.factoryname + "blurhash").then((cacheobj) => {
-			console.log("%c Line:87 🍑 cacheobj", "color:#e41a6a", cacheobj);
 			if (cacheobj) {
 				this.user.blurhash = cacheobj;
 			}
@@ -291,7 +293,6 @@ class UserService {
 		} catch (e) {
 			this.user.blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
 		}
-		console.log("%c Line:291 🍣", "color:#ed9ec7", this.user.blurhash);
 		cache.saveItem(this.factoryname + "blurhash", this.user.blurhash, 30 * 24 * 3600);
 	}
 

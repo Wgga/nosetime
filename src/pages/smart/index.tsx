@@ -4,6 +4,11 @@ import { View, Text, StyleSheet, Pressable, StatusBar, NativeEventEmitter, Dimen
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import SmartDiscuss from "./smart-discuss";
+import SmartVod from "./smart-vod";
+import SmartWiki from "./smart-wiki";
+import SmartCatalog from "./smart-catalog";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -12,11 +17,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-import SmartDiscuss from "./smart-discuss";
-import SmartVod from "./smart-vod";
-import SmartWiki from "./smart-wiki";
-import SmartCatalog from "./smart-catalog";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();

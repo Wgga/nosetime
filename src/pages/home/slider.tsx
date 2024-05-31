@@ -2,10 +2,10 @@ import React from "react";
 import { Text, Dimensions, View, StyleSheet, Pressable, ImageBackground } from "react-native";
 
 import Carousel from "react-native-reanimated-carousel";
+import { LongPressGestureHandler } from "react-native-gesture-handler";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { LongPressGestureHandler } from "react-native-gesture-handler";
 
 const width = Dimensions.get("window").width;
 

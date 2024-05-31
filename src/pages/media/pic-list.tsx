@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Flat
 
 import FastImage from "react-native-fast-image";
 
-import http from "../../utils/api/http";
-
 import HeaderView from "../../components/headerview";
 import ListBottomTip from "../../components/listbottomtip";
+
+import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
 

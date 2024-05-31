@@ -10,11 +10,11 @@ import RnImage from "../../components/RnImage";
 import searchService from "../../services/search-service/search-service";
 import us from "../../services/user-service/user-service";
 
+import http from "../../utils/api/http";
+
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalstyles";
-
-import http from "../../utils/api/http";
 
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
@@ -579,22 +579,20 @@ function SearchResult({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.search_con}>
-			<HeaderView
-				data={{
-					title: "",
-					placeholder: holder,
-					word: searchword,
-					isShowSearch: true,
-					isautoFocus: false
-				}}
-				method={{
-					fun: () => { navigation.goBack() },
-					setWord: (wordval: string) => {
-						setSearchword(wordval);
-					},
-					Search,
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title: "",
+				placeholder: holder,
+				word: searchword,
+				isShowSearch: true,
+				isautoFocus: false
+			}} method={{
+				fun: () => { navigation.goBack() },
+				setWord: (wordval: string) => {
+					setSearchword(wordval);
+				},
+				Search,
+				back: () => { navigation.goBack() },
+			}} />
 			<View style={styles.tabs_con}>
 				{tabs && tabs.map((item: any, index: number) => {
 					return (

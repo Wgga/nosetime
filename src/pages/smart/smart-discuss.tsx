@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Imag
 
 import { FlashList } from "@shopify/flash-list";
 
+import ListBottomTip from "../../components/listbottomtip";
+
 import smartService from "../../services/smart-service/smart-service";
 import us from "../../services/user-service/user-service";
-
-import ListBottomTip from "../../components/listbottomtip";
 
 import http from "../../utils/api/http";
 

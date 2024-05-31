@@ -18,10 +18,10 @@ import { ModalPortal } from "../../components/modals";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";
 
-import http from "../../utils/api/http";
-
 import us from "../../services/user-service/user-service";
 import upService from "../../services/upload-photo-service/upload-photo-service";
+
+import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
 
@@ -43,9 +43,22 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 	// 数据
 	let fullname = React.useRef<string>(""); // 签名香名称
 	let signperfume = React.useRef<any>({}); // 签名香数据
-	let uname = React.useRef<string>(""); // 用户名
+	let inputdata = React.useRef<any>({
+		uname: "",
+		ulocation: "",
+	}); // 输入框数据
 
 	React.useEffect(() => {
+		setsignperfume();
+		events.addListener("nosetime_reload_user_setting_list_page", () => {
+			setsignperfume();
+		})
+		return () => {
+			events.removeAllListeners("nosetime_reload_user_setting_list_page");
+		}
+	}, [])
+
+	const setsignperfume = () => {
 		if (us.user.uiid > 0) {
 			cache.getItem("item" + us.user.uiid + "getinfo").then((cacheobj) => {
 				if (cacheobj) {
@@ -67,8 +80,9 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 			fullname.current = "";
 			setisRender(val => !val);
 		}
-	}, [])
+	}
 
+	// 打开输入框弹窗
 	const opendlg = (data: any) => {
 		ModalPortal.show((
 			<AlertInputPopover data={{
@@ -76,68 +90,138 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 				message: "",
 				inputs: [{
 					type: "text",
-					value: data.value,
+					value: inputdata.current[data.type],
 					onChangeText: (value: any) => {
-						data.value = value;
+						inputdata.current[data.type] = value;
 					},
 					placeholder: data.placeholder,
 				}],
 				buttons: [{
 					text: "取消",
 					handler: () => {
-						ModalPortal.dismiss(data.key);
-						data.value = "";
+						ModalPortal.dismiss(data.type + "_inputalert");
+						inputdata.current[data.type] = "";
 					}
 				}, {
 					text: "确认",
-					handler: data.sure
+					handler: () => {
+						ModalPortal.dismiss(data.type + "_inputalert");
+						var res = inputdata.current[data.type];
+						if (res == undefined || res == "")
+							return;
+						if (data.type == "uname") {
+							res = strip_str(res, 28);
+						} else if (data.type == "ulocation") {
+							res = strip_str(res, 20);
+						}
+						if (res == "") return;
+
+						if (us.user[data.type] == res) return;
+
+						let params: any = { method: data.method, id: us.user.uid, token: us.user.token };
+						if (data.type == "uname") {
+							params["name"] = res;
+						} else if (data.type == "ulocation") {
+							params["info"] = { ulocation: res };
+						}
+
+						http.post(ENV.user, params).then((resp_data: any) => {
+							if (resp_data.msg == "OK") {
+								cache.removeItem("User" + us.user.uid);
+								if (data.type == "uname") {
+									us.user.uname = resp_data.name;
+								} else if (data.type == "ulocation") {
+									us.user.ulocation = res;
+								}
+								us.saveUser(us.user);
+								ToastCtrl.show({ message: "修改成功", duration: 2000, viewstyle: "short_toast", key: "change_success_toast" });
+								inputdata.current[data.type] = "";
+							} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+								us.delUser();
+								return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
+							} else {
+								ToastCtrl.show({ message: resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "change_err_toast" });
+							}
+							setisRender(val => !val);
+						});
+					}
 				}],
 			}}
 			/>
 		), {
-			key: data.key,
+			key: data.type + "_inputalert",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss(data.key);
-				data.value = "";
-
+				ModalPortal.dismiss(data.type + "_inputalert");
+				inputdata.current[data.type] = "";
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
 		})
 	}
-	// 更改昵称
-	const changeName = () => {
-		opendlg({
-			header: "修改昵称",
-			value: uname.current,
-			placeholder: "您的新昵称",
-			sure: () => {
 
-			}
-		})
+	// 处理字符串
+	const strip_str = (sz: any, len: number) => {
+		sz = sz.trim();
+		let cache_val = "";
+		for (let i in sz) {
+			if (sz[i].charCodeAt() <= 128)
+				--len;
+			else
+				len = len - 2;
+			if (len < 0) break;
+			cache_val += sz[i];
+		}
+		return cache_val;
 	}
 
 	// 更改性别
 	const changeGender = () => {
-		console.log("%c Line:81 🥓", "color:#e41a6a", "changeGender");
+		ActionSheetCtrl.show({
+			key: "changeGender_action_sheet",
+			buttons: [{
+				text: "我是男士",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("changeGender_action_sheet");
+					setgender("m");
+				}
+			}, {
+				text: "我是女士",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("changeGender_action_sheet");
+					setgender("f");
+				}
+			}, {
+				text: "取消",
+				style: { color: theme.tit },
+				handler: () => {
+					ActionSheetCtrl.close("changeGender_action_sheet");
+				}
+			}],
+			onTouchOutside: () => {
+				ActionSheetCtrl.close("changeGender_action_sheet");
+			},
+		})
 	}
 
-	// 更改地区
-	const changeLocation = () => {
-		console.log("%c Line:91 🥓", "color:#e41a6a", "changeLocation");
-	}
-
-	// 更改签名香
-	const changePerfume = () => {
-		console.log("%c Line:101 🥓", "color:#e41a6a", "changePerfume");
-	}
-
-	// 更改简介
-	const changeIntro = () => {
-		console.log("%c Line:111 🥓", "color:#e41a6a", "changeIntro");
+	// 设置性别
+	const setgender = (gender: string) => {
+		http.post(ENV.user, { method: "changegender", id: us.user.uid, token: us.user.token, gender }).then((resp_data: any) => {
+			if (resp_data.msg == "f" || resp_data.msg == "m") {
+				us.setGender(resp_data.msg);
+				us.saveUser(us.user);
+				ToastCtrl.show({ message: resp_data.msg == "f" ? "我是女士" : "我是男士", duration: 800, viewstyle: "short_toast", key: "changegender_success_toast" });
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App设置页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "changegender_err_toast" });
+			}
+		});
 	}
 
 	return (
@@ -154,7 +238,14 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 						</View>
 					</Pressable>
-					<Pressable onPress={changeName} style={styles.list_item}>
+					<Pressable onPress={() => {
+						opendlg({
+							header: "修改昵称",
+							type: "uname",
+							method: "changename",
+							placeholder: "您的新昵称",
+						})
+					}} style={styles.list_item}>
 						<Text style={styles.item_title}>{"昵称"}</Text>
 						<View style={styles.item_msg}>
 							{us.user.uname && <Text style={styles.item_msg_text}>{us.user.uname}</Text>}
@@ -170,7 +261,14 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 						</View>
 					</Pressable>
-					<Pressable onPress={changeLocation} style={styles.list_item}>
+					<Pressable onPress={() => {
+						opendlg({
+							header: "修改所在地",
+							type: "ulocation",
+							method: "changesetting",
+							placeholder: "您的所在地",
+						})
+					}} style={styles.list_item}>
 						<Text style={styles.item_title}>{"地区"}</Text>
 						<View style={styles.item_msg}>
 							{us.user.ulocation && <Text style={styles.item_msg_text}>{us.user.ulocation}</Text>}
@@ -180,7 +278,9 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 					</Pressable>
 				</ShadowedView>
 				<ShadowedView style={styles.list_item_con}>
-					<Pressable onPress={changePerfume}>
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "UserChangeSignPerfume", params: { signperfume: signperfume.current } });
+					}}>
 						<View style={styles.list_item}>
 							<Text style={styles.item_title}>{"签名香"}</Text>
 							<View style={styles.item_msg}>
@@ -189,13 +289,15 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 								<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 							</View>
 						</View>
-						<View style={styles.item_info_text_con}>
+						{signperfume.current.iid && <View style={styles.item_info_text_con}>
 							<Text style={styles.item_info_text}>{fullname.current}</Text>
-						</View>
+						</View>}
 					</Pressable>
 				</ShadowedView>
 				<ShadowedView style={styles.list_item_con}>
-					<Pressable onPress={changeIntro}>
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "UserChangeDesc" });
+					}}>
 						<View style={styles.list_item}>
 							<Text style={styles.item_title}>{"简介"}</Text>
 							<View style={styles.item_msg}>
@@ -257,7 +359,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 				buttons: [{
 					text: "取消",
 					handler: () => {
-						ModalPortal.dismiss("giftcode_alert");
+						ModalPortal.dismiss("giftcode_inputalert");
 						giftcode.current = "";
 					}
 				}, {
@@ -273,12 +375,12 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			}}
 			/>
 		), {
-			key: "giftcode_alert",
+			key: "giftcode_inputalert",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss("giftcode_alert");
+				ModalPortal.dismiss("giftcode_inputalert");
 				giftcode.current = "";
 
 			},

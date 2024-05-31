@@ -3,15 +3,6 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions } fro
 
 import { Md5 } from "ts-md5";
 
-import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage/storage";
-
-import theme from "../../configs/theme";
-import { ENV } from "../../configs/ENV";
-
-import Icon from "../../assets/iconfont";
-
 import HeaderView from "../../components/headerview";
 import AlertCtrl from "../../components/alertctrl";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
@@ -20,6 +11,15 @@ import ToastCtrl from "../../components/toastctrl";
 import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";
+
+import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
+
+import theme from "../../configs/theme";
+import { ENV } from "../../configs/ENV";
+
+import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -64,7 +64,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 					buttons: [{
 						text: "取消",
 						handler: () => {
-							ModalPortal.dismiss(type + "_alert");
+							ModalPortal.dismiss(type + "_inputalert");
 							user.current = {
 								mobile: "",
 								pwd: ""
@@ -76,7 +76,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 							if (type == "password") {
 								signIn();
 							} else {
-								ModalPortal.dismiss(type + "_alert");
+								ModalPortal.dismiss(type + "_inputalert");
 								unregister_alert("password");
 							}
 						}
@@ -84,12 +84,12 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 				}}
 				/>
 			), {
-				key: type + "_alert",
+				key: type + "_inputalert",
 				width: width,
 				rounded: false,
 				useNativeDriver: true,
 				onTouchOutside: () => {
-					ModalPortal.dismiss(type + "_alert");
+					ModalPortal.dismiss(type + "_inputalert");
 					user.current = {
 						mobile: "",
 						pwd: ""
@@ -246,14 +246,12 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 
 	return (
 		<View style={styles.unregister_container}>
-			<HeaderView
-				data={{
-					title: "账户注销",
-					isShowSearch: false,
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title: "账户注销",
+				isShowSearch: false,
+			}} method={{
+				back: () => { navigation.goBack() },
+			}} />
 			<View style={styles.unregister_con}>{terms}</View>
 			<LinearButton containerStyle={styles.footer_btn} text="继续注销" onPress={() => { unregister_alert("mobile") }} />
 		</View>

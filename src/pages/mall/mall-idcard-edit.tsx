@@ -4,13 +4,13 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Scro
 import { useFocusEffect } from "@react-navigation/native";
 import WebView from "react-native-webview";
 
-import us from "../../services/user-service/user-service";
-import upService from "../../services/upload-photo-service/upload-photo-service";
-
 import HeaderView from "../../components/headerview";
 import LinearButton from "../../components/linearbutton";
 import AlertCtrl from "../../components/alertctrl";
 import ActionSheetCtrl from "../../components/actionsheetctrl";
+
+import us from "../../services/user-service/user-service";
+import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
 
@@ -296,14 +296,12 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.idcard_container}>
-			<HeaderView
-				data={{
-					title: "跨境购物实名认证",
-					isShowSearch: false,
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title: "跨境购物实名认证",
+				isShowSearch: false,
+			}} method={{
+				back: () => { navigation.goBack() },
+			}} />
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idcard_con}>
 				<View style={styles.idcard_img_item}>
 					<Image style={styles.idcard_img}

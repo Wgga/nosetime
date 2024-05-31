@@ -3,6 +3,12 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Scro
 
 import LinearGradient from "react-native-linear-gradient";
 
+import HeaderView from "../../components/headerview";
+import AlertCtrl from "../../components/alertctrl";
+import LinearButton from "../../components/linearbutton";
+
+import us from "../../services/user-service/user-service";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -11,12 +17,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-import HeaderView from "../../components/headerview";
-import AlertCtrl from "../../components/alertctrl";
-import LinearButton from "../../components/linearbutton";
-
-import us from "../../services/user-service/user-service";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -106,17 +106,15 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.address_container}>
-			<HeaderView
-				data={{
-					title: "管理收获地址",
-					isShowSearch: false,
-					style: { backgroundColor: theme.bg }
-				}}
-				method={{
-					back: () => {
-						navigation.goBack();
-					},
-				}}>
+			<HeaderView data={{
+				title: "管理收获地址",
+				isShowSearch: false,
+				style: { backgroundColor: theme.bg }
+			}} method={{
+				back: () => {
+					navigation.goBack();
+				},
+			}}>
 				<Pressable style={styles.title_text_con} onPress={() => { setEdit(val => !val) }}>
 					{!edit && <Text style={styles.title_text}>{"编辑"}</Text>}
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}

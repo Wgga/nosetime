@@ -3,17 +3,17 @@ import { FlatList, View, Text, StyleSheet, Image, VirtualizedList, NativeEventEm
 
 import FastImage from "react-native-fast-image";
 
-import { ENV } from "../../configs/ENV";
-import theme from "../../configs/theme";
+import Slider from "./slider";
 
 import http from "../../utils/api/http";
 
-import Slider from "./slider";
-
 import cache from "../../hooks/storage/storage";
 
-const events = new NativeEventEmitter();
+import { ENV } from "../../configs/ENV";
+import theme from "../../configs/theme";
+
 const { width, height } = Dimensions.get("window");
+const events = new NativeEventEmitter();
 
 function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 

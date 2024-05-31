@@ -2,12 +2,14 @@ import React from "react";
 import { Platform, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, TextInput, Image, ActivityIndicator } from "react-native";
 
 import { Brightness } from "react-native-color-matrix-image-filters";
-import ImagePicker from "react-native-image-crop-picker";
 
 import HeaderView from "../../components/headerview";
 import ActionSheetCtrl from "../../components/actionsheetctrl";
 import LinearButton from "../../components/linearbutton";
 import ToastCtrl from "../../components/toastctrl";
+
+import upService from "../../services/upload-photo-service/upload-photo-service";
+import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
@@ -17,9 +19,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-import upService from "../../services/upload-photo-service/upload-photo-service";
-import us from "../../services/user-service/user-service";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -202,14 +201,12 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.feedback_container}>
-			<HeaderView
-				data={{
-					title,
-					isShowSearch: false,
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title,
+				isShowSearch: false,
+			}} method={{
+				back: () => { navigation.goBack() },
+			}} />
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.feedback_con}>
 				<View style={styles.feedback_textarea_con}>
 					<TextInput style={styles.textarea}
@@ -255,7 +252,6 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.toolbarbg,
 	},
 	feedback_con: {
-		flex: 1,
 		paddingTop: 26,
 		paddingHorizontal: 27,
 		paddingBottom: 50,
@@ -271,6 +267,7 @@ const styles = StyleSheet.create({
 		height: "100%",
 		textAlignVertical: "top",
 		fontSize: 14,
+		color: theme.tit2,
 		padding: 0,
 		margin: 0,
 	},

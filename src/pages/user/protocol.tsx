@@ -3,12 +3,12 @@ import { View, StyleSheet } from "react-native";
 
 import { WebView } from "react-native-webview";
 
+import HeaderView from "../../components/headerview";
+
 import http from "../../utils/api/http";
+
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
-
-import HeaderView from "../../components/headerview";
-import { ModalPortal } from "../../components/modals";
 
 function Protocol({ navigation, route }: any): React.JSX.Element {
 
@@ -31,14 +31,12 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.protocol_con}>
-			<HeaderView
-				data={{
-					title,
-					isShowSearch: false,
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}} />
+			<HeaderView data={{
+				title,
+				isShowSearch: false,
+			}} method={{
+				back: () => { navigation.goBack() },
+			}} />
 			<WebView
 				originWhitelist={["*"]}
 				scalesPageToFit={false}

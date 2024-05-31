@@ -12,6 +12,8 @@ import UserSetting from "../pages/user/user-setting";
 import UserUnregister from "../pages/user/user-unregister";
 import UserFeedback from "../pages/user/user-feedback";
 import UserChangeInfo from "../pages/user/user-change-info";
+import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
+import UserChangeDesc from "../pages/user/user-change-desc";
 
 import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
@@ -48,6 +50,8 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserUnregister" component={UserUnregister} />
 			<Stack.Screen name="UserFeedback" component={UserFeedback} />
 			<Stack.Screen name="UserChangeInfo" component={UserChangeInfo} />
+			<Stack.Screen name="UserChangeSignPerfume" component={UserChangeSignPerfume} />
+			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
 
 			<Stack.Screen name="Search" component={Search} />
 			<Stack.Screen name="SearchResult" component={SearchResult} />

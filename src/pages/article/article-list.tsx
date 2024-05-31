@@ -1,17 +1,17 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, NativeEventEmitter, Image, Dimensions } from "react-native";
 
+import articleService from "../../services/article-service/article-service";
+
+import cache from "../../hooks/storage/storage";
+
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-import cache from "../../hooks/storage/storage";
-
-import articleService from "../../services/article-service/article-service";
-
-const events = new NativeEventEmitter();
 const { width, height } = Dimensions.get("window");
+const events = new NativeEventEmitter();
 
 const ArticleList = React.memo(({ type, setListHeight }: any) => {
 

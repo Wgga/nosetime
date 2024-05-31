@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView } from "react-native";
 
+import HeaderView from "../../components/headerview";
+import us from "../../services/user-service/user-service";
+import ToastCtrl from "../../components/toastctrl";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -9,10 +13,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-import HeaderView from "../../components/headerview";
-import us from "../../services/user-service/user-service";
-import ToastCtrl from "../../components/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
@@ -85,18 +85,16 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={styles.coupon_container}>
-			<HeaderView
-				data={{
-					title: "优惠券",
-					isShowSearch: false,
-					style: { zIndex: 0 },
-					childrenstyle: {
-						headercolor: { color: theme.toolbarbg },
-					}
-				}}
-				method={{
-					back: () => { navigation.goBack() },
-				}}>
+			<HeaderView data={{
+				title: "优惠券",
+				isShowSearch: false,
+				style: { zIndex: 0 },
+				childrenstyle: {
+					headercolor: { color: theme.toolbarbg },
+				}
+			}} method={{
+				back: () => { navigation.goBack() },
+			}}>
 				<View style={styles.header_bg}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/couponbg.jpg")}

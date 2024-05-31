@@ -51,7 +51,6 @@ class ActionSheet {
 		), {
 			key: data.key,
 			width: width,
-			height: (57 + 10) * data.buttons.length,
 			rounded: false,
 			useNativeDriver: true,
 			modalAnimation: new SlideAnimation({
@@ -80,7 +79,6 @@ class ActionSheet {
 
 const styles = StyleSheet.create({
 	containerView: {
-		flex: 1,
 		alignItems: "center",
 		justifyContent: "flex-end",
 	},
@@ -116,12 +114,6 @@ const styles = StyleSheet.create({
 		lineHeight: 57,
 		textAlign: "center",
 		fontSize: 15,
-	},
-	button_color_tit: {
-		color: theme.tit,
-	},
-	button_color_tit2: {
-		color: theme.tit2,
 	},
 })
 

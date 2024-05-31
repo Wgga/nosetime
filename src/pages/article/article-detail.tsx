@@ -4,8 +4,6 @@ import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, NativeEv
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
 
-import Icon from "../../assets/iconfont";
-
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
@@ -14,14 +12,15 @@ import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 
+import us from "../../services/user-service/user-service";
+import articleService from "../../services/article-service/article-service";
+
 import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import cache from "../../hooks/storage/storage";
 
-import us from "../../services/user-service/user-service";
-import articleService from "../../services/article-service/article-service";
+import Icon from "../../assets/iconfont";
 
 const Winwidth = Dimensions.get("window").width;
 const Winheight = Dimensions.get("window").height;
@@ -413,67 +412,64 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 			{loading && <View style={styles.loading_con}>
 				<Image style={styles.loading_img} source={require("../../assets/images/loading.gif")} />
 			</View>}
-			<HeaderView
-				data={{
-					title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
-					isShowSearch: false,
-					showmenu,
-					style: [
-						{ display: isfull ? "none" : "flex" },
-						!articledata.current.mp4URL ? styles.notmp4 : null
-					],
-					childrenstyle: {
-						headercolor: { color: !articledata.current.mp4URL ? theme.toolbarbg : theme.text2 },
-						headertitle: { opacity: !articledata.current.mp4URL ? headerOpt : 1 },
-					}
-				}}
-				method={{
-					back: () => {
-						navigation.goBack();
-						Orientation.getOrientation((orientation: any) => {
-							if (orientation == "LANDSCAPE") {
-								Orientation.lockToPortrait();
-							}
-						})
-					},
-				}}
-				MenuChildren={() => {
-					return (
-						<>
-							<Pressable style={styles.menu_icon_con} onPress={() => {
-								ModalPortal.show((
-									<SharePopover />
-								), {
-									key: "share_popover",
-									width: Winwidth,
-									height: 200,
-									rounded: false,
+			<HeaderView data={{
+				title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
+				isShowSearch: false,
+				showmenu,
+				style: [
+					{ display: isfull ? "none" : "flex" },
+					!articledata.current.mp4URL ? styles.notmp4 : null
+				],
+				childrenstyle: {
+					headercolor: { color: !articledata.current.mp4URL ? theme.toolbarbg : theme.text2 },
+					headertitle: { opacity: !articledata.current.mp4URL ? headerOpt : 1 },
+				}
+			}} method={{
+				back: () => {
+					navigation.goBack();
+					Orientation.getOrientation((orientation: any) => {
+						if (orientation == "LANDSCAPE") {
+							Orientation.lockToPortrait();
+						}
+					})
+				},
+			}} MenuChildren={() => {
+				return (
+					<>
+						<Pressable style={styles.menu_icon_con} onPress={() => {
+							ModalPortal.show((
+								<SharePopover />
+							), {
+								key: "share_popover",
+								width: Winwidth,
+								height: 200,
+								rounded: false,
+								useNativeDriver: true,
+								modalAnimation: new SlideAnimation({
+									initialValue: 0,
+									slideFrom: "bottom",
 									useNativeDriver: true,
-									modalAnimation: new SlideAnimation({
-										initialValue: 0,
-										slideFrom: "bottom",
-										useNativeDriver: true,
-									}),
-									onTouchOutside: () => {
-										ModalPortal.dismiss("share_popover");
-									},
-									swipeDirection: "down",
-									animationDuration: 300,
-									type: "bottomModal",
-									modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
-								})
-								showMenu();
-							}}>
-								<Icon style={styles.menu_icon} name="share2" size={14} color={theme.text1} />
-								<Text style={styles.menu_text}>{"分享"}</Text>
-							</Pressable>
-							<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={favarticle}>
-								{likelist.current[id] ? <Icon style={styles.menu_icon} name="heart-checked" size={16} color={theme.redchecked} /> : <Icon style={styles.menu_icon} name="heart" size={16} color={theme.text1} />}
-								<Text style={styles.menu_text}>{"收藏"}</Text>
-							</Pressable>
-						</>
-					)
-				}}>
+								}),
+								onTouchOutside: () => {
+									ModalPortal.dismiss("share_popover");
+								},
+								swipeDirection: "down",
+								animationDuration: 300,
+								type: "bottomModal",
+								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+							})
+							showMenu();
+						}}>
+							<Icon style={styles.menu_icon} name="share2" size={14} color={theme.text1} />
+							<Text style={styles.menu_text}>{"分享"}</Text>
+						</Pressable>
+						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={favarticle}>
+							{likelist.current[id] ? <Icon style={styles.menu_icon} name="heart-checked" size={16} color={theme.redchecked} /> : <Icon style={styles.menu_icon} name="heart" size={16} color={theme.text1} />}
+							<Text style={styles.menu_text}>{"收藏"}</Text>
+						</Pressable>
+					</>
+				)
+			}}>
 				{!articledata.current.mp4URL && <Animated.View style={[styles.coverimg_con, { opacity: headerOpt }]}>
 					<View style={styles.coverimg_msk}></View>
 					<Image source={{ uri: ENV.image + articledata.current.coverimg, cache: "force-cache" }} style={styles.coverimg} resizeMode="cover" />

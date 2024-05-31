@@ -1,4 +1,4 @@
-import { Platform, AppState, NativeEventEmitter } from "react-native";
+import { NativeEventEmitter } from "react-native";
 
 import ImagePicker from "react-native-image-crop-picker";
 import { Blurhash } from "react-native-blurhash";
@@ -6,12 +6,12 @@ import { Blurhash } from "react-native-blurhash";
 import ToastCtrl from "../../components/toastctrl";
 import AlertCtrl from "../../components/alertctrl";
 
-import { ENV } from "../../configs/ENV";
+import permissionService from "../permission-service/permission-service";
+import us from "../user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import permissionService from "../permission-service/permission-service";
-import us from "../user-service/user-service";
+import { ENV } from "../../configs/ENV";
 
 const events = new NativeEventEmitter();
 
@@ -25,9 +25,6 @@ class UploadPhotoService {
 		maxHeight: 1024,
 		src: ""
 	}
-	constructor() {
-
-	}
 
 	async buttonClicked(params: any) {
 		let type = params.index == 0 ? "camera" : "write";
@@ -39,6 +36,8 @@ class UploadPhotoService {
 			compressImageQuality: params.quality,
 			compressImageMaxWidth: params.maxWidth,
 			compressImageMaxHeight: params.maxHeight,
+			cropperStatusBarColor: "#FFFFFF",
+			cropperCircleOverlay: this.params.src == "useravatar" ? true : false,
 		}
 		if (params.index == 0) {//相机
 			ImagePicker.openCamera({ ...options, mediaType: "photo" }).then((image: any) => {

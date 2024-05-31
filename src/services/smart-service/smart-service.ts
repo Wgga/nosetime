@@ -2,8 +2,10 @@ import { Dimensions, NativeEventEmitter } from "react-native";
 
 import reactNativeTextSize from "react-native-text-size";
 
-import cache from "../../hooks/storage/storage";
 import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
+
 import { ENV } from "../../configs/ENV";
 
 const Winwidth = Dimensions.get("window").width;

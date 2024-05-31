@@ -14,15 +14,19 @@ import {
 import { Md5 } from "ts-md5";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Icon from "../../assets/iconfont";
-import theme from "../../configs/theme";
-import cache from "../../hooks/storage/storage";
-
-import { ENV } from "../../configs/ENV";
-import http from "../../utils/api/http";
-import us from "../../services/user-service/user-service";
 import AlertCtrl from "../../components/alertctrl";
 import ToastCtrl from "../../components/toastctrl";
+
+import us from "../../services/user-service/user-service";
+
+import http from "../../utils/api/http";
+
+import cache from "../../hooks/storage/storage";
+
+import theme from "../../configs/theme";
+import { ENV } from "../../configs/ENV";
+
+import Icon from "../../assets/iconfont";
 
 const { height, width } = Dimensions.get("window");
 const events = new NativeEventEmitter();
