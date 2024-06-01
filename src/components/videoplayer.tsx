@@ -102,16 +102,14 @@ export default class VideoPlayer extends React.Component<PropsType> {
 					style={{ width: this.state.videoWidth, height: this.state.videoHeight }}
 				/>
 				{this.state.showPoster && <Pressable style={[styles.poster_con, { width: this.state.videoWidth, height: this.state.videoHeight }]} onPress={() => { this.hidePoster() }}>
-					<Image
-						style={[styles.poster_con, { width: this.state.videoWidth, height: this.state.videoHeight }]}
+					<Image style={[styles.poster_con, { width: this.state.videoWidth, height: this.state.videoHeight }]}
 						resizeMode={"cover"}
 						source={{ uri: this.state.poster }}
 					/>
 					<View style={styles.play_con}>
 						{this.state.children}
 						<View style={styles.play_btn}>
-							<Image
-								style={styles.playButton}
+							<Image style={styles.playButton}
 								resizeMode="cover"
 								source={require("../assets/images/player/play.png")}
 							/>

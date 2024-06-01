@@ -8,7 +8,7 @@ const { width, height } = Dimensions.get("window");
 // 自定义AlertInput弹框
 const AlertInputPopover = React.memo(({ data }: any) => {
 
-	const [isrender, setisRender] = React.useState(false); // 是否渲染
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 	const alert_data = React.useRef<any>({
 		header: "这是一个AlertInput组件",
 		headstyle: {},
@@ -21,7 +21,7 @@ const AlertInputPopover = React.memo(({ data }: any) => {
 	React.useEffect(() => {
 		if (data) {
 			Object.assign(alert_data.current, data);
-			setisRender(val => !val);
+			setIsRender(val => !val);
 		}
 	}, [])
 
@@ -41,7 +41,7 @@ const AlertInputPopover = React.memo(({ data }: any) => {
 									onChangeText={(e) => {
 										item.value = e;
 										item.onChangeText(e);
-										setisRender(val => !val);
+										setIsRender(val => !val);
 									}}
 									placeholder={item.placeholder}
 									secureTextEntry={item.type == "password"}

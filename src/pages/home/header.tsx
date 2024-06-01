@@ -114,8 +114,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 			</View>
 			<View style={styles.homepart}>
 				<Text style={styles.title}>寻味之旅</Text>
-				<FlatList
-					data={homedataref.current.smellitems}
+				<FlatList data={homedataref.current.smellitems}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={styles.contentContainer}
@@ -126,8 +125,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 								<Pressable onPress={() => { gotoArticle(item.id) }}>
 									<View style={styles.itemImg}>
 										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) &&
-											<FastImage
-												style={styles.itemImg}
+											<FastImage style={styles.itemImg}
 												source={{
 													uri: ENV.image + item.pic,
 												}}
@@ -163,8 +161,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 			</View>
 			<View style={styles.homepart}>
 				<Text style={styles.title}>热门视频</Text>
-				<FlatList
-					data={homedataref.current.hotvod}
+				<FlatList data={homedataref.current.hotvod}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={styles.contentContainer}
@@ -175,8 +172,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 								<Pressable onPress={() => { gotoVod(item) }}>
 									<View style={styles.itemImg}>
 										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) &&
-											<FastImage
-												style={styles.itemImg}
+											<FastImage style={styles.itemImg}
 												source={{
 													uri: item.vpicurl,
 												}}

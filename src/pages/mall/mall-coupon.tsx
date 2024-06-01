@@ -31,7 +31,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	// 数据
 	// 状态
 	let isempty = React.useRef<boolean>(false);
-	const [isrender, setisRender] = React.useState<boolean>(false);
+	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		if (route.params) {
@@ -58,7 +58,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 			if (resp_data.valid.length == 0 && resp_data.expire.length == 0 && resp_data.used.length == 0) {
 				isempty.current = true;
 			}
-			setisRender(val => !val);
+			setIsRender(val => !val);
 		});
 	}
 

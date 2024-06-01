@@ -26,7 +26,7 @@ function Route(): React.JSX.Element {
 			// 监听路由变化改变状态栏颜色
 			const urlRegex = [
 				"ItemDetail",
-				"Login", "User",
+				"Login", "User", "UserJifen", "Lottery",
 				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
 				"Home", "Lottery",
 			];

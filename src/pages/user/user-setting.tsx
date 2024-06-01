@@ -38,7 +38,7 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 
 	// 控件
 	// 变量
-	const [isrender, setisRender] = React.useState(false); // 是否渲染
+	const [isrender, setIsRender] = React.useState(false); // 是否渲染
 
 	// 数据
 	let fullname = React.useRef<string>(""); // 签名香名称
@@ -64,21 +64,21 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 				if (cacheobj) {
 					signperfume.current = cacheobj;
 					fullname.current = cacheobj.ifullname;
-					setisRender(val => !val);
+					setIsRender(val => !val);
 				}
 			}).catch(() => {
 				http.get(ENV.item + "?method=getinfo&id=" + us.user.uiid).then((resp_data: any) => {
 					signperfume.current = resp_data;
 					fullname.current = resp_data.ifullname;
 					cache.saveItem("item" + us.user.uiid + "getinfo", resp_data, 60);
-					setisRender(val => !val);
+					setIsRender(val => !val);
 				});
 			});
 		} else {
 			// 20230516 shibo:修复删除签名香后退出重进数据未更新
 			signperfume.current = { iid: null };
 			fullname.current = "";
-			setisRender(val => !val);
+			setIsRender(val => !val);
 		}
 	}
 
@@ -142,7 +142,7 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 							} else {
 								ToastCtrl.show({ message: resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "change_err_toast" });
 							}
-							setisRender(val => !val);
+							setIsRender(val => !val);
 						});
 					}
 				}],

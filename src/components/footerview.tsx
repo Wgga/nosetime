@@ -43,8 +43,10 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 				{children}
 				{isfocus && <LinearGradient style={styles.footer_publish}
 					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0.5 }}
-					end={{ x: 1, y: 0.5 }}>
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 0 }}
+					locations={[0, 1]}
+				>
 					<Text style={styles.publish_text}>{"发布"}</Text>
 				</LinearGradient>}
 			</View>

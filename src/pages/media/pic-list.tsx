@@ -127,8 +127,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.photolist_item}>
-							<FastImage
-								style={styles.photolist_item_img}
+							<FastImage style={styles.photolist_item_img}
 								defaultSource={require("../../assets/images/nopic.png")}
 								source={{
 									uri: ENV.image + "/" + item.picurl + ".jpg!l",

@@ -6,6 +6,7 @@ import ArticleDetail from "../pages/article/article-detail";
 
 import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
+import Lottery from "../pages/user/lottery";
 import UserDetail from "../pages/user/user-detail";
 import UserJifen from "../pages/user/user-jifen";
 import UserSetting from "../pages/user/user-setting";
@@ -46,6 +47,7 @@ function Page(): React.JSX.Element {
 
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Protocol" component={Protocol} />
+			<Stack.Screen name="Lottery" component={Lottery} />
 			<Stack.Screen name="UserDetail" component={UserDetail} />
 			<Stack.Screen name="UserJifen" component={UserJifen} />
 			<Stack.Screen name="UserSetting" component={UserSetting} />

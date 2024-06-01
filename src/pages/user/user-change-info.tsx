@@ -48,7 +48,7 @@ function UserChangeInfo({ navigation, route }: any): React.JSX.Element {
 	let result = React.useRef<string>("");
 	// 数据
 	// 状态
-	const [isrender, setisRender] = React.useState<boolean>(false);
+	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		if (type == "mobile" && modify != "modify") {
@@ -65,8 +65,7 @@ function UserChangeInfo({ navigation, route }: any): React.JSX.Element {
 		} else {
 			navigation.goBack();
 		}
-		console.log("%c Line:57 🍏 step.current", "color:#33a5ff", step.current);
-		setisRender(val => !val);
+		setIsRender(val => !val);
 	}, [])
 
 	// 输入框内容变更
@@ -76,7 +75,7 @@ function UserChangeInfo({ navigation, route }: any): React.JSX.Element {
 		} else if (type == "mobile") {
 			mobiledata.current[valtype] = value;
 		}
-		setisRender(val => !val);
+		setIsRender(val => !val);
 	}
 
 	// 动态获取按钮文字
