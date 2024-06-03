@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	alert_wrapper: {
-		backgroundColor: "#fff",
+		backgroundColor: theme.toolbarbg,
 		borderRadius: 15,
 		overflow: "hidden",
 		width: 250,

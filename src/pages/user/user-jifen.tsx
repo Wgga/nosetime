@@ -6,6 +6,8 @@ import LinearGradient from "react-native-linear-gradient";
 
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
+import { ModalPortal } from "../../components/modals";
+import ExchangePopover from "../../components/popover/jifen-popover";
 
 import us from "../../services/user-service/user-service";
 
@@ -31,7 +33,10 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 	// 数据
 	let points = React.useRef<string>("0"); // 积分点数
 	let list = React.useRef<any[]>([]); // 积分商品列表
-	let lottery = React.useRef<any>({}); // 抽奖商品
+	let lottery = React.useRef<any>({
+		name: "占星机预言与抽奖",
+		point: 40,
+	}); // 抽奖商品
 	// 参数
 	// 状态
 	let showmenu = React.useRef<boolean>(false); // 是否显示菜单
@@ -94,6 +99,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 		}
 	}
 
+	// 兑换商品
 	const exchange = (item: any) => {
 		if (item.type == 1) {
 			return navigation.navigate("Page", { screen: "Lottery", params: { point: item.point, points: points.current } });
@@ -101,6 +107,81 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 		if (points.current < item.point) {
 			return ToastCtrl.show({ message: "积分不足", duration: 1000, viewstyle: "short_toast", key: "points_lack_toast" });
 		}
+
+		let params = {
+			title: "确定要兑换该商品吗?",
+			message: "兑换物仅支持国内仓发货，有效期90天",
+			buttons: [{
+				text: "取消",
+				handler: () => {
+					ModalPortal.dismiss("jifen_exchange_popover");
+				}
+			},
+			{
+				text: "确定",
+				handler: () => {
+					ModalPortal.dismiss("jifen_exchange_popover");
+					setTimeout(() => { _exchange(item) }, 200);
+				}
+			}]
+		}
+
+		if (item.type == 2) {
+			params.title = "确定要兑换优惠券吗？";
+			params.message = "优惠券有效期30天";
+		}
+
+		ModalPortal.show((
+			<ExchangePopover params={params} />
+		), {
+			key: "jifen_exchange_popover",
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("jifen_exchange_popover");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	// 请求兑换接口
+	const _exchange = (item: any) => {
+		http.post(ENV.points + "?uid=" + us.user.uid, { method: "exchangev2", data: item, token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				success_popover({ text: resp_data.detail });
+				points.current = resp_data.val;
+				setIsRender(val => !val);
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App积分集市页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "exchange_err_toast" });
+			}
+		});
+	}
+
+	// 兑换成功弹窗
+	const success_popover = (item: any) => {
+		ModalPortal.show((
+			<View style={styles.exchange_success_container}>
+				<Image style={styles.exchange_success_img}
+					source={require("../../assets/images/duihuan.png")}
+				/>
+				<Text style={styles.exchange_success_text}>{item.text}</Text>
+			</View>
+		), {
+			key: "exchange_success_popover",
+			width: width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("exchange_success_popover");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
 	}
 
 	return (
@@ -119,8 +200,8 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 				return (
 					<>
 						<Pressable style={styles.menu_icon_con} onPress={() => {
-							showMenu();
 							navigation.navigate("Page", { screen: "Protocol", params: { title: "积分规则", type: "jfrule" } })
+							showMenu();
 						}}>
 							<Icon style={styles.menu_icon} name="jfrule" size={17} color={theme.text1} />
 							<Text style={styles.menu_text}>{"积分规则"}</Text>
@@ -437,6 +518,24 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		fontSize: 14,
 		color: theme.placeholder2
+	},
+	exchange_success_container: {
+		marginHorizontal: 40,
+		backgroundColor: theme.toolbarbg,
+		alignItems: "center",
+		borderRadius: 4,
+		overflow: "hidden",
+	},
+	exchange_success_img: {
+		width: 40,
+		height: 40,
+		marginHorizontal: 27,
+		marginVertical: 22,
+	},
+	exchange_success_text: {
+		marginBottom: 17,
+		fontSize: 17,
+		color: theme.text2,
 	}
 });
 export default UserJifen;

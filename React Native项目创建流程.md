@@ -925,6 +925,18 @@ npm install react-native-image-crop-picker
 yarn add react-native-image-crop-picker
 ```
 
+### 30. react-native-color-matrix-image-filters
+
+react-native-color-matrix-image-filters 是一个用于在 React Native 应用中使用颜色矩阵进行图像处理的库。如滤镜。
+
+```bash
+# using npm
+npm install react-native-color-matrix-image-filters
+
+# OR using Yarn
+yarn add react-native-color-matrix-image-filters
+```
+
 
 # 三、 打包 release APK
 ```bash

@@ -207,12 +207,12 @@ function User({ navigation }: any): React.JSX.Element {
 			}}
 			/>
 		), {
-			key: "giftcode_inputalert",
+			key: "giftcode_inputAlert",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss("giftcode_inputalert");
+				ModalPortal.dismiss("giftcode_inputAlert");
 				giftcode.current = "";
 
 			},
@@ -241,12 +241,12 @@ function User({ navigation }: any): React.JSX.Element {
 		ModalPortal.show((
 			<GiftcodePopover data={data} />
 		), {
-			key: "giftcode_popover_alert",
+			key: "giftcode_popover",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss("giftcode_popover_alert");
+				ModalPortal.dismiss("giftcode_popover");
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },

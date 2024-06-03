@@ -42,10 +42,10 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 			<TabView
 				navigationState={{ index, routes }}
 				renderScene={SceneMap({
-					discuss: SmartDiscuss,
-					vod: SmartVod,
-					wiki: SmartWiki,
-					catalog: SmartCatalog,
+					discuss: () => <SmartDiscuss navigation={navigation} />,
+					vod: () => <SmartVod navigation={navigation} />,
+					wiki: () => <SmartWiki navigation={navigation} />,
+					catalog: () => <SmartCatalog navigation={navigation} />,
 				})}
 				renderTabBar={(props: any) => {
 					return (

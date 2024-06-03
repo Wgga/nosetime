@@ -21,14 +21,14 @@ import Icon from "../../assets/iconfont";
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
-function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
+const SmartDiscuss = React.memo(({ navigation }: any) => {
 	// 控件
 	// 变量
-	const [perfumelist, setPerfumeList] = React.useState<any[]>([]); // 香单广场部分数据
 	let word = React.useRef<any>("discuss"); // 当前新鲜事评论数据
 	// 数据
-	let talenttop = React.useRef<any[]>([]); // 资深评论家部分数据
+	let talentTop = React.useRef<any[]>([]); // 资深评论家部分数据
 	let smartlist = React.useRef<any[]>([]); // 新鲜事评论数据
+	let perfumelist = React.useRef<any[]>([]); // 香单广场部分数据
 	// 参数
 	// 状态
 	let noMore = React.useRef<any>(false); // 是否还有更多新鲜事评论数据
@@ -36,7 +36,6 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 
 	React.useEffect(() => {
 		init();
-
 		events.addListener("nosetime_smartlistUpdated", (type: string) => {
 			smartlist.current = smartService.getItems(word.current);
 			noMore.current = !smartService.moreDataCanBeLoaded(type);
@@ -53,25 +52,49 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 		}
 	}, []);
 
+	const getTalentData = () => {
+		return new Promise((resolve, reject) => {
+			cache.getItem("SmartTalent").then((cacheobj) => {
+				if (cacheobj) {
+					talentTop.current = cacheobj.slice(0, 3);
+					resolve(1);
+				}
+			}).catch(() => {
+				http.get(ENV.smart + "?method=gettalent").then((resp_data: any) => {
+					cache.saveItem("SmartTalent", resp_data, 600);
+					talentTop.current = resp_data.slice(0, 3);
+					resolve(1);
+				});
+			});
+		})
+	}
+
+	const getPerfumeList = () => {
+		return new Promise((resolve, reject) => {
+			http.get(ENV.collection + "?method=getsquare").then((resp_data: any) => {
+				perfumelist.current = resp_data;
+				resolve(1);
+			});
+		})
+	}
+
 	const init = () => {
 		smartService.fetch(word.current, us.user.uid, "init");
-		cache.getItem("smarttalent").then((cacheobj) => {
-			if (cacheobj) {
-				talenttop.current = cacheobj.slice(0, 3);
+		Promise.all([getTalentData(), getPerfumeList()]).then((data) => {
+			if (data.length == 2) {
+				setIsRender((val) => !val);
 			}
-		}).catch(() => {
-			http.get(ENV.smart + "?method=gettalent").then((resp_data: any) => {
-				cache.saveItem("smarttalent", resp_data, 600);
-				talenttop.current = resp_data.slice(0, 3);
-			});
-		});
-		http.get(ENV.collection + "?method=getsquare").then((resp_data: any) => {
-			setPerfumeList(resp_data);
-		});
+		})
 	}
 
 	const loadMore = () => {
 		smartService.fetch(word.current, us.user.uid, "loadMore");
+	}
+
+	const gotodetail = (page: string, item: any) => {
+		if (page == "ItemDetail") {
+			navigation.navigate("Page", { screen: page, params: { id: item.id, title: item.cnname, src: "APP新鲜事" } });
+		}
 	}
 
 	return (
@@ -89,7 +112,7 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 						<View style={[styles.like_con, styles.flex_row]}>
 							<Text style={styles.flex_row_tit}>{"资深评论家"}</Text>
 							<View style={styles.flex_row}>
-								{(talenttop.current && talenttop.current.length > 0) && talenttop.current.map((item: any, index: number) => {
+								{(talentTop.current && talentTop.current.length > 0) && talentTop.current.map((item: any, index: number) => {
 									return (
 										<Image key={item.uid} style={styles.like_avatar} defaultSource={require("../../assets/images/default_avatar.png")}
 											source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
@@ -104,7 +127,7 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 							<Icon name="r-return" size={15} color={theme.tit2} />
 						</View>
 						<View style={styles.perfume_list_con}>
-							{(perfumelist && perfumelist.length > 0) && perfumelist.map((item: any, index: number) => {
+							{(perfumelist.current && perfumelist.current.length > 0) && perfumelist.current.map((item: any, index: number) => {
 								return (
 									<View key={item.cid} style={[styles.perfume_item, { marginRight: (index + 1) % 3 == 0 ? 0 : 10 }]}>
 										<Image style={styles.perfume_item_img} defaultSource={require("../../assets/images/nopic.png")}
@@ -120,13 +143,25 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.smartlist_item_con}>
-							<Image style={styles.item_img} defaultSource={require("../../assets/images/noxx.png")}
-								source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
-								resizeMode="contain"
-							/>
+							<Pressable onPress={() => {
+								gotodetail("ItemDetail", item);
+							}}>
+								<Image style={styles.item_img} defaultSource={require("../../assets/images/noxx.png")}
+									source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
+									resizeMode="contain"
+								/>
+							</Pressable>
 							<View style={styles.item_info}>
-								<Text numberOfLines={1} style={styles.item_cnname}>{item.cnname}</Text>
-								<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
+								<Pressable onPress={() => {
+									gotodetail("ItemDetail", item);
+								}}>
+									<Text numberOfLines={1} style={styles.item_cnname}>{item.cnname}</Text>
+								</Pressable>
+								<Pressable onPress={() => {
+									gotodetail("ItemDetail", item);
+								}}>
+									<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
+								</Pressable>
 								<View style={styles.item_uname}>
 									<Text style={styles.item_uname_text}>{item.uname}</Text>
 									{item.score > 0 && <View style={Globalstyles.star}>
@@ -167,7 +202,7 @@ function SmartDiscuss({ route, navigation }: any): React.JSX.Element {
 			/>}
 		</>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	flex_row: {

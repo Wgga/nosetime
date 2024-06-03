@@ -64,7 +64,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 					buttons: [{
 						text: "取消",
 						handler: () => {
-							ModalPortal.dismiss(type + "_inputalert");
+							ModalPortal.dismiss(type + "_inputAlert");
 							user.current = {
 								mobile: "",
 								pwd: ""
@@ -76,7 +76,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 							if (type == "password") {
 								signIn();
 							} else {
-								ModalPortal.dismiss(type + "_inputalert");
+								ModalPortal.dismiss(type + "_inputAlert");
 								unregister_alert("password");
 							}
 						}
@@ -84,12 +84,12 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 				}}
 				/>
 			), {
-				key: type + "_inputalert",
+				key: type + "_inputAlert",
 				width: width,
 				rounded: false,
 				useNativeDriver: true,
 				onTouchOutside: () => {
-					ModalPortal.dismiss(type + "_inputalert");
+					ModalPortal.dismiss(type + "_inputAlert");
 					user.current = {
 						mobile: "",
 						pwd: ""

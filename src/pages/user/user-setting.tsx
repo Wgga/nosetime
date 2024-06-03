@@ -99,13 +99,13 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 				buttons: [{
 					text: "取消",
 					handler: () => {
-						ModalPortal.dismiss(data.type + "_inputalert");
+						ModalPortal.dismiss(data.type + "_inputAlert");
 						inputdata.current[data.type] = "";
 					}
 				}, {
 					text: "确认",
 					handler: () => {
-						ModalPortal.dismiss(data.type + "_inputalert");
+						ModalPortal.dismiss(data.type + "_inputAlert");
 						var res = inputdata.current[data.type];
 						if (res == undefined || res == "")
 							return;
@@ -149,12 +149,12 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 			}}
 			/>
 		), {
-			key: data.type + "_inputalert",
+			key: data.type + "_inputAlert",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss(data.type + "_inputalert");
+				ModalPortal.dismiss(data.type + "_inputAlert");
 				inputdata.current[data.type] = "";
 			},
 			animationDuration: 300,
@@ -321,6 +321,13 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 	let giftcode = React.useRef<string>("");
 	// 状态
 
+
+	React.useEffect(() => {
+		return () => {
+			ModalPortal.dismissAll();
+		}
+	}, [])
+
 	// 跳转页面
 	const gotodetail = (page: string, type: string = "", modify: string = "") => {
 		switch (page) {
@@ -339,7 +346,6 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			default:
 				break;
 		}
-		console.log("%c Line:171 🍐", "color:#e41a6a");
 	}
 
 	// 打开礼品码兑换输入框
@@ -359,7 +365,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 				buttons: [{
 					text: "取消",
 					handler: () => {
-						ModalPortal.dismiss("giftcode_inputalert");
+						ModalPortal.dismiss("giftcode_inputAlert");
 						giftcode.current = "";
 					}
 				}, {
@@ -375,12 +381,12 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			}}
 			/>
 		), {
-			key: "giftcode_inputalert",
+			key: "giftcode_inputAlert",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss("giftcode_inputalert");
+				ModalPortal.dismiss("giftcode_inputAlert");
 				giftcode.current = "";
 
 			},
@@ -409,12 +415,12 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 		ModalPortal.show((
 			<GiftcodePopover data={data} />
 		), {
-			key: "giftcode_popover_alert",
+			key: "giftcode_popover",
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
 			onTouchOutside: () => {
-				ModalPortal.dismiss("giftcode_popover_alert");
+				ModalPortal.dismiss("giftcode_popover");
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },

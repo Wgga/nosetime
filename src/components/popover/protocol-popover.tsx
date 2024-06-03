@@ -23,14 +23,34 @@ function ProtocolPopover({ modalparams }: any): React.JSX.Element {
 
 	React.useEffect(() => {
 		StatusBar.setBarStyle("dark-content", true);
-		http.get(ENV.api + ENV.terms + "?method=" + type, "text").then((resp_data: any) => {
-			resp_data = resp_data.replace(/\n|\\n/g, "<p>");
-			setProtocol(
-				`<html><head>
-				<style>.content{padding:15px;padding-bottom:50px;} div{font-size:13px;line-height:20px;color:${theme.text1};text-indent:26px;}</style>
-				</head><body><div class="content">${resp_data}</div></body></html>`
-			);
-		}).catch((error: any) => { })
+		if (type == "jfrule") {
+			http.get(ENV.points + "?method=rules").then((resp_data: any) => {
+				setProtocol(
+					`<html>
+						<head><style>
+							*{padding:0;margin:0;}
+							.content{padding:15px;padding-bottom:100px;}
+							div{font-size:14px;color:${theme.text2};}
+						</style></head>
+						<body><div class="content">${resp_data.msg}</div></body>
+					</html>`
+				);
+			}).catch((error: any) => { });
+		} else {
+			http.get(ENV.terms + "?method=" + type, "text").then((resp_data: any) => {
+				resp_data = resp_data.replace(/\n|\\n/g, "<p>");
+				setProtocol(
+					`<html>
+						<head><style>
+							*{padding:0;margin:0;}
+							.content{padding:15px;padding-bottom:50px;}
+							div{font-size:13px;line-height:20px;color:${theme.text1};text-indent:26px;}
+						</style></head>
+						<body><div class="content">${resp_data}</div></body>
+					</html>`
+				);
+			}).catch((error: any) => { });
+		}
 	}, [])
 
 	return (

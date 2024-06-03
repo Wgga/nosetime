@@ -4,14 +4,9 @@ import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Back
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 import ProtocolPopover from "../../components/popover/protocol-popover";
 
-import http from "../../utils/api/http";
-
 import cache from "../../hooks/storage/storage";
 
 import theme from "../../configs/theme";
-import { ENV } from "../../configs/ENV";
-
-import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();

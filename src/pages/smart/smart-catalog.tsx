@@ -18,7 +18,7 @@ const classname: string = "SmartCatalogPage";
 
 console.log("%c Line:14 🍌 width, height", "color:#7f2b82", width, height);
 
-function SmartCatalog({ navigation }: any): React.JSX.Element {
+const SmartCatalog = React.memo(({ navigation }: any) => {
 	// 控件
 	// 变量
 	// 数据
@@ -106,7 +106,7 @@ function SmartCatalog({ navigation }: any): React.JSX.Element {
 			</View>
 		</ScrollView>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	catalog_con: {
