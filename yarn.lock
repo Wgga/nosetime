@@ -6305,10 +6305,10 @@ react-is@^17.0.1:
   resolved "https://registry.npmmirror.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-blurhash@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.npmmirror.com/react-native-blurhash/-/react-native-blurhash-2.0.2.tgz#a58ea86a5a67bd4b433fe7237b00cebe1abcba63"
-  integrity sha512-qUakbrKgvHynV/clCWh/Zj3p/s+/ED3eyoLFPgSlyrYmnZTtKC/9925l/NvF8ydIhOQpe7zgdEzFwbhpXlvQiQ==
+react-native-blurhash@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npmmirror.com/react-native-blurhash/-/react-native-blurhash-2.0.3.tgz#8c13a853248fcffac0ad1eb308475dc0b271a82e"
+  integrity sha512-bO24BTjNzDMHvaEg042l9NgxDcs+x0RavacNE/havlFQjPip4EeanNWK5o24qvWZa/0LWRf41BKyB7L5xM87vA==
 
 react-native-collapsible-tab-view@^7.0.1:
   version "7.0.1"
@@ -6392,10 +6392,10 @@ react-native-reanimated-carousel@^3.5.1:
   resolved "https://registry.npmmirror.com/react-native-reanimated-carousel/-/react-native-reanimated-carousel-3.5.1.tgz#3605b9959ffc0aa1c6b8b8736d98f91f46e36b17"
   integrity sha512-9BBQV6JAYSQm2lV7MFtT4mzapXmW4IZO6s38gfiJL84Jg23ivGB1UykcNQauKgtHyhtW2NuZJzItb1s42lM+hA==
 
-react-native-reanimated@^3.11.0:
-  version "3.11.0"
-  resolved "https://registry.npmmirror.com/react-native-reanimated/-/react-native-reanimated-3.11.0.tgz#d4265d4e0232623f5958ed60e1686ca884fc3452"
-  integrity sha512-BNw/XDgUfs8UhfY1X6IniU8kWpnotWGyt8qmQviaHisTi5lvwnaOdXQKfN1KGONx6ekdFRHRP5EFwLi0UajwKA==
+react-native-reanimated@^3.12.0:
+  version "3.12.0"
+  resolved "https://registry.npmmirror.com/react-native-reanimated/-/react-native-reanimated-3.12.0.tgz#2c768d43971bb19e425c436c892bf68c74b9ccab"
+  integrity sha512-Bwa4jKL/QttnV8pQYiX+1N5a6XgL8yZtMyH+7UbEaW7ZeNCv1Pxp2PmYu/bP3LafCkmS9Yj/hY2adYNKe58g9A==
   dependencies:
     "@babel/plugin-transform-arrow-functions" "^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator" "^7.0.0-0"
@@ -6406,10 +6406,10 @@ react-native-reanimated@^3.11.0:
     convert-source-map "^2.0.0"
     invariant "^2.2.4"
 
-react-native-safe-area-context@^4.10.1:
-  version "4.10.1"
-  resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.10.1.tgz#29fb27395ff7dfa2fa38788a27226330d73a81cc"
-  integrity sha512-w8tCuowDorUkPoWPXmhqosovBr33YsukkwYCDERZFHAxIkx6qBadYxfeoaJ91nCQKjkNzGrK5qhoNOeSIcYSpA==
+react-native-safe-area-context@^4.10.3:
+  version "4.10.3"
+  resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.10.3.tgz#ad132b64e1e7cdd043b4e82a7a2449d99f4f7630"
+  integrity sha512-nW9B0fydpJSN798awtdslamYzRqDM/FIEh80ZPDEXVYpqYNsDLpz52pMtuKyhF5aOgJlfiroQrgdOxQNFtSM8A==
 
 react-native-screens@^3.31.1:
   version "3.31.1"
@@ -6478,11 +6478,6 @@ react-native-video@^6.1.2:
   version "6.1.2"
   resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.1.2.tgz#84580458e0d0ebbf6ca395cc15cd2f76c337bbda"
   integrity sha512-oKk4hLhcWiL+k5CRgqs+/Bvp23QrHFGx3ylawrF4OWjKRekGeHNCf2mSf7+er66ZmktMtJC0ofBTgEPq4rRG6A==
-
-react-native-vision-camera@^4.0.5:
-  version "4.0.5"
-  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-4.0.5.tgz#8dde4e742433206f9175d4bd4dcc09f863be4e6b"
-  integrity sha512-MaNQPnRLf6RfWOvhrPb+qiwhOAQIhtWhXJck6UU5Xj0ehoC3SsZjbdPZ39V5BD1KifK1n2YnuS0tzGw/zfrBzg==
 
 react-native-webview@^13.10.2:
   version "13.10.2"
