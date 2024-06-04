@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, FlatList, Animated } from "react-native";
+import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, FlatList, Animated, TouchableOpacity } from "react-native";
 
-import { GestureHandlerRootView, RectButton, Swipeable } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
+import Swipeable from "../../components/swipeable";
 
 import us from "../../services/user-service/user-service";
 
@@ -129,65 +129,76 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			<GestureHandlerRootView>
-				<View style={styles.wishlist_con}>
-					{(wishlist_isempty.current && tab == "wishlist") && <Image style={styles.emptyimg}
-						resizeMode="contain"
-						source={require("../../assets/images/empty/wishlist_blank.png")} />}
-					{(stocktip_isempty.current && tab == "stocktip") && <Image style={styles.emptyimg}
-						resizeMode="contain"
-						source={require("../../assets/images/empty/stocktip_blank.png")} />}
-					{(!wishlist_isempty.current || !stocktip_isempty.current) && <FlatList data={tab == "stocktip" ? stocktip.current : wishlist.current}
-						showsHorizontalScrollIndicator={false}
-						keyExtractor={(item: any) => item.id}
-						renderItem={({ item }: any) => {
-							return (
-								<View style={styles.wish_or_stip_item}>
-									<View style={styles.item_img_con}>
-										{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <Image style={styles.item_img}
-											source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!l" }}
-											resizeMode="contain"
-										/>}
-										{(tab == "wishlist" && item.type == 3) && <Image style={[styles.item_img, styles.item_hj_img]}
-											source={{ uri: ENV.image + item.info.appimage + "!l" }}
-										/>}
-									</View>
-									<View style={styles.item_info}>
-										<View style={{ maxWidth: "90%" }}>
-											{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <>
-												<Text numberOfLines={1} style={[styles.item_cnname, !item.instock && { color: theme.placeholder }]}>{item.cnname}</Text>
-												<Text numberOfLines={1} style={[styles.item_enname, !item.instock && { color: theme.placeholder }]}>{item.enname}</Text>
-											</>}
-											{(tab == "wishlist" && item.type == 3) && <Text numberOfLines={1} style={[styles.item_cnname, !item.instock && { color: theme.placeholder }]}>{item.info.tbhjname + " - 合辑"}</Text>}
-
-											{(item.minprice < item.maxprice) && <Text style={styles.item_price}>
-												{"¥ " + item.minprice + " ﹣ ¥ " + item.maxprice}
-											</Text>}
-											{(item.minprice >= item.maxprice) && <Text style={styles.item_price}>
-												{"¥ " + item.minprice}
-											</Text>}
-										</View>
-										{edit && <Icon name="delete" style={styles.item_icon} size={19} color={theme.placeholder} />}
-
-										{(tab == "wishlist" && item.instock && !edit) && <Icon name="addcart" style={styles.item_icon} size={19} color={theme.placeholder} />}
-										{(tab == "wishlist" && !item.instock) && <Text style={styles.nostock}>{"缺货"}</Text>}
-
-										{(tab == "stocktip" && item.instock) && <Text style={styles.stocktip_msg}>{item.msg}</Text>}
-										{(tab == "stocktip" && !item.instock) && <Text style={styles.stocktip_msg}>{item.msg}</Text>}
-
-
-										{(((tab == "wishlist" && item.type == 1) || tab == "stocktip") && item.instock) && <View style={styles.item_price_icon}>
-											{item.bottle && <Bottle width={31} height={15} />}
-											{item.sample && <Sample width={31} height={15} />}
-										</View>}
-									</View>
+			<View style={styles.wishlist_con}>
+				{(wishlist_isempty.current && tab == "wishlist") && <Image style={styles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/wishlist_blank.png")} />}
+				{(stocktip_isempty.current && tab == "stocktip") && <Image style={styles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/stocktip_blank.png")} />}
+				{(!wishlist_isempty.current || !stocktip_isempty.current) && <FlatList data={tab == "stocktip" ? stocktip.current : wishlist.current}
+					showsHorizontalScrollIndicator={false}
+					keyExtractor={(item: any) => item.id}
+					renderItem={({ item }: any) => {
+						return (
+							<Swipeable contentContainerStyle={styles.wish_or_stip_item}
+								rightButtonWidth={86}
+								rightButtonsActivationDistance={86}
+								rightButtonContainerStyle={styles.right_btn_con}
+								rightButtons={[
+									<Pressable style={styles.btn_con}>
+										<Text style={styles.btn_text}>{"加购"}</Text>
+									</Pressable>,
+									<Pressable style={[styles.btn_con, styles.del_btn]}>
+										<Text style={styles.btn_text}>{"删除"}</Text>
+									</Pressable>
+								]}
+							>
+								<View style={styles.item_img_con}>
+									{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <Image style={styles.item_img}
+										source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!l" }}
+										resizeMode="contain"
+									/>}
+									{(tab == "wishlist" && item.type == 3) && <Image style={[styles.item_img, styles.item_hj_img]}
+										source={{ uri: ENV.image + item.info.appimage + "!l" }}
+									/>}
 								</View>
-							)
-						}}
-					/>}
-					{(!stocktip_isempty.current && tab == "stocktip")}
-				</View>
-			</GestureHandlerRootView>
+								<View style={styles.item_info}>
+									<View style={{ maxWidth: "90%" }}>
+										{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <>
+											<Text numberOfLines={1} style={[styles.item_cnname, !item.instock && { color: theme.placeholder }]}>{item.cnname}</Text>
+											<Text numberOfLines={1} style={[styles.item_enname, !item.instock && { color: theme.placeholder }]}>{item.enname}</Text>
+										</>}
+										{(tab == "wishlist" && item.type == 3) && <Text numberOfLines={1} style={[styles.item_cnname, !item.instock && { color: theme.placeholder }]}>{item.info.tbhjname + " - 合辑"}</Text>}
+
+										{(item.minprice < item.maxprice) && <Text style={styles.item_price}>
+											{"¥ " + item.minprice + " ﹣ ¥ " + item.maxprice}
+										</Text>}
+										{(item.minprice >= item.maxprice) && <Text style={styles.item_price}>
+											{"¥ " + item.minprice}
+										</Text>}
+									</View>
+									{edit && <Icon name="delete" style={styles.item_icon} size={19} color={theme.placeholder} />}
+
+									{(tab == "wishlist" && item.instock && !edit) && <Icon name="addcart" style={styles.item_icon} size={19} color={theme.placeholder} />}
+									{(tab == "wishlist" && !item.instock) && <Text style={styles.nostock}>{"缺货"}</Text>}
+
+									{(tab == "stocktip" && item.instock) && <Text style={styles.stocktip_msg}>{item.msg}</Text>}
+									{(tab == "stocktip" && !item.instock) && <Text style={styles.stocktip_msg}>{item.msg}</Text>}
+
+
+									{(((tab == "wishlist" && item.type == 1) || tab == "stocktip") && item.instock) && <View style={styles.item_price_icon}>
+										{item.bottle && <Bottle width={31} height={15} />}
+										{item.sample && <Sample width={31} height={15} />}
+									</View>}
+								</View>
+							</Swipeable>
+
+						)
+					}}
+				/>}
+				{(!stocktip_isempty.current && tab == "stocktip")}
+			</View>
 		</View >
 	);
 }
@@ -234,6 +245,21 @@ const styles = StyleSheet.create({
 	emptyimg: {
 		width: "100%",
 		height: 500,
+	},
+	right_btn_con: {
+		width: "100%",
+		height: "100%",
+		justifyContent: "center",
+	},
+	btn_con: {
+		backgroundColor: "#92abf2",
+	},
+	del_btn: {
+		backgroundColor: "#D77878",
+	},
+	btn_text: {
+		fontSize: 13,
+		color: theme.toolbarbg,
 	},
 	wish_or_stip_item: {
 		flexDirection: "row",

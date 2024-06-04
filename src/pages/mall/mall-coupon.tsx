@@ -64,10 +64,10 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 
 	const selectcoupon = (x: any) => {
 		if (!route.params) return;
-		let msg = '';
+		let msg = "";
 
 		let t = new Date();
-		let sznow = t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate();
+		let sznow = t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate();
 		let now = new Date(sznow).getTime();
 		let from = new Date(x.mcfrom).getTime();
 		let to = new Date(x.mcto).getTime();
@@ -78,7 +78,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 			msg += "使用期限 " + x.mcto + " 已过\n";
 		if (actualfee.current < x.mcmin)
 			msg += "订单金额需大于 " + x.mcmin + " 元\n";
-		if (msg != '') {
+		if (msg != "") {
 			ToastCtrl.show({ message: msg, duration: 2000, viewstyle: "short_toast", key: "coupon_toast" });
 			return;
 		}

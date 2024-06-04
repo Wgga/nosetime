@@ -46,7 +46,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 
 	// 输入框弹窗
 	const unregister_alert = (type: string) => {
-		if (us.user.mobile.indexOf('@weixin') > 0 || us.user.mobile.indexOf('@weibo') > 0) {
+		if (us.user.mobile.indexOf("@weixin") > 0 || us.user.mobile.indexOf("@weibo") > 0) {
 			confirm_alert("confirm");
 		} else {
 			ModalPortal.show((

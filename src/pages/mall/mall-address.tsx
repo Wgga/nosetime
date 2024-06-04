@@ -53,7 +53,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 	// 切换默认地址
 	const defaultaddress = (item: any) => {
 		http.post(ENV.mall + "?uid=" + us.user.uid, { method: "setdefaultaddress", token: us.user.token, id: item.maid }).then((resp_data: any) => {
-			if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App地址列表页" } });
 			}
@@ -90,8 +90,8 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 	}
 
 	const _deladdress = (item: any) => {
-		http.post(ENV.mall + '?uid=' + us.user.uid, { method: "deladdress", token: us.user.token, id: item.maid }).then((resp_data: any) => {
-			if (resp_data.msg == 'TOKEN_ERR' || resp_data.msg == 'TOKEN_EXPIRE') {
+		http.post(ENV.mall + "?uid=" + us.user.uid, { method: "deladdress", token: us.user.token, id: item.maid }).then((resp_data: any) => {
+			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App地址列表页" } });
 			}

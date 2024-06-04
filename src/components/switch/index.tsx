@@ -1,13 +1,13 @@
-import React, { type FC, useEffect } from 'react';
-import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import React, { type FC, useEffect } from "react";
+import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
 	interpolateColor,
 	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 export type SwitchProps = {
 	/**
@@ -24,22 +24,22 @@ export type SwitchProps = {
 	disabled?: boolean;
 	/**
 	 * Container color when component is active
-	 * @default 'darkblue'
+	 * @default "darkblue"
 	 */
 	activeColor?: string;
 	/**
 	 * Container color when component is inactive
-	 * @default 'darkgray'
+	 * @default "darkgray"
 	 */
 	inactiveColor?: string;
 	/**
 	 * Container color when component is active and disabled
-	 * @default 'blue'
+	 * @default "blue"
 	 */
 	disabledActiveColor?: string;
 	/**
 	 * Container color when component is inactive and disabled
-	 * @default 'gray'
+	 * @default "gray"
 	 */
 	disabledInactiveColor?: string;
 	/**
@@ -57,7 +57,7 @@ export type SwitchProps = {
 	circleStyle?: StyleProp<ViewStyle>;
 	/**
 	 * The width that the circle will be able to move
-	 * @default 'containerWidth - circleWidth - containerPaddingHorizontal * 2'
+	 * @default "containerWidth - circleWidth - containerPaddingHorizontal * 2"
 	 */
 	trackWidth?: number;
 };
@@ -65,10 +65,10 @@ const Switch: FC<SwitchProps> = ({
 	value,
 	onValueChange,
 	disabled,
-	activeColor = 'darkblue',
-	inactiveColor = 'darkgray',
-	disabledActiveColor = 'blue',
-	disabledInactiveColor = 'gray',
+	activeColor = "darkblue",
+	inactiveColor = "darkgray",
+	disabledActiveColor = "blue",
+	disabledInactiveColor = "gray",
 	shouldCancelWhenOutside = false,
 	containerStyle,
 	circleStyle,
@@ -78,13 +78,13 @@ const Switch: FC<SwitchProps> = ({
 			width: 52,
 			height: 32,
 			borderRadius: 16,
-			justifyContent: 'center',
+			justifyContent: "center",
 			paddingHorizontal: 4,
 		},
 		circle: {
 			width: 24,
 			height: 24,
-			backgroundColor: 'red',
+			backgroundColor: "red",
 			borderRadius: 12,
 		},
 	});
