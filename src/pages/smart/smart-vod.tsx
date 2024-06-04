@@ -1,6 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, ScrollView } from "react-native";
 
+import FastImage from "react-native-fast-image";
+import { useNavigation } from "@react-navigation/native";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
@@ -15,8 +18,9 @@ const events = new NativeEventEmitter();
 const classname = "SmartEvaluatePage";
 
 
-const SmartVod = React.memo(({ navigation }: any) => {
+const SmartVod = React.memo(() => {
 	// 控件
+	const navigation: any = useNavigation();
 	// 变量
 	// 数据
 	let vodlist = React.useRef<any[]>([]); // 单品视频列表
@@ -98,21 +102,17 @@ const SmartVod = React.memo(({ navigation }: any) => {
 					<View key={item.id} style={styles.vodlist_item}>
 						<View style={styles.vod_title_con}>
 							<Text style={styles.vod_title_text}>{item.title}</Text>
-							<View style={styles.vod_title_icon}>
+							<Pressable onPress={() => {
+								navigation.navigate("Page", { screen: "PicList", params: { id: 0, src: "smart" + item.id, title: item.title } });
+							}} style={styles.vod_title_icon}>
 								<Text style={styles.vod_title_icon_text}>{"全部"}</Text>
 								<Icon name="r-return" size={15} color={theme.text1} />
-							</View>
+							</Pressable>
 						</View>
 						{item.firstvod && <View style={styles.vod_first_con}>
-							<View style={styles.first_img_con}>
-								<Image style={styles.vod_image}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: item.firstvod.vpicurl }}
-								/>
-								<Image style={styles.triangle}
-									source={require("../../assets/images/player/play.png")}
-									resizeMode="cover"
-								/>
+							<View style={[styles.first_img_con, styles.vode_brs]}>
+								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: item.firstvod.vpicurl }} />
+								<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
 							</View>
 							{item.firstvod.mainname && <Text numberOfLines={1} style={styles.vod_mainname}>{item.firstvod.mainname}</Text>}
 							{item.firstvod.subname && <Text numberOfLines={1} style={styles.vod_subname}>{item.firstvod.subname}</Text>}
@@ -125,15 +125,9 @@ const SmartVod = React.memo(({ navigation }: any) => {
 										marginLeft: (index + 1) % 2 == 0 ? 7 : 0,
 										marginRight: (index + 1) % 2 == 1 ? 7 : 0
 									}}>
-										<View style={[styles.list_img_con]}>
-											<Image style={styles.vod_image}
-												defaultSource={require("../../assets/images/nopic.png")}
-												source={{ uri: item2.vpicurl }}
-											/>
-											<Image style={[styles.triangle, styles.list_triangle]}
-												source={require("../../assets/images/player/play.png")}
-												resizeMode="cover"
-											/>
+										<View style={[styles.list_img_con, styles.vode_brs]}>
+											<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: item2.vpicurl }} />
+											<Image style={[styles.triangle, styles.list_triangle]} source={require("../../assets/images/player/play.png")} />
 										</View>
 										{item2.mainname && <Text numberOfLines={1} style={[styles.vod_mainname, styles.vod_width]}>{item2.mainname}</Text>}
 										{item2.subname && <Text numberOfLines={1} style={[styles.vod_subname, styles.vod_width]}>{item2.subname}</Text>}
@@ -177,33 +171,34 @@ const styles = StyleSheet.create({
 		color: "#808080",
 		fontWeight: "500",
 	},
+	vode_brs: {
+		borderRadius: 8,
+		overflow: "hidden",
+		backgroundColor: theme.bg
+	},
 	vod_first_con: {
 		marginBottom: 20,
 	},
 	first_img_con: {
 		width: width - 40,
-		height: (width - 40) * 0.625,
-		borderRadius: 8,
-		overflow: "hidden",
-	},
-	vod_image: {
-		width: "100%",
-		height: "100%",
+		aspectRatio: 1728 / 1080,
 	},
 	triangle: {
 		position: "absolute",
 		right: 0,
 		bottom: 0,
 		width: (width - 40) * 0.15,
-		height: (width - 40) * 0.15,
-		marginBottom: (width - 40) * 0.06,
-		marginRight: (width - 40) * 0.06,
+		height: "auto",
+		aspectRatio: 137 / 137,
+		marginBottom: "6%",
+		marginRight: "6%",
 	},
 	vod_mainname: {
 		width: width - 40,
 		fontSize: 15,
 		color: theme.text1,
 		fontWeight: "500",
+		fontFamily: "PingFang SC",
 		marginTop: 13,
 	},
 	vod_subname: {
@@ -218,15 +213,11 @@ const styles = StyleSheet.create({
 	},
 	list_img_con: {
 		width: (width - 40 - 14) / 2,
-		height: (width - 40 - 14) / 2 * 0.625,
-		borderRadius: 8,
-		overflow: "hidden",
+		aspectRatio: 1728 / 1080,
 	},
 	list_triangle: {
 		width: (width - 40 - 14) / 2 * 0.23,
-		height: (width - 40 - 14) / 2 * 0.23,
-		marginBottom: (width - 40 - 14) / 2 * 0.06,
-		marginRight: (width - 40 - 14) / 2 * 0.06,
+		aspectRatio: 137 / 137,
 	},
 	vod_width: {
 		width: (width - 40 - 14) / 2

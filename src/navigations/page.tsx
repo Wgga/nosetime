@@ -4,6 +4,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import ArticleDetail from "../pages/article/article-detail";
 
+import Search from "../pages/search/search";
+import SearchResult from "../pages/search/search-result";
+
+import ItemDetail from "../pages/item/item-detail";
+
+import MediaListDetail from "../pages/media/media-list-detail";
+import PicList from "../pages/media/pic-list";
+
+import WikiDetail from "../pages/smart/wiki-detail";
+import Talent from "../pages/smart/talent";
+
+import PerfumeListSquare from "../pages/perfume/perfume-list-square";
+
 import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
 import Lottery from "../pages/user/lottery";
@@ -17,17 +30,7 @@ import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
 import UserChangeDesc from "../pages/user/user-change-desc";
 import UserCart from "../pages/user/user-cart";
 
-import Search from "../pages/search/search";
-import SearchResult from "../pages/search/search-result";
-
-import ItemDetail from "../pages/item/item-detail";
-
 import SocialShequDetail from "../pages/social/social-shequ-detail";
-
-import WikiDetail from "../pages/wiki/wiki-detail";
-
-import MediaListDetail from "../pages/media/media-list-detail";
-import PicList from "../pages/media/pic-list";
 
 import MallGroup from "../pages/mall/mall-group";
 import MallHeji from "../pages/mall/mall-heji";
@@ -45,6 +48,19 @@ function Page(): React.JSX.Element {
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="ArticleDetail" component={ArticleDetail} />
 
+			<Stack.Screen name="Search" component={Search} />
+			<Stack.Screen name="SearchResult" component={SearchResult} />
+
+			<Stack.Screen name="ItemDetail" component={ItemDetail} />
+
+			<Stack.Screen name="MediaListDetail" component={MediaListDetail} />
+			<Stack.Screen name="PicList" component={PicList} />
+
+			<Stack.Screen name="WikiDetail" component={WikiDetail} />
+			<Stack.Screen name="Talent" component={Talent} />
+
+			<Stack.Screen name="PerfumeListSquare" component={PerfumeListSquare} />
+
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Protocol" component={Protocol} />
 			<Stack.Screen name="Lottery" component={Lottery} />
@@ -58,17 +74,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
 			<Stack.Screen name="UserCart" component={UserCart} />
 
-			<Stack.Screen name="Search" component={Search} />
-			<Stack.Screen name="SearchResult" component={SearchResult} />
-
-			<Stack.Screen name="ItemDetail" component={ItemDetail} />
-
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
-
-			<Stack.Screen name="WikiDetail" component={WikiDetail} />
-
-			<Stack.Screen name="MediaListDetail" component={MediaListDetail} />
-			<Stack.Screen name="PicList" component={PicList} />
 
 			<Stack.Screen name="MallGroup" component={MallGroup} />
 			<Stack.Screen name="MallHeji" component={MallHeji} />

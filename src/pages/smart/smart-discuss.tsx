@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
+import { useNavigation } from "@react-navigation/native";
 
 import ListBottomTip from "../../components/listbottomtip";
 
@@ -21,8 +22,9 @@ import Icon from "../../assets/iconfont";
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
-const SmartDiscuss = React.memo(({ navigation }: any) => {
+const SmartDiscuss = React.memo(() => {
 	// 控件
+	const navigation: any = useNavigation();
 	// 变量
 	let word = React.useRef<any>("discuss"); // 当前新鲜事评论数据
 	// 数据
@@ -91,9 +93,11 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 		smartService.fetch(word.current, us.user.uid, "loadMore");
 	}
 
-	const gotodetail = (page: string, item: any) => {
+	const gotodetail = (page: string, item: any = null) => {
 		if (page == "ItemDetail") {
 			navigation.navigate("Page", { screen: page, params: { id: item.id, title: item.cnname, src: "APP新鲜事" } });
+		} else {
+			navigation.navigate("Page", { screen: page });
 		}
 	}
 
@@ -109,7 +113,9 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 				keyExtractor={(item: any) => item.id + "_" + item.uid}
 				ListHeaderComponent={(
 					<View style={styles.discuss_con}>
-						<View style={[styles.like_con, styles.flex_row]}>
+						<Pressable onPress={() => {
+							gotodetail("Talent");
+						}} style={[styles.like_con, styles.flex_row]}>
 							<Text style={styles.flex_row_tit}>{"资深评论家"}</Text>
 							<View style={styles.flex_row}>
 								{(talentTop.current && talentTop.current.length > 0) && talentTop.current.map((item: any, index: number) => {
@@ -121,7 +127,7 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 								})}
 								<Icon name="r-return" size={15} color={theme.tit2} />
 							</View>
-						</View>
+						</Pressable>
 						<View style={[styles.perfume_tit_con, styles.flex_row]}>
 							<Text style={styles.flex_row_tit}>{"香单广场"}</Text>
 							<Icon name="r-return" size={15} color={theme.tit2} />

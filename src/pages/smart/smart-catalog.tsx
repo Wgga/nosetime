@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, ScrollView } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 
 import http from "../../utils/api/http";
 
@@ -16,10 +17,9 @@ const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 const classname: string = "SmartCatalogPage";
 
-console.log("%c Line:14 🍌 width, height", "color:#7f2b82", width, height);
-
-const SmartCatalog = React.memo(({ navigation }: any) => {
+const SmartCatalog = React.memo(() => {
 	// 控件
+	const navigation: any = useNavigation();
 	// 变量
 	// 数据
 	const [items, setItems] = React.useState<any[]>([]); // 排行列表数据

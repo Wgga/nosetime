@@ -1,8 +1,9 @@
 import React from "react";
-import { Text, Dimensions, View, StyleSheet, Pressable, ImageBackground } from "react-native";
+import { Text, Dimensions, View, StyleSheet, Pressable } from "react-native";
 
 import Carousel from "react-native-reanimated-carousel";
 import { LongPressGestureHandler } from "react-native-gesture-handler";
+import FastImage from "react-native-fast-image";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -42,8 +43,7 @@ function Slider({ navigation, banner, setSliderHeight }: any): React.JSX.Element
 					<LongPressGestureHandler>
 						<Pressable key={item.code} onPress={() => navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.code } })}>
 							<View style={styles.container}>
-								<ImageBackground style={styles.image_box}
-									source={{ uri: ENV.image + item.img, cache: "force-cache" }} resizeMode="cover" />
+								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.img }} />
 								<View style={styles.title_box}>
 									<Text style={styles.title} numberOfLines={1}>{item.title}</Text>
 									<Text style={styles.subtitle} numberOfLines={1}>{item.subtitle}</Text>
@@ -64,22 +64,15 @@ function Slider({ navigation, banner, setSliderHeight }: any): React.JSX.Element
 
 const styles = StyleSheet.create({
 	container: {
-		width: "100%",
-		aspectRatio: 390 / 273,
-	},
-	image_box: {
-		position: "absolute",
-		width: "100%",
-		height: "100%",
+		width: width,
+		aspectRatio: 900 / 630,
 		backgroundColor: "rgba(129, 129, 129, 0.09)"
 	},
 	title_box: {
 		position: "absolute",
 		width: "100%",
-		bottom: "10%",
+		bottom: "12%",
 		height: 50,
-		textAlign: "left",
-		marginTop: -10,
 		color: theme.toolbarbg,
 		paddingLeft: 30,
 	},

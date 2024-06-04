@@ -698,7 +698,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 								)
 							})}
 							<Pressable style={styles.media_moredata_btn} onPress={() => {
-								navigation.navigate("Page", { screen: "PicList", params: { id: itemid } });
+								navigation.navigate("Page", { screen: "PicList", params: { id: itemid, src: "itemdetail" } });
 							}}>
 								<Text style={styles.media_moredata_btn_text}>{"全部照片"}</Text>
 								<OpenAll width={12} height={12} style={styles.media_moredata_btn_icon} />

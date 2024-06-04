@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, NativeEventEmitter, Image, Dimensions } from "react-native";
 
+import FastImage from "react-native-fast-image";
+
 import articleService from "../../services/article-service/article-service";
 
 import cache from "../../hooks/storage/storage";
@@ -82,7 +84,7 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 					<View key={item.id} style={styles.article_con}>
 						<Pressable onPress={() => { }}>
 							<View style={styles.img_box}>
-								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.pic }} resizeMode="cover" />
+								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.pic }} />
 							</View>
 							{item.title && <View style={styles.tit_content}>
 								<Text style={styles.title2} numberOfLines={1}>{item.title}</Text>
@@ -119,8 +121,8 @@ const styles = StyleSheet.create({
 	},
 	img_box: {
 		position: "relative",
-		width: "100%",
-		aspectRatio: (390 - 50) / 196.16,
+		width: (width - 50),
+		aspectRatio: (width - 50) / 196.16,
 		borderRadius: 8,
 		overflow: "hidden",
 		backgroundColor: "rgba(129,129,129,0.09)"

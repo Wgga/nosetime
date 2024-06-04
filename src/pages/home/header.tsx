@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, View, Text, StyleSheet, Image, VirtualizedList, NativeEventEmitter, Pressable, ImageBackground, Dimensions } from "react-native";
+import { FlatList, View, Text, StyleSheet, Image, NativeEventEmitter, Pressable, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
@@ -103,8 +103,8 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 			<View style={styles.homepart}>
 				<Pressable onPress={() => { gotoArticle(homedataref.current.newitem.id) }}>
 					<Text style={styles.title}>本期专题</Text>
-					<View style={[styles.newarticleimg, styles.homemargin]}>
-						<Image style={styles.newarticleimg} source={{ uri: ENV.image + homedataref.current.newitem.pic, cache: "force-cache" }} />
+					<View style={[styles.newarticleimg, styles.homemargin, styles.homebrs8]}>
+						<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + homedataref.current.newitem.pic }} />
 					</View>
 					<View style={styles.title_box}>
 						<Text numberOfLines={1} style={[styles.newitemtit2, styles.newitemtit]}>{homedataref.current.newitem?.title2}</Text>
@@ -117,23 +117,18 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				<FlatList data={homedataref.current.smellitems}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={styles.contentContainer}
+					contentContainerStyle={{ paddingRight: 20 }}
 					keyExtractor={(item: any) => item.id}
 					renderItem={({ item }: any) => {
 						return (
 							<View style={styles.itemContainer}>
 								<Pressable onPress={() => { gotoArticle(item.id) }}>
-									<View style={styles.itemImg}>
-										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) &&
-											<FastImage style={styles.itemImg}
-												source={{
-													uri: ENV.image + item.pic,
-												}}
-												resizeMode={FastImage.resizeMode.cover}
-											/>}
+									<View style={[styles.itemImg, styles.homebrs6]}>
+										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
+											source={{ uri: ENV.image + item.pic }} />}
 									</View>
-									<Text numberOfLines={1} style={[styles.smellitemtit2]}>{item.title2}</Text>
-									<Text numberOfLines={1} style={[styles.smellitemtit3]}>{item.title3}</Text>
+									<Text numberOfLines={1} style={styles.smellitemtit2}>{item.title2}</Text>
+									<Text numberOfLines={1} style={styles.smellitemtit3}>{item.title3}</Text>
 								</Pressable>
 							</View>
 						)
@@ -144,15 +139,10 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				<Text style={styles.title}>本期视频</Text>
 				<View style={styles.homemargin}>
 					<Pressable onPress={() => { gotoArticle(homedataref.current.newvod.viid) }}>
-						<View style={styles.newvideoimg}>
-							{(homedataref.current.newvod && homedataref.current.newvod.vpicurl) && <Image
-								style={styles.newvideoimg}
-								source={{ uri: homedataref.current.newvod.vpicurl, cache: "force-cache" }}
-							/>}
-							<Image style={styles.triangle}
-								source={require("../../assets/images/player/play.png")}
-								resizeMode="cover"
-							/>
+						<View style={[styles.newvideoimg, styles.homebrs8]}>
+							{(homedataref.current.newvod && homedataref.current.newvod.vpicurl) && <FastImage style={{ width: "100%", height: "100%" }}
+								source={{ uri: homedataref.current.newvod.vpicurl }} />}
+							<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
 						</View>
 						<Text numberOfLines={1} style={[styles.newvideomaintit]}>{homedataref.current.newvod.maintit}</Text>
 						{homedataref.current.newvod.subtit && <Text numberOfLines={1} style={[styles.newvideosubtit]}>{homedataref.current.newvod.subtit}</Text>}
@@ -164,28 +154,19 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				<FlatList data={homedataref.current.hotvod}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={styles.contentContainer}
+					contentContainerStyle={{ paddingRight: 20 }}
 					keyExtractor={(item: any, index: number) => item.viid + index}
 					renderItem={({ item, index }: any) => {
 						return (
-							<View style={styles.itemContainer}>
+							<View style={[styles.itemContainer, { width: 264 }]}>
 								<Pressable onPress={() => { gotoVod(item) }}>
-									<View style={styles.itemImg}>
-										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) &&
-											<FastImage style={styles.itemImg}
-												source={{
-													uri: item.vpicurl,
-												}}
-												resizeMode={FastImage.resizeMode.cover}
-											/>
-										}
-										<ImageBackground style={styles.triangle}
-											source={require("../../assets/images/player/play.png")}
-											resizeMode="cover"
-										/>
+									<View style={[styles.itemvodImg, styles.homebrs6]}>
+										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
+											source={{ uri: item.vpicurl }} />}
+										<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
 									</View>
-									<Text numberOfLines={1} style={[styles.smellitemtit2]}>{item.maintit}</Text>
-									<Text numberOfLines={1} style={[styles.smellitemtit3]}>{item.subtit}</Text>
+									<Text numberOfLines={1} style={styles.smellitemtit2}>{item.maintit}</Text>
+									<Text numberOfLines={1} style={styles.smellitemtit3}>{item.subtit}</Text>
 								</Pressable>
 							</View>
 						)
@@ -204,7 +185,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							<Pressable onPress={() => {
 								setIsVisible(true)
 							}} style={styles.topicitem}>
-								<View style={styles.topicitemImg}>
+								<View style={[styles.topicitemImg, styles.homebrs6]}>
 									{(homedataref.current.topiclist && homedataref.current.topiclist.length > 0) &&
 										<Image style={styles.topicitemImg} source={(imagelist[(index % 5)])} />}
 								</View>
@@ -230,20 +211,22 @@ const styles = StyleSheet.create({
 		marginLeft: 20,
 		marginRight: 20,
 	},
-	blurhashImage: {
-		width: width - 40,
-		height: (width - 40) * 0.58555,
-	},
-	newarticleimg: {
-		width: width - 40,
-		height: (width - 40) * 0.58555,
+	homebrs8: {
 		borderRadius: 8,
 		overflow: "hidden",
 		backgroundColor: theme.bg,
 	},
+	homebrs6: {
+		borderRadius: 6,
+		overflow: "hidden",
+		backgroundColor: theme.bg,
+	},
+	newarticleimg: {
+		width: width - 40,
+		aspectRatio: (width - 40) / ((width - 40) * 0.58555),
+	},
 	title_box: {
 		position: "absolute",
-		width: "auto",
 		bottom: "13%",
 		paddingLeft: 42,
 	},
@@ -270,26 +253,13 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		fontWeight: "400",
 	},
-	scrollX: {
-		margin: 0,
-		paddingRight: 20,
-	},
-	contentContainer: {
-		paddingRight: 20,
-		height: 211.09,
-	},
 	itemContainer: {
 		width: 260,
 		marginLeft: 20,
-		borderRadius: 6,
-		overflow: "hidden",
 	},
 	itemImg: {
 		width: 260,
-		height: 260 * 0.585,
-		borderRadius: 6,
-		overflow: "hidden",
-		backgroundColor: theme.bg,
+		aspectRatio: 260 / (260 * 0.585),
 	},
 	smellitemtit2: {
 		color: theme.tit2,
@@ -304,10 +274,7 @@ const styles = StyleSheet.create({
 	},
 	newvideoimg: {
 		width: width - 40,
-		height: (width - 40) * 0.625,
-		borderRadius: 8,
-		overflow: "hidden",
-		backgroundColor: theme.bg,
+		aspectRatio: 1728 / 1080,
 	},
 	triangle: {
 		position: "absolute",
@@ -328,6 +295,10 @@ const styles = StyleSheet.create({
 		color: theme.comment,
 		marginTop: 3,
 	},
+	itemvodImg: {
+		width: 264,
+		aspectRatio: 1728 / 1080,
+	},
 	topicContent: {
 		paddingRight: 20,
 		height: 190,
@@ -336,15 +307,10 @@ const styles = StyleSheet.create({
 		width: 148,
 		height: 190,
 		marginLeft: 20,
-		borderRadius: 6,
-		overflow: "hidden",
 	},
 	topicitemImg: {
 		width: "100%",
 		height: "100%",
-		borderRadius: 6,
-		backgroundColor: theme.bg,
-		overflow: "hidden",
 	},
 	topic_title_box: {
 		position: "absolute",

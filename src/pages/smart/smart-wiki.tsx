@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
+import { useNavigation } from "@react-navigation/native";
 import { Grayscale } from "react-native-color-matrix-image-filters"
 
 import ListBottomTip from "../../components/listbottomtip";
@@ -24,8 +25,9 @@ import Icon from "../../assets/iconfont";
 const { width, height } = Dimensions.get("window");
 const events = new NativeEventEmitter();
 
-const SmartWiki = React.memo(({ navigation }: any) => {
+const SmartWiki = React.memo(() => {
 	// 控件
+	const navigation: any = useNavigation();
 	// 参数
 	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
 	// 变量

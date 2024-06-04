@@ -43,6 +43,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 		init();
 	}, [])
 
+	// 获取愿望单数据
 	const getWishlist = () => {
 		return new Promise((resolve, reject) => {
 			if (!us.user.uid) {
@@ -64,6 +65,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 		})
 	}
 
+	// 获取到货提醒数据
 	const getStocktip = () => {
 		return new Promise((resolve, reject) => {
 			if (!us.user.uid) {
