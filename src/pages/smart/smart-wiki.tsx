@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +15,7 @@ import us from "../../services/user-service/user-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -23,7 +24,6 @@ import { Globalstyles, handlestarLeft } from "../../configs/globalstyles";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 const SmartWiki = React.memo(() => {
 	// 控件
@@ -69,7 +69,7 @@ const SmartWiki = React.memo(() => {
 	React.useEffect(() => {
 		init();
 
-		events.addListener("nosetime_smartlistUpdated", (type: string) => {
+		events.subscribe("nosetime_smartlistUpdated", (type: string) => {
 			if (current_tab.current != type) return;
 			wikilist.current[current_index.current].items = smartService.getItems(type);
 			wikilist.current[current_index.current].noMore = !smartService.moreDataCanBeLoaded(type);
@@ -79,13 +79,13 @@ const SmartWiki = React.memo(() => {
 			}
 			islike(ids);
 		});
-		events.addListener("nosetime_smartlistUpdatedError", (type) => {
+		events.subscribe("nosetime_smartlistUpdatedError", (type) => {
 			wikilist.current[current_index.current].noMore = !smartService.moreDataCanBeLoaded(type);
 			setIsRender((val) => !val);
 		});
 		return () => {
-			events.removeAllListeners("nosetime_smartlistUpdated");
-			events.removeAllListeners("nosetime_smartlistUpdatedError");
+			events.unsubscribe("nosetime_smartlistUpdated");
+			events.unsubscribe("nosetime_smartlistUpdatedError");
 		}
 	}, [])
 

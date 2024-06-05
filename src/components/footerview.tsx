@@ -27,7 +27,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<Animated.View style={[styles.footer_con, { opacity, zIndex, paddingBottom: insets.bottom + 10 }, isfocus ? styles.footer_radius : null]}>
+		<Animated.View style={[styles.footer_con, { opacity, zIndex, paddingBottom: insets.bottom + 10 }, isfocus && styles.footer_radius, style]}>
 			<View style={[styles.footer_con_left, { height: inputH }]}>
 				<TextInput
 					style={styles.footer_input}

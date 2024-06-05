@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, NativeEventEmitter, Dimensions, ScrollView, TextInput } from "react-native";
+import { View, StyleSheet, ScrollView, TextInput } from "react-native";
 
 import HeaderView from "../../components/headerview";
 import LinearButton from "../../components/linearbutton";
@@ -8,11 +8,10 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
+import events from "../../hooks/events/events";
+
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-
-const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function UserChangeDesc({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -33,7 +32,7 @@ function UserChangeDesc({ navigation }: any): React.JSX.Element {
 		us.user.udesc = udesc.current;
 		us.saveUser(us.user);
 		http.post(ENV.user, { method: "changesetting", id: us.user.uid, token: us.user.token, info: { udesc: udesc.current } }).then((resp_data: any) => {
-			events.emit("nosetime_reload_user_setting_list_page");
+			events.publish("nosetime_reload_user_setting_list_page");
 			navigation.goBack();
 		});
 	}

@@ -1,8 +1,7 @@
-import { NativeEventEmitter } from "react-native";
-
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
 
@@ -12,9 +11,7 @@ class SearchService {
 	private buydata: any = {};
 	private moredata: any = {};
 	private page: any = {};//2020-3-11yak用于存储当前数据的页码{"迷人":{"item":1,"brand":2,"odor":3}}
-	private loading: boolean = false;
 	private search_history: any[] = [];
-	private events = new NativeEventEmitter();
 
 	constructor(
 	) {
@@ -87,10 +84,10 @@ class SearchService {
 					for (let i in resp_data2) {
 						if (resp_data2[i]) this.buydata[type]["canbuy"][resp_data2[i]] = 1;
 					}
-					this.events.emit("nosetime_buydataUpdated", type);
+					events.publish("nosetime_buydataUpdated", type);
 				});
 			} else {
-				this.events.emit("nosetime_buydataUpdated", type);
+				events.publish("nosetime_buydataUpdated", type);
 			}
 		});
 	}
@@ -111,7 +108,7 @@ class SearchService {
 		if (this.moredata[word] == undefined) this.moredata[word] = {};
 		if (this.moredata[word][type] == undefined) this.moredata[word][type] = true;
 		if (!this.moredata[word][type]) {
-			this.events.emit("nosetime_searchlistUpdated", { type, word });
+			events.publish("nosetime_searchlistUpdated", { type, word });
 			return;
 		}
 		var url = "";
@@ -169,11 +166,11 @@ class SearchService {
 				if (!this.searchlist[word].vod || resp_data.vod.cnt <= this.searchlist[word].vod.length)
 					this.moredata[word]["vod"] = false;
 
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "item" || type == "tag") {
 				if (resp_data.item.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -182,11 +179,11 @@ class SearchService {
 
 				if (resp_data.item.cnt <= this.searchlist[word].item.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "vod") {
 				if (resp_data.vod.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -195,11 +192,11 @@ class SearchService {
 
 				if (resp_data.vod.cnt <= this.searchlist[word].vod.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "brand") {
 				if (resp_data.brand.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -208,11 +205,11 @@ class SearchService {
 
 				if (resp_data.brand.cnt <= this.searchlist[word].brand.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "odor") {
 				if (resp_data.odor.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -221,11 +218,11 @@ class SearchService {
 
 				if (resp_data.odor.cnt <= this.searchlist[word].odor.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "perfumer") {
 				if (resp_data.perfumer.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -234,11 +231,11 @@ class SearchService {
 
 				if (resp_data.perfumer.cnt <= this.searchlist[word].perfumer.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "article") {
 				if (resp_data.article.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -247,11 +244,11 @@ class SearchService {
 
 				if (resp_data.article.cnt <= this.searchlist[word].article.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "topic") {
 				if (resp_data.topic.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -260,11 +257,11 @@ class SearchService {
 
 				if (resp_data.topic.cnt <= this.searchlist[word].topic.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "topicv2") {
 				if (resp_data.topic.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -273,11 +270,11 @@ class SearchService {
 
 				if (resp_data.topic.cnt <= this.searchlist[word].topicv2.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "user") {
 				if (resp_data.user.cnt == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 
@@ -286,11 +283,11 @@ class SearchService {
 
 				if (resp_data.user.cnt <= this.searchlist[word].user.length)
 					this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			} else if (type == "mall") {
 				if (resp_data.length == 0) {
 					this.moredata[word][type] = false;
-					this.events.emit("nosetime_searchlistUpdatedError", { type, word });
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
 					return "NOMOREDATA";
 				}
 				//20220811 shibo:处理搜索结果商品中单品价格
@@ -304,7 +301,7 @@ class SearchService {
 				this.searchlist[word].mall = resp_data;
 				//this.cache.saveItem(this.factoryname+word,this.searchlist[word],this.factoryname,60);
 				this.moredata[word][type] = false;
-				this.events.emit("nosetime_searchlistUpdated", { type, word });
+				events.publish("nosetime_searchlistUpdated", { type, word });
 			}
 			this.page[word][type]++;
 		}, msg => console.error(`Error: ${msg.status} ${msg.statusText}`)

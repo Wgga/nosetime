@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, Image, FlatList, Animated } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList, Animated } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LinearGradient from "react-native-linear-gradient";
@@ -13,15 +13,12 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
-
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function UserJifen({ navigation }: any): React.JSX.Element {
 	// 控件

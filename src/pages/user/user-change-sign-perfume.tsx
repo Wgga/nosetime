@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, Image, TextInput } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput } from "react-native";
 
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
@@ -10,14 +10,12 @@ import us from "../../services/user-service/user-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function UserChangeSignPerfume({ navigation, route }: any): React.JSX.Element {
 	// 控件
@@ -38,13 +36,13 @@ function UserChangeSignPerfume({ navigation, route }: any): React.JSX.Element {
 	React.useEffect(() => {
 		signperfume.current = route.params.signperfume;
 		setIsRender(val => !val);
-		events.addListener("nosetime_searchlistUpdated", (data: any) => {
+		events.subscribe("nosetime_searchlistUpdated", (data: any) => {
 			const { word, type } = data;
 			list.current = searchService.getItems("item", word);
 			setIsRender(val => !val);
 		});
 		return () => {
-			events.removeAllListeners("nosetime_searchlistUpdated");
+			events.unsubscribe("nosetime_searchlistUpdated");
 		}
 	}, [])
 
@@ -55,7 +53,7 @@ function UserChangeSignPerfume({ navigation, route }: any): React.JSX.Element {
 			if (id == 0) {
 				signperfume.current = {};
 				cache.saveItem("item" + us.user.uiid + "getinfo", signperfume.current, 60);
-				events.emit("nosetime_reload_user_setting_list_page");
+				events.publish("nosetime_reload_user_setting_list_page");
 				setIsRender(val => !val);
 			} else {
 				ToastCtrl.show({ message: "修改成功", duration: 2000, viewstyle: "short_toast", key: "change_success_toast" });
@@ -68,7 +66,7 @@ function UserChangeSignPerfume({ navigation, route }: any): React.JSX.Element {
 		http.get(ENV.item + "?method=getinfo&id=" + us.user.uiid).then((resp_data: any) => {
 			signperfume.current = resp_data;
 			cache.saveItem("item" + us.user.uiid + "getinfo", signperfume.current, 60);
-			events.emit("nosetime_reload_user_setting_list_page");
+			events.publish("nosetime_reload_user_setting_list_page");
 			setIsRender(val => !val);
 		});
 	}

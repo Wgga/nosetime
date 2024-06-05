@@ -1,5 +1,3 @@
-import { NativeEventEmitter } from "react-native";
-
 import ImagePicker from "react-native-image-crop-picker";
 import { Blurhash } from "react-native-blurhash";
 
@@ -11,9 +9,9 @@ import us from "../user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import { ENV } from "../../configs/ENV";
+import events from "../../hooks/events/events";
 
-const events = new NativeEventEmitter();
+import { ENV } from "../../configs/ENV";
 
 class UploadPhotoService {
 	public myImage: string = "";
@@ -57,7 +55,7 @@ class UploadPhotoService {
 	uploadpic_by_dataurl(dataurl: string) {
 		this.myImage = dataurl;
 		if (this.params.src == "photoupload") {
-			events.emit("photo_upload" + this.params.classname + us.user.uid, this.myImage);
+			events.publish("photo_upload" + this.params.classname + us.user.uid, this.myImage);
 		} else if (this.params.src == "useravatar") {
 			this.changeAvatar();
 		}
@@ -71,7 +69,7 @@ class UploadPhotoService {
 			blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
 		}
 		let params = { avatar: this.myImage, blurhash };
-		events.emit("change_avatar", params);
+		events.publish("change_avatar", params);
 	}
 
 	changeAvatar() {

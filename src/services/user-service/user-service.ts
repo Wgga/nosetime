@@ -1,4 +1,4 @@
-import { Platform, NativeEventEmitter } from "react-native";
+import { Platform } from "react-native";
 
 import DeviceInfo from "react-native-device-info";
 import { Blurhash } from "react-native-blurhash";
@@ -6,10 +6,9 @@ import { Blurhash } from "react-native-blurhash";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
-
-const events = new NativeEventEmitter();
 
 class UserService {
 	private factoryname: string = "UserService";
@@ -38,13 +37,13 @@ class UserService {
 		//TODO:if(this.isios)
 		//TODO:	this.jpush.resetBadge();
 
-		events.addListener("nosetime_userlogin", () => {
+		events.subscribe("nosetime_userlogin", () => {
 			//console.log("this.events.subscribe("nosetime_userlogin");
 			this.userlogin();
 		});
 
 		//退出时设置别名为空
-		events.addListener("nosetime_userlogout", () => {
+		events.subscribe("nosetime_userlogout", () => {
 			console.log("setAlias-00");
 			//20181020 退出后清空推送消息
 			//TODO:if(this.isandroid)

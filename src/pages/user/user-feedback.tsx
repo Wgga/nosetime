@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, TextInput, Image, ActivityIndicator } from "react-native";
+import { Platform, View, Text, StyleSheet, Pressable, ScrollView, TextInput, Image, ActivityIndicator } from "react-native";
 
 import { Brightness } from "react-native-color-matrix-image-filters";
 
@@ -14,14 +14,12 @@ import us from "../../services/user-service/user-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function UserFeedback({ navigation, route }: any): React.JSX.Element {
 	// 控件
@@ -47,12 +45,12 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 			placeholder.current = "请留下您的宝贵意见或建议，商务合作请发邮件至contact@nosetime.com";
 		}
 
-		events.addListener("photo_upload" + classname + us.user.uid, (dataurl: string) => {
+		events.subscribe("photo_upload" + classname + us.user.uid, (dataurl: string) => {
 			uploadpic_by_dataurl(dataurl);
 		});
 
 		return () => {
-			events.removeAllListeners("photo_upload" + classname + us.user.uid);
+			events.unsubscribe("photo_upload" + classname + us.user.uid);
 		}
 	}, [])
 

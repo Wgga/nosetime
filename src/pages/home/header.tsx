@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, View, Text, StyleSheet, Image, NativeEventEmitter, Pressable, Dimensions } from "react-native";
+import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
@@ -8,12 +8,12 @@ import Slider from "./slider";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 
@@ -44,7 +44,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 	// 获取顶部内容高度
 	const onLayout = (event: any) => {
 		const { height: viewHeight } = event.nativeEvent.layout;
-		events.emit("HomeHeaderHeight", viewHeight);
+		events.publish("HomeHeaderHeight", viewHeight);
 	};
 
 	const [responsiveScreen, setResponsiveScreen] = React.useState();

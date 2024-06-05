@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, NativeEventEmitter, Keyboard, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, Dimensions, Animated, Easing } from "react-native";
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
@@ -15,6 +15,8 @@ import { ModalPortal, SlideAnimation } from "../../components/modals";
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
 
+import events from "../../hooks/events/events";
+
 import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
@@ -24,10 +26,9 @@ import Icon from "../../assets/iconfont";
 
 const Winwidth = Dimensions.get("window").width;
 const Winheight = Dimensions.get("window").height;
-const events = new NativeEventEmitter();
 const classname = "ArticleDetail";
 
-const HeaderWebView = React.memo(({ articleid }: any) => {
+const HeaderWebView = React.memo(({ articleid, style }: any) => {
 
 	// 控件
 	const webview = React.useRef(null); // webview Ref
@@ -37,29 +38,22 @@ const HeaderWebView = React.memo(({ articleid }: any) => {
 	const [articledata, setArticledata] = React.useState<any>({}); // 文章数据
 	const [hotarticle, setHotarticle] = React.useState<any[]>([]); // 热门文章
 	// 状态
-	const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏
 
 	React.useEffect(() => {
-		// 监听文章内视频是否全屏显示
-		events.addListener("fullScreenChange" + classname + articleid, (fullval) => {
-			setIsfull(fullval);
-		})
-
 		// 监听数据设置文章列表数据
-		events.addListener(classname + articleid + "setArticleData", (data) => {
+		events.subscribe(classname + articleid + "setArticleData", (data) => {
 			setArticledata(data);
 			articleService.fetchHotArticle(data.tag);
 		})
 
-		events.addListener(classname + articleid + "HotArticle", (data) => {
+		events.subscribe(classname + articleid + "HotArticle", (data) => {
 			setHotarticle(data);
 			// startAnimation();
 		})
 
 		return () => {
-			events.removeAllListeners(classname + articleid + "fullScreenChange");
-			events.removeAllListeners(classname + articleid + "setArticleData");
-			events.removeAllListeners(classname + articleid + "HotArticle");
+			events.unsubscribe(classname + articleid + "setArticleData");
+			events.unsubscribe(classname + articleid + "HotArticle");
 		}
 	}, [])
 
@@ -122,32 +116,8 @@ const HeaderWebView = React.memo(({ articleid }: any) => {
 	};
 
 	return (
-		<View style={styles.scrollview_con}>
-			{articledata.mp4URL && <View>
-				<VideoPlayer
-					source={articledata.mp4URL}
-					poster={articledata.picURL}
-				>
-					<Animated.View style={[
-						styles.video_ripple,
-						{
-							transform: [
-								{
-									scale: rippleAnim.interpolate({
-										inputRange: [0, 1],
-										outputRange: [1, 1.35],
-									}),
-								},
-							],
-							opacity: rippleAnim.interpolate({
-								inputRange: [0, 0.6, 1],
-								outputRange: [0, 0.6, 0],
-							}),
-						},
-					]} />
-				</VideoPlayer>
-			</View>}
-			<View style={isfull ? styles.hide_view : null}>
+		<View style={[styles.scrollview_con, style]}>
+			<View>
 				{!articledata.mp4URL && <View style={styles.content_img}>
 					<Image source={{ uri: ENV.image + articledata.coverimg, cache: "force-cache" }}
 						style={{ width: Winwidth, height: articledata.tempH }} resizeMode="cover" />
@@ -238,11 +208,11 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	React.useEffect(() => {
 		articleService.fetchArticleData(classname, id);
 		// 监听文章内视频是否全屏显示
-		events.addListener(classname + id + "fullScreenChange", (fullval) => {
+		events.subscribe(classname + id + "fullScreenChange", (fullval) => {
 			setIsfull(fullval);
 		})
 
-		events.addListener(classname + id + "ArticleData", (data) => {
+		events.subscribe(classname + id + "ArticleData", (data) => {
 			articledata.current = articleService.getArticleData(classname, id);
 			// 获取文章评论数据
 			getArticleReply();
@@ -266,8 +236,8 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 		Keyboard.addListener("keyboardDidHide", () => { setIsFocus(false); })
 
 		return () => {
-			events.removeAllListeners(classname + id + "fullScreenChange");
-			events.removeAllListeners(classname + id + "ArticleData");
+			events.unsubscribe(classname + id + "fullScreenChange");
+			events.unsubscribe(classname + id + "ArticleData");
 		}
 	}, []);
 
@@ -284,7 +254,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 			// this.setrefuname(replydata.current.items);
 			favs(resp_data);
 			if (page.current == 1) {
-				events.emit(classname + id + "setArticleData", articledata.current);
+				events.publish(classname + id + "setArticleData", articledata.current);
 				setTimeout(() => { setLoading(false) }, 1000);
 			}
 			setIsRender((val) => !val);
@@ -409,7 +379,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	return (
 		<>
-			{loading && <View style={styles.loading_con}>
+			{loading && <View style={[styles.loading_con, isfull && styles.hide_view]}>
 				<Image style={styles.loading_img} source={require("../../assets/images/loading.gif")} />
 			</View>}
 			<HeaderView data={{
@@ -417,8 +387,8 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				isShowSearch: false,
 				showmenu,
 				style: [
-					{ display: isfull ? "none" : "flex" },
-					!articledata.current.mp4URL ? styles.notmp4 : null
+					isfull && styles.hide_view,
+					!articledata.current.mp4URL && styles.notmp4
 				],
 				childrenstyle: {
 					headercolor: { color: !articledata.current.mp4URL ? theme.toolbarbg : theme.text2 },
@@ -491,12 +461,42 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 						getArticleReply();
 					}
 				}}
-				ListHeaderComponent={<HeaderWebView articleid={id} />}
+				ListHeaderComponent={
+					<>
+						{articledata.current.mp4URL && <VideoPlayer
+							source={articledata.current.mp4URL}
+							poster={articledata.current.picURL}
+							classname={classname + id}>
+							{/* <Animated.View style={[
+								styles.video_ripple,
+								{
+									transform: [
+										{
+											scale: rippleAnim.interpolate({
+												inputRange: [0, 1],
+												outputRange: [1, 1.35],
+											}),
+										},
+									],
+									opacity: rippleAnim.interpolate({
+										inputRange: [0, 0.6, 1],
+										outputRange: [0, 0.6, 0],
+									}),
+								},
+							]} /> */}
+						</VideoPlayer>}
+						<HeaderWebView articleid={id} style={isfull && styles.hide_view} />
+					</>
+				}
 				contentContainerStyle={styles.flatlist_con}
 				removeClippedSubviews={true}
 				renderItem={({ item, index }: any) => {
 					return (
-						<View style={[styles.replyitem_con, { borderBottomColor: index == replydata.current.items.length - 1 ? "transparent" : theme.bg, }]}>
+						<View style={[
+							styles.replyitem_con,
+							isfull && styles.hide_view,
+							{ borderBottomColor: index == replydata.current.items.length - 1 ? "transparent" : theme.bg }
+						]}>
 							{item.uid > 0 && <Image source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} style={styles.replyitem_img} resizeMode="cover" />}
 							{!(item.uid > 0) && <Image source={{ uri: "https:" + item.wxavatar }} style={styles.replyitem_img} resizeMode="cover" />}
 							<View style={styles.replyitem_uname_con}>
@@ -548,11 +548,14 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 						</View>
 					)
 				}}
-				ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={replydata.current.items && replydata.current.items.length > 0} />}
+				ListFooterComponent={<ListBottomTip noMore={noMore.current}
+					isShowTip={replydata.current.items && replydata.current.items.length > 0}
+					style={isfull && styles.hide_view}
+				/>}
 			/>
-			{isfocus && <Pressable style={styles.bgmsk} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
+			{isfocus && <Pressable style={[styles.bgmsk, isfull && styles.hide_view]} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
 			<FooterView
-				data={{ placeholder: "快快告诉我，你在想什么", replytext, opacity: footerOpt, zIndex: footerZ }}
+				data={{ placeholder: "快快告诉我，你在想什么", replytext, opacity: footerOpt, zIndex: footerZ, style: isfull && styles.hide_view }}
 				method={{ setReplyText }}>
 				{!isfocus && <View style={styles.footer_icon_con}>
 					<View style={styles.footer_icon}>

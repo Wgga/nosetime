@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, View, Text, StyleSheet, NativeEventEmitter, FlatList, Pressable, Dimensions, ScrollView } from "react-native";
+import { Image, View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
 
@@ -12,6 +12,8 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
+import events from "../../hooks/events/events";
+
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalstyles";
@@ -23,7 +25,6 @@ import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 const tabs: any = [
 	{ key: "item", title: "香水" },
@@ -93,12 +94,12 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 	}
 
 	React.useEffect(() => {
-		events.addListener("nosetime_searchlistUpdatedError", (data: any) => {
+		events.subscribe("nosetime_searchlistUpdatedError", (data: any) => {
 			const { word, type } = data;
 			if (word != currentword) return;
 			noMore[type] = true;
 		});
-		events.addListener("nosetime_searchlistUpdated", (data: any) => {
+		events.subscribe("nosetime_searchlistUpdated", (data: any) => {
 			const { word, type } = data;
 			const types = ["brand", "odor", "perfumer", "user", "article", "topic", "mall"];
 			if (word != currentword) return;
@@ -158,11 +159,11 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				noMore.topics = !searchService.moreDataCanBeLoaded(type, currentword);
 			}
 		})
-		events.addListener("nosetime_buydataUpdated", (type: string) => {
+		events.subscribe("nosetime_buydataUpdated", (type: string) => {
 			setIsBuy(searchService.getbuyItems(type).isbuy);
 			setCanBuy(searchService.getbuyItems(type).canbuy);
 		})
-		events.addListener("nosetime_searchwordUpdated", (data: any) => {
+		events.subscribe("nosetime_searchwordUpdated", (data: any) => {
 			currentword = data.word;
 			if (data.tab == "mall") {
 				searchService.fetch("mall", data.word);
@@ -172,10 +173,10 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		})
 
 		return () => {
-			events.removeAllListeners("nosetime_searchlistUpdatedError");
-			events.removeAllListeners("nosetime_searchlistUpdated");
-			events.removeAllListeners("nosetime_buydataUpdated");
-			events.removeAllListeners("nosetime_searchwordUpdated");
+			events.unsubscribe("nosetime_searchlistUpdatedError");
+			events.unsubscribe("nosetime_searchlistUpdated");
+			events.unsubscribe("nosetime_buydataUpdated");
+			events.unsubscribe("nosetime_searchwordUpdated");
 		}
 	}, [])
 
@@ -230,7 +231,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 	return (
 		<>
 			{tab == "item" && <View style={styles.search_con}>
-				{emptyimg.item && <Image style={styles.emptyimg}
+				{emptyimg.item && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.items && searchdata.items.length > 0 && <View style={styles.item_list}>
@@ -286,7 +287,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				</View>}
 			</View>}
 			{tab == "wiki" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.wiki && <Image style={styles.emptyimg}
+				{emptyimg.wiki && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.articles && <View>
@@ -386,7 +387,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "mall" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.mall && <Image style={styles.emptyimg}
+				{emptyimg.mall && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.malls && searchdata.malls.length > 0 && searchdata.malls.map((item: any, index: number) => {
@@ -436,7 +437,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "social" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
-				{emptyimg.social && <Image style={styles.emptyimg}
+				{emptyimg.social && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.topics && <View>
@@ -496,7 +497,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
 			{tab == "vod" && <View style={styles.search_con}>
-				{emptyimg.vod && <Image style={styles.emptyimg}
+				{emptyimg.vod && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.vods && searchdata.vods.length > 0 && <View style={styles.item_list}>
@@ -565,7 +566,7 @@ function SearchResult({ navigation, route }: any): React.JSX.Element {
 	const init = (val: string) => {
 		if (val == "") return;
 		searchService.addHistory(val);
-		events.emit("nosetime_searchwordUpdated", { word: val, tab });
+		events.publish("nosetime_searchwordUpdated", { word: val, tab });
 	}
 
 	const Search = () => {
@@ -598,7 +599,7 @@ function SearchResult({ navigation, route }: any): React.JSX.Element {
 					return (
 						<Pressable key={item.key} onPress={() => {
 							setTab(item.key);
-							events.emit("nosetime_searchwordUpdated", { word: searchword, tab: item.key });
+							events.publish("nosetime_searchwordUpdated", { word: searchword, tab: item.key });
 						}}>
 							<View style={styles.tabs_text}>
 								<Text style={[styles.tabs_title, tab == item.key ? styles.tabs_title_active : null]}>{item.title}</Text>
@@ -645,10 +646,6 @@ const styles = StyleSheet.create({
 		width: 20,
 		height: 1,
 		backgroundColor: "#757FE0"
-	},
-	emptyimg: {
-		width: "100%",
-		height: 500,
 	},
 	item_list: {
 		flex: 1,

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, NativeEventEmitter, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 
 import http from "../../utils/api/http";
 
@@ -14,7 +14,6 @@ import Link from "../../assets/svg/share/link.svg";
 import Download from "../../assets/svg/share/download.svg";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function SharePopover({ navigation }: any): React.JSX.Element {
 	// 控件

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Image, Dimensions, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image, Dimensions, ScrollView, TouchableOpacity } from "react-native";
 
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
 import LinearGradient from "react-native-linear-gradient";
@@ -18,6 +18,7 @@ import itemService from "../../services/item-service/item-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -31,7 +32,6 @@ import Yimai from "../../assets/svg/itemdetail/yimai.svg";
 import OpenAll from "../../assets/svg/itemdetail/openall.svg";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 const classname = "ItemDetailPage";
 
 const ItemHeader = React.memo(({ itemid, navigation }: any) => {
@@ -66,7 +66,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 	let isbuy_ = React.useRef<any>({}); // 是否购买
 
 	React.useEffect(() => {
-		events.addListener(classname + itemid + "itemdatas", (data: any) => {
+		events.subscribe(classname + itemid + "itemdatas", (data: any) => {
 			itemdata.current = data.itemdata;
 			wikidata.current = data.wikidata;
 			odorpct.current = data.odorpct;
@@ -75,13 +75,13 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 			getotherdata();
 		})
 
-		events.addListener(classname + itemid + "itemcolors", (data: any) => {
+		events.subscribe(classname + itemid + "itemcolors", (data: any) => {
 			itemcolors.current = data;
 		});
 
 		return () => {
-			events.removeAllListeners(classname + itemid + "itemdatas");
-			events.removeAllListeners(classname + itemid + "itemcolors");
+			events.unsubscribe(classname + itemid + "itemdatas");
+			events.unsubscribe(classname + itemid + "itemcolors");
 			ModalPortal.dismiss("intro_popover");
 		}
 	}, []);
@@ -918,7 +918,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	}
 
 	const loadaddtioninfo = (id: number) => {
-		events.emit(classname + id + "itemdatas", {
+		events.publish(classname + id + "itemdatas", {
 			itemdata: itemdata.current,
 			wikidata: wikidata.current,
 			odorpct: odorpct.current,
@@ -971,7 +971,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			itembgcolor: `hsl(${bgcolorstr})`,
 			itemcolor04: `hsla(${colorstr},0.4)`,
 		};
-		events.emit(classname + id + "itemcolors", itemcolors.current);
+		events.publish(classname + id + "itemcolors", itemcolors.current);
 	}
 
 	// 显示/隐藏右上角菜单

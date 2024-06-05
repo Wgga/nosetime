@@ -1,16 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image } from "react-native";
-
-import http from "../../utils/api/http";
-import cache from "../../hooks/storage/storage";
+import { View, Text, StyleSheet, Image } from "react-native";
 
 import theme from "../../configs/theme";
-import { ENV } from "../../configs/ENV";
-
-import Icon from "../../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function GiftcodePopover({ data }: any): React.JSX.Element {
 	// 控件

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
 
 import HeaderView from "../../components/headerview";
 
@@ -11,13 +11,9 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalstyles";
 
-import Icon from "../../assets/iconfont";
 import us from "../../services/user-service/user-service";
 import ToastCtrl from "../../components/toastctrl";
 import LinearGradient from "react-native-linear-gradient";
-
-const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function Talent({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -149,62 +145,69 @@ function Talent({ navigation }: any): React.JSX.Element {
 				</View>
 				<View style={styles.title_text_con}></View>
 			</HeaderView>
-			{<FlatList data={tab == "care" ? carelist.current : talentlist.current}
-				showsHorizontalScrollIndicator={false}
-				contentContainerStyle={styles.talent_con}
-				keyExtractor={(item: any) => getid(tab, item)}
-				renderItem={({ item }: any) => {
-					return (
-						<View style={styles.talent_or_care_item}>
-							<View style={styles.item_img_con}>
-								{tab == "talent" && <Image style={styles.item_img}
-									source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
-								/>}
-								{tab == "care" && <Image style={styles.item_img}
-									source={{ uri: ENV.avatar + item.id + ".jpg?" + item.uface }}
-								/>}
-							</View>
-							<View style={styles.item_info}>
-								<View style={styles.item_flex}>
-									<Text numberOfLines={1} style={styles.item_uname}>{item.uname}</Text>
-									<View style={Globalstyles.level}>
-										<Image
-											style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-											defaultSource={require("../../assets/images/nopic.png")}
-											source={require("../../assets/images/level.png")}
-										/>
+			<View style={styles.talent_list}>
+				{(tab == "care" && carelist.current.length == 0) && <View style={styles.borderbg}>
+					<Image style={Globalstyles.emptyimg}
+						resizeMode="contain"
+						source={require("../../assets/images/empty/userfriend_blank.png")} />
+				</View>}
+				{((tab == "care" && carelist.current.length > 0) || (tab == "talent" && talentlist.current.length > 0)) && <FlatList data={tab == "care" ? carelist.current : talentlist.current}
+					showsHorizontalScrollIndicator={false}
+					contentContainerStyle={[styles.talent_con, styles.borderbg]}
+					keyExtractor={(item: any) => getid(tab, item)}
+					renderItem={({ item }: any) => {
+						return (
+							<View style={styles.talent_or_care_item}>
+								<View style={styles.item_img_con}>
+									{tab == "talent" && <Image style={styles.item_img}
+										source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
+									/>}
+									{tab == "care" && <Image style={styles.item_img}
+										source={{ uri: ENV.avatar + item.id + ".jpg?" + item.uface }}
+									/>}
+								</View>
+								<View style={styles.item_info}>
+									<View style={styles.item_flex}>
+										<Text numberOfLines={1} style={styles.item_uname}>{item.uname}</Text>
+										<View style={Globalstyles.level}>
+											<Image
+												style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+												defaultSource={require("../../assets/images/nopic.png")}
+												source={require("../../assets/images/level.png")}
+											/>
+										</View>
+									</View>
+									<View style={styles.item_message}>
+										{tab == "talent" && <>
+											<Text style={{ marginRight: 15 }}>{"商业香  " + item.stradexp}</Text>
+											<Text>{"沙龙香  " + item.ssalonxp}</Text>
+										</>}
+										{tab == "care" && <>
+											<Text style={{ marginRight: 15 }}>{"商业香  " + item.utradexp}</Text>
+											<Text>{"沙龙香  " + item.usalonxp}</Text>
+										</>}
 									</View>
 								</View>
-								<View style={styles.item_message}>
-									{tab == "talent" && <>
-										<Text style={{ marginRight: 15 }}>{"商业香  " + item.stradexp}</Text>
-										<Text>{"沙龙香  " + item.ssalonxp}</Text>
-									</>}
-									{tab == "care" && <>
-										<Text style={{ marginRight: 15 }}>{"商业香  " + item.utradexp}</Text>
-										<Text>{"沙龙香  " + item.usalonxp}</Text>
-									</>}
-								</View>
+								{(!like_.current[getid(tab, item)] && getid(tab, item) != us.user.uid) && <Pressable onPress={() => { care("add", item) }} style={styles.item_btn_con}>
+									<LinearGradient style={styles.item_btn}
+										colors={["#81B4EC", "#9BA6F5"]}
+										start={{ x: 0, y: 0 }}
+										end={{ x: 1, y: 0 }}
+										locations={[0, 1]}
+									>
+										<Text style={styles.btn_text}>{"关注"}</Text>
+									</LinearGradient>
+								</Pressable>}
+								{like_.current[getid(tab, item)] && <Pressable onPress={() => { care("del", item) }} style={styles.item_btn_con}>
+									<View style={[styles.item_btn, { borderWidth: 1, borderColor: "#EEEEEE" }]}>
+										<Text style={styles.btn_text2}>{"取消关注"}</Text>
+									</View>
+								</Pressable>}
 							</View>
-							{(!like_.current[getid(tab, item)] && getid(tab, item) != us.user.uid) && <Pressable onPress={() => { care("add", item) }} style={styles.item_btn_con}>
-								<LinearGradient style={styles.item_btn}
-									colors={["#81B4EC", "#9BA6F5"]}
-									start={{ x: 0, y: 0 }}
-									end={{ x: 1, y: 0 }}
-									locations={[0, 1]}
-								>
-									<Text style={styles.btn_text}>{"关注"}</Text>
-								</LinearGradient>
-							</Pressable>}
-							{like_.current[getid(tab, item)] && <Pressable onPress={() => { care("del", item) }} style={styles.item_btn_con}>
-								<View style={[styles.item_btn, { borderWidth: 1, borderColor: "#EEEEEE" }]}>
-									<Text style={styles.btn_text2}>{"取消关注"}</Text>
-								</View>
-							</Pressable>}
-						</View>
-					)
-				}}
-			/>}
+						)
+					}}
+				/>}
+			</View>
 		</View>
 	);
 }
@@ -234,11 +237,16 @@ const styles = StyleSheet.create({
 		height: 44,
 		justifyContent: "center",
 	},
-	talent_con: {
-		paddingTop: 8,
-		marginTop: 6,
-		paddingBottom: 14,
+	talent_list: {
+		flex: 1,
 		backgroundColor: theme.toolbarbg,
+	},
+	borderbg: {
+		borderTopColor: theme.bg,
+		borderTopWidth: 6,
+	},
+	talent_con: {
+		paddingVertical: 8,
 	},
 	talent_or_care_item: {
 		paddingHorizontal: 14,

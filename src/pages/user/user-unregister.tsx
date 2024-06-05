@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
 import { Md5 } from "ts-md5";
 
@@ -14,15 +14,12 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
-import Icon from "../../assets/iconfont";
-
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 const UserUnregister = React.memo(({ navigation }: any) => {
 	// 控件
@@ -140,7 +137,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 		http.post(ENV.api + ENV.user, { method: "unregister", uid: us.user.uid, token: us.user.token }).then((resp_data: any) => {
 			ToastCtrl.show({ message: "您的账户已注销", duration: 2000, viewstyle: "medium_toast", key: "unregister_toast" });
 			us.delUser();
-			events.emit("nosetime_userlogout");
+			events.publish("nosetime_userlogout");
 			navigation.navigate("Tabs", { screen: "Home" });
 		}).catch(() => { });
 	}

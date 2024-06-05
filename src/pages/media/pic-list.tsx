@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, FlatList, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, FlatList, Image } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
@@ -16,7 +16,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 const classname = "PicListPage";
 
 function PicList({ route, navigation }: any): React.JSX.Element {

@@ -7,6 +7,6 @@ declare module "*.svg" {
 
 declare module "ts-md5"
 declare module "react-native-stars"
-declare module "@emotion/native"
 declare module "react-native-vector-icons"
 declare module "react-native-video"
+declare module "@react-navigation/native"

@@ -7,8 +7,7 @@ import {
 	StyleSheet,
 	TextInput,
 	Pressable,
-	Dimensions,
-	NativeEventEmitter
+	Dimensions
 } from "react-native";
 
 import { Md5 } from "ts-md5";
@@ -22,6 +21,7 @@ import us from "../../services/user-service/user-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -29,7 +29,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { height, width } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 	return (
@@ -581,7 +580,7 @@ function Login({ route, navigation }: any): React.JSX.Element {
 			navigation.navigate("Tabs", { screen: "User" });
 		}
 		// this.events.publish("user_reload");
-		events.emit("nosetime_userlogin");
+		events.publish("nosetime_userlogin");
 	}
 
 	//登录验证

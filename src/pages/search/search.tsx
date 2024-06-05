@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter } from "react-native";
+import { View, Text, StyleSheet, Pressable,  } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -10,13 +10,13 @@ import searchService from "../../services/search-service/search-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-const events = new NativeEventEmitter();
 const classname = "Search";
 
 function Search({ navigation, route }: any): React.JSX.Element {
@@ -82,7 +82,7 @@ function Search({ navigation, route }: any): React.JSX.Element {
 
 	const Search = (word: string) => {
 		if (word == "") return;
-		events.emit(classname + "gotoPage", from);
+		events.publish(classname + "gotoPage", from);
 		let obj = {
 			screen: "SearchResult",
 			params: {

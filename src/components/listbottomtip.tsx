@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, Image } from "react-native";
 
 import theme from "../configs/theme";
 
-function ListBottomTip({ noMore, isShowTip }: any): React.JSX.Element {
+function ListBottomTip({ noMore, isShowTip, style }: any): React.JSX.Element {
 	return (
-		<View style={styles.loading_con}>
+		<View style={[styles.loading_con, style]}>
 			{!noMore && <Image style={styles.loading_img} source={require("../assets/images/loading.gif")} />}
 			{(noMore && isShowTip) && <Text style={styles.tip_text}>{"没有更多内容了"}</Text>}
 		</View>

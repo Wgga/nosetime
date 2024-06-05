@@ -1,5 +1,5 @@
 import React from "react";
-import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable, NativeEventEmitter } from "react-native";
+import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
@@ -21,7 +21,7 @@ import us from "../../services/user-service/user-service";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
-
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
@@ -29,7 +29,6 @@ import theme from "../../configs/theme";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function Home({ navigation }: any): React.JSX.Element {
 
@@ -75,13 +74,13 @@ function Home({ navigation }: any): React.JSX.Element {
 	};
 
 	React.useEffect(() => {
-		events.addListener("HomeHeaderHeight", (data: number) => {
+		events.subscribe("HomeHeaderHeight", (data: number) => {
 			if (data - searchHeight.current > 0) {
 				setContentHeight(data - searchHeight.current);
 			}
 		})
 		return () => {
-			events.removeAllListeners("HomeHeaderHeight");
+			events.unsubscribe("HomeHeaderHeight");
 		}
 	}, []);
 
@@ -91,7 +90,7 @@ function Home({ navigation }: any): React.JSX.Element {
 			if (us.user.uid) {
 				//登录用户不显示协议
 				cache.saveItem("showProtocol", true, 3650 * 86400);
-				events.emit("can_push", true);
+				events.publish("can_push", true);
 				lowPrice();
 
 				//首次登录（在登录处）
@@ -141,7 +140,7 @@ function Home({ navigation }: any): React.JSX.Element {
 	// 显示同意协议弹窗
 	const show_protocol = () => {
 		cache.getItem("showProtocol").then(() => {
-			events.emit("can_push", true);
+			events.publish("can_push", true);
 			lowPrice();
 		}).catch(() => {
 			open_popover({

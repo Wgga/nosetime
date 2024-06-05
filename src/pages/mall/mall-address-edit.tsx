@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, TextInput } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, TextInput } from "react-native";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -16,9 +16,7 @@ import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	// 控件

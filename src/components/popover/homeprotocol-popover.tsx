@@ -1,15 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, BackHandler } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, BackHandler } from "react-native";
 
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 import ProtocolPopover from "../../components/popover/protocol-popover";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function HomeProtocolPopover({ method }: any): React.JSX.Element {
 	// 控件
@@ -69,7 +69,7 @@ function HomeProtocolPopover({ method }: any): React.JSX.Element {
 				<Pressable style={{ flex: 1 }} onPress={() => {
 					ModalPortal.dismiss("home_protocol_popover");
 					cache.saveItem("showProtocol", true, 3650 * 86400);
-					events.emit("can_push", true);
+					events.publish("can_push", true);
 					lowPrice();
 				}}>
 					<Text style={[styles.button_text, styles.btn2]}>{"同意"}</Text>

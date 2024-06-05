@@ -1,13 +1,13 @@
-import { Dimensions, NativeEventEmitter } from "react-native";
+import { Dimensions } from "react-native";
 
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
 
 const Winwidth = Dimensions.get("window").width;
-const events = new NativeEventEmitter();
 
 class ArticleService {
 
@@ -162,7 +162,7 @@ class ArticleService {
 		cache.getItem(classname + id).then((cacheobj: any) => {
 			if (cacheobj) {
 				this.articledata[classname + id] = cacheobj;
-				events.emit(classname + id + "ArticleData", { classname, id });
+				events.publish(classname + id + "ArticleData", { classname, id });
 			}
 		}).catch(() => {
 			http.get(ENV.article + "?id=" + id).then((resp_data: any) => {
@@ -179,7 +179,7 @@ class ArticleService {
 				resp_data.replycnt = resp_data.replycnt >= 1e3 && resp_data.replycnt < 1e4 ? Math.floor(resp_data.replycnt / 1e3) + "k" : resp_data.replycnt >= 1e4 ? Math.floor(resp_data.replycnt / 1e4) + "w" : resp_data.replycnt;
 				cache.saveItem(classname + id, resp_data, 60);
 				this.articledata[classname + id] = resp_data;
-				events.emit(classname + id + "ArticleData", { classname, id });
+				events.publish(classname + id + "ArticleData", { classname, id });
 			}).catch((error: any) => { });
 		})
 	}
@@ -189,12 +189,12 @@ class ArticleService {
 		if (!tag || tag == "") return;
 		cache.getItem(this.classname + tag).then((cacheobj: any) => {
 			if (cacheobj) {
-				events.emit(this.classname + this.id + "HotArticle", cacheobj);
+				events.publish(this.classname + this.id + "HotArticle", cacheobj);
 			}
 		}).catch(() => {
 			http.get(ENV.article + "?method=gethotarticles&tag=" + tag + "&id=" + this.id).then((resp_data: any) => {
 				cache.saveItem(this.classname + tag, resp_data, 60);
-				events.emit(this.classname + this.id + "HotArticle", resp_data);
+				events.publish(this.classname + this.id + "HotArticle", resp_data);
 			})
 		})
 	}
@@ -228,7 +228,7 @@ class ArticleService {
 	fetch(type: string, newer: number) {
 		//获取旧数据，最小值存在且为0时，没有旧数据可获取，返回空
 		if (!newer && this.articles[type].minid != undefined && this.articles[type].minid == 0) {
-			events.emit("nosetime_articlesUpdateError", type);
+			events.publish("nosetime_articlesUpdateError", type);
 			return "NOMOREDATA";
 		}
 		//如果没有数据，先从缓存读取数据，适用于App刚启动
@@ -254,7 +254,7 @@ class ArticleService {
 					cacheobj.data = data2;
 					this.articles[type] = cacheobj;
 					//如果有数据，且没有过期，直接返回数据
-					events.emit("nosetime_articlesUpdated", type);
+					events.publish("nosetime_articlesUpdated", type);
 				}
 			}).catch(() => {
 				this.fetchWeb(type, newer);
@@ -304,14 +304,14 @@ class ArticleService {
 						}
 					}
 				}
-				events.emit("nosetime_articlesUpdated", type);
+				events.publish("nosetime_articlesUpdated", type);
 
 				return;
 			} else if (!newer && resp_data.minid == 0) {
 				this.articles[type].minid = 0;
 			}
 
-			events.emit("nosetime_articlesUpdateError", type);
+			events.publish("nosetime_articlesUpdateError", type);
 			return "NOMOREDATA";
 		})
 		return "ok";

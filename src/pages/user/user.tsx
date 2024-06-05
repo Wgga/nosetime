@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,6 +20,7 @@ import upService from "../../services/upload-photo-service/upload-photo-service"
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -36,7 +37,6 @@ import Giftcode from "../../assets/svg/user/giftcode.svg";
 import Setting from "../../assets/svg/user/setting.svg";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 const classname = "UserPage";
 
 function User({ navigation }: any): React.JSX.Element {
@@ -65,19 +65,19 @@ function User({ navigation }: any): React.JSX.Element {
 	);
 
 	React.useEffect(() => {
-		events.addListener("change_avatar", (data: any) => {
+		events.subscribe("change_avatar", (data: any) => {
 			if (data) {
 				avatar.current = data.avatar;
 				blurhash.current = data.blurhash;
 				setIsRender((val) => !val);
 			}
 		})
-		events.addListener("userupdatedata", (result) => {
+		events.subscribe("userupdatedata", (result) => {
 			showgiftcode.current = result && result.showgiftcode == 1 ? true : false;
 		})
 		return () => {
-			events.removeAllListeners("change_avatar");
-			events.removeAllListeners("userupdatedata");
+			events.unsubscribe("change_avatar");
+			events.unsubscribe("userupdatedata");
 		}
 	}, []);
 

@@ -1,15 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, BackHandler, TouchableHighlight } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, TouchableHighlight } from "react-native";
 
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 import ProtocolPopover from "../../components/popover/protocol-popover";
 
-import cache from "../../hooks/storage/storage";
-
 import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function ExchangePopover({ params }: any): React.JSX.Element {
 	// 控件

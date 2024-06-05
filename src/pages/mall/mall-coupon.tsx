@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -10,14 +10,15 @@ import ToastCtrl from "../../components/toastctrl";
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	// 控件
@@ -82,7 +83,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 			ToastCtrl.show({ message: msg, duration: 2000, viewstyle: "short_toast", key: "coupon_toast" });
 			return;
 		}
-		events.emit("nosetime_reload_orderconfirmpage_coupon", x);
+		events.publish("nosetime_reload_orderconfirmpage_coupon", x);
 		navigation.goBack();
 	}
 
@@ -105,7 +106,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 				</View>
 			</HeaderView>
 			<View style={styles.coupon_con}>
-				{isempty.current && <Image style={styles.emptyimg}
+				{isempty.current && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/coupon_blank.png")} />}
 				{!isempty.current && <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.coupon_list}>
@@ -165,10 +166,6 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.bg,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
-	},
-	emptyimg: {
-		width: "100%",
-		height: 500,
 	},
 	coupon_list: {
 		paddingTop: 11,

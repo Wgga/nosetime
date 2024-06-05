@@ -1,15 +1,15 @@
-import { Dimensions, NativeEventEmitter } from "react-native";
+import { Dimensions } from "react-native";
 
 import reactNativeTextSize from "react-native-text-size";
 
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
 
 const Winwidth = Dimensions.get("window").width;
-const events = new NativeEventEmitter();
 
 class SmartService {
 
@@ -30,7 +30,7 @@ class SmartService {
 		if (this.smartlist[type] === undefined) {
 			cache.getItem(this.factoryname + type + uid).then((cacheobj) => {
 				this.smartlist[type] = cacheobj;
-				events.emit("nosetime_smartlistUpdated", type);
+				events.publish("nosetime_smartlistUpdated", type);
 			}).catch(() => {
 				this.fetchWeb(type, uid, src);
 				return;
@@ -105,13 +105,13 @@ class SmartService {
 				this.moredata[type] = false;
 			}
 			if (resp_data.length > 0) {
-				events.emit("nosetime_smartlistUpdated", type);
+				events.publish("nosetime_smartlistUpdated", type);
 			} else {
-				events.emit("nosetime_smartlistUpdatedError", type);
+				events.publish("nosetime_smartlistUpdatedError", type);
 				return "NOMOREDATA";
 			}
 		}, (error) => {
-			events.emit("nosetime_smartlistUpdatedError", type);
+			events.publish("nosetime_smartlistUpdatedError", type);
 			return "ERROR";
 		});
 	}

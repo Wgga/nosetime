@@ -1,7 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, ScrollView } from "react-native";
 
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { GifPlayerView } from "react-native-gif-player";
 import { ShadowedView } from "react-native-fast-shadow";
 
@@ -13,16 +12,13 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 
 import { ENV } from "../../configs/ENV";
 
-import Icon from "../../assets/iconfont";
-
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function Lottery({ navigation, route }: any): React.JSX.Element {
 	// 控件
@@ -113,7 +109,7 @@ function Lottery({ navigation, route }: any): React.JSX.Element {
 			lottery.current = resp_data;
 			//20200215直接通过事件传递点数，避免刷新延迟，减少请求
 			if (lottery.current.val >= 0) {
-				events.emit("jifen_newpoint", lottery.current.val);
+				events.publish("jifen_newpoint", lottery.current.val);
 				points.current = lottery.current.val;
 			}
 			setIsRender(val => !val);

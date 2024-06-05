@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView, NativeEventEmitter, Image, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
 import articleService from "../../services/article-service/article-service";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -13,7 +14,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 const ArticleList = React.memo(({ type, setListHeight }: any) => {
 
@@ -27,7 +27,7 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 	React.useEffect(() => {
 		articleService.fetch(type, 1);
 
-		events.addListener("nosetime_articlesUpdated", (typeval: string) => {
+		events.subscribe("nosetime_articlesUpdated", (typeval: string) => {
 			if (type != typeval) return;
 			var item_list = articleService.getItems(type);
 			if (item_list instanceof Array) {
@@ -43,7 +43,7 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 					});
 				}, 1000)
 
-				events.emit("list_loadmore", true);
+				events.publish("list_loadmore", true);
 
 				if (type != "最新") {
 					hiddenid.current = articleService.getMaxId() - 10;
@@ -51,16 +51,16 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 			}
 		});
 
-		events.addListener("nosetime_articlesUpdateError", (typeval: string) => {
+		events.subscribe("nosetime_articlesUpdateError", (typeval: string) => {
 			if (type != typeval) return;
 			Render("nosetime_articlesUpdateError")
 
-			events.emit("list_loadmore", false);
+			events.publish("list_loadmore", false);
 		});
 
 		return () => {
-			events.removeAllListeners("nosetime_articlesUpdated");
-			events.removeAllListeners("nosetime_articlesUpdateError");
+			events.unsubscribe("nosetime_articlesUpdated");
+			events.unsubscribe("nosetime_articlesUpdateError");
 		}
 	}, [])
 

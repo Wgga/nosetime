@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 
@@ -19,7 +19,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function MallAddress({ navigation }: any): React.JSX.Element {
 	// 控件

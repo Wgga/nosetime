@@ -161,6 +161,10 @@ const Globalstyles: any = StyleSheet.create({
 	level_top_80: {
 		top: -80,
 	},
+	emptyimg: {
+		width: "100%",
+		height: 500,
+	},
 });
 
 export { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, handlereplystarLeft };

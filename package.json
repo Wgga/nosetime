@@ -17,6 +17,7 @@
 		"@react-navigation/native-stack": "^6.9.26",
 		"@shopify/flash-list": "^1.6.4",
 		"axios": "^1.7.2",
+		"deprecated-react-native-prop-types": "^5.0.0",
 		"react": "18.2.0",
 		"react-native": "0.74.1",
 		"react-native-blurhash": "^2.0.3",

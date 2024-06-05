@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, StatusBar, TextInput, Animated, Easing, NativeEventEmitter, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, StatusBar, TextInput, Animated, Easing, Dimensions } from "react-native";
 
 import { ShadowedView } from "react-native-fast-shadow";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,7 +9,6 @@ import Icon from "../assets/iconfont";
 import theme from "../configs/theme";
 import { ENV } from "../configs/ENV";
 
-const events = new NativeEventEmitter();
 const { width, height } = Dimensions.get("window");
 
 const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: any) => {

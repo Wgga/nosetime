@@ -1,10 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, FlatList, Animated, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
-import Swipeable from "../../components/swipeable";
 
 import us from "../../services/user-service/user-service";
 
@@ -14,17 +13,16 @@ import cache from "../../hooks/storage/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function MallWishList({ navigation }: any): React.JSX.Element {
 	// 控件
-	let swipeable = React.useRef<any>(null);
 	const insets = useSafeAreaInsets();
 	// 变量
 	const [edit, setEdit] = React.useState<boolean>(false); // 是否编辑
@@ -130,10 +128,10 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 				</Pressable>
 			</HeaderView>
 			<View style={styles.wishlist_con}>
-				{(wishlist_isempty.current && tab == "wishlist") && <Image style={styles.emptyimg}
+				{(wishlist_isempty.current && tab == "wishlist") && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/wishlist_blank.png")} />}
-				{(stocktip_isempty.current && tab == "stocktip") && <Image style={styles.emptyimg}
+				{(stocktip_isempty.current && tab == "stocktip") && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/stocktip_blank.png")} />}
 				{(!wishlist_isempty.current || !stocktip_isempty.current) && <FlatList data={tab == "stocktip" ? stocktip.current : wishlist.current}
@@ -141,19 +139,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 					keyExtractor={(item: any) => item.id}
 					renderItem={({ item }: any) => {
 						return (
-							<Swipeable contentContainerStyle={styles.wish_or_stip_item}
-								rightButtonWidth={86}
-								rightButtonsActivationDistance={86}
-								rightButtonContainerStyle={styles.right_btn_con}
-								rightButtons={[
-									<Pressable style={styles.btn_con}>
-										<Text style={styles.btn_text}>{"加购"}</Text>
-									</Pressable>,
-									<Pressable style={[styles.btn_con, styles.del_btn]}>
-										<Text style={styles.btn_text}>{"删除"}</Text>
-									</Pressable>
-								]}
-							>
+							<View style={styles.wish_or_stip_item}>
 								<View style={styles.item_img_con}>
 									{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <Image style={styles.item_img}
 										source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!l" }}
@@ -192,7 +178,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 										{item.sample && <Sample width={31} height={15} />}
 									</View>}
 								</View>
-							</Swipeable>
+							</View>
 
 						)
 					}}
@@ -241,10 +227,6 @@ const styles = StyleSheet.create({
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
 		overflow: "hidden",
-	},
-	emptyimg: {
-		width: "100%",
-		height: 500,
 	},
 	right_btn_con: {
 		width: "100%",

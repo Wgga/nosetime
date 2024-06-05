@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, ScrollView, Image, TextInput } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, TextInput } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
 import WebView from "react-native-webview";
@@ -15,6 +15,7 @@ import upService from "../../services/upload-photo-service/upload-photo-service"
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -22,7 +23,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -208,12 +208,12 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 	}
 
 	React.useEffect(() => {
-		events.addListener("photo_upload" + classname + us.user.uid, (dataurl: string) => {
+		events.subscribe("photo_upload" + classname + us.user.uid, (dataurl: string) => {
 			uploadpic_by_dataurl(dataurl);
 		});
 
 		return () => {
-			events.removeAllListeners("photo_upload" + classname + us.user.uid);
+			events.unsubscribe("photo_upload" + classname + us.user.uid);
 		}
 	}, [])
 

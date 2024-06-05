@@ -8,7 +8,6 @@ import {
 	TouchableOpacity,
 	StyleSheet,
 	StatusBar,
-	NativeEventEmitter,
 	ActivityIndicator,
 	Pressable
 } from "react-native";
@@ -19,12 +18,13 @@ import Slider from "@react-native-community/slider";
 import LinearGradient from "react-native-linear-gradient";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
+import events from "../hooks/events/events";
+
 import Icon from "../assets/iconfont";
 
 import theme from "../configs/theme";
 
 const screenWidth = Dimensions.get("window").width;
-const events = new NativeEventEmitter();
 
 function formatTime(second: string) {
 	let h = 0, i = 0, s = parseInt(second);
@@ -51,7 +51,7 @@ interface PropsType {
 	duration?: number,	// 视频的总时长
 	isFullScreen?: boolean,	// 当前是否全屏显示
 	playFromBeginning?: boolean,	// 是否从头开始播放
-	children: any,	// 子组件
+	children?: any,	// 子组件
 }
 
 export default class VideoPlayer extends React.Component<PropsType> {
@@ -72,7 +72,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 		playFromBeginning: false,	// 是否从头开始播放
 		isBuffering: false,	// 是否正在缓冲
 		isShowMenu: false,	// 是否显示菜单
-		children: this.props.children,	// 子组件
+		children: this.props.children ? this.props.children : null,	// 子组件
 	} as any;
 
 	constructor(props: any) {
@@ -173,8 +173,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 						maximumValue={this.state.duration}
 						onValueChange={(currentTime) => { this.onSliderValueChanged(currentTime) }}
 					/>
-				</LinearGradient>
-				}
+				</LinearGradient>}
 			</View>
 		)
 	}
@@ -281,21 +280,21 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	/// 点击了工具栏上的全屏按钮
 	onControlShrinkPress() {
 		if (!this.state.isFullScreen) {
-			Orientation.lockToLandscape();
 			this.videoRef.presentFullscreenPlayer();
+			Orientation.lockToLandscape();
 			this.setState((state: any) => {
 				state.isFullScreen = true;
 			})
 			StatusBar.setHidden(true);
 		} else {
-			Orientation.lockToPortrait();
 			this.videoRef.dismissFullscreenPlayer();
+			Orientation.lockToPortrait();
 			this.setState((state: any) => {
 				state.isFullScreen = false;
 			})
 			StatusBar.setHidden(false);
 		}
-		events.emit(this.state.classname + "fullScreenChange", !this.state.isFullScreen);
+		events.publish(this.state.classname + "fullScreenChange", !this.state.isFullScreen);
 	}
 
 	/// 进度条值改变

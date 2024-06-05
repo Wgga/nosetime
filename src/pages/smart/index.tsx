@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, StatusBar, NativeEventEmitter, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,17 +9,9 @@ import SmartVod from "./smart-vod";
 import SmartWiki from "./smart-wiki";
 import SmartCatalog from "./smart-catalog";
 
-import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage/storage";
-
 import theme from "../../configs/theme";
-import { ENV } from "../../configs/ENV";
-
-import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 
 function Smart({ route, navigation }: any): React.JSX.Element {
 

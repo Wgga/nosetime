@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, ScrollView } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
@@ -14,7 +14,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 const classname: string = "SmartCatalogPage";
 
 const SmartCatalog = React.memo(() => {

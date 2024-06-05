@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, NativeEventEmitter, Dimensions, Image, Platform, Linking } from "react-native";
+import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, Dimensions, Image, Platform, Linking } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -24,6 +24,7 @@ import upService from "../../services/upload-photo-service/upload-photo-service"
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
+import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -31,7 +32,6 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-const events = new NativeEventEmitter();
 const AppVersion = ENV.AppMainVersion + "." + ENV.AppMiniVersion + "." + ENV.AppBuildVersion;
 
 const Person = React.memo(({ navigation, changeAvatar }: any) => {
@@ -50,11 +50,11 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 
 	React.useEffect(() => {
 		setsignperfume();
-		events.addListener("nosetime_reload_user_setting_list_page", () => {
+		events.subscribe("nosetime_reload_user_setting_list_page", () => {
 			setsignperfume();
 		})
 		return () => {
-			events.removeAllListeners("nosetime_reload_user_setting_list_page");
+			events.unsubscribe("nosetime_reload_user_setting_list_page");
 		}
 	}, [])
 
@@ -430,7 +430,7 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 	const logout = () => {
 		http.post(ENV.user, { method: "logout", id: us.user.uid, token: us.user.token }).then(() => { }).catch(() => { });
 		us.delUser();
-		events.emit("nosetime_userlogout");
+		events.publish("nosetime_userlogout");
 		navigation.navigate("Tabs", { screen: "Home" });
 	}
 
@@ -696,7 +696,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 	// 状态
 
 	React.useEffect(() => {
-		events.addListener("userupdatedata", (result: any) => {
+		events.subscribe("userupdatedata", (result: any) => {
 			if (result) {
 				showgiftcode.current = result.showgiftcode == 1 ? true : false;
 				copyrightyear.current = result.copyrightyear;
@@ -717,7 +717,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 		}).catch(() => { });
 
 		return () => {
-			events.removeAllListeners("userupdatedata");
+			events.unsubscribe("userupdatedata");
 		}
 	}, [])
 
