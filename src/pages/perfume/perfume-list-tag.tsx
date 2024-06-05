@@ -62,6 +62,7 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 					alltags.current[i].tags[j] = { name: alltags.current[i].tags[j], sel: 0 };
 				}
 			}
+			alltags.current[i]["tag_data"] = handle_tag(alltags.current[i].tags);
 			if (alltags.current[i].tags2) {
 				for (var j in alltags.current[i].tags2) {
 					if (seltags.current.indexOf(alltags.current[i].tags2[j]) >= 0) {
@@ -72,9 +73,8 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 					}
 				}
 			}
-			console.log("%c Line:76 🍓", "color:#93c0a4", alltags.current[i].tags);
 		}
-		// setIsRender(val => !val);
+		setIsRender(val => !val);
 	}
 
 	const clickbtn = (tag: string, item: any) => {
@@ -118,9 +118,9 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 								{item.tag_data && <View style={styles.tags_item_con}>
 									{item.tag_data.first.length > 0 && item.tag_data.first.map((tag: any, index: number) => {
 										return (
-											<Pressable onPress={() => { clickbtn(tag, item) }} key={tag} style={[styles.item_border, { height: 50 }]}>
+											<Pressable onPress={() => { clickbtn(tag.name, item) }} key={tag.name} style={[styles.item_border, { height: 50 }]}>
 												{/* <View style={styles.item_tag_border}></View> */}
-												<Text style={[styles.item_tag_text, tag == "换一批" && styles.item_alter]}>{tag}</Text>
+												<Text style={[styles.item_tag_text, tag.name == "换一批" && styles.item_alter]}>{tag.name}</Text>
 											</Pressable>
 										)
 									})}
@@ -129,9 +129,9 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 							{item.tag_data && <View style={styles.tags_item_con}>
 								{item.tag_data.more.length > 0 && item.tag_data.more.map((tag: any, index: number) => {
 									return (
-										<Pressable onPress={() => { clickbtn(tag, item) }} key={tag} style={[styles.item_border, { height: 50 }]}>
+										<Pressable onPress={() => { clickbtn(tag.name, item) }} key={tag.name} style={[styles.item_border, { height: 50 }]}>
 											{/* <View style={styles.item_tag_border}></View> */}
-											<Text style={[styles.item_tag_text, tag == "换一批" && styles.item_alter]}>{tag}</Text>
+											<Text style={[styles.item_tag_text, tag.name == "换一批" && styles.item_alter]}>{tag.name}</Text>
 										</Pressable>
 									)
 								})}

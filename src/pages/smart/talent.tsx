@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
 
+import FastImage from "react-native-fast-image";
 import HeaderView from "../../components/headerview";
 
 import http from "../../utils/api/http";
@@ -159,12 +160,9 @@ function Talent({ navigation }: any): React.JSX.Element {
 						return (
 							<View style={styles.talent_or_care_item}>
 								<View style={styles.item_img_con}>
-									{tab == "talent" && <Image style={styles.item_img}
-										source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
-									/>}
-									{tab == "care" && <Image style={styles.item_img}
-										source={{ uri: ENV.avatar + item.id + ".jpg?" + item.uface }}
-									/>}
+									<FastImage style={styles.item_img}
+										source={{ uri: ENV.avatar + (tab == "talent" ? item.uid : item.id) + ".jpg?" + item.uface }}
+									/>
 								</View>
 								<View style={styles.item_info}>
 									<View style={styles.item_flex}>
