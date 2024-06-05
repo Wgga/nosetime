@@ -112,7 +112,7 @@ const SmartDiscuss = React.memo(() => {
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 				keyExtractor={(item: any) => item.id + "_" + item.uid}
 				ListHeaderComponent={(
-					<View style={styles.discuss_con}>
+					<View style={Globalstyles.container}>
 						<Pressable onPress={() => {
 							gotodetail("Talent");
 						}} style={[styles.like_con, styles.flex_row]}>
@@ -220,10 +220,6 @@ const styles = StyleSheet.create({
 	flex_row_tit: {
 		fontSize: 15,
 		color: theme.tit2,
-	},
-	discuss_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
 	},
 	like_con: {
 		height: 55,

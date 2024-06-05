@@ -98,7 +98,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.wishlist_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "",
 				isShowSearch: false,
@@ -127,7 +127,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			<View style={styles.wishlist_con}>
+			<View style={[styles.wishlist_con, Globalstyles.container]}>
 				{(wishlist_isempty.current && tab == "wishlist") && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/wishlist_blank.png")} />}
@@ -189,10 +189,6 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	wishlist_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	header_bg: {
 		position: "absolute",
 		top: 0,
@@ -222,8 +218,6 @@ const styles = StyleSheet.create({
 		color: theme.toolbarbg,
 	},
 	wishlist_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
 		overflow: "hidden",

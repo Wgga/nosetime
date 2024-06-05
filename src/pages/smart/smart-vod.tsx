@@ -10,6 +10,7 @@ import cache from "../../hooks/storage/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -94,7 +95,7 @@ const SmartVod = React.memo(() => {
 	}
 
 	return (
-		<ScrollView style={styles.vodelist_con}
+		<ScrollView style={[styles.vodelist_con, Globalstyles.container]}
 			showsVerticalScrollIndicator={false}>
 			{(smartvodlist.current && smartvodlist.current.length > 0) && smartvodlist.current.map((item: any, index: number) => {
 				return (
@@ -142,8 +143,6 @@ const SmartVod = React.memo(() => {
 })
 const styles = StyleSheet.create({
 	vodelist_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
 		paddingHorizontal: 20,
 	},
 	vodlist_item: {

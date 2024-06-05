@@ -6,6 +6,20 @@
   "description": "app专用",
   "glyphs": [
     {
+      "icon_id": "40621317",
+      "name": "weixinpay",
+      "font_class": "weixin1",
+      "unicode": "e626",
+      "unicode_decimal": 58918
+    },
+    {
+      "icon_id": "40621291",
+      "name": "alipay",
+      "font_class": "alipay",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
       "icon_id": "40411084",
       "name": "fav-outline",
       "font_class": "fav-outline",

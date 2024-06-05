@@ -18,6 +18,7 @@ import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -198,7 +199,7 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.feedback_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title,
 				isShowSearch: false,
@@ -245,10 +246,6 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	feedback_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	feedback_con: {
 		paddingTop: 26,
 		paddingHorizontal: 27,

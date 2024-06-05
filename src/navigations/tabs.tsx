@@ -34,7 +34,7 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 				<Tab.Screen name="Smart" options={{ title: "发现" }} component={Smart} />
 				<Tab.Screen name="Social" options={{ title: "圈子" }} component={Social} />
 				<Tab.Screen name="Mall" options={{ title: "商城" }} component={Mall} />
-				<Tab.Screen name="User" options={{ title: "我的" }} listeners={({ navigation, route }) => ({
+				<Tab.Screen name="User" options={{ title: "我的" }} listeners={({ navigation, route }: any) => ({
 					tabPress: (e: any) => {
 						e.preventDefault();
 						if (us.user.uid == 0) {

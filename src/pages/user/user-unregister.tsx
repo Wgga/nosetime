@@ -18,6 +18,7 @@ import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 const { width, height } = Dimensions.get("window");
 
@@ -242,7 +243,7 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 	}
 
 	return (
-		<View style={styles.unregister_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "账户注销",
 				isShowSearch: false,
@@ -256,10 +257,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 })
 
 const styles = StyleSheet.create({
-	unregister_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	unregister_con: {
 		marginVertical: 20,
 		marginHorizontal: 25,

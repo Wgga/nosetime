@@ -15,6 +15,7 @@ import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -182,7 +183,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.points_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "",
 				isShowSearch: false,
@@ -313,10 +314,6 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	points_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	header_title_con: {
 		flex: 1,
 		height: 44,

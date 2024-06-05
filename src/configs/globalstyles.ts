@@ -1,5 +1,7 @@
 import { StyleSheet } from "react-native";
 
+import theme from "./theme";
+
 const handlelevelLeft = (level: number) => {
 	if (level == 2 || level == 5 || level == 8 || level == 11 || level == 14) {
 		return Globalstyles.level_left_20;
@@ -164,6 +166,19 @@ const Globalstyles: any = StyleSheet.create({
 	emptyimg: {
 		width: "100%",
 		height: 500,
+	},
+	container: {
+		flex: 1,
+		backgroundColor: theme.toolbarbg,
+	},
+	title_text_con: {
+		width: 44,
+		height: 44,
+		justifyContent: "center",
+	},
+	title_text: {
+		fontSize: 13,
+		color: theme.tit2,
 	},
 });
 

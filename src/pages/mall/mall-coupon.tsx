@@ -88,7 +88,7 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.coupon_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "优惠券",
 				isShowSearch: false,
@@ -150,10 +150,6 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	coupon_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	header_bg: {
 		position: "absolute",
 		top: 0,

@@ -145,7 +145,7 @@ function Talent({ navigation }: any): React.JSX.Element {
 				</View>
 				<View style={styles.title_text_con}></View>
 			</HeaderView>
-			<View style={styles.talent_list}>
+			<View style={Globalstyles.container}>
 				{(tab == "care" && carelist.current.length == 0) && <View style={styles.borderbg}>
 					<Image style={Globalstyles.emptyimg}
 						resizeMode="contain"
@@ -236,10 +236,6 @@ const styles = StyleSheet.create({
 		width: 44,
 		height: 44,
 		justifyContent: "center",
-	},
-	talent_list: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
 	},
 	borderbg: {
 		borderTopColor: theme.bg,

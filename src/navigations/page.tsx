@@ -16,6 +16,7 @@ import WikiDetail from "../pages/smart/wiki-detail";
 import Talent from "../pages/smart/talent";
 
 import PerfumeListSquare from "../pages/perfume/perfume-list-square";
+import PerfumeListTag from "../pages/perfume/perfume-list-tag";
 
 import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
@@ -60,6 +61,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="Talent" component={Talent} />
 
 			<Stack.Screen name="PerfumeListSquare" component={PerfumeListSquare} />
+			<Stack.Screen name="PerfumeListTag" component={PerfumeListTag} />
 
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Protocol" component={Protocol} />

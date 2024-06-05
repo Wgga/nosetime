@@ -12,6 +12,7 @@ import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 function UserChangeDesc({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -38,7 +39,7 @@ function UserChangeDesc({ navigation }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.desc_container}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "修改个人简介",
 				isShowSearch: false,
@@ -62,10 +63,6 @@ function UserChangeDesc({ navigation }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	desc_container: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	desc_con: {
 		paddingTop: 26,
 		paddingHorizontal: 27,

@@ -14,6 +14,7 @@ import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -125,7 +126,7 @@ function Search({ navigation, route }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.search_con}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "",
 				placeholder,
@@ -176,10 +177,6 @@ function Search({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-	search_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	},
 	list_title: {
 		flexDirection: "row",
 		justifyContent: "space-between",

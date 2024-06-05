@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 
 import { WebView } from "react-native-webview";
 
@@ -9,6 +9,7 @@ import http from "../../utils/api/http";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
+import { Globalstyles } from "../../configs/globalstyles";
 
 function Protocol({ navigation, route }: any): React.JSX.Element {
 
@@ -50,7 +51,7 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<View style={styles.protocol_con}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title,
 				isShowSearch: false,
@@ -66,12 +67,5 @@ function Protocol({ navigation, route }: any): React.JSX.Element {
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	protocol_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
-	}
-})
 
 export default Protocol;

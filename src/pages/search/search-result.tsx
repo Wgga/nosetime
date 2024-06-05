@@ -230,7 +230,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 
 	return (
 		<>
-			{tab == "item" && <View style={styles.search_con}>
+			{tab == "item" && <View style={Globalstyles.container}>
 				{emptyimg.item && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
@@ -286,7 +286,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					/>
 				</View>}
 			</View>}
-			{tab == "wiki" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
+			{tab == "wiki" && <ScrollView style={Globalstyles.container} showsVerticalScrollIndicator={false}>
 				{emptyimg.wiki && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
@@ -386,7 +386,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				</Pressable>}
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
-			{tab == "mall" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
+			{tab == "mall" && <ScrollView style={Globalstyles.container} showsVerticalScrollIndicator={false}>
 				{emptyimg.mall && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
@@ -436,7 +436,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				})}
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
-			{tab == "social" && <ScrollView style={styles.search_con} showsVerticalScrollIndicator={false}>
+			{tab == "social" && <ScrollView style={Globalstyles.container} showsVerticalScrollIndicator={false}>
 				{emptyimg.social && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
@@ -496,7 +496,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 				</View>}
 				<View style={{ marginBottom: 100 }}></View>
 			</ScrollView>}
-			{tab == "vod" && <View style={styles.search_con}>
+			{tab == "vod" && <View style={Globalstyles.container}>
 				{emptyimg.vod && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
@@ -579,7 +579,7 @@ function SearchResult({ navigation, route }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.search_con}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: "",
 				placeholder: holder,
@@ -618,10 +618,6 @@ const styles = StyleSheet.create({
 	item_flex: {
 		flexDirection: "row",
 		alignItems: "center",
-	},
-	search_con: {
-		flex: 1,
-		backgroundColor: theme.toolbarbg,
 	},
 	tabs_con: {
 		width: "100%",
