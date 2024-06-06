@@ -91,9 +91,10 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 		}
 
 		Promise.all([getWishlist(), getStocktip()]).then((data) => {
-			if (data.length == 2) {
-				setIsRender((val) => !val);
+			if (data.includes(0)) {
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App愿望单列表页" } });
 			}
+			setIsRender((val) => !val);
 		})
 	}
 

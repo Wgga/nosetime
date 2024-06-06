@@ -18,14 +18,17 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-const TagItem = React.memo(({ item, type, clickbtn }: any) => {
+const TagItem = React.memo(({ item, type, selectbtn }: any) => {
 	return (
 		<>
 			{item.tag_data && <View style={styles.tags_item_con}>
-				{/* {item.tag_data[type].length > 0 && item.tag_data[type].map((tag: any, index: number) => {
+				{item.tag_data[type].length > 0 && item.tag_data[type].map((tag: any, index: number) => {
 					return (
-						<Pressable key={tag.name} onPress={() => { clickbtn(tag, item) }}>
-							{tag.sel && <View style={styles.item_tag_border}></View>}
+						<Pressable key={tag.name} onPress={() => { selectbtn(tag, item) }}>
+							{tag.sel && <View style={styles.item_tag_border}>
+								<View style={styles.tag_border}></View>
+								<Icon style={styles.tag_icon} name="correct" size={17} color={theme.toolbarbg} />
+							</View>}
 							<Text style={[
 								styles.item_con,
 								styles.item_tag_text,
@@ -35,17 +38,18 @@ const TagItem = React.memo(({ item, type, clickbtn }: any) => {
 							</Text>
 						</Pressable>
 					)
-				})} */}
+				})}
 			</View>}
 		</>
 	)
 })
 
-function PerfumeListTag({ navigation }: any): React.JSX.Element {
+function PerfumeListTag({ navigation, route }: any): React.JSX.Element {
 
 	// 控件
 	const classname = "PerfumeListTagPage";
 	// 变量
+	let title = React.useRef<string>("添加标签");
 	// 数据
 	let alltags = React.useRef<any[]>([]);
 	let seltags = React.useRef<any[]>([]);
@@ -55,16 +59,22 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
-		cache.getItem(classname + "tags").then((cacheobj) => {
-			console.log("%c Line:59 🍣 cacheobj", "color:#42b983", cacheobj, alltags.current);
+		selected_tags.current = [];
+		if (route.params.tags.length > 0) {
+			seltags.current = route.params.tags;
+		}
+		if (route.params.src == "square") {
+			title.current = "选择标签";
+		}
+		cache.getItem(classname + "tags").then((cacheobj: any) => {
 			if (cacheobj) {
 				select_tags(cacheobj);
 			}
 		}).catch(() => {
-			// http.get(ENV.collection + "?method=gettags").then((resp_data: any) => {
-			// 	cache.saveItem(classname + "tags", resp_data, 3600);
-			// 	select_tags(resp_data);
-			// });
+			http.get(ENV.collection + "?method=gettags").then((resp_data: any) => {
+				cache.saveItem(classname + "tags", resp_data, 3600);
+				select_tags(resp_data);
+			});
 		});
 	}, [])
 
@@ -79,7 +89,7 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 
 	// 处理标签数据
 	const select_tags = (data: any) => {
-		let tags_data = [...data];
+		let tags_data = JSON.parse(JSON.stringify(data));
 		for (let i = 0; i < tags_data.length; i++) {
 			for (let j = 0; j < tags_data[i].tags.length; j++) {
 				if (seltags.current.indexOf(tags_data[i].tags[j]) >= 0) {
@@ -105,7 +115,7 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 		setIsRender(val => !val);
 	}
 
-	const clickbtn = (tags: any, item: any) => {
+	const selectbtn = (tags: any, item: any) => {
 		if (tags.name == "换一批") {
 			let tmptags = item.tags2;
 			item.tags2 = item.tags;
@@ -116,7 +126,7 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 		}
 		if (tags.sel) {
 			tags.sel = false;
-			let index = selected_tags.current.indexOf(item.name);
+			let index = selected_tags.current.indexOf(tags.name);
 			if (index > -1) {
 				selected_tags.current.splice(index, 1);
 			}
@@ -126,15 +136,30 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 				return;
 			}
 			tags.sel = true;
-			selected_tags.current.push(item.name);
+			selected_tags.current.push(tags.name);
 		}
 		setIsRender(val => !val);
+	}
+
+	const surebtn = () => {
+		if (selected_tags.current.length == 0 && title.current != "添加标签") {
+			return navigation.goBack();
+		}
+		if (title.current == "选择标签") {
+			if (selected_tags.current.length == 0) {
+				return navigation.goBack();
+			}
+			navigation.push("Page", { screen: "PerfumeListSquare", params: { tags: selected_tags.current } });
+		} else {
+			events.publish("selected_tags", selected_tags.current)
+			navigation.goBack();
+		}
 	}
 
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
-				title: "选择标签",
+				title: title.current,
 				isShowSearch: false,
 				style: { backgroundColor: theme.toolbarbg }
 			}} method={{
@@ -142,7 +167,7 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 					navigation.goBack();
 				},
 			}}>
-				<Pressable style={Globalstyles.title_text_con} onPress={() => { }}>
+				<Pressable style={Globalstyles.title_text_con} onPress={surebtn}>
 					<Text style={Globalstyles.title_text}>{"确定"}</Text>
 				</Pressable>
 			</HeaderView>
@@ -158,9 +183,9 @@ function PerfumeListTag({ navigation }: any): React.JSX.Element {
 									/>
 									<Text style={styles.item_name}>{item.name}</Text>
 								</View>
-								<TagItem item={item} type="first" clickbtn={clickbtn} />
+								<TagItem item={item} type="first" selectbtn={selectbtn} />
 							</View>
-							{/* <TagItem item={item} type="more" clickbtn={clickbtn} /> */}
+							<TagItem item={item} type="more" selectbtn={selectbtn} />
 						</View>
 					)
 				})}
@@ -217,6 +242,27 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		zIndex: 1,
 		borderColor: "#E93D4D"
+	},
+	tag_border: {
+		position: "absolute",
+		top: 0,
+		right: 0,
+		width: 0,
+		height: 0,
+		zIndex: 1,
+		borderWidth: 8,
+		borderLeftColor: "transparent",
+		borderBottomColor: "transparent",
+		borderRightColor: "#E93D4D",
+		borderTopColor: "#E93D4D",
+	},
+	tag_icon: {
+		position: "absolute",
+		top: -5,
+		right: 1,
+		width: 13,
+		height: 13,
+		zIndex: 1,
 	},
 	item_tag_text: {
 		fontSize: 14,

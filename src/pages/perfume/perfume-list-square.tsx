@@ -42,6 +42,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 	// 参数
 	// 状态
 	let noMore = React.useRef<boolean>(false); // 是否还有更多
+	let isempty = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
@@ -80,6 +81,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 			cur_page.current = 1;
 			http.get(ENV.collection + "?method=" + method.current).then((resp_data: any) => {
 				alllist.current = resp_data;
+				isempty.current = (resp_data.length == 0);
 				noMore.current = (resp_data.length < 20);
 				resolve(1);
 			})
@@ -89,9 +91,10 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 	const init = () => {
 		if (tags.current.length == 0) {
 			Promise.all([getHotlist(), getNewlist(), getAlllist()]).then((data) => {
-				if (data.length == 3) {
-					setIsRender(val => !val);
+				if (data.includes(0)) {
+					return navigation.navigate("Page", { screen: "Login", params: { src: "App香单广场" } });
 				}
+				setIsRender((val) => !val);
 			})
 		} else {
 			getAlllist().then(() => {
@@ -136,13 +139,16 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 					navigation.goBack();
 				},
 			}}>
-				<Pressable style={Globalstyles.title_text_con} onPress={() => {
+				{title.current == "香单广场" && <Pressable style={Globalstyles.title_text_con} onPress={() => {
 					gotodetail("PerfumeListTag")
 				}}>
 					<Text style={Globalstyles.title_text}>{"分类"}</Text>
-				</Pressable>
+				</Pressable>}
 			</HeaderView>
-			<FlatList data={alllist.current}
+			{isempty.current && <Image style={Globalstyles.emptyimg}
+				resizeMode="contain"
+				source={require("../../assets/images/empty/odor_blank.png")} />}
+			{!isempty.current && <FlatList data={alllist.current}
 				horizontal={false}
 				numColumns={3}
 				showsHorizontalScrollIndicator={false}
@@ -185,7 +191,8 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 									}}
 								/>
 							</>}
-							{alllist.current.length > 0 && <Text style={styles.list_title}>{"全部"}</Text>}
+							{(alllist.current.length > 0 && tags.current.length == 0) && <Text style={styles.list_title}>{"全部"}</Text>}
+							{tags.current.length > 0 && <Text style={styles.list_title}>{"关键字：" + tags.current}</Text>}
 						</>
 					)
 				}}
@@ -200,7 +207,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 					)
 				}}
 				ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={alllist.current.length > 0} />}
-			/>
+			/>}
 		</View>
 	);
 }

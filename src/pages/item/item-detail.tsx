@@ -34,8 +34,10 @@ import OpenAll from "../../assets/svg/itemdetail/openall.svg";
 const { width, height } = Dimensions.get("window");
 const classname = "ItemDetailPage";
 
-const ItemHeader = React.memo(({ itemid, navigation }: any) => {
+const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 
+	// 参数
+	const { gotovote } = method;
 	// 变量
 	const [seltitstr, setSeltitstr] = React.useState<any>("media"); // 选中的标题，值为photo(影像记录)和intro(官方简介)，默认为photo(影像记录)
 	const [seltitstr2, setSeltitstr2] = React.useState<any>("innose"); // 选中的标题2，值为innose(包含它的香单)和inarticle(相关文章)，默认为innose(包含它的香单)
@@ -195,6 +197,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 								type2.current = "";
 								break;
 						}
+						events.publish("wanteditem_type", type2.current);
 						resolve(1);
 					}
 				});
@@ -247,10 +250,19 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 
 	// 获取其他数据
 	const getotherdata = () => {
-		Promise.all([getReplyData(), getSimilarData(), getMediaData(), getInnoseData(), getWantedData(), getOdorVoteData(), getIsBuy()]).then((data) => {
-			if (data.length == 7) {
-				setIsRender((val) => !val);
+		Promise.all([
+			getReplyData(),
+			getSimilarData(),
+			getMediaData(),
+			getInnoseData(),
+			getWantedData(),
+			getOdorVoteData(),
+			getIsBuy()
+		]).then((data) => {
+			if (data.includes(0)) {
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 			}
+			setIsRender((val) => !val);
 		})
 
 		// 评论回复数据
@@ -363,6 +375,17 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 		})
 	}
 
+	const gotodetail = (page: string, item: any = null, udid: number = 0) => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
+		}
+
+		if (page == "item-detail") {
+			if (itemid == item.iid) return;
+			navigation.push("Page", { screen: "ItemDetail", params: { id: item.iid, src: "App单品页" } });
+		}
+	}
+
 	return (
 		<View style={styles.header_con}>
 			<View style={styles.header_img_con}>
@@ -385,38 +408,38 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 						<Text style={styles.info_enname}>{itemdata.current.enname}</Text>
 						<View style={styles.favbtn_con}>
 							{type2.current == "" && <>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								<Pressable onPress={() => { gotovote("wanted") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<Icon style={styles.favbtn_icon} name="heart3" size={16} color={theme.toolbarbg} />
 									<Text style={styles.favbtn_text}>{"想要"}</Text>
-								</View>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								</Pressable>
+								<Pressable onPress={() => { gotovote("smelt") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<Icon style={styles.favbtn_icon} name="smell2" size={16} color={theme.toolbarbg} />
 									<Text style={styles.favbtn_text}>{"闻过"}</Text>
-								</View>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								</Pressable>
+								<Pressable onPress={() => { gotovote("have") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<Icon style={styles.favbtn_icon} name="star3" size={16} color={theme.toolbarbg} />
 									<Text style={styles.favbtn_text}>{"拥有"}</Text>
-								</View>
+								</Pressable>
 							</>}
 							{type2.current == "wanted" && <View style={styles.favbtned}>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								<Pressable onPress={() => { gotovote("wanted") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<WantChecked width={16} height={16} style={styles.favbtn_icon} />
 									<Text style={styles.favbtn_text}>{"想要"}</Text>
-								</View>
+								</Pressable>
 								<Text style={styles.favbtned_text}>{"我想要这款香水"}</Text>
 							</View>}
 							{type2.current == "smelt" && <View style={styles.favbtned}>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								<Pressable onPress={() => { gotovote("smelt") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<SmeltChecked width={16} height={16} style={styles.favbtn_icon} />
 									<Text style={styles.favbtn_text}>{"闻过"}</Text>
-								</View>
+								</Pressable>
 								<Text style={styles.favbtned_text}>{"我闻过这款香水"}</Text>
 							</View>}
 							{type2.current == "have" && <View style={styles.favbtned}>
-								<View style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
+								<Pressable onPress={() => { gotovote("have") }} style={[styles.favbtn, { backgroundColor: itemcolors.current.itemcolor }]}>
 									<HaveChecked width={16} height={16} style={styles.favbtn_icon} />
 									<Text style={styles.favbtn_text}>{"已拥有"}</Text>
-								</View>
+								</Pressable>
 								<Text style={styles.favbtned_text}>{"我拥有这款香水"}</Text>
 							</View>}
 						</View>
@@ -777,7 +800,9 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 						{(seltitstr3 == "similar" && similarlist.current.length > 0) && <ScrollView style={styles.paddingL20} horizontal={true} showsHorizontalScrollIndicator={false}>
 							{(similarlist.current && similarlist.current.length > 0) && similarlist.current.map((item: any, index: number) => {
 								return (
-									<View key={item.iid} style={styles.h_list_item_con}>
+									<Pressable onPress={() => {
+										gotodetail("item-detail", item)
+									}} key={item.iid} style={styles.h_list_item_con}>
 										<View style={[styles.h_list_item_img_con, { backgroundColor: theme.toolbarbg }]}>
 											<Image style={styles.similar_item_img}
 												defaultSource={require("../../assets/images/nopic.png")}
@@ -785,7 +810,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 												source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
 										</View>
 										<Text numberOfLines={1} style={styles.h_list_item_text}>{item.ifullname}</Text>
-									</View>
+									</Pressable>
 								)
 							})}
 							<View style={{ marginRight: 20 }}></View>
@@ -836,7 +861,7 @@ const ItemHeader = React.memo(({ itemid, navigation }: any) => {
 const ItemDetail = React.memo(({ route, navigation }: any) => {
 
 	// 参数
-	const { id, title } = route.params;
+	const { id } = route.params;
 
 	// 状态
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
@@ -844,6 +869,8 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 
 	// 变量
 	let allodorcnt = React.useRef<number>(0); // 所有气味数量
+	let title = React.useRef<string>(""); // 标题
+	let type2 = React.useRef<string>(""); // 单品页类型
 	//数据
 	let itemdata = React.useRef<any>({}); // 单品页数据
 	let odorpct = React.useRef<any>({}); // 气味百分比
@@ -853,7 +880,18 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	let issubscription_ = React.useRef<any>({}); // 是否订阅到货
 
 	React.useEffect(() => {
+		if (route.params.title) {
+			title.current = route.params.title;
+		}
 		init();
+
+		events.subscribe("wanteditem_type", (val) => {
+			type2.current = val;
+		});
+
+		return () => {
+			events.unsubscribe("wanteditem_type");
+		}
 	}, [])
 
 	// 初始化数据
@@ -871,6 +909,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			initdata();
 			if (!resp_data.title) return;
 			itemdata.current = resp_data;
+			title.current = resp_data.title;
 			// 如果该商品评分为0,则右边的星级条都为0
 			if (resp_data.isscore == 0) {
 				resp_data.istars = [0, 0, 0, 0, 0];
@@ -980,10 +1019,33 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 		setShowMenu(isShowmenu);
 	}
 
+	const gotodetail = (page: string) => {
+		showMenu();
+		navigation.push("Page", { screen: page, params: { src: "App单品页" } });
+	}
+
+	const gotovote = (type: string = "") => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
+		}
+		if (showmenu) showMenu();
+		navigation.push("Page", {
+			screen: "ItemVote",
+			params: {
+				type,
+				optionaltype: type2.current ? type2.current : "smelt",
+				id,
+				name: itemdata.current.cnname,
+				enname: itemdata.current.enname,
+				src: "App单品页"
+			}
+		});
+	}
+
 	return (
 		<>
 			<HeaderView data={{
-				title,
+				title: title.current,
 				isShowSearch: false,
 				showmenu,
 				style: { backgroundColor: itemcolors.current.itembgcolor },
@@ -1022,13 +1084,16 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 							<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
 							<Text style={styles.menu_text}>{"分享"}</Text>
 						</Pressable>
-						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
+						<Pressable style={styles.menu_icon_con} onPress={() => {
+							gotodetail("MallItem")
+						}}>
 							<Icon style={styles.menu_icon} name="shopcart" size={15} color={theme.tit2} />
 							<Text style={styles.menu_text}>{"去购买"}</Text>
 						</Pressable>
-						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
+						<Pressable style={styles.menu_icon_con} onPress={() => { gotovote() }}>
 							<Icon style={styles.menu_icon} name="edit" size={14} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"编辑香评"}</Text>
+							{type2.current && <Text style={styles.menu_text}>{"编辑香评"}</Text>}
+							{!type2.current && <Text style={styles.menu_text}>{"写香评"}</Text>}
 						</Pressable>
 						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
 							<Icon style={styles.menu_icon} name="addlist" size={16} color={theme.tit2} />
@@ -1054,7 +1119,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 				</Pressable>
 			</HeaderView>
 			<ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-				<ItemHeader itemid={id} navigation={navigation} />
+				<ItemHeader itemid={id} navigation={navigation} method={{ gotovote }} />
 			</ScrollView>
 		</>
 	);

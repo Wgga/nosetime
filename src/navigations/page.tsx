@@ -8,6 +8,7 @@ import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
 
 import ItemDetail from "../pages/item/item-detail";
+import ItemVote from "../pages/item/item-vote";
 
 import MediaListDetail from "../pages/media/media-list-detail";
 import PicList from "../pages/media/pic-list";
@@ -53,6 +54,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="SearchResult" component={SearchResult} />
 
 			<Stack.Screen name="ItemDetail" component={ItemDetail} />
+			<Stack.Screen name="ItemVote" component={ItemVote} />
 
 			<Stack.Screen name="MediaListDetail" component={MediaListDetail} />
 			<Stack.Screen name="PicList" component={PicList} />

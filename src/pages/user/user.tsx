@@ -115,10 +115,11 @@ function User({ navigation }: any): React.JSX.Element {
 			showgiftcode.current = cacheobj && cacheobj.showgiftcode == 1 ? true : false;
 		}).catch(() => { });
 		Promise.all([getjifenval()]).then((data: any) => {
-			if (data.length == 1) {
-				blurhash.current = us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
-				setIsRender((val) => !val);
+			if (data.includes(0)) {
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App我的页面" } });
 			}
+			blurhash.current = us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
+			setIsRender((val) => !val);
 		})
 	}
 
@@ -191,7 +192,7 @@ function User({ navigation }: any): React.JSX.Element {
 				buttons: [{
 					text: "取消",
 					handler: () => {
-						ModalPortal.dismiss("giftcode_inputalert");
+						ModalPortal.dismiss("giftcode_inputAlert");
 						giftcode.current = "";
 					}
 				}, {

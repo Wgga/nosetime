@@ -84,13 +84,14 @@ const SmartVod = React.memo(() => {
 
 	const init = () => {
 		Promise.all([getVodlist(), getHjVodlist()]).then((data) => {
-			if (data.length == 2) {
-				smartvodlist.current = [
-					{ id: "hejivod", title: "视频合辑", items: hjvodlist.current, firstvod: firstvod.current["hejivod"] },
-					{ id: "singlevod", title: "单品评测", items: vodlist.current, firstvod: firstvod.current["singlevod"] }
-				]
-				setIsRender((val) => !val);
+			if (data.includes(0)) {
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页视频" } });
 			}
+			smartvodlist.current = [
+				{ id: "hejivod", title: "视频合辑", items: hjvodlist.current, firstvod: firstvod.current["hejivod"] },
+				{ id: "singlevod", title: "单品评测", items: vodlist.current, firstvod: firstvod.current["singlevod"] }
+			]
+			setIsRender((val) => !val);
 		})
 	}
 

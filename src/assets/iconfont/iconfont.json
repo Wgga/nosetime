@@ -6,6 +6,41 @@
   "description": "app专用",
   "glyphs": [
     {
+      "icon_id": "40628207",
+      "name": "leaf-outline",
+      "font_class": "leaf-outline",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "40628206",
+      "name": "leaf",
+      "font_class": "leaf",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "40627766",
+      "name": "radio1-outline",
+      "font_class": "radio-outline",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "40627765",
+      "name": "radio1",
+      "font_class": "radio1",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "40627570",
+      "name": "send3",
+      "font_class": "send3",
+      "unicode": "e627",
+      "unicode_decimal": 58919
+    },
+    {
       "icon_id": "40621317",
       "name": "weixinpay",
       "font_class": "weixin1",
