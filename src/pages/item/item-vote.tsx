@@ -9,11 +9,10 @@ import { Brightness } from "react-native-color-matrix-image-filters";
 import ActionSheetCtrl from "../../components/actionsheetctrl";
 import AlertCtrl from "../../components/alertctrl";
 import ToastCtrl from "../../components/toastctrl";
-import { ModalPortal, SlideAnimation } from "../../components/modals";
+import { ModalPortal } from "../../components/modals";
 import ItemVotePopover from "../../components/popover/itemvote-popover";
-import RulesPopover from "../../components/popover/rules-popover";
 import HeaderView from "../../components/headerview";
-
+import RulesView from "../../components/rulesview";
 
 import us from "../../services/user-service/user-service";
 import upService from "../../services/upload-photo-service/upload-photo-service";
@@ -42,13 +41,12 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 	const scorestrarr: any = { "1": "太差了", "2": "不太好", "3": "一般般", "4": "还不错", "5": "棒极了" };
 	const timevotestrarr: any = { "1": "非常短", "2": "较短", "3": "中等", "4": "较长", "5": "非常持久" };
 	// 变量
-	let info = React.useRef<any>({ type: "" });
+	let info = React.useRef<any>({ type: "", score: 0 });
+	let title = React.useRef<string>("");
 	let type1 = React.useRef<string>("");
 	let type2 = React.useRef<string>("");
 	let type3 = React.useRef<string>("");
 	let holder = React.useRef<string>("");
-	let scorestr = React.useRef<string>("");
-	let timevotestr = React.useRef<string>("");
 	// 数据
 	let mid = React.useRef<any[]>([]);
 	let rmmid = React.useRef<any[]>([]);
@@ -58,7 +56,8 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
-		init()
+		init();
+		title.current = name ? name : enname;
 		type1.current = type;
 		type3.current = optionaltype;
 
@@ -339,34 +338,10 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 		})
 	}
 
-
-	const openRule = (params: any) => {
-		ModalPortal.show((
-			<RulesPopover modalparams={params} />
-		), {
-			key: params.modalkey,
-			width,
-			rounded: false,
-			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
-			onTouchOutside: () => {
-				ModalPortal.dismiss(params.modalkey);
-			},
-			swipeDirection: "down",
-			animationDuration: 300,
-			type: "bottomModal",
-			modalStyle: { backgroundColor: "transparent" },
-		})
-	}
-
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
-				title: name ? name : enname,
+				title: title.current,
 				isShowSearch: false,
 				style: { backgroundColor: theme.toolbarbg }
 			}} method={{
@@ -400,7 +375,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 						{info.current.score == 0 && <Text style={styles.vote_text}>{"未点评"}</Text>}
 					</View>
 					<View style={styles.star_con}>
-						<Stars default={info.current.score}
+						<Stars default={parseInt(info.current.score)}
 							count={5}
 							starSize={50}
 							spacing={20}
@@ -438,7 +413,6 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 				</>}
 				<View style={styles.vote_textarea}>
 					<TextInput style={styles.textarea}
-						multiline={true}
 						value={info.current.replytext}
 						onChangeText={(value: string) => {
 							info.current.replytext = value;
@@ -471,14 +445,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 					</Pressable>
 				</View>
 			</ScrollView>
-			<View style={styles.vote_footer}>
-				<Pressable style={styles.footer_btn} onPress={() => {
-					openRule({ type: "replyrule", rulesdata: rules.current, modalkey: "replyrule_popover" });
-				}}>
-					<Text style={styles.btn_text}>{"香评发布规则"}</Text>
-					<Icon name="tixing" size={14} color={theme.placeholder} />
-				</Pressable>
-			</View>
+			<RulesView rules={rules.current} tip={"香评发布规则"} />
 		</View>
 	);
 }
@@ -587,20 +554,6 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 	},
-	vote_footer: {
-		height: 50,
-	},
-	footer_btn: {
-		height: "100%",
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	btn_text: {
-		fontSize: 12,
-		color: theme.placeholder,
-		marginRight: 5,
-	}
 });
 
 export default ItemVote;

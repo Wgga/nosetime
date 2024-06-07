@@ -80,6 +80,7 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 				})
 			}]
 		}
+		setIsRender((val) => !val);
 	}
 
 	return (

@@ -16,7 +16,7 @@ function RulesPopover({ modalparams }: any): React.JSX.Element {
 	// 控件
 	// 变量
 	// 参数
-	const { modalkey, type, rulesdata } = modalparams;
+	const { modalkey, rulesdata } = modalparams;
 	// 数据
 	const [rule, setRule] = React.useState<string>("");
 	// 状态

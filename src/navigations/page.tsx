@@ -33,6 +33,7 @@ import UserChangeDesc from "../pages/user/user-change-desc";
 import UserCart from "../pages/user/user-cart";
 
 import SocialShequDetail from "../pages/social/social-shequ-detail";
+import SocialShequPost from "../pages/social/social-shequ-post";
 
 import MallGroup from "../pages/mall/mall-group";
 import MallHeji from "../pages/mall/mall-heji";
@@ -79,6 +80,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserCart" component={UserCart} />
 
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
+			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />
 
 			<Stack.Screen name="MallGroup" component={MallGroup} />
 			<Stack.Screen name="MallHeji" component={MallHeji} />

@@ -185,7 +185,7 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App跨境实名认证页" } });
 			} else if (resp_data.msg == "OK") {
-				navigation.goback();
+				navigation.goBack();
 			} else {
 				AlertCtrl.show({
 					header: "保存失败!",
