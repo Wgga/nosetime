@@ -264,14 +264,14 @@ function User({ navigation }: any): React.JSX.Element {
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
 				/>
-				<Blurhash style={styles.header_bg}
+				{blurhash.current && <Blurhash style={styles.header_bg}
 					blurhash={blurhash.current}
 					decodeWidth={16}
 					decodeHeight={16}
 					decodePunch={1}
 					resizeMode="cover"
 					decodeAsync={true}
-				/>
+				/>}
 			</Brightness>
 			{userinfo.current && <View style={styles.user_info_con}>
 				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
@@ -286,14 +286,14 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 				</View>
 				<Brightness amount={0.85} style={styles.user_page_con}>
-					<Blurhash style={styles.user_page_bg}
+					{blurhash.current && <Blurhash style={styles.user_page_bg}
 						blurhash={blurhash.current}
 						decodeWidth={16}
 						decodeHeight={16}
 						decodePunch={1}
 						resizeMode="cover"
 						decodeAsync={true}
-					/>
+					/>}
 					<Image style={styles.user_page_msk}
 						source={require("../../assets/images/user/userpage.png")}
 					/>

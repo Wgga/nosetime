@@ -61,7 +61,6 @@ const AlertInputPopover = React.memo(({ data }: any) => {
 								}]}
 									onPress={() => {
 										alert_data.current.btnbg = theme.text2;
-										console.log("%c Line:65 🥥 item", "color:#2eafb0", item.handler());
 										item.handler();
 									}}
 									onShowUnderlay={() => {

@@ -347,7 +347,6 @@ function Home({ navigation }: any): React.JSX.Element {
 					})}
 					onIndexChange={index => {
 						// setIndex(index)
-						console.log("%c Line:144 🍇 index", "color:#6ec1c2", index);
 					}}
 					style={{ height: 2000 }}
 				/> */}

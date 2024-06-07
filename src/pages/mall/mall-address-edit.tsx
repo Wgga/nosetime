@@ -29,7 +29,6 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		console.log("%c Line:22 🍇 item", "color:#ed9ec7", route.params);
 	}, [])
 
 	const onChange = (type: string, value: string | boolean) => {

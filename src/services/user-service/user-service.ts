@@ -89,9 +89,7 @@ class UserService {
 			if (cacheobj) {
 				this.user.blurhash = cacheobj;
 			}
-		}).catch(() => {
-			console.log("%c Line:93 🍡", "color:#2eafb0");
-		});
+		}).catch(() => {});
 
 		cache.getItem(this.factoryname + "mobile").then((cacheobj) => {
 			if (cacheobj) {

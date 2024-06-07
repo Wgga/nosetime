@@ -910,7 +910,6 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			if (!resp_data.title) return;
 			itemdata.current = resp_data;
 			title.current = resp_data.title;
-			console.log("%c Line:913 🍫 title.current", "color:#465975", title.current);
 			// 如果该商品评分为0,则右边的星级条都为0
 			if (resp_data.isscore == 0) {
 				resp_data.istars = [0, 0, 0, 0, 0];
