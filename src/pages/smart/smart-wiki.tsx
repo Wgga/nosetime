@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
-import { useNavigation } from "@react-navigation/native";
 import { Grayscale } from "react-native-color-matrix-image-filters"
 
 import ListBottomTip from "../../components/listbottomtip";
@@ -14,7 +13,6 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
 import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
@@ -25,9 +23,8 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-const SmartWiki = React.memo(() => {
+const SmartWiki = React.memo(({ navigation }: any) => {
 	// 控件
-	const navigation: any = useNavigation();
 	// 参数
 	const words: any = { brand: "品牌", odor: "气味", perfumer: "调香师", fragrance: "香调" };
 	// 变量
@@ -43,18 +40,18 @@ const SmartWiki = React.memo(() => {
 		{
 			tit: "香调", text: "fragrance", items: [],
 			lists: [
-				{ text: "hua", code: 14000008 },
-				{ text: "dong", code: 14000002 },
-				{ text: "mu", code: 14000003 },
-				{ text: "pi", code: 14000010 },
-				{ text: "gan", code: 14000004 },
-				{ text: "fu", code: 14000001 },
-				{ text: "fang", code: 14000012 },
-				{ text: "ye", code: 14000005 },
-				{ text: "shui", code: 14000006 },
-				{ text: "ju", code: 14000011 },
-				{ text: "mei", code: 14000009 },
-				{ text: "guo", code: 14000007 },
+				{ text: "hua", id: 14000008, style: { top: width * 0.16, left: width * 0.418 } },
+				{ text: "dong", id: 14000002, style: { top: width * 0.18, left: width * 0.56 } },
+				{ text: "mu", id: 14000003, style: { top: width * 0.27, left: width * 0.66 } },
+				{ text: "pi", id: 14000010, style: { top: width * 0.41, left: width * 0.68 } },
+				{ text: "gan", id: 14000004, style: { top: width * 0.55, left: width * 0.66 } },
+				{ text: "fu", id: 14000001, style: { top: width * 0.64, left: width * 0.56 } },
+				{ text: "fang", id: 14000012, style: { top: width * 0.67, left: width * 0.42 } },
+				{ text: "ye", id: 14000005, style: { top: width * 0.64, left: width * 0.28 } },
+				{ text: "shui", id: 14000006, style: { top: width * 0.56, left: width * 0.17 } },
+				{ text: "ju", id: 14000011, style: { top: width * 0.42, left: width * 0.15 } },
+				{ text: "mei", id: 14000009, style: { top: width * 0.27, left: width * 0.18 } },
+				{ text: "guo", id: 14000007, style: { top: width * 0.18, left: width * 0.28 } },
 			],
 			noMore: false,
 			img: require("../../assets/images/tab4-1.jpg")
@@ -63,11 +60,8 @@ const SmartWiki = React.memo(() => {
 	let favs = React.useRef<any>({}); // 用户喜欢的数据列表
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
 
-
-
-
 	React.useEffect(() => {
-		init();
+		clicktab("brand");
 
 		events.subscribe("nosetime_smartlistUpdated", (type: string) => {
 			if (current_tab.current != type) return;
@@ -88,10 +82,6 @@ const SmartWiki = React.memo(() => {
 			events.unsubscribe("nosetime_smartlistUpdatedError");
 		}
 	}, [])
-
-	const init = () => {
-		clicktab("brand");
-	}
 
 	const islike = (ids: any[]) => {
 		if (!us.user.uid || ids.length == 0) {
@@ -125,10 +115,16 @@ const SmartWiki = React.memo(() => {
 	}
 
 	const gotodetail = (page: string, item: any) => {
-	}
-
-	const loadMore = () => {
-		smartService.fetch(current_tab.current, us.user.uid, "loadMore");
+		if (page == "user-fav" && !us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页面" } });
+		}
+		if (page == "item-detail") {
+			navigation.push("Page", { screen: "ItemDetail", params: { id: item.id, src: "App发现百科页" } });
+		} else if (page == "wiki-detail") {
+			navigation.navigate("Page", { screen: "WikiDetail", params: { id: item.id } });
+		} else if (page == "user-fav") {
+			navigation.navigate("Page", { screen: "UserFav", params: { id: 2, uid: us.user.uid, type: item.text } });
+		}
 	}
 
 	const togglefav = (wid: number) => {
@@ -155,7 +151,9 @@ const SmartWiki = React.memo(() => {
 			{(wikilist.current[current_index.current].items && wikilist.current[current_index.current].items.length > 0) && <FlashList data={wikilist.current[current_index.current].items}
 				extraData={isrender}
 				estimatedItemSize={100}
-				onEndReached={loadMore}
+				onEndReached={() => {
+					smartService.fetch(current_tab.current, us.user.uid, "loadMore");
+				}}
 				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
@@ -222,7 +220,9 @@ const SmartWiki = React.memo(() => {
 								)
 							})}
 						</View>
-						{current_index.current != 3 && <View style={[styles.like_con, styles.flex_row]}>
+						{current_index.current != 3 && <Pressable onPress={() => {
+							gotodetail("user-fav", wikilist.current[current_index.current])
+						}} style={[styles.like_con, styles.flex_row]}>
 							<Text style={styles.flex_row_tit}>{"我喜欢的" + wikilist.current[current_index.current].tit}</Text>
 							<View style={styles.flex_row}>
 								{(favs.current[current_tab.current] && favs.current[current_tab.current].length > 0) && favs.current[current_tab.current].map((item: any, index: number) => {
@@ -247,6 +247,20 @@ const SmartWiki = React.memo(() => {
 								})}
 								<Icon name="r-return" size={15} color={theme.tit2} />
 							</View>
+						</Pressable>}
+						{current_index.current == 3 && <View style={styles.fragrance_image}>
+							<Image style={{ width: "100%", height: "100%" }}
+								source={require("../../assets/images/wiki/xiangdiaofenlei3.png")}
+							/>
+							{wikilist.current[current_index.current].lists.map((fran: any, index: number) => {
+								return (
+									<Pressable key={fran.id} onPress={() => {
+										gotodetail("wiki-detail", fran)
+									}}
+										style={[styles.fragrance_image_item, fran.style]}>
+									</Pressable>
+								)
+							})}
 						</View>}
 					</>
 				)}
@@ -411,9 +425,20 @@ const styles = StyleSheet.create({
 		marginRight: 5,
 		backgroundColor: theme.toolbarbg,
 	},
+	fragrance_image: {
+		width: width,
+		height: width,
+		paddingVertical: 15,
+		paddingHorizontal: 10,
+	},
+	fragrance_image_item: {
+		position: "absolute",
+		width: width * 0.17,
+		height: width * 0.17,
+		borderRadius: 53,
+	},
 	wiki_item_con: {
 		paddingTop: 11,
-		// alignItems: "center",
 	},
 	wiki_brand_img: {
 		width: width * 0.7,

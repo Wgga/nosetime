@@ -213,7 +213,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 				onEndReached={loadMore}
 				renderItem={({ item, index }: any) => {
 					return (
-						<View key={getid(item)} style={{
+						<View style={{
 							marginBottom: 14,
 							marginLeft: (index + 1) % 2 == 0 ? 7 : 0,
 							marginRight: (index + 1) % 2 == 1 ? 7 : 0

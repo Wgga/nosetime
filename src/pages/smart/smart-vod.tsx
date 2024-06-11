@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, Image, ScrollView } from "react-native";
 
 import FastImage from "react-native-fast-image";
-import { useNavigation } from "@react-navigation/native";
 
 import http from "../../utils/api/http";
 
@@ -17,10 +16,8 @@ import Icon from "../../assets/iconfont";
 const { width, height } = Dimensions.get("window");
 const classname = "SmartEvaluatePage";
 
-
-const SmartVod = React.memo(() => {
+const SmartVod = React.memo(({ navigation }: any) => {
 	// 控件
-	const navigation: any = useNavigation();
 	// 变量
 	// 数据
 	let vodlist = React.useRef<any[]>([]); // 单品视频列表

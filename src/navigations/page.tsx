@@ -31,6 +31,7 @@ import UserChangeInfo from "../pages/user/user-change-info";
 import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
 import UserChangeDesc from "../pages/user/user-change-desc";
 import UserCart from "../pages/user/user-cart";
+import UserFav from "../pages/user/user-fav";
 
 import SocialShequDetail from "../pages/social/social-shequ-detail";
 import SocialShequPost from "../pages/social/social-shequ-post";
@@ -78,6 +79,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserChangeSignPerfume" component={UserChangeSignPerfume} />
 			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
 			<Stack.Screen name="UserCart" component={UserCart} />
+			<Stack.Screen name="UserFav" component={UserFav} />
 
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
 			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />

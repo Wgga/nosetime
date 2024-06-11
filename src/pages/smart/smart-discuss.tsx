@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
-import { useNavigation } from "@react-navigation/native";
 
 import ListBottomTip from "../../components/listbottomtip";
 
@@ -22,9 +21,8 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-const SmartDiscuss = React.memo(() => {
+const SmartDiscuss = React.memo(({ navigation }: any) => {
 	// 控件
-	const navigation: any = useNavigation();
 	// 变量
 	let word = React.useRef<any>("discuss"); // 当前新鲜事评论数据
 	// 数据
@@ -90,13 +88,9 @@ const SmartDiscuss = React.memo(() => {
 		})
 	}
 
-	const loadMore = () => {
-		smartService.fetch(word.current, us.user.uid, "loadMore");
-	}
-
 	const gotodetail = (page: string, item: any = null) => {
-		if (page == "ItemDetail") {
-			navigation.navigate("Page", { screen: page, params: { id: item.id, title: item.cnname, src: "APP新鲜事" } });
+		if (page == "item-detail") {
+			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "APP新鲜事" } });
 		} else {
 			navigation.navigate("Page", { screen: page });
 		}
@@ -107,7 +101,9 @@ const SmartDiscuss = React.memo(() => {
 			{(smartlist.current && smartlist.current.length > 0) && <FlashList data={smartlist.current}
 				extraData={isrender}
 				estimatedItemSize={100}
-				onEndReached={loadMore}
+				onEndReached={()=>{
+					smartService.fetch(word.current, us.user.uid, "loadMore");
+				}}
 				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
@@ -153,7 +149,7 @@ const SmartDiscuss = React.memo(() => {
 					return (
 						<View style={styles.smartlist_item_con}>
 							<Pressable onPress={() => {
-								gotodetail("ItemDetail", item);
+								gotodetail("item-detail", item);
 							}}>
 								<Image style={styles.item_img} defaultSource={require("../../assets/images/noxx.png")}
 									source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
@@ -162,12 +158,12 @@ const SmartDiscuss = React.memo(() => {
 							</Pressable>
 							<View style={styles.item_info}>
 								<Pressable onPress={() => {
-									gotodetail("ItemDetail", item);
+									gotodetail("item-detail", item);
 								}}>
 									<Text numberOfLines={1} style={styles.item_cnname}>{item.cnname}</Text>
 								</Pressable>
 								<Pressable onPress={() => {
-									gotodetail("ItemDetail", item);
+									gotodetail("item-detail", item);
 								}}>
 									<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
 								</Pressable>

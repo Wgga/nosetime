@@ -1,5 +1,6 @@
 import React from "react";
-import { Image } from "react-native";
+
+import FastImage from "react-native-fast-image";
 
 const RnImage = React.memo(({ source, style, resizeMode }: any) => {
 	// 控件
@@ -10,9 +11,9 @@ const RnImage = React.memo(({ source, style, resizeMode }: any) => {
 	// 状态
 
 	return (
-		<Image style={style}
+		<FastImage style={style}
 			source={isError ? require("../assets/images/perfumer.png") : source}
-			resizeMode={resizeMode}
+			resizeMode={resizeMode ? resizeMode : isError ? "contain" : "cover"}
 			onError={() => { setIsError(true) }}
 		/>
 	);

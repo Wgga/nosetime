@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { TabView, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import SmartDiscuss from "./smart-discuss";
@@ -33,12 +33,20 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 		<>
 			<TabView
 				navigationState={{ index, routes }}
-				renderScene={SceneMap({
-					discuss: SmartDiscuss,
-					vod: SmartVod,
-					wiki: SmartWiki,
-					catalog: SmartCatalog,
-				})}
+				renderScene={({ route }) => {
+					switch (route.key) {
+						case "discuss":
+							return <SmartDiscuss navigation={navigation} />;
+						case "vod":
+							return <SmartVod navigation={navigation} />;
+						case "wiki":
+							return <SmartWiki navigation={navigation} />;
+						case "catalog":
+							return <SmartCatalog navigation={navigation} />;
+						default:
+							return null;
+					}
+				}}
 				renderTabBar={(props: any) => {
 					return (
 						<TabBar {...props}
@@ -53,7 +61,7 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 					)
 				}}
 				style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
-				onIndexChange={setIndex}
+				onIndexChange={() => { }}
 				initialLayout={{ width }}
 			/>
 		</>

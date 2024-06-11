@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, BackHandler, StatusBar, StyleSheet, Dimensions } from "react-native";
+import { BackHandler, StatusBar } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -9,9 +9,7 @@ import { ModalPortal } from "../components/modals";
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
-import theme from "../configs/theme";
 
-const { width, height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
 
 function Route(): React.JSX.Element {
@@ -26,7 +24,7 @@ function Route(): React.JSX.Element {
 			// 监听路由变化改变状态栏颜色
 			const urlRegex = [
 				"ItemDetail",
-				"Login", "User", "UserJifen", "Lottery",
+				"Login", "User", "UserJifen", "Lottery", "UserFav",
 				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
 				"Home", "Lottery",
 			];

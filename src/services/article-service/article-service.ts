@@ -138,7 +138,6 @@ class ArticleService {
 		data.html = `<html><head><style>
 			*{padding:0;margin:0;}
 			#content{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;pointer-events:none;overflow:hidden;width:${webwidth}px;}
-			::-webkit-scrollbar{display:none;}
 			#content .article_img{display:block !important;cursor:pointer;line-height:normal;}
 			.title,.author{display:none;}
 			.content a{text-decoration:none !important;color:#6979bf;-webkit-tap-highlight-color:rgba(255,0,0,0);}
@@ -315,6 +314,11 @@ class ArticleService {
 			return "NOMOREDATA";
 		})
 		return "ok";
+	}
+
+	unitNumber(number: number, decimal: number) {
+		let ponit = Math.pow(10, decimal);
+		return number >= 1e3 && number < 1e4 ? (Math.floor(number / 1e3 * ponit) / ponit) + 'k' : number >= 1e4 ? (Math.floor(number / 1e4 * ponit) / ponit) + 'w' : number
 	}
 }
 const articleService = new ArticleService();
