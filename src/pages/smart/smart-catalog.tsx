@@ -17,10 +17,16 @@ const classname: string = "SmartCatalogPage";
 
 const SmartCatalog = React.memo(({ navigation }: any) => {
 	// 控件
+	// 参数
+	const topdata: any = {
+		trade: { tag: "trade", title: "商业香排行榜 Top200" },
+		salon: { tag: "salon", title: "沙龙香排行榜 Top200" },
+		recent: { tag: "recent", title: "新香排行榜 Top100" },
+		affordable: { tag: "affordable", title: "平价排行榜 Top100" },
+	}
 	// 变量
 	// 数据
 	const [items, setItems] = React.useState<any[]>([]); // 排行列表数据
-	// 参数
 	// 状态
 
 	React.useEffect(() => {
@@ -43,37 +49,41 @@ const SmartCatalog = React.memo(({ navigation }: any) => {
 		});
 	}, []);
 
+	const gotodetail = (data: any, src: string) => {
+		navigation.navigate("Page", { screen: "Top", params: { data, src } });
+	}
+
 	return (
 		<ScrollView contentContainerStyle={styles.catalog_con} showsVerticalScrollIndicator={false}>
 			<View style={styles.catalog_top_con}>
-				<View style={styles.ranking_top}>
+				<Pressable style={styles.ranking_top} onPress={() => { gotodetail(topdata.trade, "top") }}>
 					<Image style={styles.tradepic}
 						source={require("../../assets/images/catalog/tradepic.jpg")}
 					/>
 					<Text style={[styles.title, styles.tradetitle, { marginLeft: 14 }]}>{"商业香排行榜"}</Text>
 					<Text style={[styles.title, styles.tradetittop, { marginLeft: 14 }]}>{"TOP200"}</Text>
-				</View>
+				</Pressable>
 				<View style={styles.ranking_btm}>
-					<View style={[styles.ranking_btm_con, { marginRight: 5 }]}>
+					<Pressable style={[styles.ranking_btm_con, { marginRight: 5 }]} onPress={() => { gotodetail(topdata.salon, "top") }}>
 						<Image style={styles.salonpic}
 							source={require("../../assets/images/catalog/salonpic.jpg")}
 						/>
 						<Text style={[styles.title, styles.salontitle, { marginLeft: 12 }]}>{"沙龙香排行榜"}</Text>
 						<Text style={[styles.title, styles.salontittop, { marginLeft: 12 }]}>{"TOP200"}</Text>
-					</View>
+					</Pressable>
 					<View style={[styles.ranking_btm_con, { marginLeft: 5 }]}>
-						<View style={[styles.btm_right_con, { marginBottom: 5 }]}>
+						<Pressable style={[styles.btm_right_con, { marginBottom: 5 }]} onPress={() => { gotodetail(topdata.recent, "top") }}>
 							<Image style={[styles.btm_right_img, styles.recentpic]}
 								source={require("../../assets/images/catalog/recentpic.jpg")}
 							/>
 							<Text style={[styles.title, styles.btm_right_tit]}>{"新香排行榜"}</Text>
-						</View>
-						<View style={[styles.btm_right_con, { marginTop: 5 }]}>
+						</Pressable>
+						<Pressable style={[styles.btm_right_con, { marginTop: 5 }]} onPress={() => { gotodetail(topdata.affordable, "top") }}>
 							<Image style={[styles.btm_right_img, styles.affordablepic]}
 								source={require("../../assets/images/catalog/affordablepic.jpg")}
 							/>
 							<Text style={[styles.title, styles.btm_right_tit]}>{"平价排行榜"}</Text>
-						</View>
+						</Pressable>
 					</View>
 				</View>
 			</View>
@@ -91,9 +101,9 @@ const SmartCatalog = React.memo(({ navigation }: any) => {
 							{item.menu && <View style={{ flexDirection: "row" }}>
 								{item.menu.map((item2: any, index_menu: number) => {
 									return (
-										<View key={item2.name} style={styles.item_menu_item}>
+										<Pressable key={item2.name} style={styles.item_menu_item} onPress={() => { gotodetail(item2, "tag") }}>
 											<Image style={styles.item_menu_img} source={{ uri: ENV.image + item2.img }} />
-										</View>
+										</Pressable>
 									)
 								})}
 							</View>}
@@ -121,10 +131,12 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		marginBottom: 10,
 		justifyContent: "flex-end",
+		alignItems: "flex-start",
 	},
 	title: {
 		fontWeight: "500",
-		color: theme.toolbarbg
+		color: theme.toolbarbg,
+		fontFamily: "PingFang SC",
 	},
 	tradepic: {
 		position: "absolute",
@@ -150,6 +162,7 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		overflow: "hidden",
 		justifyContent: "flex-end",
+		alignItems: "flex-start",
 	},
 	salonpic: {
 		position: "absolute",
@@ -171,6 +184,7 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 		overflow: "hidden",
 		justifyContent: "flex-end",
+		alignItems: "flex-start",
 	},
 	btm_right_img: {
 		position: "absolute",

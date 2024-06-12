@@ -99,7 +99,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 		} else {
 			smart_vodlist.current = resp[type];
 		}
-		setIsRender((val) => !val);
+		setIsRender(val => !val);
 	}
 
 	const loadMore = () => {
@@ -133,7 +133,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 		}
 		let maxnum = total.current - vodlist.current.length;
 		noMore.current = !(photolist.current.length < maxnum);
-		setIsRender((val) => !val);
+		setIsRender(val => !val);
 	}
 
 	const getid = (item: any) => {
@@ -171,8 +171,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 								return (
 									<View key={item.mid} style={styles.vodlist_item}>
 										<View style={styles.item_image_con}>
-											<Image style={styles.item_image}
-												source={{ uri: item.vpicurl, cache: "force-cache" }} />
+											<FastImage style={styles.item_image} source={{ uri: item.vpicurl }} />
 											<Image style={styles.triangle}
 												source={require("../../assets/images/player/play.png")}
 												resizeMode="cover"

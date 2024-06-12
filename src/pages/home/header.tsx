@@ -64,7 +64,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				} else {
 					homedataref.current.newvod = resp_data2.items_heji[0];
 				}
-				setIsRender((val) => !val);
+				setIsRender(val => !val);
 				cache.saveItem("newitemid", [resp_data.newitem.id, homedataref.current.newvod.viid], 12 * 3600);
 			}).catch((error: any) => { });
 		}).catch((error: any) => { });

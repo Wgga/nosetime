@@ -15,7 +15,7 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-function SocialShequDetail({ navigation, route }: any): React.JSX.Element {
+function SocialList({ navigation, type }: any): React.JSX.Element {
 
 	// 控件
 	// 参数
@@ -25,12 +25,13 @@ function SocialShequDetail({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={Globalstyles.container}>
-			<Text>SocialShequDetail!</Text>
+			<Text>SocialList!</Text>
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
+	
 });
 
-export default SocialShequDetail;
+export default SocialList;

@@ -80,7 +80,7 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 				})
 			}]
 		}
-		setIsRender((val) => !val);
+		setIsRender(val => !val);
 	}
 
 	return (
@@ -127,7 +127,7 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 								startAnimation();
 							} else {
 								titleWidth.current = viewWidth.current;
-								setIsRender((val) => !val);
+								setIsRender(val => !val);
 							}
 						}} style={[
 							styles.title_text,
@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: 44,
 		overflow: "hidden",
-		fontWeight: "500",
 		marginHorizontal: 20,
 		backgroundColor: "transparent",
 		zIndex: 1,

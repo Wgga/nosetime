@@ -180,6 +180,11 @@ const Globalstyles: any = StyleSheet.create({
 		fontSize: 13,
 		color: theme.tit2,
 	},
+	social_mask: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 1,
+		backgroundColor: "rgba(0,0,0,0.5)"
+	}
 });
 
 export { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, handlereplystarLeft };

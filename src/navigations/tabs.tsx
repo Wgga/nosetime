@@ -1,9 +1,7 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-import events from "../hooks/events/events";
 
 import TabOption from "./TabOption";
 import Home from "../pages/home";
@@ -11,7 +9,12 @@ import Smart from "../pages/smart";
 import Social from "../pages/social";
 import Mall from "../pages/mall";
 import User from "../pages/user/user";
+
 import us from "../services/user-service/user-service";
+
+import events from "../hooks/events/events";
+
+import { Globalstyles } from "../configs/globalstyles";
 
 const Tab = createBottomTabNavigator();
 
@@ -70,7 +73,7 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 						}
 					},
 				})} component={User} />
-			</Tab.Navigator >
+			</Tab.Navigator>
 		</>
 	);
 }

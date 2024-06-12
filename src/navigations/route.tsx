@@ -1,5 +1,5 @@
 import React from "react";
-import { BackHandler, StatusBar } from "react-native";
+import { BackHandler, StatusBar, View } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -9,6 +9,7 @@ import { ModalPortal } from "../components/modals";
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
+import { Globalstyles } from "../configs/globalstyles";
 
 const Stack = createNativeStackNavigator();
 

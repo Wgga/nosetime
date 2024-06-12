@@ -75,7 +75,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 		});
 		events.subscribe("nosetime_smartlistUpdatedError", (type) => {
 			wikilist.current[current_index.current].noMore = !smartService.moreDataCanBeLoaded(type);
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 		return () => {
 			events.unsubscribe("nosetime_smartlistUpdated");
@@ -84,15 +84,15 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	}, [])
 
 	const islike = (ids: any[]) => {
-		if (!us.user.uid || ids.length == 0) {
-			setIsRender((val) => !val);
-			return;
+		if (!us.user.uid) {
+			setIsRender(val => !val);
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页" } });
 		}
 		http.post(ENV.wiki, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {
 				like_.current[resp_data[i]] = 1;
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 	}
 
@@ -142,7 +142,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 	}
 
@@ -298,7 +298,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 								{item.desc && <Pressable onPress={() => {
 									if (item.desc2) {
 										item.isopen = !item.isopen;
-										setIsRender((val) => !val);
+										setIsRender(val => !val);
 									}
 								}}>
 									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
@@ -343,7 +343,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 									{item.desc && <Pressable style={{ marginTop: 14 }} onPress={() => {
 										if (item.desc2) {
 											item.isopen = !item.isopen;
-											setIsRender((val) => !val);
+											setIsRender(val => !val);
 										}
 									}}>
 										{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}

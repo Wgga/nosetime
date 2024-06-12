@@ -84,6 +84,10 @@ function Talent({ navigation }: any): React.JSX.Element {
 	}
 
 	const islike = (ids: any) => {
+		if (!us.user.uid) {
+			setIsRender(val => !val);
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App资深评论家页" } });
+		}
 		http.post(ENV.user, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {
 				like_.current[resp_data[i]] = 1;

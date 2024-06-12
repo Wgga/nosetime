@@ -105,12 +105,6 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 		})
 	}
 
-	// 显示/隐藏右上角菜单
-	const showMenu = () => {
-		let isShowmenu = !showmenu;
-		setShowMenu(isShowmenu);
-	}
-
 	const publish = () => {
 		if (!info.current.title)
 			info.current.title = "";
@@ -279,7 +273,7 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 						placeholder={"起个标题吧..."}
 						placeholderTextColor={theme.placeholder}
 					/>
-					<Pressable onPress={showMenu} style={styles.social_tag}>
+					<Pressable onPress={()=>{ setShowMenu(val => !val) }} style={styles.social_tag}>
 						<LinearGradient
 							colors={["#81B4EC", "#9BA6F5"]}
 							start={{ x: 0, y: 0 }}

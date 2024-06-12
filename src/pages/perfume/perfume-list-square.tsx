@@ -94,7 +94,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 				if (data.includes(0)) {
 					return navigation.navigate("Page", { screen: "Login", params: { src: "App香单广场" } });
 				}
-				setIsRender((val) => !val);
+				setIsRender(val => !val);
 			})
 		} else {
 			getAlllist().then(() => {

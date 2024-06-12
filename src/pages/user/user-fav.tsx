@@ -490,7 +490,7 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 							renderLabel={({ route, focused, color }: any) => {
 								return (
 									<View style={styles.tabbar_con}>
-										<Text style={{ color }}>{route.title}</Text>
+										<Text style={[styles.title_text, { color }]}>{route.title}</Text>
 										<Text style={[styles.favcnt, { color }]}>{favcntlist.current[route.title]}</Text>
 									</View>
 								)
@@ -500,7 +500,6 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 							indicatorStyle={{ backgroundColor: theme.tit, width: 20, height: 1, bottom: 9, left: ((width / 5 - 20) / 2) }}
 							android_ripple={{ color: "transparent" }}
 							indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-							labelStyle={{ fontSize: 14, fontWeight: "bold" }}
 							style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
 						/>
 					)
@@ -524,6 +523,11 @@ const styles = StyleSheet.create({
 	tabbar_con: {
 		flexDirection: "row",
 		alignItems: "baseline",
+	},
+	title_text: {
+		fontSize: 14,
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
 	},
 	favcnt: {
 		fontSize: 12,

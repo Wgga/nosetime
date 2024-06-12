@@ -30,7 +30,7 @@ function UserChangeSignPerfume({ navigation, route }: any): React.JSX.Element {
 
 
 	const search = () => {
-		searchService.fetch("all", word.current);
+		searchService.fetch("all", word.current, "init");
 	}
 
 	React.useEffect(() => {

@@ -15,6 +15,7 @@ import PicList from "../pages/media/pic-list";
 
 import WikiDetail from "../pages/smart/wiki-detail";
 import Talent from "../pages/smart/talent";
+import Top from "../pages/smart/top";
 
 import PerfumeListSquare from "../pages/perfume/perfume-list-square";
 import PerfumeListTag from "../pages/perfume/perfume-list-tag";
@@ -63,6 +64,7 @@ function Page(): React.JSX.Element {
 
 			<Stack.Screen name="WikiDetail" component={WikiDetail} />
 			<Stack.Screen name="Talent" component={Talent} />
+			<Stack.Screen name="Top" component={Top} />
 
 			<Stack.Screen name="PerfumeListSquare" component={PerfumeListSquare} />
 			<Stack.Screen name="PerfumeListTag" component={PerfumeListTag} />

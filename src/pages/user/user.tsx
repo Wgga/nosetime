@@ -69,7 +69,7 @@ function User({ navigation }: any): React.JSX.Element {
 			if (data) {
 				avatar.current = data.avatar;
 				blurhash.current = data.blurhash;
-				setIsRender((val) => !val);
+				setIsRender(val => !val);
 			}
 		})
 		events.subscribe("userupdatedata", (result) => {
@@ -119,7 +119,7 @@ function User({ navigation }: any): React.JSX.Element {
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App我的页面" } });
 			}
 			blurhash.current = us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		})
 	}
 

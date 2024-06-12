@@ -1,9 +1,15 @@
+import { Dimensions } from "react-native";
+
+import reactNativeTextSize from "react-native-text-size";
+
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
 import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
+
+const Winwidth = Dimensions.get("window").width;
 
 class SearchService {
 	//private factoryname : string = "SearchService";
@@ -92,7 +98,7 @@ class SearchService {
 		});
 	}
 
-	fetch(type: string, word: string) {
+	fetch(type: string, word: string, src: string) {
 		if (type == "all") {
 			this.moredata[word] = {};
 			this.page[word] = {};
@@ -111,6 +117,7 @@ class SearchService {
 			events.publish("nosetime_searchlistUpdated", { type, word });
 			return;
 		}
+		if (src == "loadMore") this.page[word][type]++;
 		var url = "";
 		if (type == "item")
 			url = ENV.api + ENV.search + "?type=item&page=" + this.page[word][type] + "&word=" + word;//&in=tag 20180420
@@ -167,7 +174,7 @@ class SearchService {
 					this.moredata[word]["vod"] = false;
 
 				events.publish("nosetime_searchlistUpdated", { type, word });
-			} else if (type == "item" || type == "tag") {
+			} else if (type == "item") {
 				if (resp_data.item.cnt == 0) {
 					this.moredata[word][type] = false;
 					events.publish("nosetime_searchlistUpdatedError", { type, word });
@@ -176,6 +183,48 @@ class SearchService {
 
 				if (this.searchlist[word].item == undefined) this.searchlist[word].item = [];
 				this.searchlist[word].item = this.searchlist[word].item.concat(resp_data.item.data);
+
+				if (resp_data.item.cnt <= this.searchlist[word].item.length)
+					this.moredata[word][type] = false;
+				events.publish("nosetime_searchlistUpdated", { type, word });
+			} else if (type == "tag") {
+				if (resp_data.item.cnt == 0) {
+					this.moredata[word][type] = false;
+					events.publish("nosetime_searchlistUpdatedError", { type, word });
+					return "NOMOREDATA";
+				}
+
+				if (this.searchlist[word].item == undefined) this.searchlist[word].item = [];
+				resp_data.item.data.map((item: any) => {
+					item["discuss2"] = "";
+					item["isopen"] = true;
+					if (item.discuss.length > 0) {
+						reactNativeTextSize.measure({
+							width: Winwidth - 30,
+							fontSize: 13,
+							fontFamily: "monospace",
+							fontWeight: "normal",
+							text: item.discuss,
+							lineInfoForLine: 7
+						}).then((data: any) => {
+							if (data.lineCount < 7) {
+								item["discuss2"] = "";
+								item["isopen"] = true;
+							} else {
+								item["discuss2"] = item.discuss.slice(0, data.lineInfo.start - 14);
+								item["isopen"] = false;
+							}
+						}).catch((error) => {
+							item["discuss2"] = "";
+							item["isopen"] = true;
+						});
+					}
+				});
+				if (this.page[word][type] > 2) {
+					this.searchlist[word].item = this.searchlist[word].item.concat(resp_data.item.data);
+				} else {
+					this.searchlist[word].item = resp_data.item.data;
+				}
 
 				if (resp_data.item.cnt <= this.searchlist[word].item.length)
 					this.moredata[word][type] = false;
@@ -303,7 +352,6 @@ class SearchService {
 				this.moredata[word][type] = false;
 				events.publish("nosetime_searchlistUpdated", { type, word });
 			}
-			this.page[word][type]++;
 		}, msg => console.error(`Error: ${msg.status} ${msg.statusText}`)
 		);
 	}

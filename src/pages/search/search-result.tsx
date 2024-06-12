@@ -23,6 +23,7 @@ import Yimai from "../../assets/svg/itemdetail/yimai.svg";
 import Sale from "../../assets/svg/sale.svg";
 import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
+import StarImage from "../../components/starimage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -151,7 +152,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					searchService.fetchbuys(searchdata.malls, type, us.user.uid);
 					emptyimg["mall"] = !searchdata.malls || searchdata.malls.length == 0;
 				} else {
-					setIsRender((val) => !val);
+					setIsRender(val => !val);
 					noMore[type] = !searchService.moreDataCanBeLoaded(type, currentword);
 				}
 			} else if (type == "topicv2") {
@@ -166,9 +167,9 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		events.subscribe("nosetime_searchwordUpdated", (data: any) => {
 			currentword = data.word;
 			if (data.tab == "mall") {
-				searchService.fetch("mall", data.word);
+				searchService.fetch("mall", data.word, "init");
 			} else {
-				searchService.fetch("all", data.word);
+				searchService.fetch("all", data.word, "init");
 			}
 		})
 
@@ -182,18 +183,16 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 
 	const loadMore = (type: string = "") => {
 		if (type) {
-			setIsRender((val) => !val);
-			searchService.fetch(type, currentword);
+			setIsRender(val => !val);
+			searchService.fetch(type, currentword, "loadMore");
 			return
 		}
 		if (tab == "social") {
-			searchService.fetch("topicv2", currentword);
-		} else if (tab == "collection") {
-			searchService.fetch("item", currentword);
-		} else if (tab == "item") {
-			searchService.fetch("item", currentword);
+			searchService.fetch("topicv2", currentword, "loadMore");
+		} else if (tab == "collection" || tab == "item") {
+			searchService.fetch("item", currentword, "loadMore");
 		} else if (tab == "vod") {
-			searchService.fetch("vod", currentword);
+			searchService.fetch("vod", currentword, "loadMore");
 		}
 	}
 
@@ -214,7 +213,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		} else if (type == "topic") {
 			navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.id, title: item.title, src: "APP搜索" } });
 		} else if (type == "item") {
-			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, title: item.cnname, src: "APP搜索" } });
+			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "APP搜索" } });
 		} else if (type == "brand" || type == "odor" || type == "perfumer") {
 			navigation.navigate("Page", { screen: "WikiDetail", params: { id: item.id, src: "APP搜索" } });
 		} else if (type == "user-detail") {
@@ -259,21 +258,12 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 											</Pressable>}
 										</View>
 										<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
-										<View style={styles.item_flex}>
-											<View style={Globalstyles.star}>
-												{item.s0 == 1 && <Image
-													style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
-													defaultSource={require("../../assets/images/nopic.png")}
-													source={require("../../assets/images/star/star2.png")}
-												/>}
-												{item.s0 == 0 && <Image
-													style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
-													defaultSource={require("../../assets/images/nopic.png")}
-													source={require("../../assets/images/star/star.png")}
-												/>}
-											</View>
-											<Text style={styles.score_total}>&nbsp;{item.isscore}分&nbsp;/&nbsp;{item.istotal}人</Text>
-										</View>
+										<StarImage item={{
+											istotal: item.istotal,
+											s0: item.s0,
+											s1: item.s1,
+											isscore: item.isscore,
+										}} />
 									</View>
 								</Pressable>
 							)
@@ -681,14 +671,6 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: theme.text2,
 		marginVertical: 10
-	},
-	starimg: {
-		width: 14,
-		height: 14,
-	},
-	score_total: {
-		color: theme.placeholder,
-		fontSize: 13,
 	},
 	wiki_title: {
 		fontSize: 14,

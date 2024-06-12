@@ -37,7 +37,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 	}); // 抽奖商品
 	// 参数
 	// 状态
-	let showmenu = React.useRef<boolean>(false); // 是否显示菜单
+	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 	let isToggle = React.useRef<boolean>(false); // 是否显示头部
 
@@ -45,11 +45,6 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 		init();
 	}, [])
 
-	// 显示/隐藏右上角菜单
-	const showMenu = () => {
-		showmenu.current = !showmenu.current;
-		setIsRender(val => !val);
-	}
 	// 初始化获取数据
 	const init = () => {
 		http.post(ENV.points + "?uid=" + us.user.uid, { method: "mypoints", token: us.user.token }).then((resp_data: any) => {
@@ -187,7 +182,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 			<HeaderView data={{
 				title: "",
 				isShowSearch: false,
-				showmenu: showmenu.current,
+				showmenu,
 				style: { zIndex: 0 },
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
@@ -199,14 +194,14 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 					<>
 						<Pressable style={styles.menu_icon_con} onPress={() => {
 							navigation.navigate("Page", { screen: "Protocol", params: { title: "积分规则", type: "jfrule" } })
-							showMenu();
+							setShowMenu(val => !val);
 						}}>
 							<Icon style={styles.menu_icon} name="jfrule" size={17} color={theme.text1} />
 							<Text style={styles.menu_text}>{"积分规则"}</Text>
 						</Pressable>
 						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={() => {
 							navigation.navigate("Page", { screen: "MallCoupon" });
-							showMenu();
+							setShowMenu(val => !val);
 						}}>
 							<Icon style={styles.menu_icon} name="coupon" size={16} color={theme.text1} />
 							<Text style={styles.menu_text}>{"我的优惠券"}</Text>
@@ -226,7 +221,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 						<Icon name="diamond" size={16} color={theme.toolbarbg} style={{ marginLeft: 5 }} />
 					</Animated.View>
 				</View>
-				<Pressable style={{ zIndex: 1 }} onPress={showMenu}>
+				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>

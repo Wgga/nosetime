@@ -94,7 +94,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 			if (data.includes(0)) {
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App愿望单列表页" } });
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		})
 	}
 

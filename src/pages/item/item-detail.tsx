@@ -262,7 +262,7 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 			if (data.includes(0)) {
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		})
 
 		// 评论回复数据
@@ -366,7 +366,7 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 		})
 		http.post(ENV.item + "?method=postodor&id=" + itemid + "&uid=" + us.user.uid, { token: us.user.token, voteodor: params }).then((resp_data: any) => {
 			if (resp_data.msg == "OK") {
-				setIsRender((val) => !val);
+				setIsRender(val => !val);
 				ToastCtrl.show({ message: "再次点击，可调整投票数：0～3", duration: 1000, viewstyle: "superior_toast", key: "vote_toast" });
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {//20240229 shibo:处理token失效
 				us.delUser();
@@ -721,7 +721,7 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 								)
 							})}
 							<Pressable style={styles.media_moredata_btn} onPress={() => {
-								navigation.navigate("Page", { screen: "PicList", params: { id: itemid, src: "itemdetail" } });
+								navigation.push("Page", { screen: "PicList", params: { id: itemid, src: "itemdetail" } });
 							}}>
 								<Text style={styles.media_moredata_btn_text}>{"全部照片"}</Text>
 								<OpenAll width={12} height={12} style={styles.media_moredata_btn_icon} />
@@ -970,7 +970,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	// 获取用户是否订阅当前商品到货
 	const getIsSubscribe = () => {
 		if (!us.user.uid) {
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 			return;
 		}
 		http.post(ENV.mall + "?uid=" + us.user.uid, { method: "issubscription", ids: [id], token: us.user.token }).then((resp_data: any) => {
@@ -981,7 +981,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			for (var i in resp_data) {
 				issubscription_.current[resp_data[i]] = 1;
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 	}
 
@@ -1013,14 +1013,8 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 		events.publish(classname + id + "itemcolors", itemcolors.current);
 	}
 
-	// 显示/隐藏右上角菜单
-	const showMenu = () => {
-		let isShowmenu = !showmenu;
-		setShowMenu(isShowmenu);
-	}
-
 	const gotodetail = (page: string) => {
-		showMenu();
+		setShowMenu(val => !val);
 		navigation.push("Page", { screen: page, params: { src: "App单品页" } });
 	}
 
@@ -1028,7 +1022,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
 		}
-		if (showmenu) showMenu();
+		if (showmenu) setShowMenu(false);
 		navigation.push("Page", {
 			screen: "ItemVote",
 			params: {
@@ -1079,7 +1073,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 								type: "bottomModal",
 								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
 							})
-							showMenu();
+							setShowMenu(val => !val);
 						}}>
 							<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
 							<Text style={styles.menu_text}>{"分享"}</Text>
@@ -1114,7 +1108,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 					</>
 				)
 			}}>
-				<Pressable style={{ zIndex: 1 }} onPress={showMenu}>
+				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>

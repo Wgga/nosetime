@@ -30,41 +30,39 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 	// 参数
 	// 状态
 	return (
-		<>
-			<TabView
-				navigationState={{ index, routes }}
-				renderScene={({ route }) => {
-					switch (route.key) {
-						case "discuss":
-							return <SmartDiscuss navigation={navigation} />;
-						case "vod":
-							return <SmartVod navigation={navigation} />;
-						case "wiki":
-							return <SmartWiki navigation={navigation} />;
-						case "catalog":
-							return <SmartCatalog navigation={navigation} />;
-						default:
-							return null;
-					}
-				}}
-				renderTabBar={(props: any) => {
-					return (
-						<TabBar {...props}
-							activeColor={theme.tit}
-							inactiveColor={theme.text2}
-							indicatorStyle={{ backgroundColor: theme.tit, width: 15, height: 1, bottom: 11, left: ((width / 4 - 15) / 2) }}
-							android_ripple={{ color: "transparent" }}
-							indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-							labelStyle={{ fontSize: 16, fontWeight: "bold" }}
-							style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
-						/>
-					)
-				}}
-				style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
-				onIndexChange={() => { }}
-				initialLayout={{ width }}
-			/>
-		</>
+		<TabView
+			navigationState={{ index, routes }}
+			renderScene={({ route }) => {
+				switch (route.key) {
+					case "discuss":
+						return <SmartDiscuss navigation={navigation} />;
+					case "vod":
+						return <SmartVod navigation={navigation} />;
+					case "wiki":
+						return <SmartWiki navigation={navigation} />;
+					case "catalog":
+						return <SmartCatalog navigation={navigation} />;
+					default:
+						return null;
+				}
+			}}
+			renderTabBar={(props: any) => {
+				return (
+					<TabBar {...props}
+						activeColor={theme.tit}
+						inactiveColor={theme.text2}
+						indicatorStyle={{ backgroundColor: theme.tit, width: 15, height: 1, bottom: 11, left: ((width / 4 - 15) / 2) }}
+						android_ripple={{ color: "transparent" }}
+						indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
+						labelStyle={{ fontSize: 16, fontWeight: "bold" }}
+						style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
+					/>
+				)
+			}}
+			style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
+			onIndexChange={() => { }}
+			initialLayout={{ width }}
+		/>
 	);
 };
 

@@ -257,7 +257,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				events.publish(classname + id + "setArticleData", articledata.current);
 				setTimeout(() => { setLoading(false) }, 1000);
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 	};
 
@@ -294,12 +294,6 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				if (resp_data[i]) likelist.current[resp_data[i]] = true;
 			}
 		})
-	}
-
-	// 显示/隐藏右上角菜单
-	const showMenu = () => {
-		let isShowmenu = !showmenu;
-		setShowMenu(isShowmenu);
 	}
 
 	// 动态修改顶部导航栏透明度
@@ -356,7 +350,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	// 收藏文章
 	const favarticle = () => {
-		showMenu();
+		setShowMenu(val => !val);
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 		}
@@ -428,7 +422,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 								type: "bottomModal",
 								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
 							})
-							showMenu();
+							setShowMenu(val => !val);
 						}}>
 							<Icon style={styles.menu_icon} name="share2" size={14} color={theme.text1} />
 							<Text style={styles.menu_text}>{"分享"}</Text>
@@ -444,7 +438,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 					<View style={styles.coverimg_msk}></View>
 					<Image source={{ uri: ENV.image + articledata.current.coverimg, cache: "force-cache" }} style={styles.coverimg} resizeMode="cover" />
 				</Animated.View>}
-				<Pressable style={{ zIndex: 1 }} onPress={showMenu}>
+				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
 					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>

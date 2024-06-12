@@ -39,11 +39,11 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 		events.subscribe("nosetime_smartlistUpdated", (type: string) => {
 			smartlist.current = smartService.getItems(word.current);
 			noMore.current = !smartService.moreDataCanBeLoaded(type);
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 		events.subscribe("nosetime_smartlistUpdatedError", (type: string) => {
 			noMore.current = !smartService.moreDataCanBeLoaded(type);
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		});
 
 		return () => {
@@ -84,7 +84,7 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 			if (data.includes(0)) {
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页新鲜事" } });
 			}
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		})
 	}
 
@@ -188,7 +188,7 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 								{item.desc && <Pressable style={{ marginTop: 14 }} onPress={() => {
 									if (item.desc2) {
 										item.isopen = !item.isopen;
-										setIsRender((val) => !val);
+										setIsRender(val => !val);
 									}
 								}}>
 									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}

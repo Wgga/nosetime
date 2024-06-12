@@ -88,7 +88,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 				{ id: "hejivod", title: "视频合辑", items: hjvodlist.current, firstvod: firstvod.current["hejivod"] },
 				{ id: "singlevod", title: "单品评测", items: vodlist.current, firstvod: firstvod.current["singlevod"] }
 			]
-			setIsRender((val) => !val);
+			setIsRender(val => !val);
 		})
 	}
 
