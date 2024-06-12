@@ -38,75 +38,88 @@ function Social({ navigation, route }: any): React.JSX.Element {
 		{ key: "salon", title: "沙龙" },
 	]);
 	// 状态
-	let flag = React.useRef<string>("");
+	let flag = React.useRef<string>("new");
 	let tabbarH = React.useRef<number>(0);
 	const [showfilter, setShowFilter] = React.useState<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
+	React.useEffect(() => {
+		events.subscribe("toggle_showfilter", (val: boolean) => {
+			setShowFilter(val);
+		});
+		return () => {
+			events.unsubscribe("toggle_showfilter");
+		}
+	}, [])
+
 	return (
-		<TabView style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
-			navigationState={{ index, routes }}
-			renderScene={({ route }) => {
-				return <SocialList navigation={navigation} type={route.key} />;
-			}}
-			renderTabBar={(props: any) => {
-				return (
-					<>
-						<View onLayout={(e) => {
-							tabbarH.current = e.nativeEvent.layout.height + insets.top;
-							setIsRender(val => !val);
-						}}>
-							<TabBar {...props}
-								renderLabel={({ route, focused, color }: any) => {
-									return (
-										<View style={styles.tabbar_con}>
-											<Text style={[styles.title_text, { color }]}>{route.title}</Text>
-											{route.key == "new" && <Icon name={showfilter ? "toparrow" : "btmarrow"} size={16} color={color} />}
-										</View>
-									)
-								}}
-								onTabPress={({ route, preventDefault }) => {
-									if (route.key == "new" && flag.current == "new") {
-										preventDefault();
-										setShowFilter(val => !val);
-									}
-									flag.current = route.key;
-								}}
-								activeColor={theme.tit}
-								inactiveColor={theme.text2}
-								indicatorStyle={{ backgroundColor: theme.tit, width: 20, height: 1, bottom: 7, left: ((width / 5 - 20) / 2) }}
-								android_ripple={{ color: "transparent" }}
-								indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-								style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent", zIndex: 2 }}
-							/>
-						</View>
-						{showfilter && <View style={[styles.topic_con, { marginTop: tabbarH.current }]}>
-							<Text style={styles.topic_title}>{"筛选最新话题显示"}</Text>
-							<View style={styles.topic_btn_con}>
-								<Pressable style={styles.topic_btn}>
-									<Text style={[styles.btn_text, fids.current.includes("1") && { color: theme.tit }]}>{"闲谈"}</Text>
-									<Icon name={fids.current.includes("1") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-								</Pressable>
-								<Pressable style={styles.topic_btn}>
-									<Text style={[styles.btn_text, fids.current.includes("2") && { color: theme.tit }]}>{"求助"}</Text>
-									<Icon name={fids.current.includes("2") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-								</Pressable>
-								<Pressable style={styles.topic_btn}>
-									<Text style={[styles.btn_text, fids.current.includes("3") && { color: theme.tit }]}>{"气味"}</Text>
-									<Icon name={fids.current.includes("3") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-								</Pressable>
-								<Pressable style={styles.topic_btn}>
-									<Text style={[styles.btn_text, fids.current.includes("4") && { color: theme.tit }]}>{"沙龙"}</Text>
-									<Icon name={fids.current.includes("4") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-								</Pressable>
+		<>
+			<TabView style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
+				navigationState={{ index, routes }}
+				renderScene={({ route }) => {
+					return <SocialList navigation={navigation} type={route.key} />;
+				}}
+				renderTabBar={(props: any) => {
+					return (
+						<>
+							{showfilter && <View style={[Globalstyles.social_mask, { top: insets.top, bottom: 0, zIndex: 1 }]}></View>}
+							<View style={{ zIndex: 2 }} onLayout={(e) => {
+								tabbarH.current = e.nativeEvent.layout.height + insets.top;
+								setIsRender(val => !val);
+							}}>
+								<TabBar {...props}
+									renderLabel={({ route, focused, color }: any) => {
+										return (
+											<View style={styles.tabbar_con}>
+												<Text style={[styles.title_text, { color }]}>{route.title}</Text>
+												{route.key == "new" && <Icon name={showfilter ? "toparrow" : "btmarrow"} size={16} color={color} />}
+											</View>
+										)
+									}}
+									onTabPress={({ route, preventDefault }) => {
+										if (route.key == "new" && flag.current == "new") {
+											preventDefault();
+											events.publish("toggle_showfilter", true);
+										}
+										flag.current = route.key;
+										if (showfilter) events.publish("toggle_showfilter", false);
+									}}
+									activeColor={theme.tit}
+									inactiveColor={theme.text2}
+									indicatorStyle={{ backgroundColor: theme.tit, width: 20, height: 1, bottom: 7, left: ((width / 5 - 20) / 2) }}
+									android_ripple={{ color: "transparent" }}
+									indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
+									style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent", zIndex: 2 }}
+								/>
 							</View>
-						</View>}
-					</>
-				)
-			}}
-			onIndexChange={() => { }}
-			initialLayout={{ width }}
-		/>
+							{showfilter && <View style={[styles.topic_con, { marginTop: tabbarH.current }]}>
+								<Text style={styles.topic_title}>{"筛选最新话题显示"}</Text>
+								<View style={styles.topic_btn_con}>
+									<Pressable style={styles.topic_btn}>
+										<Text style={[styles.btn_text, fids.current.includes("1") && { color: theme.tit }]}>{"闲谈"}</Text>
+										<Icon name={fids.current.includes("1") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
+									</Pressable>
+									<Pressable style={styles.topic_btn}>
+										<Text style={[styles.btn_text, fids.current.includes("2") && { color: theme.tit }]}>{"求助"}</Text>
+										<Icon name={fids.current.includes("2") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
+									</Pressable>
+									<Pressable style={styles.topic_btn}>
+										<Text style={[styles.btn_text, fids.current.includes("3") && { color: theme.tit }]}>{"气味"}</Text>
+										<Icon name={fids.current.includes("3") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
+									</Pressable>
+									<Pressable style={styles.topic_btn}>
+										<Text style={[styles.btn_text, fids.current.includes("4") && { color: theme.tit }]}>{"沙龙"}</Text>
+										<Icon name={fids.current.includes("4") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
+									</Pressable>
+								</View>
+							</View>}
+						</>
+					)
+				}}
+				onIndexChange={() => { }}
+				initialLayout={{ width }}
+			/>
+		</>
 	);
 }
 
@@ -126,7 +139,7 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-		zIndex: 99,
+		zIndex: 2,
 		backgroundColor: theme.toolbarbg
 	},
 	topic_title: {
