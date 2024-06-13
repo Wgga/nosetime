@@ -68,7 +68,7 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 
 	const init = () => {
 		if (!us.user.uid) {
-			events.publish("social_show_filter", true)
+			events.publish("social_show_filter", true);
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子发布页" } });
 		}
 

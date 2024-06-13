@@ -1,5 +1,5 @@
 import React from "react";
-import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable } from "react-native";
+import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable, FlatList } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
@@ -27,31 +27,33 @@ import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
 import Icon from "../../assets/iconfont";
+import articleService from "../../services/article-service/article-service";
 
 const { width, height } = Dimensions.get("window");
 
-function Home({ navigation }: any): React.JSX.Element {
+const Home = React.memo(({ navigation }: any) => {
 
 	// 控件
 	const insets = useSafeAreaInsets();
 	let debounceTimer = React.useRef<any>(null); // 防抖定时器
-
 	// 变量
 	const [sliderHeight, setSliderHeight] = React.useState<number>(0); // 轮播图高度
 	const [contentHeight, setContentHeight] = React.useState<number>(0); // 顶部内容高度
-	const [listH, setListH] = React.useState<number>(2000); // 列表高度
 	let scrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 滚动值
 	let HeaderScrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 顶部滚动动画
 	let searchHeight = React.useRef<number>(0); // 顶部搜索框高度
+	const [index, setIndex] = React.useState(0);
 	let currentindex = React.useRef<number>(0); // 当前页面索引
-
 	// 数据
-	let pages = React.useRef<any[]>([
-		{ key: "new", title: "最新", pageheight: 2000, },
-		{ key: "subject", title: "专题", pageheight: 2000, },
-		{ key: "smell", title: "寻味", pageheight: 2000, },
-		{ key: "knowledge", title: "知识", pageheight: 2000, },
-	]).current; // 文章列表Tab
+	const [routes] = React.useState([
+		{ key: "new", title: "最新", },
+		{ key: "subject", title: "专题", },
+		{ key: "smell", title: "寻味", },
+		{ key: "knowledge", title: "知识", },
+	]);
+	// 状态
+	let noMore = React.useRef<boolean>(false);
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	// 动态背景透明度
 	const opacity = scrollY.interpolate({
@@ -79,8 +81,19 @@ function Home({ navigation }: any): React.JSX.Element {
 				setContentHeight(data - searchHeight.current);
 			}
 		})
+
+		events.subscribe("list_loadmore", (data: boolean) => {
+			cache.getItem("articleService" + routes[index].title).then((itemid) => {
+				if (itemid.minid == 0) {
+					noMore.current = false;
+				}
+				setIsRender(val => !val);
+			})
+		})
+
 		return () => {
 			events.unsubscribe("HomeHeaderHeight");
+			events.unsubscribe("list_loadmore");
 		}
 	}, []);
 
@@ -219,26 +232,6 @@ function Home({ navigation }: any): React.JSX.Element {
 		})
 	}
 
-	// 切换底部文章列表Tab
-	const changeIndex = (index: number) => {
-		if (debounceTimer.current) {
-			clearTimeout(debounceTimer.current);
-		}
-
-		debounceTimer.current = setTimeout(() => {
-			currentindex.current = index;
-			setListH(pages[currentindex.current].pageheight);
-		}, 100);
-	};
-
-	// 设置文章列表高度
-	const setListHeight = (height: number, type: string) => {
-		let index = pages.findIndex(item => item.title === type);
-		if (index >= 0 && pages[index].pageheight < height) {
-			pages[index].pageheight = height;
-		}
-	}
-
 	return (
 		<>
 			<View onLayout={onLayout} style={[styles.search_con, { paddingTop: insets.top ? insets.top : 24 }]}>
@@ -254,11 +247,9 @@ function Home({ navigation }: any): React.JSX.Element {
 				</Pressable>
 			</View>
 			<GestureHandlerRootView>
-				<Animated.ScrollView
+				<Animated.FlatList data={[1]}
+					extraData={isrender}
 					showsVerticalScrollIndicator={false}
-					nestedScrollEnabled={true}
-					bounces={false}
-					scrollEventThrottle={1}
 					onScroll={
 						Animated.event(
 							[{ nativeEvent: { contentOffset: { y: HeaderScrollY } } }],
@@ -268,93 +259,48 @@ function Home({ navigation }: any): React.JSX.Element {
 								}
 							}
 						)
-					}>
-					<Header navigation={navigation} setSliderHeight={setSliderHeight} style={{ height: contentHeight }} />
-					{<Tabs.Container
-						renderTabBar={(props: any) => {
-							return (
-								<StickyHeader stickyHeaderY={contentHeight} stickyScrollY={HeaderScrollY}>
-									<MaterialTabBar {...props}
-										TabItemComponent={props => {
-											return (
-												<MaterialTabItem {...props} android_ripple={{ color: "transparent" }}></MaterialTabItem>
-											)
-										}}
-										activeColor={theme.tit}
-										inactiveColor={theme.text2}
-										style={{ height: 48, backgroundColor: theme.toolbarbg }}
-										indicatorStyle={{ backgroundColor: "transparent" }}
-										labelStyle={{ fontSize: 14, fontWeight: "bold" }}>
-									</MaterialTabBar>
-								</StickyHeader>
-							)
-						}}
-						onIndexChange={changeIndex}
-						headerContainerStyle={{ shadowOpacity: 0, elevation: 0 }}
-						containerStyle={{ backgroundColor: theme.toolbarbg, height: listH }}
-					>
-						<Tabs.Tab name="new" label="最新">
-							<ArticleList type="最新" setListHeight={setListHeight} />
-						</Tabs.Tab>
-						<Tabs.Tab name="subject" label="专题">
-							<ArticleList type="专题" setListHeight={setListHeight} />
-						</Tabs.Tab>
-						<Tabs.Tab name="smell" label="寻味">
-							<ArticleList type="寻味" setListHeight={setListHeight} />
-						</Tabs.Tab>
-						<Tabs.Tab name="knowledge" label="知识">
-							<ArticleList type="知识" setListHeight={setListHeight} />
-						</Tabs.Tab>
-					</Tabs.Container>}
-					{/* <TabView
-					navigationState={{ index: currentindex, routes }}
-					renderTabBar={(props) =>
-						<StickyHeader stickyHeaderY={contentHeight} stickyScrollY={HeaderScrollY}>
-							<TabBar {...props}
-								activeColor={theme.tit}
-								inactiveColor={theme.text2}
-								indicatorStyle={{ backgroundColor: theme.tit, width: 15, height: 3, bottom: 10, left: "10.5%", borderRadius: 8 }}
-								indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-								labelStyle={{ fontSize: 14, fontWeight: "bold" }}
-								style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }} />
-						</StickyHeader>
 					}
-					renderScene={SceneMap({
-						new: () => {
-							return (
-								<View></View>
-								// <ArticleList />
-							)
-						},
-						subject: () => {
-							return (
-								<View></View>
-								// <ArticleList />
-							)
-						},
-						smell: () => {
-							return (
-								<View></View>
-								// <ArticleList />
-							)
-						},
-						knowledge: () => {
-							return (
-								<View></View>
-								// <ArticleList />
-							)
-						},
-					})}
-					onIndexChange={index => {
-						// setIndex(index)
+					ListHeaderComponent={
+						<Header navigation={navigation} setSliderHeight={setSliderHeight} style={{ height: contentHeight }} />
+					}
+					onEndReachedThreshold={0.1}
+					onEndReached={() => {
+						let type = routes[index].title;
+						articleService.fetch(type, 0);
 					}}
-					style={{ height: 2000 }}
-				/> */}
-				</Animated.ScrollView >
+					renderItem={({ item }) => {
+						return (
+							<TabView navigationState={{ index, routes }}
+								renderScene={({ route }) => {
+									return <ArticleList type={route.title} />;
+								}}
+								sceneContainerStyle={{ backgroundColor: theme.toolbarbg }}
+								lazy
+								renderTabBar={(props: any) => {
+									return (
+										<StickyHeader stickyHeaderY={contentHeight + 30} stickyScrollY={HeaderScrollY}>
+											<TabBar {...props}
+												activeColor={theme.tit}
+												inactiveColor={theme.text2}
+												indicatorStyle={{ backgroundColor: theme.tit, width: 15, height: 1, bottom: 10, left: ((width / 4 - 15) / 2) }}
+												android_ripple={{ color: "transparent" }}
+												indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
+												labelStyle={{ fontSize: 16, fontWeight: "bold" }}
+												style={{ paddingTop: 30, backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
+											/>
+										</StickyHeader>
+									)
+								}}
+								onIndexChange={setIndex}
+								initialLayout={{ width }}
+							/>
+						)
+					}}
+				/>
 			</GestureHandlerRootView>
 		</>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	search_con: {

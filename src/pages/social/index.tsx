@@ -1,16 +1,17 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated } from "react-native";
 
-import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { TabView, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import SocialList from "./social-list";
+import SocialShequ from "./social-shequ";
+
+import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
 import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
@@ -26,45 +27,99 @@ function Social({ navigation, route }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
 	// 参数
+	const topic_btn: any = [
+		{ text: "闲谈", id: "1" },
+		{ text: "求助", id: "2" },
+		{ text: "气味", id: "3" },
+		{ text: "沙龙", id: "4" },
+	]
 	// 变量
 	const [index, setIndex] = React.useState(0);
 	let fids = React.useRef<string>("1234");
 	// 数据
 	const [routes] = React.useState([
-		{ key: "new", title: "最新" },
-		{ key: "chat", title: "闲谈" },
-		{ key: "resort", title: "求助" },
-		{ key: "smell", title: "气味" },
-		{ key: "salon", title: "沙龙" },
+		{ key: "new", title: "最新", text: "最新" },
+		{ key: "chat", title: "闲谈", text: "香水闲谈" },
+		{ key: "resort", title: "求助", text: "荐香求助" },
+		{ key: "smell", title: "气味", text: "有关气味" },
+		{ key: "salon", title: "沙龙", text: "小众沙龙" },
 	]);
 	// 状态
 	let flag = React.useRef<string>("new");
 	let tabbarH = React.useRef<number>(0);
-	const [showfilter, setShowFilter] = React.useState<boolean>(false);
+	let showfilter = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 滚动值
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
+	const [isShowfilter, setIsShowFilter] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
-		events.subscribe("toggle_showfilter", (val: boolean) => {
-			setShowFilter(val);
+		if (us.user.uid) {
+			fids.current = us.user.fids;
+		}
+		events.subscribe("social_show_filter", (val: boolean) => {
+			setIsShowFilter(val);
+			if (val) {
+				Animated.timing(showfilter, {
+					toValue: 1,
+					duration: 150,
+					useNativeDriver: true,
+				}).start();
+			} else {
+				Animated.timing(showfilter, {
+					toValue: 0,
+					duration: 150,
+					useNativeDriver: true,
+				}).start();
+			}
 		});
 		return () => {
-			events.unsubscribe("toggle_showfilter");
+			events.unsubscribe("social_show_filter");
 		}
 	}, [])
 
+	// 筛选弹窗动画
+	const top = showfilter.interpolate({
+		inputRange: [0, 1],
+		outputRange: [-10, tabbarH.current],
+		extrapolate: "clamp",
+	});
+
+	const togglefid = (fid: string) => {
+		if (!us.user.uid) {
+			events.publish("social_show_filter", false);
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子页" } });
+		}
+		if (fids.current.indexOf(fid) > -1) {
+			fids.current = fids.current.replace(fid, "");
+		} else {
+			fids.current = (fids.current + fid).split("").sort().join("");
+		}
+		us.user.fids = fids.current;
+		us.saveUser(us.user);
+		http.post(ENV.user, { method: "setting", uid: us.user.uid, token: us.user.token, fids: fids.current, type: "fids" }).then((resp_data: any) => {
+			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子页" } });
+			} else {
+				events.publish("social_shequ_fecth_new");
+			}
+			setIsRender(val => !val);
+		});
+	}
+
 	return (
-		<>
-			<TabView style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
-				navigationState={{ index, routes }}
+		<GestureHandlerRootView>
+			<TabView navigationState={{ index, routes }}
 				renderScene={({ route }) => {
-					return <SocialList navigation={navigation} type={route.key} />;
+					return <SocialShequ navigation={navigation} type={route.text} />;
 				}}
 				renderTabBar={(props: any) => {
 					return (
 						<>
-							{showfilter && <View style={[Globalstyles.social_mask, { top: insets.top, bottom: 0, zIndex: 1 }]}></View>}
-							<View style={{ zIndex: 2 }} onLayout={(e) => {
-								tabbarH.current = e.nativeEvent.layout.height + insets.top;
+							{isShowfilter && <Pressable style={[Globalstyles.social_mask, { zIndex: 1 }]} onPress={() => {
+								events.publish("social_show_filter", false);
+							}}></Pressable>}
+							<View style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg, zIndex: 2 }} onLayout={(e) => {
+								tabbarH.current = e.nativeEvent.layout.height;
 								setIsRender(val => !val);
 							}}>
 								<TabBar {...props}
@@ -72,17 +127,17 @@ function Social({ navigation, route }: any): React.JSX.Element {
 										return (
 											<View style={styles.tabbar_con}>
 												<Text style={[styles.title_text, { color }]}>{route.title}</Text>
-												{route.key == "new" && <Icon name={showfilter ? "toparrow" : "btmarrow"} size={16} color={color} />}
+												{route.key == "new" && <Icon name={isShowfilter ? "toparrow" : "btmarrow"} size={16} color={color} />}
 											</View>
 										)
 									}}
 									onTabPress={({ route, preventDefault }) => {
 										if (route.key == "new" && flag.current == "new") {
 											preventDefault();
-											events.publish("toggle_showfilter", true);
+											if (!isShowfilter) events.publish("social_show_filter", true);
 										}
 										flag.current = route.key;
-										if (showfilter) events.publish("toggle_showfilter", false);
+										if (isShowfilter) events.publish("social_show_filter", false);
 									}}
 									activeColor={theme.tit}
 									inactiveColor={theme.text2}
@@ -92,34 +147,26 @@ function Social({ navigation, route }: any): React.JSX.Element {
 									style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent", zIndex: 2 }}
 								/>
 							</View>
-							{showfilter && <View style={[styles.topic_con, { marginTop: tabbarH.current }]}>
+							<Animated.View style={[styles.topic_con, { transform: [{ translateY: top }] }]}>
 								<Text style={styles.topic_title}>{"筛选最新话题显示"}</Text>
 								<View style={styles.topic_btn_con}>
-									<Pressable style={styles.topic_btn}>
-										<Text style={[styles.btn_text, fids.current.includes("1") && { color: theme.tit }]}>{"闲谈"}</Text>
-										<Icon name={fids.current.includes("1") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-									</Pressable>
-									<Pressable style={styles.topic_btn}>
-										<Text style={[styles.btn_text, fids.current.includes("2") && { color: theme.tit }]}>{"求助"}</Text>
-										<Icon name={fids.current.includes("2") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-									</Pressable>
-									<Pressable style={styles.topic_btn}>
-										<Text style={[styles.btn_text, fids.current.includes("3") && { color: theme.tit }]}>{"气味"}</Text>
-										<Icon name={fids.current.includes("3") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-									</Pressable>
-									<Pressable style={styles.topic_btn}>
-										<Text style={[styles.btn_text, fids.current.includes("4") && { color: theme.tit }]}>{"沙龙"}</Text>
-										<Icon name={fids.current.includes("4") ? "select-checked" : "select"} size={10} color={fids.current.includes("1") ? theme.tit : theme.text2} />
-									</Pressable>
+									{topic_btn.map((item: any, index: number) => {
+										return (
+											<Pressable key={item.id} style={styles.topic_btn} onPress={() => { togglefid(item.id) }}>
+												<Text style={[styles.btn_text, fids.current.includes(item.id) && { color: theme.tit }]}>{item.text}</Text>
+												<Icon name={fids.current.includes(item.id) ? "select-checked" : "select"} size={10} color={fids.current.includes(item.id) ? theme.tit : theme.text2} />
+											</Pressable>
+										)
+									})}
 								</View>
-							</View>}
+							</Animated.View>
 						</>
 					)
 				}}
 				onIndexChange={() => { }}
 				initialLayout={{ width }}
 			/>
-		</>
+		</GestureHandlerRootView>
 	);
 }
 
@@ -139,8 +186,8 @@ const styles = StyleSheet.create({
 		top: 0,
 		left: 0,
 		right: 0,
-		zIndex: 2,
-		backgroundColor: theme.toolbarbg
+		zIndex: 1,
+		backgroundColor: theme.toolbarbg,
 	},
 	topic_title: {
 		fontSize: 13,

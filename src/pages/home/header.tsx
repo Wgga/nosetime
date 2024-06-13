@@ -47,8 +47,6 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		events.publish("HomeHeaderHeight", viewHeight);
 	};
 
-	const [responsiveScreen, setResponsiveScreen] = React.useState();
-
 	// 初始化首页数据
 	React.useEffect(() => {
 		http.get(ENV.article + "?method=gethomearticles").then((resp_data: any) => {

@@ -24,8 +24,7 @@ function Slider({ navigation, banner, setSliderHeight }: any): React.JSX.Element
 
 	return (
 		<View onLayout={onLayout} style={styles.container}>
-			<Carousel
-				ref={ref}
+			<Carousel ref={ref}
 				width={width}
 				data={banner}
 				defaultIndex={0}
@@ -103,8 +102,7 @@ const styles = StyleSheet.create({
 		right: 20,
 	},
 	dotstyle: {
-		marginLeft: 4,
-		marginRight: 4,
+		marginHorizontal: 4,
 		width: 20,
 		height: 2,
 		borderRadius: 1,

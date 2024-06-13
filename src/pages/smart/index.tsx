@@ -30,8 +30,7 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 	// 参数
 	// 状态
 	return (
-		<TabView
-			navigationState={{ index, routes }}
+		<TabView navigationState={{ index, routes }}
 			renderScene={({ route }) => {
 				switch (route.key) {
 					case "discuss":
@@ -55,11 +54,10 @@ function Smart({ route, navigation }: any): React.JSX.Element {
 						android_ripple={{ color: "transparent" }}
 						indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
 						labelStyle={{ fontSize: 16, fontWeight: "bold" }}
-						style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
+						style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg, shadowColor: "transparent" }}
 					/>
 				)
 			}}
-			style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg }}
 			onIndexChange={() => { }}
 			initialLayout={{ width }}
 		/>

@@ -259,6 +259,8 @@ class ArticleService {
 				this.fetchWeb(type, newer);
 				return;
 			})
+		} else {
+			this.fetchWeb(type,newer);
 		}
 	}
 

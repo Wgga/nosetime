@@ -56,7 +56,11 @@ function lowPricePopover({ modalparams, navigation }: any): React.JSX.Element {
 			word = (data.newprice && data.newprice.indexOf("分装") > -1) ? 2 : 1
 		}
 		if (screen) {
-			navigation.navigate("Page", { screen, params: { src: "App特价弹窗", word } });
+			if (screen == "ArticleDetail") {
+				navigation.navigate("Page", { screen, params: { src: "App特价弹窗", id: data.code } });
+			} else {
+				navigation.navigate("Page", { screen, params: { src: "App特价弹窗", word } });
+			}
 			// 统计商城UV，不要删
 			http.post(ENV.mall + "?uid=" + us.user.uid, {
 				token: us.user.token, method: "clickpopup", did: us.did, page: data.page, code: data.code

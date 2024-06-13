@@ -5,8 +5,6 @@ import { checkMultiple, requestMultiple, PERMISSIONS } from "react-native-permis
 import ToastCtrl from "../../components/toastctrl";
 import AlertCtrl from "../../components/alertctrl";
 
-import theme from "../../configs/theme";
-
 class PermissionService {
 	private per_toast: any;
 	private permissionmsg: any = {

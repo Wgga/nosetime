@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, FlatList } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
@@ -12,17 +12,23 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import { Globalstyles } from "../../configs/globalstyles";
+import { FlashList } from "@shopify/flash-list";
+import ListBottomTip from "../../components/listbottomtip";
 
 const { width, height } = Dimensions.get("window");
 
-const ArticleList = React.memo(({ type, setListHeight }: any) => {
+const ArticleList = React.memo(({ navigation, type }: any) => {
 
 	// 数据
-	const [listdata, setListData] = React.useState<any[]>([]); // 文章列表数据
 	let items = React.useRef<any[]>([]); // 过滤最新视频和最新文章的文章列表数据
 
 	// 变量
 	let hiddenid = React.useRef<number>(0); // 隐藏文章id
+
+	// 状态
+	let noMore = React.useRef<boolean>(false);
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
 		articleService.fetch(type, 1);
@@ -35,15 +41,16 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 				setTimeout(() => {
 					cache.getItem("newitemid").then((newids) => {
 						items.current = item_list.filter((item: any) => { return !newids.includes(item.id) });
-						Render("nosetime_articlesUpdated")
+						setIsRender(val => !val);
+						events.publish("list_loadmore", true);
 					}).catch(() => {
 						items.current = item_list;
-						Render("nosetime_articlesUpdated")
+						setIsRender(val => !val);
+						events.publish("list_loadmore", true);
 						return;
 					});
 				}, 1000)
 
-				events.publish("list_loadmore", true);
 
 				if (type != "最新") {
 					hiddenid.current = articleService.getMaxId() - 10;
@@ -53,7 +60,7 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 
 		events.subscribe("nosetime_articlesUpdateError", (typeval: string) => {
 			if (type != typeval) return;
-			Render("nosetime_articlesUpdateError")
+			setIsRender(val => !val);
 
 			events.publish("list_loadmore", false);
 		});
@@ -64,24 +71,17 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 		}
 	}, [])
 
-
-	const Render = (type: string) => {
-		setListData(items.current);
-	}
-
 	return (
-		<ScrollView style={styles.container}
+		<FlashList data={items.current}
+			extraData={isrender}
+			estimatedItemSize={100}
 			scrollEnabled={false}
-			onLayout={(e: any) => {
-				setListHeight(e.nativeEvent.layout.height, type);
-			}}
-			onContentSizeChange={(w, h) => {
-				setListHeight(h, type);
-			}}
-		>
-			{(listdata && listdata.length > 0) && listdata.map((item: any, index: number) => {
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
+			keyExtractor={(item: any) => item.id}
+			renderItem={({ item, index }: any) => {
 				return (
-					<View key={item.id} style={styles.article_con}>
+					<View style={styles.article_con}>
 						<Pressable onPress={() => { }}>
 							<View style={styles.img_box}>
 								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.pic }} />
@@ -102,10 +102,47 @@ const ArticleList = React.memo(({ type, setListHeight }: any) => {
 								</View>
 							</View>
 						</Pressable>
-					</View >
+					</View>
 				)
-			})}
-		</ScrollView>
+			}}
+			ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
+		/>
+		// <ScrollView style={styles.container}
+		// 	scrollEnabled={false}
+		// 	onLayout={(e: any) => {
+		// 		setListHeight(e.nativeEvent.layout.height, type);
+		// 	}}
+		// 	onContentSizeChange={(w, h) => {
+		// 		setListHeight(h, type);
+		// 	}}
+		// >
+		// 	{(listdata && listdata.length > 0) && listdata.map((item: any, index: number) => {
+		// 		return (
+		// 			<View key={item.id} style={styles.article_con}>
+		// 				<Pressable onPress={() => { }}>
+		// 					<View style={styles.img_box}>
+		// 						<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.pic }} />
+		// 					</View>
+		// 					{item.title && <View style={styles.tit_content}>
+		// 						<Text style={styles.title2} numberOfLines={1}>{item.title}</Text>
+		// 						{/* <Text style={styles.title3}>{item.title3}</Text> */}
+		// 					</View>}
+		// 					{(item.desc && !item.title) && <Text style={styles.desc} numberOfLines={2}>{item.desc}</Text>}
+		// 					<View style={styles.icon_box}>
+		// 						<View style={styles.icon_con}>
+		// 							<Icon name="heart" size={16} color={theme.placeholder} />
+		// 							<Text style={styles.icon_text}>{item.favcnt}</Text>
+		// 						</View>
+		// 						<View style={styles.icon_con}>
+		// 							<Icon name="reply" size={17} color={theme.placeholder} />
+		// 							<Text style={styles.icon_text}>{item.replycnt}</Text>
+		// 						</View>
+		// 					</View>
+		// 				</Pressable>
+		// 			</View >
+		// 		)
+		// 	})}
+		// </ScrollView>
 	);
 })
 const styles = StyleSheet.create({
@@ -116,6 +153,7 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.toolbarbg,
 	},
 	article_con: {
+		flex: 1,
 		paddingHorizontal: 25,
 		paddingBottom: 20,
 	},

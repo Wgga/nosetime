@@ -6,6 +6,13 @@
   "description": "app专用",
   "glyphs": [
     {
+      "icon_id": "40708556",
+      "name": "reply2",
+      "font_class": "comment",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
       "icon_id": "40628207",
       "name": "leaf-outline",
       "font_class": "leaf-outline",
