@@ -260,9 +260,7 @@ const Home = React.memo(({ navigation }: any) => {
 							}
 						)
 					}
-					ListHeaderComponent={
-						<Header navigation={navigation} setSliderHeight={setSliderHeight} style={{ height: contentHeight }} />
-					}
+					ListHeaderComponent={<Header navigation={navigation} setSliderHeight={setSliderHeight} style={{ height: contentHeight }} />}
 					onEndReachedThreshold={0.1}
 					onEndReached={() => {
 						let type = routes[index].title;

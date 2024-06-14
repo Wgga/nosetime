@@ -24,10 +24,11 @@ function Route(): React.JSX.Element {
 		React.useCallback(() => {
 			// 监听路由变化改变状态栏颜色
 			const urlRegex = [
-				"ItemDetail",
-				"Login", "User", "UserJifen", "Lottery", "UserFav",
-				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
 				"Home", "Lottery",
+				"ItemDetail",
+				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
+				"SocialShequDetail",
+				"Login", "User", "UserJifen", "Lottery", "UserFav",
 			];
 			const unsubscribe = navigation.addListener("state", () => {
 				let isMatched = urlRegex.find((item) => { return item == navigation.getCurrentRoute().name });

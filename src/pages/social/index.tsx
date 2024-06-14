@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Animated } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated, TextInput } from "react-native";
 
 import { TabView, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -36,6 +36,11 @@ function Social({ navigation, route }: any): React.JSX.Element {
 	// 变量
 	const [index, setIndex] = React.useState(0);
 	let fids = React.useRef<string>("1234");
+	let flag = React.useRef<string>("new");
+	let tabbarH = React.useRef<number>(0);
+	let showfilter = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 滚动值
+	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
+	let headerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
 	// 数据
 	const [routes] = React.useState([
 		{ key: "new", title: "最新", text: "最新" },
@@ -45,9 +50,7 @@ function Social({ navigation, route }: any): React.JSX.Element {
 		{ key: "salon", title: "沙龙", text: "小众沙龙" },
 	]);
 	// 状态
-	let flag = React.useRef<string>("new");
-	let tabbarH = React.useRef<number>(0);
-	let showfilter = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 滚动值
+	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 	const [isShowfilter, setIsShowFilter] = React.useState<boolean>(false); // 是否渲染
 
@@ -106,11 +109,41 @@ function Social({ navigation, route }: any): React.JSX.Element {
 		});
 	}
 
+	const showHeaderView = (e: any) => {
+		if (e.nativeEvent.contentOffset.y > 208) {
+			if (isShowHeader.current) return;
+			isShowHeader.current = true;
+			Animated.timing(headerOpt, {
+				toValue: 1,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(headerZ, {
+				toValue: 1,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			if (!isShowHeader.current) return;
+			isShowHeader.current = false;
+			Animated.timing(headerOpt, {
+				toValue: 0,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(headerZ, {
+				toValue: -1,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+		}
+	}
+
 	return (
 		<GestureHandlerRootView>
 			<TabView navigationState={{ index, routes }}
 				renderScene={({ route }) => {
-					return <SocialShequ navigation={navigation} type={route.text} />;
+					return <SocialShequ navigation={navigation} type={route.text} showHeaderView={showHeaderView} />;
 				}}
 				renderTabBar={(props: any) => {
 					return (
@@ -118,7 +151,7 @@ function Social({ navigation, route }: any): React.JSX.Element {
 							{isShowfilter && <Pressable style={[Globalstyles.social_mask, { zIndex: 1 }]} onPress={() => {
 								events.publish("social_show_filter", false);
 							}}></Pressable>}
-							<View style={{ paddingTop: insets.top, backgroundColor: theme.toolbarbg, zIndex: 2 }} onLayout={(e) => {
+							<View style={{ zIndex: 2 }} onLayout={(e) => {
 								tabbarH.current = e.nativeEvent.layout.height;
 								setIsRender(val => !val);
 							}}>
@@ -144,8 +177,19 @@ function Social({ navigation, route }: any): React.JSX.Element {
 									indicatorStyle={{ backgroundColor: theme.tit, width: 20, height: 1, bottom: 7, left: ((width / 5 - 20) / 2) }}
 									android_ripple={{ color: "transparent" }}
 									indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-									style={{ backgroundColor: theme.toolbarbg, shadowColor: "transparent", zIndex: 2 }}
+									style={{ paddingTop: insets.top + 8, shadowColor: "transparent" }}
 								/>
+								<Animated.View style={[styles.search_con, { opacity: headerOpt, zIndex: headerZ }]}>
+									<Pressable onPress={() => {
+										// 跳转到搜索页面
+										navigation.navigate("Page", { screen: "Search", params: { from: "social" } });
+									}}>
+										<View style={[styles.searchbar, { marginTop: insets.top + 10 }]}>
+											<Text style={styles.placeholder}>搜索帖子</Text>
+											<Icon name="search" size={23} color="#adadad" style={{ marginRight: 13 }} />
+										</View>
+									</Pressable>
+								</Animated.View>
 							</View>
 							<Animated.View style={[styles.topic_con, { transform: [{ translateY: top }] }]}>
 								<Text style={styles.topic_title}>{"筛选最新话题显示"}</Text>
@@ -179,6 +223,28 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontFamily: "PingFang SC",
 		fontWeight: "500",
+	},
+	search_con: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		height: 80,
+		paddingHorizontal: 13,
+		backgroundColor: theme.toolbarbg,
+	},
+	searchbar: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		backgroundColor: theme.bg,
+		height: 37,
+		borderRadius: 30,
+		paddingLeft: 13,
+	},
+	placeholder: {
+		color: theme.placeholder2,
+		fontSize: 12,
 	},
 	topic_con: {
 		height: 80,

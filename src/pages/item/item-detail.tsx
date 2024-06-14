@@ -1075,35 +1075,35 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 							})
 							setShowMenu(val => !val);
 						}}>
-							<Icon style={styles.menu_icon} name="share2" size={13} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"分享"}</Text>
+							<Icon style={Globalstyles.menu_icon} name="share2" size={13} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"分享"}</Text>
 						</Pressable>
-						<Pressable style={styles.menu_icon_con} onPress={() => {
+						<Pressable style={[Globalstyles.menu_icon_con, styles.menu_icon_con]} onPress={() => {
 							gotodetail("MallItem")
 						}}>
-							<Icon style={styles.menu_icon} name="shopcart" size={15} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"去购买"}</Text>
+							<Icon style={Globalstyles.menu_icon} name="shopcart" size={15} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"去购买"}</Text>
 						</Pressable>
-						<Pressable style={styles.menu_icon_con} onPress={() => { gotovote() }}>
-							<Icon style={styles.menu_icon} name="edit" size={14} color={theme.tit2} />
-							{type2.current && <Text style={styles.menu_text}>{"编辑香评"}</Text>}
-							{!type2.current && <Text style={styles.menu_text}>{"写香评"}</Text>}
+						<Pressable style={[Globalstyles.menu_icon_con, styles.menu_icon_con]} onPress={() => { gotovote() }}>
+							<Icon style={Globalstyles.menu_icon} name="edit" size={14} color={theme.tit2} />
+							{type2.current && <Text style={Globalstyles.menu_text}>{"编辑香评"}</Text>}
+							{!type2.current && <Text style={Globalstyles.menu_text}>{"写香评"}</Text>}
 						</Pressable>
-						<Pressable style={styles.menu_icon_con} onPress={() => { }}>
-							<Icon style={styles.menu_icon} name="addlist" size={16} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"加入香单"}</Text>
+						<Pressable style={[Globalstyles.menu_icon_con, styles.menu_icon_con]} onPress={() => { }}>
+							<Icon style={Globalstyles.menu_icon} name="addlist" size={16} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"加入香单"}</Text>
 						</Pressable>
-						{issubscription_.current[id] && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
-							<Icon style={styles.menu_icon} name="star2-checked" size={16} color={theme.star} />
-							<Text style={styles.menu_text}>{"取消到货提醒"}</Text>
+						{issubscription_.current[id] && <Pressable style={[Globalstyles.menu_icon_con, styles.menu_icon_con]} onPress={() => { }}>
+							<Icon style={Globalstyles.menu_icon} name="star2-checked" size={16} color={theme.star} />
+							<Text style={Globalstyles.menu_text}>{"取消到货提醒"}</Text>
 						</Pressable>}
-						{(!issubscription_.current[id] && !itemdata.current.onsale) && <Pressable style={styles.menu_icon_con} onPress={() => { }}>
-							<Icon style={styles.menu_icon} name="star2" size={16} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"订阅到货提醒"}</Text>
+						{(!issubscription_.current[id] && !itemdata.current.onsale) && <Pressable style={[Globalstyles.menu_icon_con, styles.menu_icon_con]} onPress={() => { }}>
+							<Icon style={Globalstyles.menu_icon} name="star2" size={16} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"订阅到货提醒"}</Text>
 						</Pressable>}
-						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={() => { }}>
-							<Icon style={styles.menu_icon} name="cancelfav1" size={14} color={theme.tit2} />
-							<Text style={styles.menu_text}>{"删除红心标记"}</Text>
+						<Pressable style={[[Globalstyles.menu_icon_con, styles.menu_icon_con], Globalstyles.no_border_bottom]} onPress={() => { }}>
+							<Icon style={Globalstyles.menu_icon} name="cancelfav1" size={14} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"删除红心标记"}</Text>
 						</Pressable>
 					</>
 				)
@@ -1129,21 +1129,6 @@ const styles = StyleSheet.create({
 	menu_icon_con: {
 		paddingLeft: 10,
 		paddingVertical: 15,
-		alignItems: "center",
-		flexDirection: "row",
-		borderBottomWidth: 1,
-		borderBottomColor: theme.bg
-	},
-	no_border_bottom: {
-		borderBottomWidth: 0,
-	},
-	menu_icon: {
-		marginRight: 9,
-	},
-	menu_text: {
-		fontSize: 14,
-		color: theme.tit2,
-		marginRight: 15,
 	},
 	header_con: {
 		width: "100%",

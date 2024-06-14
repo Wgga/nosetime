@@ -1,5 +1,4 @@
 import ImagePicker from "react-native-image-crop-picker";
-import { Blurhash } from "react-native-blurhash";
 
 import ToastCtrl from "../../components/toastctrl";
 import AlertCtrl from "../../components/alertctrl";
@@ -62,13 +61,7 @@ class UploadPhotoService {
 	}
 
 	async emitavatar() {
-		let blurhash = "";
-		try {
-			blurhash = await Blurhash.encode(this.myImage, 4, 3);
-		} catch (e) {
-			blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
-		}
-		let params = { avatar: this.myImage, blurhash };
+		let params = { avatar: this.myImage };
 		events.publish("change_avatar", params);
 	}
 

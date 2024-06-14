@@ -1,7 +1,6 @@
 import { Platform } from "react-native";
 
 import DeviceInfo from "react-native-device-info";
-import { Blurhash } from "react-native-blurhash";
 
 import http from "../../utils/api/http";
 
@@ -84,12 +83,6 @@ class UserService {
 				this.gender = cacheobj;
 			}
 		}).catch(() => { });
-
-		cache.getItem(this.factoryname + "blurhash").then((cacheobj) => {
-			if (cacheobj) {
-				this.user.blurhash = cacheobj;
-			}
-		}).catch(() => {});
 
 		cache.getItem(this.factoryname + "mobile").then((cacheobj) => {
 			if (cacheobj) {
@@ -279,18 +272,7 @@ class UserService {
 		if (user.uid > 0) {
 			this.user = user;
 			cache.saveItem(this.factoryname + "user", this.user, 30 * 24 * 3600);
-			this.setblurhash(user);
 		}
-	}
-
-	// 设置用户头像模糊图
-	async setblurhash(user: any) {
-		try {
-			this.user.blurhash = await Blurhash.encode(ENV.avatar + user.uid + ".jpg?" + user.uface, 4, 3);
-		} catch (e) {
-			this.user.blurhash = "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
-		}
-		cache.saveItem(this.factoryname + "blurhash", this.user.blurhash, 30 * 24 * 3600);
 	}
 
 	delUser() {

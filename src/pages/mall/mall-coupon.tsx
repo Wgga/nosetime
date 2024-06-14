@@ -99,13 +99,13 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
+				<View style={[Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/couponbg.jpg")}
 					/>
 				</View>
 			</HeaderView>
-			<View style={styles.coupon_con}>
+			<View style={[styles.coupon_con, Globalstyles.list_content]}>
 				{isempty.current && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/coupon_blank.png")} />}
@@ -150,18 +150,9 @@ function MallCoupon({ navigation, route }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	header_bg: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		overflow: "hidden"
-	},
 	coupon_con: {
 		flex: 1,
 		backgroundColor: theme.bg,
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
 	},
 	coupon_list: {
 		paddingTop: 11,

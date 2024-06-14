@@ -230,22 +230,6 @@ const styles = StyleSheet.create({
 		},
 		zIndex: 2,
 	},
-	menu_icon_con: {
-		paddingLeft: 5,
-		paddingTop: 13,
-		paddingRight: 9,
-		paddingBottom: 12,
-		alignItems: "center",
-		flexDirection: "row",
-	},
-	menu_icon: {
-		marginRight: 9,
-	},
-	menu_text: {
-		fontSize: 14,
-		color: theme.tit2,
-		marginRight: 15,
-	},
 })
 
 export default HeaderView;

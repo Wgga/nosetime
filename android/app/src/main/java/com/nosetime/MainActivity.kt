@@ -30,7 +30,7 @@ class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState : Bundle?) {
       SplashScreen.show(this, R.style.SplashScreenTheme, true);
       super.onCreate(savedInstanceState);
-      WindowCompat.setDecorFitsSystemWindows(window, false)
+    //   WindowCompat.setDecorFitsSystemWindows(window, false)
   }
 
   override fun onConfigurationChanged(newConfig : Configuration) {

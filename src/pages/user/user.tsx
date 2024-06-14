@@ -4,7 +4,6 @@ import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Brightness } from "react-native-color-matrix-image-filters";
-import { Blurhash } from "react-native-blurhash";
 import { useFocusEffect } from "@react-navigation/native";
 import { ShadowedView } from "react-native-fast-shadow";
 
@@ -46,7 +45,6 @@ function User({ navigation }: any): React.JSX.Element {
 	// 变量
 	let pointval = React.useRef<number>(0); // 积分-
 	let avatar = React.useRef<string>(""); // 头像
-	let blurhash = React.useRef<string>(""); // 头像模糊图
 	let giftcode = React.useRef<string>("");
 	// 数据
 	let userinfo = React.useRef<any>({
@@ -68,7 +66,6 @@ function User({ navigation }: any): React.JSX.Element {
 		events.subscribe("change_avatar", (data: any) => {
 			if (data) {
 				avatar.current = data.avatar;
-				blurhash.current = data.blurhash;
 				setIsRender(val => !val);
 			}
 		})
@@ -88,9 +85,11 @@ function User({ navigation }: any): React.JSX.Element {
 				getmoredata("init");
 			}
 		}).catch(() => {
-			http.post(ENV.api + ENV.user, { method: "getsocialinfo", id: us.user.uid }).then((resp_data: any) => {
+			http.post(ENV.user, { method: "getsocialinfo", id: us.user.uid }).then((resp_data: any) => {
 				cache.saveItem(classname + us.user.uid, resp_data, 10);
-				userinfo.current = resp_data;
+				if (resp_data) {
+					userinfo.current = resp_data;
+				}
 				getmoredata("init");
 			})
 		});
@@ -118,7 +117,6 @@ function User({ navigation }: any): React.JSX.Element {
 			if (data.includes(0)) {
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App我的页面" } });
 			}
-			blurhash.current = us.user.blurhash ? us.user.blurhash : "LEHV6nWB2yk8pyo0adR*.7kCMdnj0";
 			setIsRender(val => !val);
 		})
 	}
@@ -264,36 +262,23 @@ function User({ navigation }: any): React.JSX.Element {
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
 				/>
-				{blurhash.current && <Blurhash style={styles.header_bg}
-					blurhash={blurhash.current}
-					decodeWidth={16}
-					decodeHeight={16}
-					decodePunch={1}
-					resizeMode="cover"
-					decodeAsync={true}
-				/>}
+				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
-			{userinfo.current && <View style={styles.user_info_con}>
+			<View style={styles.user_info_con}>
 				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
 					<Pressable onPress={changeAvatar}>
 						<Image style={styles.user_avatar}
+							defaultSource={require("../../assets/images/default_avatar.png")}
 							source={{ uri: avatar.current ? avatar.current : ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
 						/>
 					</Pressable>
 					<View>
-						<Text style={styles.user_name}>{userinfo.current.uname}</Text>
-						<Text style={styles.user_days}>{"已入住 " + userinfo.current.days + "，记录了 " + userinfo.current.all + " 款香水"}</Text>
+						<Text style={styles.user_name}>{userinfo.current.uname ? userinfo.current.uname : "未设置"}</Text>
+						<Text style={styles.user_days}>{"已入住 " + (userinfo.current.days ? userinfo.current.days : "0 天") + "，记录了 " + (userinfo.current.all ? userinfo.current.all : "0") + " 款香水"}</Text>
 					</View>
 				</View>
 				<Brightness amount={0.85} style={styles.user_page_con}>
-					{blurhash.current && <Blurhash style={styles.user_page_bg}
-						blurhash={blurhash.current}
-						decodeWidth={16}
-						decodeHeight={16}
-						decodePunch={1}
-						resizeMode="cover"
-						decodeAsync={true}
-					/>}
+					<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 					<Image style={styles.user_page_msk}
 						source={require("../../assets/images/user/userpage.png")}
 					/>
@@ -365,7 +350,7 @@ function User({ navigation }: any): React.JSX.Element {
 						</Pressable>
 					</View>
 				</View>
-			</View>}
+			</View>
 		</ScrollView>
 	);
 }

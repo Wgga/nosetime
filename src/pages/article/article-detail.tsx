@@ -21,6 +21,7 @@ import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -196,7 +197,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
-	let footerZ = React.useRef(new Animated.Value(0)).current; // 底部层级动画
+	let footerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
 	// 数据
 	let articledata = React.useRef<any>({}); // 文章数据
 	let replydata = React.useRef<any>({}); // 评论数据
@@ -328,7 +329,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				useNativeDriver: true,
 			}).start();
 			Animated.timing(footerZ, {
-				toValue: 200,
+				toValue: 1,
 				duration: 200,
 				useNativeDriver: true,
 			}).start();
@@ -371,6 +372,10 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 		});
 	}
 
+	const unitNumber = (number: number) => {
+		return articleService.unitNumber(number, 1);
+	}
+
 	return (
 		<>
 			{loading && <View style={[styles.loading_con, isfull && styles.hide_view]}>
@@ -400,7 +405,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 			}} MenuChildren={() => {
 				return (
 					<>
-						<Pressable style={styles.menu_icon_con} onPress={() => {
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
 							ModalPortal.show((
 								<SharePopover />
 							), {
@@ -424,12 +429,13 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 							})
 							setShowMenu(val => !val);
 						}}>
-							<Icon style={styles.menu_icon} name="share2" size={14} color={theme.text1} />
-							<Text style={styles.menu_text}>{"分享"}</Text>
+							<Icon style={Globalstyles.menu_icon} name="share2" size={14} color={theme.text1} />
+							<Text style={Globalstyles.menu_text}>{"分享"}</Text>
 						</Pressable>
-						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={favarticle}>
-							{likelist.current[id] ? <Icon style={styles.menu_icon} name="heart-checked" size={16} color={theme.redchecked} /> : <Icon style={styles.menu_icon} name="heart" size={16} color={theme.text1} />}
-							<Text style={styles.menu_text}>{"收藏"}</Text>
+						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={favarticle}>
+							<Icon style={Globalstyles.menu_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={14}
+								color={likelist.current[id] ? theme.redchecked : theme.text1} />
+							<Text style={Globalstyles.menu_text}>{"收藏"}</Text>
 						</Pressable>
 					</>
 				)
@@ -455,13 +461,12 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 						getArticleReply();
 					}
 				}}
-				ListHeaderComponent={
-					<>
-						{articledata.current.mp4URL && <VideoPlayer
-							source={articledata.current.mp4URL}
-							poster={articledata.current.picURL}
-							classname={classname + id}>
-							{/* <Animated.View style={[
+				ListHeaderComponent={<>
+					{articledata.current.mp4URL && <VideoPlayer
+						source={articledata.current.mp4URL}
+						poster={articledata.current.picURL}
+						classname={classname + id}>
+						{/* <Animated.View style={[
 								styles.video_ripple,
 								{
 									transform: [
@@ -478,10 +483,9 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 									}),
 								},
 							]} /> */}
-						</VideoPlayer>}
-						<HeaderWebView articleid={id} style={isfull && styles.hide_view} />
-					</>
-				}
+					</VideoPlayer>}
+					<HeaderWebView articleid={id} style={isfull && styles.hide_view} />
+				</>}
 				contentContainerStyle={styles.flatlist_con}
 				removeClippedSubviews={true}
 				renderItem={({ item, index }: any) => {
@@ -548,17 +552,21 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 				/>}
 			/>
 			{isfocus && <Pressable style={[styles.bgmsk, isfull && styles.hide_view]} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
-			<FooterView
-				data={{ placeholder: "快快告诉我，你在想什么", replytext, opacity: footerOpt, zIndex: footerZ, style: isfull && styles.hide_view }}
-				method={{ setReplyText }}>
+			<FooterView data={{
+				placeholder: "快快告诉我，你在想什么", replytext,
+				opacity: footerOpt, zIndex: !isfocus ? footerZ : 200,
+				style: isfull && styles.hide_view
+			}} method={{ setReplyText }}>
 				{!isfocus && <View style={styles.footer_icon_con}>
 					<View style={styles.footer_icon}>
 						<Icon name="reply" size={16} color={theme.fav} />
-						<Text style={styles.footer_text}>{articledata.current.replycnt}</Text>
+						{articledata.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.replycnt)}</Text>}
 					</View>
 					<View style={styles.footer_icon}>
-						{likelist.current[id] ? <Icon name="heart-checked" size={16} color={theme.redchecked} /> : <Icon name="heart" size={16} color={theme.fav} />}
-						<Text style={styles.footer_text}>{articledata.current.favcnt}</Text>
+						<Icon name={likelist.current[id] ? "heart-checked" : "heart"}
+							size={16} color={likelist.current[id] ? theme.redchecked : theme.fav}
+						/>
+						{articledata.current.favcnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.favcnt)}</Text>}
 					</View>
 					<Icon name="share2" size={14} color={theme.fav} />
 				</View>}
@@ -808,27 +816,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		lineHeight: 44,
 	},
-	menu_icon_con: {
-		paddingLeft: 5,
-		paddingVertical: 13,
-		paddingRight: 9,
-		alignItems: "center",
-		flexDirection: "row",
-		borderBottomWidth: 1,
-		borderBottomColor: theme.bg
-	},
-	no_border_bottom: {
-		borderBottomWidth: 0,
-	},
-	menu_icon: {
-		marginRight: 9,
-		marginTop: 2,
-	},
-	menu_text: {
-		fontSize: 14,
-		color: theme.tit2,
-		marginRight: 15,
-	},
+
 	footer_icon_con: {
 		flexDirection: "row",
 		alignItems: "center",

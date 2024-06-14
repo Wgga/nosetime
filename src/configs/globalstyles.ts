@@ -163,10 +163,12 @@ const Globalstyles: any = StyleSheet.create({
 	level_top_80: {
 		top: -80,
 	},
+	// 空页面
 	emptyimg: {
 		width: "100%",
 		height: 500,
 	},
+	// 容器样式
 	container: {
 		flex: 1,
 		backgroundColor: theme.toolbarbg,
@@ -184,7 +186,45 @@ const Globalstyles: any = StyleSheet.create({
 		...StyleSheet.absoluteFillObject,
 		zIndex: 1,
 		backgroundColor: "rgba(0,0,0,0.5)"
-	}
+	},
+	// 头部图片背景
+	header_bg: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		overflow: "hidden"
+	},
+	// 右上角菜单
+	menu_icon_con: {
+		paddingLeft: 5,
+		paddingVertical: 13,
+		paddingRight: 9,
+		alignItems: "center",
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		borderBottomColor: theme.bg
+	},
+	no_border_bottom: {
+		borderBottomWidth: 0,
+	},
+	no_border_right: {
+		borderRightWidth: 0,
+	},
+	menu_icon: {
+		marginRight: 9,
+		marginTop: 2,
+	},
+	menu_text: {
+		fontSize: 14,
+		color: theme.tit2,
+		marginRight: 15,
+	},
+	list_content: {
+		borderTopLeftRadius: 15,
+		borderTopRightRadius: 15,
+		overflow: "hidden",
+	},
 });
 
 export { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, handlereplystarLeft };

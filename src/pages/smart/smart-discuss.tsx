@@ -101,50 +101,48 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 			{(smartlist.current && smartlist.current.length > 0) && <FlashList data={smartlist.current}
 				extraData={isrender}
 				estimatedItemSize={100}
-				onEndReached={()=>{
+				onEndReached={() => {
 					smartService.fetch(word.current, us.user.uid, "loadMore");
 				}}
 				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 				keyExtractor={(item: any) => item.id + "_" + item.uid}
-				ListHeaderComponent={(
-					<View style={Globalstyles.container}>
-						<Pressable onPress={() => {
-							gotodetail("Talent");
-						}} style={[styles.like_con, styles.flex_row]}>
-							<Text style={styles.flex_row_tit}>{"资深评论家"}</Text>
-							<View style={styles.flex_row}>
-								{(talentTop.current && talentTop.current.length > 0) && talentTop.current.map((item: any, index: number) => {
-									return (
-										<Image key={item.uid} style={styles.like_avatar} defaultSource={require("../../assets/images/default_avatar.png")}
-											source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
-										/>
-									);
-								})}
-								<Icon name="r-return" size={15} color={theme.tit2} />
-							</View>
-						</Pressable>
-						<Pressable onPress={() => {
-							gotodetail("PerfumeListSquare");
-						}} style={[styles.perfume_tit_con, styles.flex_row]}>
-							<Text style={styles.flex_row_tit}>{"香单广场"}</Text>
-							<Icon name="r-return" size={15} color={theme.tit2} />
-						</Pressable>
-						<View style={styles.perfume_list_con}>
-							{(perfumelist.current && perfumelist.current.length > 0) && perfumelist.current.map((item: any, index: number) => {
+				ListHeaderComponent={<View style={Globalstyles.container}>
+					<Pressable onPress={() => {
+						gotodetail("Talent");
+					}} style={[styles.like_con, styles.flex_row]}>
+						<Text style={styles.flex_row_tit}>{"资深评论家"}</Text>
+						<View style={styles.flex_row}>
+							{(talentTop.current && talentTop.current.length > 0) && talentTop.current.map((item: any, index: number) => {
 								return (
-									<View key={item.cid} style={[styles.perfume_item, { marginRight: (index + 1) % 3 == 0 ? 0 : 10 }]}>
-										<Image style={styles.perfume_item_img} defaultSource={require("../../assets/images/nopic.png")}
-											source={{ uri: ENV.image + item.cpic + "!l" }}
-										/>
-										<Text numberOfLines={2} style={styles.perfume_item_desc}>{item.cname}</Text>
-									</View>
-								)
+									<Image key={item.uid} style={styles.like_avatar} defaultSource={require("../../assets/images/default_avatar.png")}
+										source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
+									/>
+								);
 							})}
+							<Icon name="r-return" size={15} color={theme.tit2} />
 						</View>
+					</Pressable>
+					<Pressable onPress={() => {
+						gotodetail("PerfumeListSquare");
+					}} style={[styles.perfume_tit_con, styles.flex_row]}>
+						<Text style={styles.flex_row_tit}>{"香单广场"}</Text>
+						<Icon name="r-return" size={15} color={theme.tit2} />
+					</Pressable>
+					<View style={styles.perfume_list_con}>
+						{(perfumelist.current && perfumelist.current.length > 0) && perfumelist.current.map((item: any, index: number) => {
+							return (
+								<View key={item.cid} style={[styles.perfume_item, { marginRight: (index + 1) % 3 == 0 ? 0 : 10 }]}>
+									<Image style={styles.perfume_item_img} defaultSource={require("../../assets/images/nopic.png")}
+										source={{ uri: ENV.image + item.cpic + "!l" }}
+									/>
+									<Text numberOfLines={2} style={styles.perfume_item_desc}>{item.cname}</Text>
+								</View>
+							)
+						})}
 					</View>
-				)}
+				</View>}
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.smartlist_item_con}>

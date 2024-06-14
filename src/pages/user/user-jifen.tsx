@@ -192,24 +192,24 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 			}} MenuChildren={() => {
 				return (
 					<>
-						<Pressable style={styles.menu_icon_con} onPress={() => {
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
 							navigation.navigate("Page", { screen: "Protocol", params: { title: "积分规则", type: "jfrule" } })
 							setShowMenu(val => !val);
 						}}>
-							<Icon style={styles.menu_icon} name="jfrule" size={17} color={theme.text1} />
-							<Text style={styles.menu_text}>{"积分规则"}</Text>
+							<Icon style={Globalstyles.menu_icon} name="jfrule" size={17} color={theme.text1} />
+							<Text style={Globalstyles.menu_text}>{"积分规则"}</Text>
 						</Pressable>
-						<Pressable style={[styles.menu_icon_con, styles.no_border_bottom]} onPress={() => {
+						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={() => {
 							navigation.navigate("Page", { screen: "MallCoupon" });
 							setShowMenu(val => !val);
 						}}>
-							<Icon style={styles.menu_icon} name="coupon" size={16} color={theme.text1} />
-							<Text style={styles.menu_text}>{"我的优惠券"}</Text>
+							<Icon style={Globalstyles.menu_icon} name="coupon" size={16} color={theme.text1} />
+							<Text style={Globalstyles.menu_text}>{"我的优惠券"}</Text>
 						</Pressable>
 					</>
 				)
 			}}>
-				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
+				<View style={[styles.header_bg, Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/jfmallbg.jpg")}
 					/>
@@ -225,7 +225,7 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>
-			<View style={styles.points_con}>
+			<View style={[Globalstyles.list_content, Globalstyles.container]}>
 				<FlatList data={list.current}
 					initialNumToRender={10}
 					numColumns={2}
@@ -233,38 +233,34 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 					keyExtractor={(item: any) => item.name}
 					contentContainerStyle={styles.points_list}
 					onScroll={toggleHeaderView}
-					ListHeaderComponent={() => {
-						return (
-							<>
-								<View style={styles.points_header}>
-									<View style={styles.points_num_con} onLayout={(e: any) => {
-										headerHeight.current = e.nativeEvent.layout.height;
-									}}>
-										<Text style={styles.points_num}>{points.current}</Text>
-										<Icon name="diamond" size={14} color={theme.primary} />
-										<Text style={styles.points_num_text}>{"可用积分"}</Text>
+					ListHeaderComponent={<>
+						<View style={styles.points_header}>
+							<View style={styles.points_num_con} onLayout={(e: any) => {
+								headerHeight.current = e.nativeEvent.layout.height;
+							}}>
+								<Text style={styles.points_num}>{points.current}</Text>
+								<Icon name="diamond" size={14} color={theme.primary} />
+								<Text style={styles.points_num_text}>{"可用积分"}</Text>
+							</View>
+							<Pressable onPress={() => { exchange(lottery.current) }} style={styles.lottery_con}>
+								<Image style={styles.lottery_img}
+									source={require("../../assets/images/jifen/lotterybg.png")}
+								/>
+								<View style={styles.lottery_btn_con}>
+									<Text style={styles.lottery_name}>{lottery.current.name}</Text>
+									<View style={[styles.lottery_btn, points.current < lottery.current.point && styles.point_lack]}>
+										<Text style={[styles.lottery_btn_text, points.current < lottery.current.point && styles.point_lack_color]}>{lottery.current.point}</Text>
+										<Icon name="diamond" size={14} color={points.current < lottery.current.point ? "#BCBCBC" : "#7980B1"} />
 									</View>
-									<Pressable onPress={() => { exchange(lottery.current) }} style={styles.lottery_con}>
-										<Image style={styles.lottery_img}
-											source={require("../../assets/images/jifen/lotterybg.png")}
-										/>
-										<View style={styles.lottery_btn_con}>
-											<Text style={styles.lottery_name}>{lottery.current.name}</Text>
-											<View style={[styles.lottery_btn, points.current < lottery.current.point && styles.point_lack]}>
-												<Text style={[styles.lottery_btn_text, points.current < lottery.current.point && styles.point_lack_color]}>{lottery.current.point}</Text>
-												<Icon name="diamond" size={14} color={points.current < lottery.current.point ? "#BCBCBC" : "#7980B1"} />
-											</View>
-										</View>
-									</Pressable>
 								</View>
-								<Text style={styles.list_title}>{"今日好物"}</Text>
-							</>
-						)
-					}}
+							</Pressable>
+						</View>
+						<Text style={styles.list_title}>{"今日好物"}</Text>
+					</>}
 					columnWrapperStyle={{ backgroundColor: theme.toolbarbg }}
 					renderItem={({ item, index }: any) => {
 						return (
-							<View style={[styles.list_item, (index + 1) % 2 == 0 && styles.no_border_right]}>
+							<View style={[styles.list_item, (index + 1) % 2 == 0 && Globalstyles.no_border_right]}>
 								{item.type == 2 && <View>
 									<Image style={styles.coupon_img}
 										source={require("../../assets/images/coupon/jfcoupon.png")}
@@ -324,13 +320,8 @@ const styles = StyleSheet.create({
 		color: theme.toolbarbg,
 	},
 	header_bg: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
 		height: 90,
 		zIndex: 0,
-		overflow: "hidden"
 	},
 	title_icon: {
 		width: 44,
@@ -338,35 +329,8 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		lineHeight: 44,
 	},
-	menu_icon_con: {
-		paddingLeft: 5,
-		paddingVertical: 13,
-		paddingRight: 9,
-		alignItems: "center",
-		flexDirection: "row",
-		borderBottomWidth: 1,
-		borderBottomColor: theme.bg
-	},
-	no_border_bottom: {
-		borderBottomWidth: 0,
-	},
-	no_border_right: {
-		borderRightWidth: 0,
-	},
-	menu_icon: {
-		marginRight: 9,
-		marginTop: 2,
-	},
-	menu_text: {
-		fontSize: 14,
-		color: theme.tit2,
-		marginRight: 15,
-	},
 	points_con: {
 		flex: 1,
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		overflow: "hidden",
 	},
 	emptyimg: {
 		width: "100%",

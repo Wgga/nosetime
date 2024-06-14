@@ -8,6 +8,7 @@ import WebView from "react-native-webview";
 import { ModalPortal } from "../modals";
 
 import theme from "../../configs/theme";
+import { Globalstyles } from "../../configs/globalstyles";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,7 +41,7 @@ function RulesPopover({ modalparams }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<View style={styles.rules_con}>
+		<View style={[styles.rules_con, Globalstyles.list_content]}>
 			<Text style={styles.rules_title}>{rulesdata.title}</Text>
 			<WebView
 				originWhitelist={["*"]}
@@ -68,9 +69,6 @@ function RulesPopover({ modalparams }: any): React.JSX.Element {
 const styles = StyleSheet.create({
 	rules_con: {
 		height: height * 0.61,
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		overflow: "hidden",
 		backgroundColor: theme.toolbarbg,
 	},
 	rules_title: {

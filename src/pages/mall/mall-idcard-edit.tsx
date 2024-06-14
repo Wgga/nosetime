@@ -31,8 +31,8 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 	let imgbage = React.useRef<string>("https://img.xssdcdn.com/static/mall/idcard/imgbage.jpg");
 	let pictype = React.useRef<string>("");
 	// 参数
-	const defultimagface = "https://img.xssdcdn.com/static/mall/idcard/imgface.jpg";
-	const defultimagbage = "https://img.xssdcdn.com/static/mall/idcard/imgbage.jpg";
+	const defaultimagface = "https://img.xssdcdn.com/static/mall/idcard/imgface.jpg";
+	const defaultimagbage = "https://img.xssdcdn.com/static/mall/idcard/imgbage.jpg";
 	const classname = "MallIdcardEditPage";
 	// 数据
 	let idcard = React.useRef<any>({
@@ -305,24 +305,24 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.idcard_con}>
 				<View style={styles.idcard_img_item}>
 					<Image style={styles.idcard_img}
-						defaultSource={{ uri: defultimagface }}
+						defaultSource={{ uri: defaultimagface }}
 						source={{ uri: imgface.current }}
 					/>
 					<Pressable onPress={() => { openfiledlg("face") }} style={styles.idcard_btn}>
 						<Icon name="add" size={35} color={theme.placeholder} style={styles.idcard_btn_icon} />
-						{imgface.current == defultimagface && <Text>{"上传身份证姓名面照片"}</Text>}
-						{imgface.current != defultimagface && <Text>{"重新上传姓名面照片"}</Text>}
+						{imgface.current == defaultimagface && <Text>{"上传身份证姓名面照片"}</Text>}
+						{imgface.current != defaultimagface && <Text>{"重新上传姓名面照片"}</Text>}
 					</Pressable>
 				</View>
 				<View style={styles.idcard_img_item}>
 					<Image style={styles.idcard_img}
-						defaultSource={{ uri: defultimagbage }}
+						defaultSource={{ uri: defaultimagbage }}
 						source={{ uri: imgbage.current }}
 					/>
 					<Pressable onPress={() => { openfiledlg("bage") }} style={styles.idcard_btn}>
 						<Icon name="add" size={35} color={theme.placeholder} style={styles.idcard_btn_icon} />
-						{imgbage.current == defultimagbage && <Text>{"上传身份证国徽面照片"}</Text>}
-						{imgbage.current != defultimagbage && <Text>{"重新上传国徽面照片"}</Text>}
+						{imgbage.current == defaultimagbage && <Text>{"上传身份证国徽面照片"}</Text>}
+						{imgbage.current != defaultimagbage && <Text>{"重新上传国徽面照片"}</Text>}
 					</Pressable>
 				</View>
 				<View style={styles.idcard_input_con}>

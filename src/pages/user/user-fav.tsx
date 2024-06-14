@@ -460,7 +460,7 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
+				<View style={[Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/likebg.jpg")}
 					/>
@@ -513,13 +513,6 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 })
 
 const styles = StyleSheet.create({
-	header_bg: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		overflow: "hidden"
-	},
 	tabbar_con: {
 		flexDirection: "row",
 		alignItems: "baseline",

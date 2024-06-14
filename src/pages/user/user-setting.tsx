@@ -4,7 +4,6 @@ import { ScrollView as RNScrollView, View, Text, StyleSheet, Pressable, Dimensio
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LinearGradient from "react-native-linear-gradient";
-import { Blurhash } from "react-native-blurhash";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { ShadowedView } from "react-native-fast-shadow";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
@@ -775,14 +774,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
 				/>
-				<Blurhash style={styles.header_bg}
-					blurhash={us.user.blurhash}
-					decodeWidth={32}
-					decodeHeight={32}
-					decodePunch={1}
-					resizeMode="cover"
-					decodeAsync={true}
-				/>
+				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
 			<View style={[styles.setting_header, { paddingTop: insets.top ? insets.top + 30 : 55 }]}>
 				<Pressable onPress={changeAvatar}>

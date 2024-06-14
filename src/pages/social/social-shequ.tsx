@@ -24,7 +24,7 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-const SocialShequ = React.memo(({ navigation, type }: any) => {
+const SocialShequ = React.memo(({ navigation, type, showHeaderView }: any) => {
 
 	// 控件
 	const classname = "SocialShequPage";
@@ -58,7 +58,7 @@ const SocialShequ = React.memo(({ navigation, type }: any) => {
 		});
 
 		events.subscribe("social_shequ_fecth_new", () => {
-			if (currentword.current == "最新"){
+			if (currentword.current == "最新") {
 				shequService.fetch(currentword.current, 1);
 			}
 		});
@@ -93,61 +93,67 @@ const SocialShequ = React.memo(({ navigation, type }: any) => {
 			extraData={isrender}
 			estimatedItemSize={100}
 			onEndReached={() => {
-				shequService.fetch(currentword.current, 0);
+				if (items.current.length > 0) {
+					shequService.fetch(currentword.current, 0);
+				}
 			}}
 			onEndReachedThreshold={0.1}
 			showsVerticalScrollIndicator={false}
 			contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 			keyExtractor={(item: any) => item.id}
+			onScroll={(e: any) => {
+				if (currentword.current != "最新") return;
+				showHeaderView(e);
+			}}
 			refreshing={false}
 			onRefresh={() => {
 				setTimeout(() => {
 					shequService.fetch(currentword.current, 1);
 				}, 500)
 			}}
-			ListHeaderComponent={(
-				<>
-					{currentword.current == "最新" &&
-						<View style={styles.slides_container}>
-							<Carousel ref={slidesref}
-								width={width}
-								data={banners.current}
-								defaultIndex={0}
-								autoPlayInterval={3000}
-								scrollAnimationDuration={500}
-								autoPlay={false}
-								autoFillData
-								panGestureHandlerProps={{
-									activeOffsetX: [-10, 10],
-								}}
-								onSnapToItem={(index: number) => {
-									setSlidesIndex(index);
-								}}
-								renderItem={({ item, index }: any) => (
-									<LongPressGestureHandler>
-										<Pressable key={item.code} onPress={() => {
-										}}>
-											<View style={styles.slides_container}>
-												<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.ctimg }} />
-												<View style={styles.slides_title_box}>
-													<Text style={styles.slides_title} numberOfLines={1}>{item.cttitle}</Text>
-												</View>
+			ListHeaderComponent={<>
+				{currentword.current == "最新" &&
+					<View style={styles.slides_container}>
+						<Carousel ref={slidesref}
+							width={width}
+							data={banners.current}
+							defaultIndex={0}
+							autoPlayInterval={3000}
+							scrollAnimationDuration={500}
+							autoPlay={true}
+							autoFillData
+							panGestureHandlerProps={{
+								activeOffsetX: [-10, 10],
+							}}
+							onSnapToItem={(index: number) => {
+								setSlidesIndex(index);
+							}}
+							renderItem={({ item, index }: any) => (
+								<LongPressGestureHandler>
+									<Pressable key={item.code} onPress={() => {
+									}}>
+										<View style={styles.slides_container}>
+											<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + item.ctimg }} />
+											<View style={styles.slides_title_box}>
+												<Text style={styles.slides_title} numberOfLines={1}>{item.cttitle}</Text>
 											</View>
-										</Pressable>
-									</LongPressGestureHandler>
-								)}
-							/>
-							<View style={styles.indicatorContainer}>
-								{banners.current.map((item: any, index: number) => (
-									<View key={item.id} style={[styles.dotstyle, { opacity: index === slidesIndex ? 1 : 0.2 }]}></View>
-								))}
-							</View>
-						</View>}
-				</>
-			)}
+										</View>
+									</Pressable>
+								</LongPressGestureHandler>
+							)}
+						/>
+						<View style={styles.indicatorContainer}>
+							{banners.current.map((item: any, index: number) => (
+								<View key={item.id} style={[styles.dotstyle, { opacity: index === slidesIndex ? 1 : 0.2 }]}></View>
+							))}
+						</View>
+					</View>}
+			</>}
 			renderItem={({ item, index }: any) => {
 				return (
-					<View style={styles.list_item}>
+					<Pressable style={styles.list_item} onPress={() => {
+						navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.id, ctdlgid: item.dlgid } });
+					}}>
 						<Text numberOfLines={1} style={styles.item_title}>{item.title}</Text>
 						<View style={styles.item_info}>
 							<View style={styles.item_flex}>
@@ -161,7 +167,7 @@ const SocialShequ = React.memo(({ navigation, type }: any) => {
 								<Icon name="reply2" size={18} color={theme.comment} />
 							</View>
 						</View>
-					</View>
+					</Pressable>
 				)
 			}}
 			ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}

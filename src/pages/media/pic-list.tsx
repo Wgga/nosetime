@@ -164,27 +164,25 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 				numColumns={3}
 				showsVerticalScrollIndicator={false}
 				columnWrapperStyle={styles.photolist_item_con}
-				ListHeaderComponent={(
-					<>
-						{(vodlist.current && vodlist.current.length > 0) && <View style={styles.vodlist_con}>
-							{vodlist.current.map((item: any, index: number) => {
-								return (
-									<View key={item.mid} style={styles.vodlist_item}>
-										<View style={styles.item_image_con}>
-											<FastImage style={styles.item_image} source={{ uri: item.vpicurl }} />
-											<Image style={styles.triangle}
-												source={require("../../assets/images/player/play.png")}
-												resizeMode="cover"
-											/>
-										</View>
-										<Text numberOfLines={1} style={styles.item_main_name}>{item.main_name}</Text>
-										<Text numberOfLines={1} style={styles.item_sub_name}>{item.sub_name}</Text>
+				ListHeaderComponent={<>
+					{(vodlist.current && vodlist.current.length > 0) && <View style={styles.vodlist_con}>
+						{vodlist.current.map((item: any, index: number) => {
+							return (
+								<View key={item.mid} style={styles.vodlist_item}>
+									<View style={styles.item_image_con}>
+										<FastImage style={styles.item_image} source={{ uri: item.vpicurl }} />
+										<Image style={styles.triangle}
+											source={require("../../assets/images/player/play.png")}
+											resizeMode="cover"
+										/>
 									</View>
-								)
-							})}
-						</View>}
-					</>
-				)}
+									<Text numberOfLines={1} style={styles.item_main_name}>{item.main_name}</Text>
+									<Text numberOfLines={1} style={styles.item_sub_name}>{item.sub_name}</Text>
+								</View>
+							)
+						})}
+					</View>}
+				</>}
 				onEndReachedThreshold={0.1}
 				onEndReached={loadMore}
 				renderItem={({ item, index }: any) => {

@@ -110,7 +110,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<View style={[styles.header_bg, { height: 90 + insets.top }]}>
+				<View style={[Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Image style={{ width: "100%", height: "100%" }}
 						source={require("../../assets/images/headbgpage/wishlistbg.jpg")}
 					/>
@@ -128,7 +128,7 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
-			<View style={[styles.wishlist_con, Globalstyles.container]}>
+			<View style={[Globalstyles.list_content, Globalstyles.container]}>
 				{(wishlist_isempty.current && tab == "wishlist") && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
 					source={require("../../assets/images/empty/wishlist_blank.png")} />}
@@ -190,13 +190,6 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	header_bg: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		overflow: "hidden"
-	},
 	wishlist_title: {
 		flex: 1,
 		height: 44,
@@ -217,11 +210,6 @@ const styles = StyleSheet.create({
 	title_text: {
 		fontSize: 13,
 		color: theme.toolbarbg,
-	},
-	wishlist_con: {
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		overflow: "hidden",
 	},
 	right_btn_con: {
 		width: "100%",

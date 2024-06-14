@@ -158,112 +158,110 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 				keyExtractor={(item: any) => item.id}
-				ListHeaderComponent={(
-					<>
-						<View style={styles.header_img_con}>
-							{wikilist.current.map((item: any, index: number) => {
-								let SkewViewW = 0;
-								if (index == 1) {
-									SkewViewW = width * 0.35;
-								} else if (index == 2) {
-									SkewViewW = width * 0.32;
-								} else if (index == 3) {
-									SkewViewW = width * 0.38;
-								} else {
-									SkewViewW = width * 0.27;
-								}
-								return (
-									<SkewableView
-										key={index}
-										skewDirection={"horizontal-right"}
-										style={[
-											styles.header_img,
-											index == 1 && { left: width * 0.19, zIndex: 6 },
-											index == 2 && { left: width * 0.47, zIndex: 8 },
-											index == 3 && { left: width * 0.71, zIndex: 2 },
-										]}
-										skewValue={index == 0 ? 0 : 10}
-										skewUnits={"deg"}
-										boundingBoxWidth={SkewViewW}
-										boundingBoxHeight={width / 3.2}>
-										<Pressable onPress={() => {
-											clicktab(item.text);
-										}} style={[{
-											width: SkewViewW,
-											height: width / 3.2,
-											justifyContent: "flex-end",
-										}]}>
-											{current_index.current == index && <View style={styles.image_con}>
-												<Image
-													style={{ width: "100%", height: "100%" }}
-													defaultSource={require("../../assets/images/nopic.png")}
-													source={item.img}
-												/>
-											</View>}
-											{(current_index.current != index) && <Grayscale style={styles.image_con}>
-												<Image
-													style={{ width: "100%", height: "100%" }}
-													defaultSource={require("../../assets/images/nopic.png")}
-													source={item.img}
-												/>
-											</Grayscale>}
-											<Text style={[
-												styles.header_img_tit,
-												index == 0 && { left: SkewViewW * 0.22 },
-												index == 1 && { left: SkewViewW * 0.37 },
-												index == 2 && { left: SkewViewW * 0.26 },
-												index == 3 && { left: SkewViewW * 0.32 }
-											]}>{item.tit}</Text>
-											{(current_index.current != index) && <View style={styles.header_img_msk}></View>}
-										</Pressable>
-									</SkewableView>
-								)
-							})}
-						</View>
-						{current_index.current != 3 && <Pressable onPress={() => {
-							gotodetail("user-fav", wikilist.current[current_index.current])
-						}} style={[styles.like_con, styles.flex_row]}>
-							<Text style={styles.flex_row_tit}>{"我喜欢的" + wikilist.current[current_index.current].tit}</Text>
-							<View style={styles.flex_row}>
-								{(favs.current[current_tab.current] && favs.current[current_tab.current].length > 0) && favs.current[current_tab.current].map((item: any, index: number) => {
-									return (
-										<View key={item.id}>
-											{current_tab.current == "brand" && <Image style={styles.like_avatar}
+				ListHeaderComponent={<>
+					<View style={styles.header_img_con}>
+						{wikilist.current.map((item: any, index: number) => {
+							let SkewViewW = 0;
+							if (index == 1) {
+								SkewViewW = width * 0.35;
+							} else if (index == 2) {
+								SkewViewW = width * 0.32;
+							} else if (index == 3) {
+								SkewViewW = width * 0.38;
+							} else {
+								SkewViewW = width * 0.27;
+							}
+							return (
+								<SkewableView
+									key={index}
+									skewDirection={"horizontal-right"}
+									style={[
+										styles.header_img,
+										index == 1 && { left: width * 0.19, zIndex: 6 },
+										index == 2 && { left: width * 0.47, zIndex: 8 },
+										index == 3 && { left: width * 0.71, zIndex: 2 },
+									]}
+									skewValue={index == 0 ? 0 : 10}
+									skewUnits={"deg"}
+									boundingBoxWidth={SkewViewW}
+									boundingBoxHeight={width / 3.2}>
+									<Pressable onPress={() => {
+										clicktab(item.text);
+									}} style={[{
+										width: SkewViewW,
+										height: width / 3.2,
+										justifyContent: "flex-end",
+									}]}>
+										{current_index.current == index && <View style={styles.image_con}>
+											<Image
+												style={{ width: "100%", height: "100%" }}
 												defaultSource={require("../../assets/images/nopic.png")}
-												source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }}
-												resizeMode="contain"
-											/>}
-											{current_tab.current == "odor" && <Image style={styles.like_avatar}
+												source={item.img}
+											/>
+										</View>}
+										{(current_index.current != index) && <Grayscale style={styles.image_con}>
+											<Image
+												style={{ width: "100%", height: "100%" }}
 												defaultSource={require("../../assets/images/nopic.png")}
-												source={{ uri: ENV.image + "/odor/" + (item.id % 100000) + ".jpg" }}
-												resizeMode="contain"
-											/>}
-											{current_tab.current == "perfumer" && <RnImage style={styles.like_avatar}
-												source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
-												resizeMode="contain"
-											/>}
-										</View>
-									);
-								})}
-								<Icon name="r-return" size={15} color={theme.tit2} />
-							</View>
-						</Pressable>}
-						{current_index.current == 3 && <View style={styles.fragrance_image}>
-							<Image style={{ width: "100%", height: "100%" }}
-								source={require("../../assets/images/wiki/xiangdiaofenlei3.png")}
-							/>
-							{wikilist.current[current_index.current].lists.map((fran: any, index: number) => {
-								return (
-									<Pressable key={fran.id} onPress={() => {
-										gotodetail("wiki-detail", fran)
-									}}
-										style={[styles.fragrance_image_item, fran.style]}>
+												source={item.img}
+											/>
+										</Grayscale>}
+										<Text style={[
+											styles.header_img_tit,
+											index == 0 && { left: SkewViewW * 0.22 },
+											index == 1 && { left: SkewViewW * 0.37 },
+											index == 2 && { left: SkewViewW * 0.26 },
+											index == 3 && { left: SkewViewW * 0.32 }
+										]}>{item.tit}</Text>
+										{(current_index.current != index) && <View style={styles.header_img_msk}></View>}
 									</Pressable>
-								)
+								</SkewableView>
+							)
+						})}
+					</View>
+					{current_index.current != 3 && <Pressable onPress={() => {
+						gotodetail("user-fav", wikilist.current[current_index.current])
+					}} style={[styles.like_con, styles.flex_row]}>
+						<Text style={styles.flex_row_tit}>{"我喜欢的" + wikilist.current[current_index.current].tit}</Text>
+						<View style={styles.flex_row}>
+							{(favs.current[current_tab.current] && favs.current[current_tab.current].length > 0) && favs.current[current_tab.current].map((item: any, index: number) => {
+								return (
+									<View key={item.id}>
+										{current_tab.current == "brand" && <Image style={styles.like_avatar}
+											defaultSource={require("../../assets/images/nopic.png")}
+											source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }}
+											resizeMode="contain"
+										/>}
+										{current_tab.current == "odor" && <Image style={styles.like_avatar}
+											defaultSource={require("../../assets/images/nopic.png")}
+											source={{ uri: ENV.image + "/odor/" + (item.id % 100000) + ".jpg" }}
+											resizeMode="contain"
+										/>}
+										{current_tab.current == "perfumer" && <RnImage style={styles.like_avatar}
+											source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
+											resizeMode="contain"
+										/>}
+									</View>
+								);
 							})}
-						</View>}
-					</>
-				)}
+							<Icon name="r-return" size={15} color={theme.tit2} />
+						</View>
+					</Pressable>}
+					{current_index.current == 3 && <View style={styles.fragrance_image}>
+						<Image style={{ width: "100%", height: "100%" }}
+							source={require("../../assets/images/wiki/xiangdiaofenlei3.png")}
+						/>
+						{wikilist.current[current_index.current].lists.map((fran: any, index: number) => {
+							return (
+								<Pressable key={fran.id} onPress={() => {
+									gotodetail("wiki-detail", fran)
+								}}
+									style={[styles.fragrance_image_item, fran.style]}>
+								</Pressable>
+							)
+						})}
+					</View>}
+				</>}
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.wiki_item_con}>

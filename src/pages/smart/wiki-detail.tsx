@@ -199,7 +199,7 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App百科详情页" } });
 		}
 		http.post(ENV.api + ENV.wiki, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
-			for (var i in resp_data){
+			for (var i in resp_data) {
 				like_.current[resp_data[i]] = 1;
 			}
 		});
@@ -248,63 +248,61 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg, paddingTop: 20, }}
 				keyExtractor={(item: any) => item.id}
-				ListHeaderComponent={(
-					<>
-						<View style={styles.wiki_header_con}>
-							<View style={styles.wiki_image}>
-								{type.current == "brand" && <Image style={{ width: "100%", height: "100%" }}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: ENV.image + "/brand/" + (wikidata.current.id % 100000) + ".jpg" }}
-									resizeMode="contain"
-								/>}
-								{type.current == "odor" && <Image style={{ width: "100%", height: "100%" }}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: ENV.image + "/odor/" + (wikidata.current.id % 100000) + ".jpg" }}
-									resizeMode="contain"
-								/>}
-								{type.current == "perfumer" && <RnImage style={{ width: "100%", height: "100%" }}
-									source={{ uri: ENV.image + "/nosevi/" + wikidata.current.id + ".jpg" }}
-									resizeMode="contain"
-								/>}
-								{(type.current == "fragrance" && ((wikidata.current.id >= 14000001 && wikidata.current.id <= 14000012) || wikidata.current.id == 14000021)) && <Image style={{ width: "100%", height: "100%" }}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: ENV.image + "/fragrance/" + wikidata.current.id + ".jpg" }}
-									resizeMode="contain"
-								/>}
-							</View>
-							<Text style={styles.wiki_title}>{wikidata.current.title}</Text>
+				ListHeaderComponent={<>
+					<View style={styles.wiki_header_con}>
+						<View style={styles.wiki_image}>
+							{type.current == "brand" && <Image style={{ width: "100%", height: "100%" }}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={{ uri: ENV.image + "/brand/" + (wikidata.current.id % 100000) + ".jpg" }}
+								resizeMode="contain"
+							/>}
+							{type.current == "odor" && <Image style={{ width: "100%", height: "100%" }}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={{ uri: ENV.image + "/odor/" + (wikidata.current.id % 100000) + ".jpg" }}
+								resizeMode="contain"
+							/>}
+							{type.current == "perfumer" && <RnImage style={{ width: "100%", height: "100%" }}
+								source={{ uri: ENV.image + "/nosevi/" + wikidata.current.id + ".jpg" }}
+								resizeMode="contain"
+							/>}
+							{(type.current == "fragrance" && ((wikidata.current.id >= 14000001 && wikidata.current.id <= 14000012) || wikidata.current.id == 14000021)) && <Image style={{ width: "100%", height: "100%" }}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={{ uri: ENV.image + "/fragrance/" + wikidata.current.id + ".jpg" }}
+								resizeMode="contain"
+							/>}
 						</View>
-						{intro.current && <View style={{ paddingHorizontal: 15 }}>
-							{intro.current}
-						</View>}
-						<View style={styles.wikilist_title_con}>
-							{type.current == "brand" && <Text style={styles.list_title}>{"该品牌共有" + cnt.current + "款香水："}</Text>}
-							{type.current == "odor" && <Text style={styles.list_title}>{"全部含有" + wikidata.current.name + "的香水："}</Text>}
-							{type.current == "perfumer" && <Text style={styles.list_title}>{wikidata.current.name + "的全部作品："}</Text>}
-							{type.current == "fragrance" && <Text style={styles.list_title}>{"全部" + wikidata.current.name + "的香水："}</Text>}
-							<Pressable style={styles.canbuy_con} onPress={togglecanbuy}>
-								{checked.current && <Icon name="shopcart-checked" size={14} color={theme.tit} />}
-								{!checked.current && <Icon name="shopcart" size={14} color={theme.text2} />}
-								<Text style={[styles.canbuy_text, checked.current && { color: theme.tit }]}>{"在售"}</Text>
-							</Pressable>
-						</View>
-						{items.current.length > 0 && <View style={styles.wikilist_tabbar_con}>
-							{tabs.map((item: any, index: number) => {
-								return (
-									item.condition !== false && (<Pressable key={item.orderBy} style={styles.tabbar_con}
-										onPress={() => { setOrderby(item.orderBy) }}>
-										<Text style={[styles.tabbar_text, orderby.current === item.orderBy && { color: theme.tit }]}>
-											{item.text}
-										</Text>
-									</Pressable>)
-								)
-							})}
-						</View>}
-						{(items.current.length == 0 && checked.current) && <Image style={Globalstyles.emptyimg}
-							resizeMode="contain"
-							source={require("../../assets/images/empty/favcanbuy_blank.png")} />}
-					</>
-				)}
+						<Text style={styles.wiki_title}>{wikidata.current.title}</Text>
+					</View>
+					{intro.current && <View style={{ paddingHorizontal: 15 }}>
+						{intro.current}
+					</View>}
+					<View style={styles.wikilist_title_con}>
+						{type.current == "brand" && <Text style={styles.list_title}>{"该品牌共有" + cnt.current + "款香水："}</Text>}
+						{type.current == "odor" && <Text style={styles.list_title}>{"全部含有" + wikidata.current.name + "的香水："}</Text>}
+						{type.current == "perfumer" && <Text style={styles.list_title}>{wikidata.current.name + "的全部作品："}</Text>}
+						{type.current == "fragrance" && <Text style={styles.list_title}>{"全部" + wikidata.current.name + "的香水："}</Text>}
+						<Pressable style={styles.canbuy_con} onPress={togglecanbuy}>
+							{checked.current && <Icon name="shopcart-checked" size={14} color={theme.tit} />}
+							{!checked.current && <Icon name="shopcart" size={14} color={theme.text2} />}
+							<Text style={[styles.canbuy_text, checked.current && { color: theme.tit }]}>{"在售"}</Text>
+						</Pressable>
+					</View>
+					{items.current.length > 0 && <View style={styles.wikilist_tabbar_con}>
+						{tabs.map((item: any, index: number) => {
+							return (
+								item.condition !== false && (<Pressable key={item.orderBy} style={styles.tabbar_con}
+									onPress={() => { setOrderby(item.orderBy) }}>
+									<Text style={[styles.tabbar_text, orderby.current === item.orderBy && { color: theme.tit }]}>
+										{item.text}
+									</Text>
+								</Pressable>)
+							)
+						})}
+					</View>}
+					{(items.current.length == 0 && checked.current) && <Image style={Globalstyles.emptyimg}
+						resizeMode="contain"
+						source={require("../../assets/images/empty/favcanbuy_blank.png")} />}
+				</>}
 				renderItem={({ item, index }: any) => {
 					return (
 						<Pressable onPress={() => {

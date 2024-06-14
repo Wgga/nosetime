@@ -154,48 +154,44 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 				showsHorizontalScrollIndicator={false}
 				columnWrapperStyle={{ paddingHorizontal: 8 }}
 				keyExtractor={(item: any, index: number) => item.cid + "_" + index}
-				ListHeaderComponent={() => {
-					return (
-						<>
-							{hotlist.current.length > 0 && <>
-								<Text style={styles.list_title}>{"热门推荐"}</Text>
-								<FlatList data={hotlist.current}
-									horizontal={true}
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={{ paddingHorizontal: 8 }}
-									keyExtractor={(item: any) => item.cid}
-									renderItem={({ item }: any) => {
-										return (
-											<Item item={item}
-												imgstyle={[styles.item_img, styles.list_img]}
-												textstyle={[styles.item_text, styles.list_text]}
-											/>
-										)
-									}}
-								/>
-							</>}
-							{newlist.current.length > 0 && <>
-								<Text style={styles.list_title}>{"最新香单"}</Text>
-								<FlatList data={newlist.current}
-									horizontal={true}
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={{ paddingHorizontal: 8 }}
-									keyExtractor={(item: any) => item.cid}
-									renderItem={({ item }: any) => {
-										return (
-											<Item item={item}
-												imgstyle={[styles.item_img, styles.list_img]}
-												textstyle={[styles.item_text, styles.list_text]}
-											/>
-										)
-									}}
-								/>
-							</>}
-							{(alllist.current.length > 0 && tags.current.length == 0) && <Text style={styles.list_title}>{"全部"}</Text>}
-							{tags.current.length > 0 && <Text style={styles.list_title}>{"关键字：" + tags.current}</Text>}
-						</>
-					)
-				}}
+				ListHeaderComponent={<>
+					{hotlist.current.length > 0 && <>
+						<Text style={styles.list_title}>{"热门推荐"}</Text>
+						<FlatList data={hotlist.current}
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={{ paddingHorizontal: 8 }}
+							keyExtractor={(item: any) => item.cid}
+							renderItem={({ item }: any) => {
+								return (
+									<Item item={item}
+										imgstyle={[styles.item_img, styles.list_img]}
+										textstyle={[styles.item_text, styles.list_text]}
+									/>
+								)
+							}}
+						/>
+					</>}
+					{newlist.current.length > 0 && <>
+						<Text style={styles.list_title}>{"最新香单"}</Text>
+						<FlatList data={newlist.current}
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={{ paddingHorizontal: 8 }}
+							keyExtractor={(item: any) => item.cid}
+							renderItem={({ item }: any) => {
+								return (
+									<Item item={item}
+										imgstyle={[styles.item_img, styles.list_img]}
+										textstyle={[styles.item_text, styles.list_text]}
+									/>
+								)
+							}}
+						/>
+					</>}
+					{(alllist.current.length > 0 && tags.current.length == 0) && <Text style={styles.list_title}>{"全部"}</Text>}
+					{tags.current.length > 0 && <Text style={styles.list_title}>{"关键字：" + tags.current}</Text>}
+				</>}
 				onEndReachedThreshold={0.1}
 				onEndReached={loadMore}
 				renderItem={({ item }: any) => {
