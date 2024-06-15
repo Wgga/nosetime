@@ -225,6 +225,11 @@ const Globalstyles: any = StyleSheet.create({
 		borderTopRightRadius: 15,
 		overflow: "hidden",
 	},
+	keyboardmask: {
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: "rgba(0,0,0,0.5)",
+		zIndex: 12
+	}
 });
 
 export { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, handlereplystarLeft };

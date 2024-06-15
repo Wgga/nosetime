@@ -1,15 +1,20 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Image, Keyboard } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, Keyboard, ScrollView } from "react-native";
 
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
+import { ShadowedView } from "react-native-fast-shadow";
+import FastImage from "react-native-fast-image";
 
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
+import ListBottomTip from "../../components/listbottomtip";
+import FooterView from "../../components/footerview";
 
 import us from "../../services/user-service/user-service";
+import articleService from "../../services/article-service/article-service";
 
 import http from "../../utils/api/http";
 
@@ -21,10 +26,6 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
-import FastImage from "react-native-fast-image";
-import ListBottomTip from "../../components/listbottomtip";
-import FooterView from "../../components/footerview";
-import articleService from "../../services/article-service/article-service";
 
 const { width, height } = Dimensions.get("window");
 
@@ -111,12 +112,13 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
 	// 数据
 	let pages = React.useRef<any>({
-		page: 1, items: [], top: 0, loaded: 0, full: 0
+		page: 1, items: [], loaded: 0, full: 0,
 	});
 	let item0 = React.useRef<any>({ uid: 0, desc: "" });
 	let items_top = React.useRef<any[]>([]);
 	let pagecnt = React.useRef<number>(0);
 	let pagenum = React.useRef<any>([]);
+	let currentpage = React.useRef<number>(1);
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
 	// 状态
 	let noMore = React.useRef<boolean>(false);
@@ -124,6 +126,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	const [isfocus, setIsFocus] = React.useState<boolean>(false); // 是否获取焦点
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
+	const [showPage, setShowPage] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		if (route.params) {
@@ -138,8 +141,8 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	}, [])
 
 	const init = () => {
-		pages.current.page = 1;
-		load();
+		pages.current = { page: 1, items: [], loaded: 0, full: 0 };
+		load("init");
 		if (fromid.current && fromid.current > 0) {
 			http.get(ENV.shequ + "?method=getshequdetailpage&dlgid=" + id.current + "&fromid=" + fromid.current).then((resp_data: any) => {
 				console.log("%c Line:44 🍊 resp_data", "color:#42b983", resp_data);
@@ -155,7 +158,9 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
-	const load = () => {
+	const load = (type: string) => {
+		if (type == "loadMore") pages.current.page++;
+		if (noMore.current) return;
 		http.get(ENV.shequ + "?method=getshequdetailv3&dlgid=" + id.current + "&page=" + pages.current.page).then((resp_data: any) => {
 			if (!resp_data) {
 				ToastCtrl.show({ message: "内容已被删除，无法查看", duration: 2000, viewstyle: "medium_toast", key: "empty_toast" });
@@ -164,27 +169,29 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 				return;
 			}
 			format_time(resp_data);
-			if (resp_data.items_top)
-				items_top.current = resp_data.items_top;
+
+			if (pages.current.page == 1 && resp_data.items_top) items_top.current = resp_data.items_top;
+			if (pages.current.page == 1 && item0.current.uid == 0) item0.current = resp_data.item0;
+
 			if (resp_data.page > 1) {
 				pagecnt.current = resp_data.page;
 				generate_pagenum();
 			}
 
-			if (resp_data.items.length == resp_data.perpage || (resp_data.items.length == resp_data.perpage - 1 && pages.current.page == 1)) {
+			if (pages.current.page == 1)
+				pages.current.items = resp_data.items;
+			else
+				pages.current.items = pages.current.items.concat(resp_data.items);
+
+			noMore.current = !(pages.current.page < pagecnt.current);
+
+			/* if (resp_data.items.length == resp_data.perpage || (resp_data.items.length == resp_data.perpage - 1 && pages.current.page == 1)) {
 				pages.current.full = 1;
 				cache.saveItem(classname + "-" + id.current + "-" + pages.current.page, resp_data, 1800);
 			} else {
 				pages.current.full = 0;
 				cache.saveItem(classname + "-" + id.current + "-" + pages.current.page, resp_data, 30);
-			}
-
-			if (pages.current.page == 1 && item0.current.uid == 0) {
-				item0.current = resp_data.item0;
-			}
-
-			pages.current.items = resp_data.items;
-			pages.current.loaded = 2;
+			} */
 
 			let ids = [];
 			if (resp_data.item0)
@@ -206,7 +213,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	const islike = (ids: any) => {
 		if (!us.user.uid) {
 			setIsRender(val => !val);
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页" } });
+			return;
 		}
 		http.post(ENV.api + ENV.shequ, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {
@@ -320,6 +327,11 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		setIsRender(val => !val);
 	}
 
+	const goPage = (page: number) => {
+		currentpage.current = page;
+		setShowPage(false);
+	}
+
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
@@ -361,12 +373,53 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>
+			{showPage && <Pressable style={styles.pagemask} onPress={() => { setShowPage(false); }}></Pressable>}
+			<View style={[styles.select_page_con, { bottom: 77 + insets.bottom }]}>
+				{!showPage && <Pressable style={styles.page_btn} onPress={() => {
+					setShowPage(true);
+				}}>
+					<Text style={styles.currentpage}>{currentpage.current}</Text>
+					<Text style={styles.allpage}>{"/" + pagecnt.current + "页"}</Text>
+				</Pressable>}
+				{showPage && <ShadowedView style={styles.gopage_btn_con}>
+					<View style={styles.gopage_title}>
+						<Pressable style={[styles.page_btn_con, { alignItems: "flex-start" }]}
+							onPress={() => {
+								goPage(1);
+							}}>
+							<Text style={[styles.btn_text, { color: theme.num }]}>首页</Text>
+						</Pressable>
+						<View style={styles.page_btn_con}>
+							<Text style={styles.btn_text}>翻页</Text>
+						</View>
+						<Pressable style={[styles.page_btn_con, { alignItems: "flex-end" }]}
+							onPress={() => {
+								goPage(pagecnt.current);
+							}}>
+							<Text style={[styles.btn_text, { color: theme.num }]}>末页</Text>
+						</Pressable>
+					</View>
+					<ScrollView contentContainerStyle={styles.gopage_btn} showsVerticalScrollIndicator={false}>
+						{pagenum.current.map((item: any, index: number) => {
+							return (
+								<Pressable key={item} style={styles.page_item} onPress={() => {
+									goPage(item);
+								}}>
+									<Text style={[styles.page_item_text, currentpage.current == item && styles.active_page]}>{item}</Text>
+								</Pressable>
+							)
+						})}
+					</ScrollView>
+				</ShadowedView>}
+			</View>
 			<View style={[Globalstyles.list_content, Globalstyles.container]}>
 				<FlashList data={pages.current.items}
 					extraData={isrender}
 					estimatedItemSize={100}
 					onEndReached={() => {
-
+						if (pages.current.items.length > 0) {
+							load("loadMore")
+						}
 					}}
 					onEndReachedThreshold={0.1}
 					showsVerticalScrollIndicator={false}
@@ -436,12 +489,10 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={pages.current.items.length > 0} />}
 				/>
 			</View>
-			<FooterView data={{
-				placeholder: "点击楼层文字，回复层主",
-				replytext
-			}} method={{ setReplyText }}>
+			{isfocus && <Pressable style={Globalstyles.keyboardmask} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
+			<FooterView data={{ placeholder: "点击楼层文字，回复层主", replytext, }} method={{ setReplyText }}>
 				{!isfocus && <View style={styles.footer_flex}>
-					<View style={[styles.footer_flex, { marginRight: 20, }]}>
+					<View style={[styles.footer_flex, { marginRight: 20 }]}>
 						<Icon name="reply" size={16} color={theme.fav} />
 						{item0.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(item0.current.replycnt)}</Text>}
 					</View>
@@ -463,6 +514,92 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
+	},
+	pagemask: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 99,
+	},
+	select_page_con: {
+		position: "absolute",
+		// left: 20,
+		right: 20,
+		zIndex: 99,
+		alignItems: "flex-end",
+	},
+	page_btn: {
+		width: 90,
+		height: 35,
+		borderColor: theme.border,
+		borderWidth: 1,
+		backgroundColor: theme.toolbarbg,
+		borderRadius: 35,
+		overflow: "hidden",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	currentpage: {
+		fontSize: 16,
+		color: theme.num,
+	},
+	allpage: {
+		fontSize: 16,
+		color: theme.placeholder,
+	},
+	gopage_btn_con: {
+		width: width - 40,
+		paddingVertical: 10,
+		paddingHorizontal: 20,
+		backgroundColor: "#FAFAFA",
+		shadowOpacity: 0.6,
+		shadowRadius: 20,
+		shadowOffset: {
+			width: 0,
+			height: 0,
+		},
+		borderRadius: 12,
+		overflow: "hidden",
+	},
+	gopage_title: {
+		height: 50,
+		flexDirection: "row",
+		alignItems: "center",
+		borderBottomColor: theme.border,
+		borderBottomWidth: 1,
+	},
+	page_btn_con: {
+		flex: 1,
+		height: 50,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	btn_text: {
+		fontSize: 16,
+		color: theme.text1,
+	},
+	gopage_btn: {
+		maxHeight: 300,
+		flexDirection: "row",
+		flexWrap: "wrap",
+	},
+	page_item: {
+		flexBasis: "20%",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	page_item_text: {
+		width: 35,
+		height: 35,
+		marginTop: 15,
+		textAlign: "center",
+		lineHeight: 35,
+		borderRadius: 50,
+		overflow: "hidden",
+		color: theme.text1,
+	},
+	active_page: {
+		backgroundColor: theme.others,
+		color: theme.toolbarbg
 	},
 	item_main_con: {
 		paddingTop: 21,

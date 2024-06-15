@@ -3,6 +3,7 @@ import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
+import HTMLView from "../../components/htmlview";
 
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
@@ -123,7 +124,12 @@ const HeaderWebView = React.memo(({ articleid, style }: any) => {
 					<Image source={{ uri: ENV.image + articledata.coverimg, cache: "force-cache" }}
 						style={{ width: Winwidth, height: articledata.tempH }} resizeMode="cover" />
 				</View>}
-				<View style={[styles.webview_con, { height: webheight }]}>
+				<View style={styles.webview_con}>
+					{articledata.html && <HTMLView
+						value={articledata.html}
+					/>}
+				</View>
+				{/* <View style={[styles.webview_con, { height: webheight }]}>
 					<WebView
 						ref={webview}
 						originWhitelist={["*"]}
@@ -137,7 +143,7 @@ const HeaderWebView = React.memo(({ articleid, style }: any) => {
 						onMessage={handleMessage}
 						style={{ width: Winwidth - 48 }}
 						source={{ html: articledata.html }} />
-				</View>
+				</View> */}
 				<View style={styles.btn_container}>
 					<View style={[styles.btn_content, styles.btn_margin]}>
 						<Icon name="time" size={16} color={theme.placeholder} />
@@ -264,9 +270,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	//获取用户曾点过的赞
 	const favs = (resp: any) => {
-		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
-		}
+		if (!us.user.uid) return;
 		let favsid: any[] = [];
 		for (let i in resp.items) {
 			favsid.push(resp.items[i].id)
@@ -287,9 +291,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 
 	// 获取用户是否收藏当前文章
 	const islike = (ids: any[]) => {
-		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
-		}
+		if (!us.user.uid) return;
 		http.post(ENV.article, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (let i in resp_data) {
 				if (resp_data[i]) likelist.current[resp_data[i]] = true;
@@ -551,10 +553,10 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 					style={isfull && styles.hide_view}
 				/>}
 			/>
-			{isfocus && <Pressable style={[styles.bgmsk, isfull && styles.hide_view]} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
+			{isfocus && <Pressable style={[Globalstyles.keyboardmask, isfull && styles.hide_view]} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
 			<FooterView data={{
 				placeholder: "快快告诉我，你在想什么", replytext,
-				opacity: footerOpt, zIndex: !isfocus ? footerZ : 200,
+				opacity: footerOpt, zIndex: !isfocus ? footerZ : 13,
 				style: isfull && styles.hide_view
 			}} method={{ setReplyText }}>
 				{!isfocus && <View style={styles.footer_icon_con}>
@@ -780,15 +782,6 @@ const styles = StyleSheet.create({
 	replysub_uname: {
 		fontSize: 14,
 		color: theme.tit2,
-	},
-	bgmsk: {
-		position: "absolute",
-		top: 0,
-		bottom: 0,
-		right: 0,
-		left: 0,
-		backgroundColor: "rgba(0,0,0,0.5)",
-		zIndex: 12
 	},
 	coverimg_con: {
 		position: "absolute",

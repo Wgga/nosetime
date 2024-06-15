@@ -165,7 +165,6 @@ class ArticleService {
 			}
 		}).catch(() => {
 			http.get(ENV.article + "?id=" + id).then((resp_data: any) => {
-				resp_data.html = this.changeurl(resp_data);
 				let covers = resp_data.coverimg.split("/"),
 					coverimgname = covers[covers.length - 1], imgWH = [];
 				if (coverimgname.match(/S(\d+)x(\d+)/g)) {
@@ -174,8 +173,6 @@ class ArticleService {
 				} else {
 					resp_data.tempH = 527 * Winwidth / 900;
 				}
-				resp_data.favcnt = resp_data.favcnt >= 1e3 && resp_data.favcnt < 1e4 ? Math.floor(resp_data.favcnt / 1e3) + "k" : resp_data.favcnt >= 1e4 ? Math.floor(resp_data.favcnt / 1e4) + "w" : resp_data.favcnt;
-				resp_data.replycnt = resp_data.replycnt >= 1e3 && resp_data.replycnt < 1e4 ? Math.floor(resp_data.replycnt / 1e3) + "k" : resp_data.replycnt >= 1e4 ? Math.floor(resp_data.replycnt / 1e4) + "w" : resp_data.replycnt;
 				cache.saveItem(classname + id, resp_data, 60);
 				this.articledata[classname + id] = resp_data;
 				events.publish(classname + id + "ArticleData", { classname, id });

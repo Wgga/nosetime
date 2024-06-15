@@ -27,7 +27,13 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<Animated.View style={[styles.footer_con, { opacity, zIndex, paddingBottom: insets.bottom + 10 }, isfocus && styles.footer_radius, style]}>
+		<Animated.View style={[
+			styles.footer_con,
+			zIndex && { zIndex },
+			opacity && { opacity },
+			{ paddingBottom: insets.bottom + 10 },
+			isfocus && styles.footer_radius, style
+		]}>
 			<View style={[styles.footer_con_left, { height: inputH }]}>
 				<TextInput
 					style={styles.footer_input}
@@ -50,7 +56,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 					<Text style={styles.publish_text}>{"发布"}</Text>
 				</LinearGradient>}
 			</View>
-		</Animated.View>
+		</Animated.View >
 	);
 }
 const styles = StyleSheet.create({
@@ -62,13 +68,13 @@ const styles = StyleSheet.create({
 		borderTopColor: theme.bg,
 		maxHeight: 96,
 		minHeight: 58,
+		flexDirection: "row",
+		alignItems: "center",
 		position: "absolute",
 		left: 0,
 		right: 0,
 		bottom: 0,
-		flexDirection: "row",
-		alignItems: "center",
-		zIndex: 200,
+		zIndex: 13,
 	},
 	footer_radius: {
 		borderTopRightRadius: 20,
