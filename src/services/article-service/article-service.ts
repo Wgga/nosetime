@@ -166,7 +166,6 @@ class ArticleService {
 		}).catch(() => {
 			http.get(ENV.article + "?id=" + id).then((resp_data: any) => {
 				resp_data.html = this.changeurl(resp_data);
-				console.log("%c Line:169 🥛 resp_data.html", "color:#e41a6a", resp_data.html);
 				let covers = resp_data.coverimg.split("/"),
 					coverimgname = covers[covers.length - 1], imgWH = [];
 				if (coverimgname.match(/S(\d+)x(\d+)/g)) {

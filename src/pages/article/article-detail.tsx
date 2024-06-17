@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated } from "react-native";
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
-import HTMLView from "../../components/htmlview";
+import FastImage from "react-native-fast-image";
 
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
@@ -25,169 +25,15 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
+import RenderHtml from "../../components/renderhtml";
 
-const Winwidth = Dimensions.get("window").width;
-const Winheight = Dimensions.get("window").height;
 const classname = "ArticleDetail";
 
-const HeaderWebView = React.memo(({ articleid, style }: any) => {
-
-	// 控件
-	const webview = React.useRef(null); // webview Ref
-	// 变量
-	const [webheight, setWebHeight] = React.useState<number>(600); // webview高度
-	// 数据
-	const [articledata, setArticledata] = React.useState<any>({}); // 文章数据
-	const [hotarticle, setHotarticle] = React.useState<any[]>([]); // 热门文章
-	// 状态
-
-	React.useEffect(() => {
-		// 监听数据设置文章列表数据
-		events.subscribe(classname + articleid + "setArticleData", (data) => {
-			setArticledata(data);
-			articleService.fetchHotArticle(data.tag);
-		})
-
-		events.subscribe(classname + articleid + "HotArticle", (data) => {
-			setHotarticle(data);
-			// startAnimation();
-		})
-
-		return () => {
-			events.unsubscribe(classname + articleid + "setArticleData");
-			events.unsubscribe(classname + articleid + "HotArticle");
-		}
-	}, [])
-
-	const INJECTED_JAVASCRIPT = `(function () {
-		function getHeight() {
-			let webheight = 0;
-			if (document.documentElement && (document.documentElement.scrollHeight)) {
-				webheight = document.documentElement.scrollHeight;
-			} else if (document.body && (document.body.scrollHeight)) {
-				webheight = document.body.scrollHeight;
-			}
-			window.ReactNativeWebView.postMessage(JSON.stringify({ height: webheight }))
-		}
-		setTimeout(getHeight, 1000);
-		var allLinks = document.querySelectorAll("a");
-		allLinks.map((link)=>{
-			link.addEventListener("click", (ev)=>{
-				let e = ev.srcElement || ev.target;
-				for (let i = 0; i < 3; ++i) {
-					if (e.nodeName == "A")
-						break;
-					else
-						e = e.parentNode;
-				}
-				if (e.nodeName != "A") return;
-				let obj = e.hash.substr(e.hash.indexOf("?") + 1).replace(/%22/g, '"');
-				window.ReactNativeWebView.postMessage(obj);
-			});
-		})
-	})();`;
-
-	// 监听webview内容并获取其高度和处理webview内点击事件
-	const handleMessage = (event: any) => {
-		if (!event.nativeEvent.data) return;
-		let data = JSON.parse(event.nativeEvent.data);
-		if (data.height && data.height > 0 && data.height != webheight) {
-			setWebHeight(data.height);
-		}
-		if (data.page && data.page.length > 3) {
-			/* let params = { token: token, method: "clickarticle", did: did, page: data.page, code: data.id };
-			http.post(ENV.mall + "?uid=" + uid, params); */
-		}
-	};
-
-	const rippleAnim = React.useRef<Animated.Value>(new Animated.Value(0)).current;
-
-	const startAnimation = () => {
-		Animated.timing(rippleAnim, {
-			toValue: 1,
-			duration: 2000,
-			delay: 1000,
-			easing: Easing.bezier(0.85, 0, 0.15, 1),
-			useNativeDriver: true,
-		}).start(({ finished }) => {
-			if (finished) {
-				rippleAnim.setValue(0);
-				startAnimation();
-			}
-		});
-	};
-
-	return (
-		<View style={[styles.scrollview_con, style]}>
-			<View>
-				{!articledata.mp4URL && <View style={styles.content_img}>
-					<Image source={{ uri: ENV.image + articledata.coverimg, cache: "force-cache" }}
-						style={{ width: Winwidth, height: articledata.tempH }} resizeMode="cover" />
-				</View>}
-				<View style={styles.webview_con}>
-					{articledata.html && <HTMLView
-						value={articledata.html}
-					/>}
-				</View>
-				{/* <View style={[styles.webview_con, { height: webheight }]}>
-					<WebView
-						ref={webview}
-						originWhitelist={["*"]}
-						scalesPageToFit={false}
-						setBuiltInZoomControls={false}
-						scrollEnabled={false}
-						nestedScrollEnabled={false}
-						showsHorizontalScrollIndicator={false}
-						showsVerticalScrollIndicator={false}
-						injectedJavaScript={INJECTED_JAVASCRIPT}
-						onMessage={handleMessage}
-						style={{ width: Winwidth - 48 }}
-						source={{ html: articledata.html }} />
-				</View> */}
-				<View style={styles.btn_container}>
-					<View style={[styles.btn_content, styles.btn_margin]}>
-						<Icon name="time" size={16} color={theme.placeholder} />
-						<Text style={styles.btn_text}>{articledata.tm}</Text>
-					</View>
-					<View style={[styles.btn_content, styles.btn_margin]}>
-						<Icon name="look" size={16} color={theme.placeholder} />
-						<Text style={styles.btn_text}>{articledata.view}</Text>
-					</View>
-					<View style={styles.btn_content}>
-						<Icon name="share3" size={16} color={theme.placeholder} />
-					</View>
-				</View>
-				<>
-					<Text style={styles.title}>热门文章</Text>
-					{(hotarticle && hotarticle.length > 0) && <FlatList
-						data={hotarticle}
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={styles.contentContainer}
-						keyExtractor={(item: any, index: number) => item.id}
-						renderItem={({ item, index }: any) => {
-							return (
-								<View style={styles.itemContainer}>
-									<Image style={styles.itemImg} source={{ uri: ENV.image + item.pic, cache: "force-cache" }} resizeMode="cover" />
-									<Text style={styles.item_tit}>{item.title}</Text>
-								</View>
-							)
-						}}
-					/>}
-				</>
-			</View>
-			<View style={styles.reply_con}>
-				<Text style={styles.title}>热门评论</Text>
-			</View>
-		</View>
-	)
-})
-
-const ArticleDetail = React.memo(({ route, navigation }: any) => {
+const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	// 参数
 	const { id } = route.params;
-
 	// 控件
+	const windowD = useWindowDimensions();
 
 	// 状态
 	const [loading, setLoading] = React.useState<boolean>(true); // 是否加载中
@@ -206,6 +52,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 	let footerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
 	// 数据
 	let articledata = React.useRef<any>({}); // 文章数据
+	let hotarticle = React.useRef<any>([]); // 热门文章
 	let replydata = React.useRef<any>({}); // 评论数据
 	let likelist = React.useRef<any>({}); // 是否收藏文章
 	let likefavs = React.useRef<any>({}); // 点赞列表
@@ -219,8 +66,14 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 			setIsfull(fullval);
 		})
 
+		console.log("%c Line:280 🍇", "color:#f5ce50");
 		events.subscribe(classname + id + "ArticleData", (data) => {
 			articledata.current = articleService.getArticleData(classname, id);
+			articleService.fetchHotArticle(articledata.current.tag);
+		})
+
+		events.subscribe(classname + id + "HotArticle", (data) => {
+			hotarticle.current = data;
 			// 获取文章评论数据
 			getArticleReply();
 
@@ -245,6 +98,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 		return () => {
 			events.unsubscribe(classname + id + "fullScreenChange");
 			events.unsubscribe(classname + id + "ArticleData");
+			events.unsubscribe(classname + id + "HotArticle");
 		}
 	}, []);
 
@@ -286,8 +140,6 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 			}
 		});
 	}
-
-
 
 	// 获取用户是否收藏当前文章
 	const islike = (ids: any[]) => {
@@ -374,8 +226,22 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 		});
 	}
 
+	// 处理评论数
 	const unitNumber = (number: number) => {
 		return articleService.unitNumber(number, 1);
+	}
+
+	const gotodetail = (page: any, id: number) => {
+		console.log("%c Line:235 🍫", "color:#93c0a4");
+		if (page == "item-detail") {
+			navigation.navigate("Page", { screen: "ItemDetail", params: { id, src: "APP文章:" + id } });
+		} else if (page == "mall-item") {
+			navigation.navigate("Page", { screen: "MallItem", params: { id, src: "APP文章:" + id } });
+		} else if (page == 'mall-heji') {
+			navigation.navigate("Page", { screen: "MallHeji", params: { id, src: "APP文章:" + id } });
+		} else if (page == 'mall-group') {
+			navigation.navigate("Page", { screen: "MallGroup", params: { id, src: "APP文章:" + id, word: 1 } });
+		}
 	}
 
 	return (
@@ -412,7 +278,7 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 								<SharePopover />
 							), {
 								key: "share_popover",
-								width: Winwidth,
+								width: windowD.width,
 								height: 200,
 								rounded: false,
 								useNativeDriver: true,
@@ -486,7 +352,108 @@ const ArticleDetail = React.memo(({ route, navigation }: any) => {
 								},
 							]} /> */}
 					</VideoPlayer>}
-					<HeaderWebView articleid={id} style={isfull && styles.hide_view} />
+					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
+						<View>
+							{!articledata.current.mp4URL && <View style={styles.content_img}>
+								<Image source={{ uri: ENV.image + articledata.current.coverimg }}
+									style={{ width: windowD.width, height: articledata.current.tempH }}
+								/>
+							</View>}
+							<View style={styles.webview_con}>
+								{articledata.current.html && <RenderHtml
+									contentWidth={windowD.width - 48}
+									html={`<div class='content' id='content'><p>2024香水基金会颁奖典礼在林肯中心大卫·H·科赫剧院举行。今年是香水基金会成立<strong>75周年</strong>，全场座无虚席，观看人数更是突破纪录。</p><p><strong><span style="color:#222"><span style="color:#222">菲菲奖 The Fragrance Foundation Awards</span></span></strong></p><p><img src="https://img.xssdcdn.com/article/690/2024S900x900.jpg"/></p><p></p><p>今年的获奖名单仍有很多熟悉的面孔，而一些奖项的获奖香水也让人有些意外。接下来，香水时代为大家带来2024TFF奖完整版获奖名单。</p><p></p><p><br/></p><p><a href='#/?{"page":"item-detail","id":781451}'><img src="https://img.xssdcdn.com/article/690/001S1080x274.jpg"/></a></p><center><small><a href='#/?{"page":"item-detail","id":781451}'><img src="https://img.xssdcdn.com/article/690/1S1000x1000.jpg"/></a></small></center></div>`}
+									ignoreDomNode={(node: any) => {
+										return (
+											node.name === "div" && (node.attribs.class === "title" || node.attribs.class === "author")
+										)
+									}}
+									tagsStyles={{
+										p: {
+											paddingVertical: 4,
+											lineHeight: 29,
+											margin: 0,
+										},
+										a: {
+											color: "#6979bf",
+											textDecorationLine: "none"
+										}
+									}}
+									onPress={gotodetail}
+								/* customHTMLElementModels={{
+									"center": HTMLElementModel.fromCustomModel({
+										tagName: "center",
+										mixedUAStyles: {
+											textAlign: "center",
+										},
+										contentModel: HTMLContentModel.block
+									}),
+								}} */
+								/* renderers={{
+									img: (props: any) => {
+										let imgWH: any[] = [],
+											tempW: number = windowD.width - 48,
+											tempH: number = 0;
+										const { rendererProps } = useInternalRenderer("img", props);
+										const cover = rendererProps.source.uri;
+										if (cover) {
+											imgWH = cover.split(/S(\d+)x(\d+)/g);
+											if (imgWH) {
+												tempH = imgWH[2] * tempW / imgWH[1];
+											}
+										}
+										return (
+											<FastImage style={{ width: tempW, height: tempH }}
+												source={{ uri: cover }} />
+										)
+									}
+								}}
+								renderersProps={{
+									a: {
+										onPress: (event: any, href: string) => {
+											let obj = JSON.parse(href.substr(href.indexOf("?") + 1).replace(/%22/g, '"'));
+											gotodetail(obj.page, obj.id);
+										}
+									}
+								}} */
+								/>}
+							</View>
+							<View style={styles.btn_container}>
+								<View style={[styles.btn_content, styles.btn_margin]}>
+									<Icon name="time" size={16} color={theme.placeholder} />
+									<Text style={styles.btn_text}>{articledata.current.tm}</Text>
+								</View>
+								<View style={[styles.btn_content, styles.btn_margin]}>
+									<Icon name="look" size={16} color={theme.placeholder} />
+									<Text style={styles.btn_text}>{articledata.current.view}</Text>
+								</View>
+								<View style={styles.btn_content}>
+									<Icon name="share3" size={16} color={theme.placeholder} />
+								</View>
+							</View>
+							<>
+								<Text style={styles.title}>热门文章</Text>
+								{(hotarticle.current && hotarticle.current.length > 0) && <FlatList
+									data={hotarticle.current}
+									horizontal={true}
+									showsHorizontalScrollIndicator={false}
+									contentContainerStyle={styles.contentContainer}
+									keyExtractor={(item: any, index: number) => item.id}
+									renderItem={({ item, index }: any) => {
+										return (
+											<View style={styles.itemContainer}>
+												<Image style={styles.itemImg} source={{ uri: ENV.image + item.pic, cache: "force-cache" }} resizeMode="cover" />
+												<Text style={styles.item_tit}>{item.title}</Text>
+											</View>
+										)
+									}}
+								/>}
+							</>
+						</View>
+						<View style={styles.reply_con}>
+							<Text style={styles.title}>热门评论</Text>
+						</View>
+					</View>
 				</>}
 				contentContainerStyle={styles.flatlist_con}
 				removeClippedSubviews={true}
