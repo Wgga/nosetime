@@ -81,9 +81,6 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 	const init = () => {
 		smartService.fetch(word.current, us.user.uid, "init");
 		Promise.all([getTalentData(), getPerfumeList()]).then((data) => {
-			if (data.includes(0)) {
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页新鲜事" } });
-			}
 			setIsRender(val => !val);
 		})
 	}

@@ -259,9 +259,6 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 			getOdorVoteData(),
 			getIsBuy()
 		]).then((data) => {
-			if (data.includes(0)) {
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品页" } });
-			}
 			setIsRender(val => !val);
 		})
 
