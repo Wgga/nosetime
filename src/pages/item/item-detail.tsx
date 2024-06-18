@@ -489,9 +489,9 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 								</View>
 							</View>
 							<View style={styles.card_bottom}>
-								{(itemdata.current.wantedcnt && itemdata.current.wantedcnt[0]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[0] + "人想要"}</Text>}
-								{(itemdata.current.wantedcnt && itemdata.current.wantedcnt[1]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[1] + "人拥有"}</Text>}
-								{(itemdata.current.wantedcnt && itemdata.current.wantedcnt[2]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[2] + "人闻过"}</Text>}
+								{(itemdata.current.wantedcnt && !!itemdata.current.wantedcnt[0]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[0] + "人想要"}</Text>}
+								{(itemdata.current.wantedcnt && !!itemdata.current.wantedcnt[1]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[1] + "人拥有"}</Text>}
+								{(itemdata.current.wantedcnt && !!itemdata.current.wantedcnt[2]) && <Text style={styles.wantedcnt}>{itemdata.current.wantedcnt[2] + "人闻过"}</Text>}
 							</View>
 						</View>
 						<View style={styles.nature_con}>

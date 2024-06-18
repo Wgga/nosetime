@@ -1,10 +1,12 @@
 import React from "react";
-import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated } from "react-native";
+import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated, ScrollView } from "react-native";
 
 import { WebView } from "react-native-webview";
 import Orientation from "react-native-orientation-locker";
 import FastImage from "react-native-fast-image";
+import { FlashList } from "@shopify/flash-list";
 
+// import RenderHtml from "../../components/renderhtml";
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
@@ -25,7 +27,8 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
-import RenderHtml from "../../components/renderhtml";
+import AutoSizeImage from "../../components/renderhtml/autosizeimage";
+import RenderHtml, { HTMLContentModel, HTMLElementModel, useInternalRenderer } from "react-native-render-html";
 
 const classname = "ArticleDetail";
 
@@ -66,7 +69,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			setIsfull(fullval);
 		})
 
-		console.log("%c Line:280 🍇", "color:#f5ce50");
 		events.subscribe(classname + id + "ArticleData", (data) => {
 			articledata.current = articleService.getArticleData(classname, id);
 			articleService.fetchHotArticle(articledata.current.tag);
@@ -77,8 +79,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			// 获取文章评论数据
 			getArticleReply();
 
-			let ids = [id];
-			islike(ids)
+			islike([id]);
 			// 统计商城UV，不要删
 			http.post(ENV.mall + "?uid=" + us.user.uid, {
 				token: us.user.token, method: "getarticle", did: us.did, page: "article", code: id
@@ -232,7 +233,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	}
 
 	const gotodetail = (page: any, id: number) => {
-		console.log("%c Line:235 🍫", "color:#93c0a4");
 		if (page == "item-detail") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id, src: "APP文章:" + id } });
 		} else if (page == "mall-item") {
@@ -316,14 +316,16 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>
-			<FlatList data={replydata.current.items}
+			<FlashList data={replydata.current.items}
 				onScroll={(e) => {
 					showHeaderView(e);
 					showFooterView(e);
 				}}
 				keyExtractor={(item: any, index: number) => item.id}
+				extraData={isrender}
+				estimatedItemSize={100}
 				onEndReachedThreshold={0.1}
-				onEndReached={(info: any) => {
+				onEndReached={() => {
 					if (replydata.current.items) {
 						page.current++;
 						getArticleReply();
@@ -334,23 +336,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						source={articledata.current.mp4URL}
 						poster={articledata.current.picURL}
 						classname={classname + id}>
-						{/* <Animated.View style={[
-								styles.video_ripple,
-								{
-									transform: [
-										{
-											scale: rippleAnim.interpolate({
-												inputRange: [0, 1],
-												outputRange: [1, 1.35],
-											}),
-										},
-									],
-									opacity: rippleAnim.interpolate({
-										inputRange: [0, 0.6, 1],
-										outputRange: [0, 0.6, 0],
-									}),
-								},
-							]} /> */}
 					</VideoPlayer>}
 					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
 						<View>
@@ -360,9 +345,26 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 								/>
 							</View>}
 							<View style={styles.webview_con}>
+								{/* {articledata.current.html && <RenderHtml
+									contentWidth={windowD.width - 48} html={articledata.current.html} ignoreDomNode={(node: any) => {
+										return (
+											node.name === "div" && (node.attribs.class === "title" || node.attribs.class === "author")
+										)
+									}} tagsStyles={{
+										p: {
+											paddingVertical: 4,
+											lineHeight: 29,
+											margin: 0,
+										},
+										a: {
+											color: "#6979bf",
+											textDecorationLine: "none"
+										}
+									}} onPress={gotodetail}
+								/>} */}
 								{articledata.current.html && <RenderHtml
 									contentWidth={windowD.width - 48}
-									html={`<div class='content' id='content'><p>2024香水基金会颁奖典礼在林肯中心大卫·H·科赫剧院举行。今年是香水基金会成立<strong>75周年</strong>，全场座无虚席，观看人数更是突破纪录。</p><p><strong><span style="color:#222"><span style="color:#222">菲菲奖 The Fragrance Foundation Awards</span></span></strong></p><p><img src="https://img.xssdcdn.com/article/690/2024S900x900.jpg"/></p><p></p><p>今年的获奖名单仍有很多熟悉的面孔，而一些奖项的获奖香水也让人有些意外。接下来，香水时代为大家带来2024TFF奖完整版获奖名单。</p><p></p><p><br/></p><p><a href='#/?{"page":"item-detail","id":781451}'><img src="https://img.xssdcdn.com/article/690/001S1080x274.jpg"/></a></p><center><small><a href='#/?{"page":"item-detail","id":781451}'><img src="https://img.xssdcdn.com/article/690/1S1000x1000.jpg"/></a></small></center></div>`}
+									source={{ html: articledata.current.html }}
 									ignoreDomNode={(node: any) => {
 										return (
 											node.name === "div" && (node.attribs.class === "title" || node.attribs.class === "author")
@@ -379,44 +381,510 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 											textDecorationLine: "none"
 										}
 									}}
-									onPress={gotodetail}
-								/* customHTMLElementModels={{
-									"center": HTMLElementModel.fromCustomModel({
-										tagName: "center",
-										mixedUAStyles: {
-											textAlign: "center",
-										},
-										contentModel: HTMLContentModel.block
-									}),
-								}} */
-								/* renderers={{
-									img: (props: any) => {
-										let imgWH: any[] = [],
-											tempW: number = windowD.width - 48,
-											tempH: number = 0;
-										const { rendererProps } = useInternalRenderer("img", props);
-										const cover = rendererProps.source.uri;
-										if (cover) {
-											imgWH = cover.split(/S(\d+)x(\d+)/g);
-											if (imgWH) {
-												tempH = imgWH[2] * tempW / imgWH[1];
+									customHTMLElementModels={{
+										"center": HTMLElementModel.fromCustomModel({
+											tagName: "center",
+											mixedUAStyles: {
+												textAlign: "center",
+											},
+											contentModel: HTMLContentModel.block
+										}),
+									}}
+									renderers={{
+										img: (props: any) => {
+											const { rendererProps } = useInternalRenderer("img", props);
+											return (
+												<AutoSizeImage contentWidth={(windowD.width - 48)} source={{ uri: rendererProps.source.uri }} />
+											)
+										}
+									}}
+									renderersProps={{
+										a: {
+											onPress: (event: any, href: string) => {
+												let obj = JSON.parse(href.substr(href.indexOf("?") + 1).replace(/%22/g, '"'));
+												gotodetail(obj.page, obj.id);
 											}
 										}
-										return (
-											<FastImage style={{ width: tempW, height: tempH }}
-												source={{ uri: cover }} />
-										)
-									}
-								}}
-								renderersProps={{
-									a: {
-										onPress: (event: any, href: string) => {
-											let obj = JSON.parse(href.substr(href.indexOf("?") + 1).replace(/%22/g, '"'));
-											gotodetail(obj.page, obj.id);
-										}
-									}
-								}} */
+									}}
 								/>}
+								{/* <View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"2024香水基金会颁奖典礼在林肯中心大卫·H·科赫剧院举行。今年是香水基金会成立"}</Text>
+											<Text style={styles.strong}>{"75周年"}</Text>
+											<Text>{"，全场座无虚席，观看人数更是突破纪录。"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.strong}>
+											<Text style={{ color: "#222" }}>
+												<Text style={{ color: "#222" }}>菲菲奖 The Fragrance Foundation Awards</Text>
+											</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"全称"}</Text>
+											<Text style={styles.strong}>{"香水基金会大奖"}</Text>
+											<Text>{"，被誉为"}</Text>
+											<Text style={styles.strong}>{"“香水界的奥斯卡”"}</Text>
+											<Text>{"，从1973年开办至今，已成为全球香水界一年一度的盛事。参选香水来自全球各大香水会员国的推荐，经过消费者及评审团票选的激烈竞争，最终评选出年度获奖名单。奖项兼具专业与商业的双重属性，参与评选的多以商业品牌为主。"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/2024S900x900.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											{"今年的获奖名单仍有很多熟悉的面孔，而一些奖项的获奖香水也让人有些意外。接下来，香水时代为大家带来2024TFF奖完整版获奖名单。"}
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 781451)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/001S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 781451)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/1S1000x1000.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"前调是类似"}</Text>
+											<Text style={styles.textline}>{"水果乳酸菌饮料"}</Text>
+											<Text>{"的味道，甜度很高。后调木质感逐渐强烈，伴随着"}</Text>
+											<Text style={styles.textline}>{"淡淡的烟熏感"}</Text>
+											<Text>{"，是一支甜酷风格的女香。比同系列的男香闻起来要有个性一些。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 806899)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/2S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 806899)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/02S1000x915.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"和原版相比，香精版本的"}</Text>
+											<Text style={styles.textline}>{"柠檬和木质变得更加突出"}</Text>
+											<Text>{"，衬托着爽朗的薰衣草和鼠尾草。在保持原有清爽感的同时，整体质感会更加冷冽和现代。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 819142)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/03S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 819142)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/3S800x600.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"丝滑的香草，再点缀上微苦的杏仁，变成了类似"}</Text>
+											<Text style={styles.textline}>{"杏仁露的味道"}</Text>
+											<Text>{"。官方写的是中性香，但是这个味道还是更适合女生。不得不说，TF营销功力一向深厚，禁忌欲望的概念话题度又有了。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 445761)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/04S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 445761)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/4S2500x2500.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"2007年上市，如今依旧备受少女们的喜爱。"}</Text>
+											<Text style={styles.textline}>{"酸甜可口的果香仿佛鲜榨的果汁"}</Text>
+											<Text>{"，加入少量的绿叶气息化解甜腻感，闻起来更加清新通透。香气充满元气，是永不过时的少女的味道。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 318250)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/05S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 318250)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/5S2048x2329.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text style={styles.textline}>{"香草和可可细腻得像一阵粉雾"}</Text>
+											<Text>{"，搭配上蓬松干燥的薰衣草，在皮肤上呈现出温柔暖甜的气息。它的香气甜而不齁，而是梦幻又撩人，高级感满满。金灿灿的瓶身更被很多人当成开运神器。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 910661)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/06S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 910661)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/6S976x976.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"圣罗兰近些年走向了商业化的极端。"}</Text>
+											<Text style={styles.textline}>{"薰衣草、橙花加过量的降龙涎香醚"}</Text>
+											<Text>{"，闻到的瞬间脑海里会闪过众多商业馥奇男香。中外口碑相差很大，是一支完全向市场妥协的产物。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 492449)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/07S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 492449)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/7S769x523.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"花园系列的新作，风格和前作有了很大的改变。"}</Text>
+											<Text style={styles.textline}>{"充满活力的柑橘"}</Text>
+											<Text>{"，再结合开心果带有奶香味的香气，想象不出来花园，倒是混合出了一杯甜甜的燕麦奶。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 203187)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/012S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 203187)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/zmlS1100x810.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"这是一支"}</Text>
+											<Text style={styles.textline}>{"七分熟的新鲜青梨"}</Text>
+											<Text>{"，清甜的梨香伴随着脂粉感的花香，真是温柔到了骨子里。它的广告也很有创意，一个个从梨树上掉下来的香水瓶，就像瓶中装着的是真实的梨子。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 633584)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/09S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 633584)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/9S800x800.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"这是一款简单、轻盈的香水。"}</Text>
+											<Text style={styles.textline}>{"清爽的柑橘带来一个明亮充满活力的开场"}</Text>
+											<Text>{"，香草和牡丹带来朦胧的脂粉花香。味道不算新颖，胜在甜美、好穿。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 374781)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/010S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 374781)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/10S960x960.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text style={styles.textline}>{"薰衣草和香根草"}</Text>
+											<Text>{"的组合，和市面上大多数的男香差别不大。香根草丰富的气味被浓厚的脂粉感遮盖了大半，作为一款男香，还是有些太甜了。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 983422)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/011S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 983422)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/11S4872x4872.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"碧梨的香水连续三年获得这个奖项， No.3是一支木质东方调的香水，"}</Text>
+											<Text style={styles.textline}>{"甜美的果香融合温暖的木质和琥珀"}</Text>
+											<Text>{"，在藏红花的催化下，尽显性感和妩媚。瓶身也换成了与之相配的暗红色。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 498874)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/640S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 498874)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/12S1800x1500.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"安娜苏SUNDAE系列的包装把食玩风格贯彻到底。圆筒型的包装，搭配上"}</Text>
+											<Text style={styles.textline}>{"马卡龙色系的仿真冰淇凌瓶"}</Text>
+											<Text>{"，童趣少女风完全就是安娜苏的统治区。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 131922)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/013S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 131922)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/13S1264x1264.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"今年的奢华包装没有往年的花哨。法兰西防御是国际象棋一个古老的开局体系，香水瓶身的设计也参考了"}</Text>
+											<Text style={styles.textline}>{"国际象棋的棋子"}</Text>
+											<Text>{"，设计虽然简单，但是黑色的金属瓶身看起来还是很有质感的。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 165548)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/014S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 165548)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/14S1077x1077.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"作为橙花狂热爱好者，路易十四曾经建造了欧洲最大的橙子园，这支香水就以此为灵感。"}</Text>
+											<Text style={styles.textline}>{"高浓度的橙花搭配淋了蜂蜜的木质"}</Text>
+											<Text>{"，如同一片洒满阳光的橙子园，温暖明亮。并且每支香水都添加了真金箔，太奢华了！"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 308171)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/015S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 308171)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/15S700x700.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"香如其名，开场是"}</Text>
+											<Text style={styles.textline}>{"鲜嫩多汁的荔枝"}</Text>
+											<Text>{"，之后清甜的玫瑰占据主场，伴有香槟酒一样的气泡感。整体香气清新又水润，可惜留香实在太短了。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 900396)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/016S1080x274.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Pressable onPress={() => {
+											gotodetail("item-detail", 900396)
+										}}>
+											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/16S2048x2329.jpg"} />
+										</Pressable>
+									</View>
+									<View style={styles.p}>
+										<Text style={{ textAlign: "right" }}>
+											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
+										</Text>
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text style={styles.textline}>{"干燥的烟丝淋上浓稠的蜂蜜"}</Text>
+											<Text>{"，同时夹杂着一丝动物气息，营造出独特的暖甜氛围。但是整体香气似乎并不和谐，于是引来众多香友的吐槽“娇兰又翻车了……”"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/0018S1080x274.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/17S1200x1200.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"罗勒与薄荷交织出清凉的绿意，加上青涩的无花果和充满气泡感的柠檬。仿佛是"}</Text>
+											<Text style={styles.textline}>{"雨后的空气"}</Text>
+											<Text>{"，清新通透，提振情绪。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/019S1080x274.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/18S1200x675.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Text>{"Gilles Andrier于1993年加入奇华顿，在2005年升任首席执行官。在他的领导下，奇华顿在全球市场中实现了显著扩张，并重新定义了公司的战略方向，巩固了奇华顿在全球香氛与美容市场的领先地位。"}</Text>
+										</Text>
+									</View>
+
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/020S1080x274.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/19S1000x500.jpg"} />
+									</View>
+									<View style={styles.p}>
+										<Text style={styles.ptext}>
+											<Pressable onPress={() => {
+												gotodetail("wiki-detail", 12059302)
+											}}>
+												<Text style={styles.strong}>{"Jacques Cavallier Belletrud"}</Text>
+											</Pressable>
+											<Text>{"出生于格拉斯的香水世家，2004年曾获得Prix Francois Coty的冠军。他认为香气与记忆、情绪紧密相连。代表作数不胜数，宝格丽 大吉岭茶、三宅一生一生之水……目前他担任LV的专属调香师。"}</Text>
+										</Text>
+									</View>
+
+								</View> */}
 							</View>
 							<View style={styles.btn_container}>
 								<View style={[styles.btn_content, styles.btn_margin]}>
@@ -456,7 +924,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					</View>
 				</>}
 				contentContainerStyle={styles.flatlist_con}
-				removeClippedSubviews={true}
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={[
@@ -545,6 +1012,26 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 })
 
 const styles = StyleSheet.create({
+	p: {
+		paddingVertical: 4,
+		margin: 0,
+	},
+	ptext: {
+		fontSize: 15,
+		color: theme.text1,
+		lineHeight: 29,
+		fontFamily: "PingFang SC"
+	},
+	strong: {
+		fontSize: 15,
+		color: theme.text1,
+		lineHeight: 29,
+		fontWeight: "bold",
+		fontFamily: "PingFang SC"
+	},
+	textline: {
+		textDecorationLine: "underline"
+	},
 	loading_con: {
 		position: "absolute",
 		top: 0,
@@ -657,7 +1144,6 @@ const styles = StyleSheet.create({
 	},
 	flatlist_con: {
 		backgroundColor: "#FCFCFC",
-		height: "auto",
 	},
 	replyitem_con: {
 		paddingHorizontal: 24,
