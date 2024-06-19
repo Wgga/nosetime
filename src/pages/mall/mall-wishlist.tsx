@@ -123,9 +123,9 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 						<Text style={[styles.wishlist_title_text, tab == "stocktip" && { color: theme.toolbarbg }]}>{"到货提醒"}</Text>
 					</Pressable>
 				</View>
-				<Pressable style={styles.title_text_con} onPress={() => { setEdit(val => !val) }}>
-					{!edit && <Text style={styles.title_text}>{"编辑"}</Text>}
-					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
+				<Pressable style={Globalstyles.title_text_con} onPress={() => { setEdit(val => !val) }}>
+					{!edit && <Text style={Globalstyles.title_text}>{"编辑"}</Text>}
+					{edit && <Text style={Globalstyles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
 			<View style={[Globalstyles.list_content, Globalstyles.container]}>
@@ -201,15 +201,6 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		color: "#CCCCCC",
 		fontWeight: "500",
-	},
-	title_text_con: {
-		width: 44,
-		height: 44,
-		justifyContent: "center",
-	},
-	title_text: {
-		fontSize: 13,
-		color: theme.toolbarbg,
 	},
 	right_btn_con: {
 		width: "100%",

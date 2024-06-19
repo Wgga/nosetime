@@ -23,7 +23,7 @@ import events from "../../hooks/events/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalstyles";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
@@ -303,30 +303,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		return articleService.unitNumber(number, 1);
 	}
 
-	const show_items = (items: any, num: number) => {
-		//控制显示前两回复，arr.show用于显示剩余回复
-		if (num == -1 && items.length > 2) {
-			return true;
-		}
-		if (num == 0 || num == 1) {
-			return true
-		} else if (!items.show) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	const display = (items: any) => {
-		//用于显示剩余回复
-		if (!items.show) {
-			items.show = true;
-		} else {
-			items.show = false;
-		}
-		setIsRender(val => !val);
-	}
-
 	const goPage = (page: number) => {
 		currentpage.current = page;
 		setShowPage(false);
@@ -467,7 +443,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 						return (
 							<View style={styles.list_item}>
 								<ReplyItem item={item} islike={like_.current[item.id]} />
-								{item.sub && <View style={styles.list_sub_item}>
+								{(item.sub && item.sub.length > 0) && <View style={styles.list_sub_item}>
 									{item.sub.map((sub: any, index: number) => {
 										return (
 											<View key={sub.id}>
@@ -476,10 +452,11 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 										)
 									})}
 									{show_items(item.sub, -1) && <Pressable onPress={() => {
-										display(item.sub)
-									}} style={styles.more_reply}>
-										{!item.sub.show && <Text style={styles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
-										{item.sub.show && <Text style={styles.more_reply_text}>{"收起回复"}</Text>}
+										display(item.sub);
+										setIsRender(val => !val);
+									}} style={Globalstyles.more_reply}>
+										{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
+										{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
 										<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
 									</Pressable>}
 								</View>}
@@ -705,16 +682,6 @@ const styles = StyleSheet.create({
 		marginBottom: 12,
 		borderRadius: 8,
 		overflow: "hidden",
-	},
-	more_reply: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginLeft: 45,
-		marginBottom: 10,
-	},
-	more_reply_text: {
-		fontSize: 12,
-		color: theme.tit,
 	},
 	footer_flex: {
 		flexDirection: "row",

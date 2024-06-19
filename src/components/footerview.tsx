@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TextInput, Keyboard, Animated } from "react-native";
+import { View, Text, StyleSheet, TextInput, Keyboard, Animated, Pressable } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,8 +14,8 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 
 	// 参数
-	const { placeholder, replytext, style, opacity, zIndex } = data;
-	const { fun, setReplyText } = method;
+	const { placeholder, replytext, style, opacity, zIndex, inputref } = data;
+	const { onChangeText, publish } = method;
 
 	// 数据
 	const [inputH, setInputH] = React.useState(0); // 输入框高度
@@ -35,9 +35,9 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 			isfocus && styles.footer_radius, style
 		]}>
 			<View style={[styles.footer_con_left, { height: inputH }]}>
-				<TextInput
+				<TextInput ref={inputref}
 					style={styles.footer_input}
-					onChangeText={text => setReplyText(text)}
+					onChangeText={onChangeText}
 					value={replytext}
 					multiline={true}
 					onContentSizeChange={(event: any) => {
@@ -47,14 +47,14 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 			</View>
 			<View style={styles.footer_con_right}>
 				{children}
-				{isfocus && <LinearGradient style={styles.footer_publish}
+				{isfocus && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
 					colors={["#81B4EC", "#9BA6F5"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
 					locations={[0, 1]}
 				>
 					<Text style={styles.publish_text}>{"发布"}</Text>
-				</LinearGradient>}
+				</LinearGradient></Pressable>}
 			</View>
 		</Animated.View >
 	);

@@ -1,13 +1,12 @@
 import { Dimensions } from "react-native";
 
-import reactNativeTextSize from "react-native-text-size";
-
 import http from "../../utils/api/http";
 
 import cache from "../../hooks/storage/storage";
 import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
+import { setContentFold } from "../../configs/globalstyles";
 
 const Winwidth = Dimensions.get("window").width;
 
@@ -195,31 +194,16 @@ class SearchService {
 				}
 
 				if (this.searchlist[word].item == undefined) this.searchlist[word].item = [];
-				resp_data.item.data.map((item: any) => {
-					item["discuss2"] = "";
-					item["isopen"] = true;
-					if (item.discuss.length > 0) {
-						reactNativeTextSize.measure({
-							width: Winwidth - 30,
-							fontSize: 13,
-							fontFamily: "monospace",
-							fontWeight: "normal",
-							text: item.discuss,
-							lineInfoForLine: 7
-						}).then((data: any) => {
-							if (data.lineCount < 7) {
-								item["discuss2"] = "";
-								item["isopen"] = true;
-							} else {
-								item["discuss2"] = item.discuss.slice(0, data.lineInfo.start - 14);
-								item["isopen"] = false;
-							}
-						}).catch((error) => {
-							item["discuss2"] = "";
-							item["isopen"] = true;
-						});
-					}
-				});
+				// 设置展开收起文本
+				setContentFold({
+					items: resp_data.item.data, // 列表数据
+					key: "discuss", // 需要展开收起的字段
+					src: "search",
+					width: Winwidth - 30, // 列表项的宽度
+					fontSize: 13, // 列表项的字体大小
+					lineInfoForLine: 7, // 收起时显示的行数
+					moreTextLen: 14, // 展开收起按钮长度
+				})
 				if (this.page[word][type] > 2) {
 					this.searchlist[word].item = this.searchlist[word].item.concat(resp_data.item.data);
 				} else {

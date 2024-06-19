@@ -86,7 +86,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 	const islike = (ids: any[]) => {
 		if (!us.user.uid) {
 			setIsRender(val => !val);
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页" } });
+			return;
 		}
 		http.post(ENV.wiki, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {
@@ -129,7 +129,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 
 	const togglefav = (wid: number) => {
 		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页面" } });
 		}
 		http.post(ENV.wiki + "?uid=" + us.user.uid, {
 			method: "togglefav", wid: wid, token: us.user.token
@@ -140,7 +140,7 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 				like_.current[wid] = false;
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现页" } });
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App发现百科页面" } });
 			}
 			setIsRender(val => !val);
 		});
@@ -301,10 +301,10 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 								}}>
 									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
 									{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
-									{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
-										{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
-										{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
-										{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+									{item.desc2 && <View style={[Globalstyles.morebtn_con, item.isopen && Globalstyles.open_morebtn]}>
+										{!item.isopen && <Text style={Globalstyles.ellipsis_text}>{"..."}</Text>}
+										{!item.isopen && <Text style={Globalstyles.morebtn_text}>{"(显示全部)"}</Text>}
+										{item.isopen && <Text style={Globalstyles.morebtn_text}>{"(收起全部)"}</Text>}
 									</View>}
 								</Pressable>}
 							</View>}
@@ -346,10 +346,10 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 									}}>
 										{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
 										{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
-										{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
-											{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
-											{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
-											{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+										{item.desc2 && <View style={[Globalstyles.morebtn_con, item.isopen && Globalstyles.open_morebtn]}>
+											{!item.isopen && <Text style={Globalstyles.ellipsis_text}>{"..."}</Text>}
+											{!item.isopen && <Text style={Globalstyles.morebtn_text}>{"(显示全部)"}</Text>}
+											{item.isopen && <Text style={Globalstyles.morebtn_text}>{"(收起全部)"}</Text>}
 										</View>}
 									</Pressable>}
 								</View>
@@ -465,22 +465,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		lineHeight: 20,
 		color: theme.text1,
-	},
-	desc_morebtn_con: {
-		position: "absolute",
-		right: 0,
-		bottom: 0,
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	open_morebtn: {
-		position: "relative",
-		justifyContent: "flex-end",
-	},
-	desc_morebtn_text: {
-		fontSize: 14,
-		color: theme.text1,
-		marginLeft: 8,
 	},
 	wiki_discuss_con: {
 		flexDirection: "row",

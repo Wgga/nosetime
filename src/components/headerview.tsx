@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, StatusBar, TextInput, Animated, Easing, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, TextInput, Animated, Easing, Dimensions } from "react-native";
 
 import { ShadowedView } from "react-native-fast-shadow";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "../assets/iconfont";
 
 import theme from "../configs/theme";
-import { ENV } from "../configs/ENV";
 
 const { width, height } = Dimensions.get("window");
 
@@ -163,6 +162,7 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
+		fontWeight: "bold"
 	},
 	title_text_con: {
 		flex: 1,

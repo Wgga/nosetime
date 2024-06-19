@@ -140,7 +140,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 						<View style={[styles.newvideoimg, styles.homebrs8]}>
 							{(homedataref.current.newvod && homedataref.current.newvod.vpicurl) && <FastImage style={{ width: "100%", height: "100%" }}
 								source={{ uri: homedataref.current.newvod.vpicurl }} />}
-							<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
+							<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} resizeMode="contain" />
 						</View>
 						<Text numberOfLines={1} style={[styles.newvideomaintit]}>{homedataref.current.newvod.maintit}</Text>
 						{homedataref.current.newvod.subtit && <Text numberOfLines={1} style={[styles.newvideosubtit]}>{homedataref.current.newvod.subtit}</Text>}
@@ -161,7 +161,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 									<View style={[styles.itemvodImg, styles.homebrs6]}>
 										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
 											source={{ uri: item.vpicurl }} />}
-										<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
+										<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} resizeMode="contain" />
 									</View>
 									<Text numberOfLines={1} style={styles.smellitemtit2}>{item.maintit}</Text>
 									<Text numberOfLines={1} style={styles.smellitemtit3}>{item.subtit}</Text>

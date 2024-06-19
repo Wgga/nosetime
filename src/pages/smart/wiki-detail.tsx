@@ -195,9 +195,7 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 
 	// 当前百科是否收藏
 	const islike = (ids: any) => {
-		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App百科详情页" } });
-		}
+		if (!us.user.uid) return;
 		http.post(ENV.api + ENV.wiki, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {
 				like_.current[resp_data[i]] = 1;

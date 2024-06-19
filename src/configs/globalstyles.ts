@@ -1,7 +1,10 @@
 import { StyleSheet } from "react-native";
 
+import reactNativeTextSize from "react-native-text-size";
+
 import theme from "./theme";
 
+// 设置等级的左偏移量
 const handlelevelLeft = (level: number) => {
 	if (level == 2 || level == 5 || level == 8 || level == 11 || level == 14) {
 		return Globalstyles.level_left_20;
@@ -10,6 +13,7 @@ const handlelevelLeft = (level: number) => {
 	}
 }
 
+// 设置等级的上偏移量
 const handlelevelTop = (level: number) => {
 	if (level == 4 || level == 5 || level == 6) {
 		return Globalstyles.level_top_20;
@@ -22,6 +26,7 @@ const handlelevelTop = (level: number) => {
 	}
 }
 
+// 设置星星的左偏移量
 const handlestarLeft = (star: number) => {
 	if (star == 0) {
 		return Globalstyles.star_left_75;
@@ -36,6 +41,7 @@ const handlestarLeft = (star: number) => {
 	}
 }
 
+// 设置评论中星星的左偏移量
 const handlereplystarLeft = (star: number) => {
 	if (star == 1 || star == 2) {
 		return Globalstyles.replystar_left_52;
@@ -45,6 +51,66 @@ const handlereplystarLeft = (star: number) => {
 		return Globalstyles.replystar_left_26;
 	} else if (star == 7 || star == 8) {
 		return Globalstyles.replystar_left_12;
+	}
+}
+
+//控制显示前两回复，arr.show用于显示剩余回复
+const show_items = (items: any, num: number) => {
+	if (num == -1 && items.length > 2) {
+		return true;
+	}
+	if (num == 0 || num == 1) {
+		return true
+	} else if (!items.show) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+//用于显示剩余回复
+const display = (items: any) => {
+	if (!items.show) {
+		items.show = true;
+	} else {
+		items.show = false;
+	}
+}
+
+// 设置内容折叠
+const handleContent = (item: any, params: any) => {
+	reactNativeTextSize.measure({
+		width: params.width,
+		fontSize: params.fontSize,
+		fontFamily: "monospace",
+		fontWeight: "normal",
+		text: item[params.key],
+		lineInfoForLine: params.lineInfoForLine,
+	}).then((data: any) => {
+		if (data.lineCount < params.lineInfoForLine) {
+			item[params.key + "2"] = "";
+			item["isopen"] = true;
+		} else {
+			item[params.key + "2"] = item[params.key].slice(0, data.lineInfo.start - params.moreTextLen);
+			item["isopen"] = false;
+		}
+	}).catch((error) => {
+		item[params.key + "2"] = "";
+		item["isopen"] = true;
+	});
+}
+const setContentFold = (params: any) => {
+	let srclist = ["smart", "article"]
+	if (srclist.includes(params.src)) {
+		handleContent(params.item, params);
+	} else {
+		params.items.forEach((item: any) => {
+			item[params.key + "2"] = "";
+			item["isopen"] = true;
+			if (item[params.key].length > 0) {
+				handleContent(item, params);
+			}
+		});
 	}
 }
 
@@ -168,11 +234,12 @@ const Globalstyles: any = StyleSheet.create({
 		width: "100%",
 		height: 500,
 	},
-	// 容器样式
+	// 各页面容器
 	container: {
 		flex: 1,
 		backgroundColor: theme.toolbarbg,
 	},
+	// 头部标题右侧按钮
 	title_text_con: {
 		width: 44,
 		height: 44,
@@ -182,6 +249,7 @@ const Globalstyles: any = StyleSheet.create({
 		fontSize: 13,
 		color: theme.tit2,
 	},
+	// 帖子首页类型筛选遮罩
 	social_mask: {
 		...StyleSheet.absoluteFillObject,
 		zIndex: 1,
@@ -220,16 +288,56 @@ const Globalstyles: any = StyleSheet.create({
 		color: theme.tit2,
 		marginRight: 15,
 	},
+	// 列表容器
 	list_content: {
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
 		overflow: "hidden",
 	},
+	// 键盘遮罩
 	keyboardmask: {
 		...StyleSheet.absoluteFillObject,
 		backgroundColor: "rgba(0,0,0,0.5)",
 		zIndex: 12
-	}
+	},
+	// 二级评论展开收起
+	more_reply: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginLeft: 45,
+		marginBottom: 10,
+	},
+	more_reply_text: {
+		fontSize: 12,
+		color: theme.tit,
+	},
+	morebtn_con: {
+		position: "absolute",
+		right: 0,
+		bottom: 0,
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	open_morebtn: {
+		position: "relative",
+		justifyContent: "flex-end",
+	},
+	ellipsis_text: {
+		fontSize: 14,
+		lineHeight: 20,
+		color: theme.text1,
+	},
+	morebtn_text: {
+		fontSize: 14,
+		color: theme.text1,
+		marginLeft: 8,
+	},
 });
 
-export { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, handlereplystarLeft };
+export {
+	Globalstyles,
+	handlelevelLeft, handlelevelTop,
+	handlestarLeft, handlereplystarLeft,
+	show_items, display,
+	setContentFold
+};

@@ -1,12 +1,10 @@
 import React from "react";
 import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated, ScrollView } from "react-native";
 
-import { WebView } from "react-native-webview";
+import { FlashList } from "@shopify/flash-list";
 import Orientation from "react-native-orientation-locker";
 import FastImage from "react-native-fast-image";
-import { FlashList } from "@shopify/flash-list";
 
-// import RenderHtml from "../../components/renderhtml";
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
@@ -14,6 +12,7 @@ import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
+import AutoHeightWebView from "../../components/autoHeightWebview";
 
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
@@ -24,11 +23,12 @@ import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
-import AutoSizeImage from "../../components/renderhtml/autosizeimage";
-import RenderHtml, { HTMLContentModel, HTMLElementModel, useInternalRenderer } from "react-native-render-html";
+import { useFocusEffect } from "@react-navigation/native";
+import cache from "../../hooks/storage/storage";
+import reactNativeTextSize from "react-native-text-size";
 
 const classname = "ArticleDetail";
 
@@ -37,7 +37,32 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	const { id } = route.params;
 	// 控件
 	const windowD = useWindowDimensions();
-
+	const webviewref = React.useRef<any>(null); // webview Ref
+	const inputref = React.useRef<any>(null); // 评论输入框 Ref
+	const listref = React.useRef<any>(null); // 评论列表 Ref
+	// 变量
+	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
+	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
+	let footerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
+	let footerMaskOpt = React.useRef(new Animated.Value(0)).current; // 底部遮罩透明度动画
+	let footerMaskZ = React.useRef(new Animated.Value(-1)).current; // 底部遮罩层级动画
+	let page = React.useRef<number>(1); // 当前页数
+	// 数据
+	let info = React.useRef<any>({
+		refid: 0,
+		refuid: 0,
+		parentid: 0,
+		refuname: "",
+		holder: "快快告诉我，你在想什么",
+		replytext: "",
+		refcontent: "",
+	});
+	let acidtoname = React.useRef<any>({});
+	let articledata = React.useRef<any>({}); // 文章数据
+	let hotarticle = React.useRef<any>([]); // 热门文章
+	let replydata = React.useRef<any>({}); // 评论数据
+	let likelist = React.useRef<any>({}); // 是否收藏文章
+	let likefavs = React.useRef<any>({}); // 点赞列表
 	// 状态
 	const [loading, setLoading] = React.useState<boolean>(true); // 是否加载中
 	const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏显示
@@ -48,18 +73,18 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	let isShowFooter = React.useRef<boolean>(false); // 是否显示底部
 	let noMore = React.useRef<boolean>(false); // 是否有更多数据
 
-	// 变量
-	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
-	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
-	let footerOpt = React.useRef(new Animated.Value(0)).current; // 底部透明度动画
-	let footerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
-	// 数据
-	let articledata = React.useRef<any>({}); // 文章数据
-	let hotarticle = React.useRef<any>([]); // 热门文章
-	let replydata = React.useRef<any>({}); // 评论数据
-	let likelist = React.useRef<any>({}); // 是否收藏文章
-	let likefavs = React.useRef<any>({}); // 点赞列表
-	let page = React.useRef<number>(1); // 当前页数
+	useFocusEffect(
+		React.useCallback(() => {
+			// 根据文章内容判断状态栏颜色
+			setTimeout(() => {
+				if (articledata.current && articledata.current.mp4URL) {
+					StatusBar.setBarStyle("dark-content", true);
+				} else {
+					StatusBar.setBarStyle("light-content", true);
+				}
+			}, 100);
+		}, [])
+	)
 
 	// 初始化数据
 	React.useEffect(() => {
@@ -84,17 +109,22 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			http.post(ENV.mall + "?uid=" + us.user.uid, {
 				token: us.user.token, method: "getarticle", did: us.did, page: "article", code: id
 			}).then(() => { }).catch(() => { });
-
-			// 根据文章内容判断状态栏颜色
-			if (articledata.current.mp4URL) {
-				StatusBar.setBarStyle("dark-content", true);
-			} else {
-				StatusBar.setBarStyle("light-content", true);
-			}
 		})
 
-		Keyboard.addListener("keyboardDidShow", () => { setIsFocus(true); })
-		Keyboard.addListener("keyboardDidHide", () => { setIsFocus(false); })
+		Keyboard.addListener("keyboardDidShow", () => { showFooterMask(true); })
+		Keyboard.addListener("keyboardDidHide", () => {
+			if (inputref.current) inputref.current.blur();
+			info.current = {
+				refid: 0,
+				refuid: 0,
+				parentid: 0,
+				refuname: "",
+				holder: "快快告诉我，你在想什么",
+				replytext: "",
+				refcontent: "",
+			};
+			showFooterMask(false);
+		})
 
 		return () => {
 			events.unsubscribe(classname + id + "fullScreenChange");
@@ -107,21 +137,66 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	const getArticleReply = () => {
 		if (noMore.current) return;
 		http.post(ENV.article, { method: "getreplyv2", aid: id, pagesize: 50, page: page.current, from: 1 }).then((resp_data: any) => {
+			// 设置展开收起文本
+			if (resp_data.items && resp_data.items.length > 0) {
+				resp_data.items.forEach((item: any) => {
+					item["content2"] = "";
+					item["isopen"] = true;
+					if (item.content.length > 0) {
+						setContentFold({
+							item, // 列表数据
+							key: "content", // 需要展开收起的字段
+							src: "article", // 来源
+							width: windowD.width - 89, // 列表项的宽度
+							fontSize: 13, // 列表项的字体大小
+							lineInfoForLine: 5, // 收起时显示的行数
+							moreTextLen: 5, // 展开收起按钮长度
+						})
+					}
+					if (item.sub && item.sub.length > 0) {
+						item.sub.forEach((subitem: any) => {
+							subitem["content2"] = "";
+							subitem["isopen"] = true;
+							if (item.content.length > 0) {
+								setContentFold({
+									item: subitem, // 列表数据
+									key: "content", // 需要展开收起的字段
+									src: "article", // 来源
+									width: windowD.width - 128, // 列表项的宽度
+									fontSize: 13, // 列表项的字体大小
+									lineInfoForLine: 5, // 收起时显示的行数
+									moreTextLen: 5, // 展开收起按钮长度
+								})
+							}
+						})
+					}
+				});
+			}
 			if (page.current == 1) {
 				replydata.current = resp_data;
 			} else {
 				replydata.current.items = replydata.current.items.concat(resp_data.items);
 			}
 			if (resp_data.items.length < 50) noMore.current = true;
-			// this.setrefuname(replydata.current.items);
+			setrefuname(replydata.current.items);
 			favs(resp_data);
 			if (page.current == 1) {
 				events.publish(classname + id + "setArticleData", articledata.current);
 				setTimeout(() => { setLoading(false) }, 1000);
 			}
-			setIsRender(val => !val);
+			setTimeout(() => { setIsRender(val => !val) }, 100);
 		});
 	};
+
+	// 设置三级回复人
+	const setrefuname = (items: any) => {
+		for (var i in items) {
+			acidtoname.current[items[i]["acid"]] = items[i]["uname"];
+			items[i].content = items[i].content.replace(/\n/g, "<br>");
+			if (items[i]["acrefid"] > 0)
+				items[i]["refuname"] = acidtoname.current[items[i]["acrefid"]];
+		}
+	}
 
 	//获取用户曾点过的赞
 	const favs = (resp: any) => {
@@ -140,6 +215,26 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				if (resp_data[i]) likefavs.current[resp_data[i]] = true;
 			}
 		});
+	}
+
+	//文章评论点赞功能
+	const like_reply = (item: any) => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+		}
+		http.post(ENV.api + ENV.article + "?uid=" + us.user.uid, { method: "togglefavcomment", acid: item.id, token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "ADD") {
+				likefavs.current[item.id] = true;
+				item.up += 1;
+			} else if (resp_data.msg == "REMOVE") {
+				likefavs.current[item.id] = false;
+				item.up -= 1;
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+			}
+			setIsRender(val => !val);
+		})
 	}
 
 	// 获取用户是否收藏当前文章
@@ -204,9 +299,37 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
+	// 动态修改底部输入框遮罩透明度和层级
+	const showFooterMask = (bol: boolean) => {
+		if (bol) {
+			Animated.timing(footerMaskOpt, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			Animated.timing(footerMaskOpt, {
+				toValue: 0,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: -1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		}
+		setIsFocus(bol);
+	}
+
 	// 收藏文章
 	const favarticle = () => {
-		setShowMenu(val => !val);
+		if (showmenu) setShowMenu(false);
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 		}
@@ -215,15 +338,16 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		}).then((resp_data: any) => {
 			if (resp_data.msg == "ADD") {
 				likelist.current[id] = true;
-				ToastCtrl.show({ message: "收藏成功", duration: 2000, viewstyle: "short_toast", key: "fav_add_toast" });
+				ToastCtrl.show({ message: "收藏成功", duration: 1000, viewstyle: "short_toast", key: "fav_add_toast" });
 			} else if (resp_data.msg == "REMOVE") {
 				likelist.current[id] = false;
-				ToastCtrl.show({ message: "已取消收藏", duration: 2000, viewstyle: "short_toast", key: "fav_remove_toast" });
+				ToastCtrl.show({ message: "已取消收藏", duration: 1000, viewstyle: "short_toast", key: "fav_remove_toast" });
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			}
 			articledata.current.favcnt = resp_data.favcnt;
+			setIsRender(val => !val);
 		});
 	}
 
@@ -232,17 +356,166 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		return articleService.unitNumber(number, 1);
 	}
 
+	// 处理webview中的链接与RN通信
+	const INJECTED_JAVASCRIPT = `(function () {
+		var allLinks = document.querySelectorAll("a");
+		allLinks.forEach((link)=>{
+			link.addEventListener("click", (ev)=>{
+				ev.preventDefault();
+				let e = ev.srcElement || ev.target;
+				for (let i = 0; i < 3; ++i) {
+					if (e.nodeName == "A")
+						break;
+					else
+						e = e.parentNode;
+				}
+				if (e.nodeName != "A") return;
+				let href = e.getAttribute("href");
+				let obj = href.substr(href.indexOf("?") + 1).replace(/%22/g, '"');
+				window.ReactNativeWebView.postMessage(obj);
+			});
+		})
+	})();`;
+
+	// 监听webview内容并获取其高度和处理webview内点击事件
+	const handleMessage = (event: any) => {
+		if (!event.nativeEvent.data) return;
+		let data = JSON.parse(event.nativeEvent.data);
+		if (data.page && data.page.length > 3) {
+			gotodetail(data.page, data.id);
+			let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: data.page, code: data.id };
+			http.post(ENV.mall + "?uid=" + us.user.uid, params);
+		}
+	};
+
+	// 跳转页面
 	const gotodetail = (page: any, id: number) => {
-		if (page == "item-detail") {
-			navigation.navigate("Page", { screen: "ItemDetail", params: { id, src: "APP文章:" + id } });
-		} else if (page == "mall-item") {
-			navigation.navigate("Page", { screen: "MallItem", params: { id, src: "APP文章:" + id } });
-		} else if (page == 'mall-heji') {
-			navigation.navigate("Page", { screen: "MallHeji", params: { id, src: "APP文章:" + id } });
-		} else if (page == 'mall-group') {
+		let screen = "";
+		let pages = ["item-detail", "mall-item", "mall-heji", "wiki-detail"];
+		switch (page) {
+			case "item-detail":
+				screen = "ItemDetail";
+				break;
+			case "mall-item":
+				screen = "MallItem";
+				break;
+			case "mall-heji":
+				screen = "MallHeji";
+				break;
+			case "wiki-detail":
+				screen = "WikiDetail";
+				break;
+			default:
+				break;
+		}
+		if (pages.includes(page)) {
+			navigation.navigate("Page", { screen, params: { id, src: "APP文章:" + id } });
+		} else if (page == "mall-group") {
 			navigation.navigate("Page", { screen: "MallGroup", params: { id, src: "APP文章:" + id, word: 1 } });
+		} else if (page == "article-detail") {
+			navigation.push("Page", { screen: "ArticleDetail", params: { id } });
 		}
 	}
+
+	// 分享弹窗
+	const showSharePopover = () => {
+		if (showmenu) setShowMenu(false);
+		ModalPortal.show((
+			<SharePopover />
+		), {
+			key: "share_popover",
+			width: windowD.width,
+			height: 200,
+			rounded: false,
+			useNativeDriver: true,
+			modalAnimation: new SlideAnimation({
+				initialValue: 0,
+				slideFrom: "bottom",
+				useNativeDriver: true,
+			}),
+			onTouchOutside: () => {
+				ModalPortal.dismiss("share_popover");
+			},
+			swipeDirection: "down",
+			animationDuration: 300,
+			type: "bottomModal",
+			modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+		})
+	}
+
+	// 点击选择回复
+	const reply = (item: any, type: string, parentitem: any = null) => {
+		info.current.refid = item.id;
+		info.current.parentid = (type == "main" || type == "wx") ? item.id : parentitem.id;
+		info.current.refuid = item.uid;
+		info.current.refuname = (type == "main" || type == "sub") ? item.uname : type == "wx" ? item.wxnick : "";
+		info.current.holder = "回复 " + info.current.refuname;
+		info.current.refcontent = item.content;
+		if (inputref.current) inputref.current.focus();
+		setIsRender(val => !val);
+	};
+
+	// 设置回复后的模拟数据
+	const setreply = () => {
+		let data: any = {
+			id: new Date().getTime(),
+			uid: us.user.uid,
+			uface: us.user.uface,
+			ulevel: us.user.ulevel,
+			uname: us.user.uname,
+			actime: "刚刚",
+			content: info.current.replytext,
+			up: 0
+		};
+		if (info.current.refid == 0 && info.current.parentid == 0) {
+			replydata.current.items.push(data);
+		} else {
+			//20240523 shibo: 增加判断，避免出错
+			let replyitems = replydata.current.items.filter((item: any) => { return item.id == info.current.parentid })[0];
+			if (!replyitems.sub) replyitems["sub"] = [];
+			if (info.current.refid == info.current.parentid) {
+				replyitems.sub.push(data);
+			} else {
+				data["refuname"] = info.current.refuname;
+				data["refuid"] = info.current.refuid;
+				data["refcontent"] = info.current.refcontent;
+				replyitems.sub.push(data);
+			}
+		}
+		setIsRender(val => !val);
+		Keyboard.dismiss();
+	}
+
+	const publish = () => {
+		var replytext = "";
+		if (info.current.replytext)
+			replytext = info.current.replytext.trim();
+		if (replytext == "") return;
+
+		cache.saveItem(classname + "publish" + id, info.current, 24 * 3600);
+		if (!us.user.uid) {
+			if (Keyboard.isVisible()) Keyboard.dismiss();
+			setTimeout(() => {
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+			}, 500);
+			return;
+		}
+		http.post(ENV.reply + "?method=post&type=article&id=" + id + "&uid=" + us.user.uid + "&refid=" + info.current.refid, {
+			token: us.user.token, content: replytext
+		}).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				cache.removeItem(classname + "publish" + id);
+				setreply();
+				ToastCtrl.show({ message: "发布成功", duration: 1000, viewstyle: "short_toast", key: "publish_success_toast" });
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				//登录失效，转到登录界面，登录后直接进行发布并转到打分页面
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+			} else {
+				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_error_toast" });
+			}
+		});
+	};
 
 	return (
 		<>
@@ -252,7 +525,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			<HeaderView data={{
 				title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
 				isShowSearch: false,
-				showmenu,
+				// showmenu,
 				style: [
 					isfull && styles.hide_view,
 					!articledata.current.mp4URL && styles.notmp4
@@ -270,53 +543,37 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						}
 					})
 				},
-			}} MenuChildren={() => {
-				return (
-					<>
-						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
-							ModalPortal.show((
-								<SharePopover />
-							), {
-								key: "share_popover",
-								width: windowD.width,
-								height: 200,
-								rounded: false,
-								useNativeDriver: true,
-								modalAnimation: new SlideAnimation({
-									initialValue: 0,
-									slideFrom: "bottom",
-									useNativeDriver: true,
-								}),
-								onTouchOutside: () => {
-									ModalPortal.dismiss("share_popover");
-								},
-								swipeDirection: "down",
-								animationDuration: 300,
-								type: "bottomModal",
-								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },
-							})
-							setShowMenu(val => !val);
-						}}>
-							<Icon style={Globalstyles.menu_icon} name="share2" size={14} color={theme.text1} />
-							<Text style={Globalstyles.menu_text}>{"分享"}</Text>
-						</Pressable>
-						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={favarticle}>
-							<Icon style={Globalstyles.menu_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={14}
-								color={likelist.current[id] ? theme.redchecked : theme.text1} />
-							<Text style={Globalstyles.menu_text}>{"收藏"}</Text>
-						</Pressable>
-					</>
-				)
-			}}>
+			}}
+			// MenuChildren={() => {
+			// 	return (
+			// 		<>
+			// 			{/* <Pressable style={Globalstyles.menu_icon_con} onPress={showSharePopover}>
+			// 				<Icon style={Globalstyles.menu_icon} name="share2" size={14} color={theme.text1} />
+			// 				<Text style={Globalstyles.menu_text}>{"分享"}</Text>
+			// 			</Pressable> */}
+			// 			<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={favarticle}>
+			// 				<Icon style={Globalstyles.menu_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={16}
+			// 					color={likelist.current[id] ? theme.redchecked : theme.text1} />
+			// 				<Text style={Globalstyles.menu_text}>{"收藏"}</Text>
+			// 			</Pressable>
+			// 		</>
+			// 	)
+			// }}
+			>
 				{!articledata.current.mp4URL && <Animated.View style={[styles.coverimg_con, { opacity: headerOpt }]}>
 					<View style={styles.coverimg_msk}></View>
 					<Image source={{ uri: ENV.image + articledata.current.coverimg, cache: "force-cache" }} style={styles.coverimg} resizeMode="cover" />
 				</Animated.View>}
-				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
-					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
+				<Pressable onPress={favarticle}>
+					<Icon style={styles.title_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={20}
+						color={likelist.current[id] ? theme.redchecked : !articledata.current.mp4URL ? theme.toolbarbg : theme.text2} />
 				</Pressable>
+				{/* <Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
+					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
+				</Pressable> */}
 			</HeaderView>
-			<FlashList data={replydata.current.items}
+			<FlashList ref={listref}
+				data={replydata.current.items}
 				onScroll={(e) => {
 					showHeaderView(e);
 					showFooterView(e);
@@ -337,6 +594,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						poster={articledata.current.picURL}
 						classname={classname + id}>
 					</VideoPlayer>}
+
 					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
 						<View>
 							{!articledata.current.mp4URL && <View style={styles.content_img}>
@@ -345,559 +603,41 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 								/>
 							</View>}
 							<View style={styles.webview_con}>
-								{/* {articledata.current.html && <RenderHtml
-									contentWidth={windowD.width - 48} html={articledata.current.html} ignoreDomNode={(node: any) => {
-										return (
-											node.name === "div" && (node.attribs.class === "title" || node.attribs.class === "author")
-										)
-									}} tagsStyles={{
-										p: {
-											paddingVertical: 4,
-											lineHeight: 29,
-											margin: 0,
-										},
-										a: {
-											color: "#6979bf",
-											textDecorationLine: "none"
-										}
-									}} onPress={gotodetail}
-								/>} */}
-								{articledata.current.html && <RenderHtml
-									contentWidth={windowD.width - 48}
+								<AutoHeightWebView style={{ width: windowD.width - 48 }}
+									ref={webviewref}
+									originWhitelist={["*"]}
+									scrollEnabled={false}
+									scalesPageToFit={false}
+									nestedScrollEnabled={false}
+									setBuiltInZoomControls={false}
+									showsHorizontalScrollIndicator={false}
+									showsVerticalScrollIndicator={false}
+									customScript={INJECTED_JAVASCRIPT}
+									onMessage={handleMessage}
+									customStyle={`*{padding:0;margin:0;}
+									#content{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;pointer-events:none;overflow:hidden;}
+									#content .article_img{display:block !important;cursor:pointer;line-height:normal;}
+									.title,.author{display:none;}
+									.content a{pointer-events: auto;text-decoration:none !important;color:#6979bf;-webkit-tap-highlight-color:rgba(255,0,0,0);}
+									.content a img,.content p img,.content center img{width: 100%;height:auto !important;background-color:#f5f5f5;}
+									.content p, center {padding-left:0 !important;color:#4D4D4D;margin:0;padding:4px 0;line-height:29px;font-size:15px;}
+									.content .maintitle{padding-bottom:0;margin-bottom:-3px;}
+									.content .subtitle{padding-top:0;}`}
 									source={{ html: articledata.current.html }}
-									ignoreDomNode={(node: any) => {
-										return (
-											node.name === "div" && (node.attribs.class === "title" || node.attribs.class === "author")
-										)
-									}}
-									tagsStyles={{
-										p: {
-											paddingVertical: 4,
-											lineHeight: 29,
-											margin: 0,
-										},
-										a: {
-											color: "#6979bf",
-											textDecorationLine: "none"
-										}
-									}}
-									customHTMLElementModels={{
-										"center": HTMLElementModel.fromCustomModel({
-											tagName: "center",
-											mixedUAStyles: {
-												textAlign: "center",
-											},
-											contentModel: HTMLContentModel.block
-										}),
-									}}
-									renderers={{
-										img: (props: any) => {
-											const { rendererProps } = useInternalRenderer("img", props);
-											return (
-												<AutoSizeImage contentWidth={(windowD.width - 48)} source={{ uri: rendererProps.source.uri }} />
-											)
-										}
-									}}
-									renderersProps={{
-										a: {
-											onPress: (event: any, href: string) => {
-												let obj = JSON.parse(href.substr(href.indexOf("?") + 1).replace(/%22/g, '"'));
-												gotodetail(obj.page, obj.id);
-											}
-										}
-									}}
-								/>}
-								{/* <View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"2024香水基金会颁奖典礼在林肯中心大卫·H·科赫剧院举行。今年是香水基金会成立"}</Text>
-											<Text style={styles.strong}>{"75周年"}</Text>
-											<Text>{"，全场座无虚席，观看人数更是突破纪录。"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.strong}>
-											<Text style={{ color: "#222" }}>
-												<Text style={{ color: "#222" }}>菲菲奖 The Fragrance Foundation Awards</Text>
-											</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"全称"}</Text>
-											<Text style={styles.strong}>{"香水基金会大奖"}</Text>
-											<Text>{"，被誉为"}</Text>
-											<Text style={styles.strong}>{"“香水界的奥斯卡”"}</Text>
-											<Text>{"，从1973年开办至今，已成为全球香水界一年一度的盛事。参选香水来自全球各大香水会员国的推荐，经过消费者及评审团票选的激烈竞争，最终评选出年度获奖名单。奖项兼具专业与商业的双重属性，参与评选的多以商业品牌为主。"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/2024S900x900.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											{"今年的获奖名单仍有很多熟悉的面孔，而一些奖项的获奖香水也让人有些意外。接下来，香水时代为大家带来2024TFF奖完整版获奖名单。"}
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 781451)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/001S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 781451)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/1S1000x1000.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"前调是类似"}</Text>
-											<Text style={styles.textline}>{"水果乳酸菌饮料"}</Text>
-											<Text>{"的味道，甜度很高。后调木质感逐渐强烈，伴随着"}</Text>
-											<Text style={styles.textline}>{"淡淡的烟熏感"}</Text>
-											<Text>{"，是一支甜酷风格的女香。比同系列的男香闻起来要有个性一些。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 806899)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/2S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 806899)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/02S1000x915.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"和原版相比，香精版本的"}</Text>
-											<Text style={styles.textline}>{"柠檬和木质变得更加突出"}</Text>
-											<Text>{"，衬托着爽朗的薰衣草和鼠尾草。在保持原有清爽感的同时，整体质感会更加冷冽和现代。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 819142)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/03S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 819142)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/3S800x600.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"丝滑的香草，再点缀上微苦的杏仁，变成了类似"}</Text>
-											<Text style={styles.textline}>{"杏仁露的味道"}</Text>
-											<Text>{"。官方写的是中性香，但是这个味道还是更适合女生。不得不说，TF营销功力一向深厚，禁忌欲望的概念话题度又有了。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 445761)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/04S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 445761)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/4S2500x2500.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"2007年上市，如今依旧备受少女们的喜爱。"}</Text>
-											<Text style={styles.textline}>{"酸甜可口的果香仿佛鲜榨的果汁"}</Text>
-											<Text>{"，加入少量的绿叶气息化解甜腻感，闻起来更加清新通透。香气充满元气，是永不过时的少女的味道。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 318250)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/05S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 318250)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/5S2048x2329.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text style={styles.textline}>{"香草和可可细腻得像一阵粉雾"}</Text>
-											<Text>{"，搭配上蓬松干燥的薰衣草，在皮肤上呈现出温柔暖甜的气息。它的香气甜而不齁，而是梦幻又撩人，高级感满满。金灿灿的瓶身更被很多人当成开运神器。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 910661)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/06S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 910661)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/6S976x976.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"圣罗兰近些年走向了商业化的极端。"}</Text>
-											<Text style={styles.textline}>{"薰衣草、橙花加过量的降龙涎香醚"}</Text>
-											<Text>{"，闻到的瞬间脑海里会闪过众多商业馥奇男香。中外口碑相差很大，是一支完全向市场妥协的产物。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 492449)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/07S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 492449)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/7S769x523.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"花园系列的新作，风格和前作有了很大的改变。"}</Text>
-											<Text style={styles.textline}>{"充满活力的柑橘"}</Text>
-											<Text>{"，再结合开心果带有奶香味的香气，想象不出来花园，倒是混合出了一杯甜甜的燕麦奶。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 203187)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/012S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 203187)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/zmlS1100x810.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"这是一支"}</Text>
-											<Text style={styles.textline}>{"七分熟的新鲜青梨"}</Text>
-											<Text>{"，清甜的梨香伴随着脂粉感的花香，真是温柔到了骨子里。它的广告也很有创意，一个个从梨树上掉下来的香水瓶，就像瓶中装着的是真实的梨子。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 633584)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/09S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 633584)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/9S800x800.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"这是一款简单、轻盈的香水。"}</Text>
-											<Text style={styles.textline}>{"清爽的柑橘带来一个明亮充满活力的开场"}</Text>
-											<Text>{"，香草和牡丹带来朦胧的脂粉花香。味道不算新颖，胜在甜美、好穿。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 374781)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/010S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 374781)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/10S960x960.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text style={styles.textline}>{"薰衣草和香根草"}</Text>
-											<Text>{"的组合，和市面上大多数的男香差别不大。香根草丰富的气味被浓厚的脂粉感遮盖了大半，作为一款男香，还是有些太甜了。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 983422)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/011S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 983422)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/11S4872x4872.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"碧梨的香水连续三年获得这个奖项， No.3是一支木质东方调的香水，"}</Text>
-											<Text style={styles.textline}>{"甜美的果香融合温暖的木质和琥珀"}</Text>
-											<Text>{"，在藏红花的催化下，尽显性感和妩媚。瓶身也换成了与之相配的暗红色。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 498874)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/640S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 498874)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/12S1800x1500.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"安娜苏SUNDAE系列的包装把食玩风格贯彻到底。圆筒型的包装，搭配上"}</Text>
-											<Text style={styles.textline}>{"马卡龙色系的仿真冰淇凌瓶"}</Text>
-											<Text>{"，童趣少女风完全就是安娜苏的统治区。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 131922)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/013S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 131922)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/13S1264x1264.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"今年的奢华包装没有往年的花哨。法兰西防御是国际象棋一个古老的开局体系，香水瓶身的设计也参考了"}</Text>
-											<Text style={styles.textline}>{"国际象棋的棋子"}</Text>
-											<Text>{"，设计虽然简单，但是黑色的金属瓶身看起来还是很有质感的。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 165548)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/014S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 165548)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/14S1077x1077.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"作为橙花狂热爱好者，路易十四曾经建造了欧洲最大的橙子园，这支香水就以此为灵感。"}</Text>
-											<Text style={styles.textline}>{"高浓度的橙花搭配淋了蜂蜜的木质"}</Text>
-											<Text>{"，如同一片洒满阳光的橙子园，温暖明亮。并且每支香水都添加了真金箔，太奢华了！"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 308171)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/015S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 308171)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/15S700x700.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"香如其名，开场是"}</Text>
-											<Text style={styles.textline}>{"鲜嫩多汁的荔枝"}</Text>
-											<Text>{"，之后清甜的玫瑰占据主场，伴有香槟酒一样的气泡感。整体香气清新又水润，可惜留香实在太短了。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 900396)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/016S1080x274.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Pressable onPress={() => {
-											gotodetail("item-detail", 900396)
-										}}>
-											<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/16S2048x2329.jpg"} />
-										</Pressable>
-									</View>
-									<View style={styles.p}>
-										<Text style={{ textAlign: "right" }}>
-											<Text style={{ fontSize: 14 }}>{"△点击购买"}</Text>
-										</Text>
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text style={styles.textline}>{"干燥的烟丝淋上浓稠的蜂蜜"}</Text>
-											<Text>{"，同时夹杂着一丝动物气息，营造出独特的暖甜氛围。但是整体香气似乎并不和谐，于是引来众多香友的吐槽“娇兰又翻车了……”"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/0018S1080x274.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/17S1200x1200.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"罗勒与薄荷交织出清凉的绿意，加上青涩的无花果和充满气泡感的柠檬。仿佛是"}</Text>
-											<Text style={styles.textline}>{"雨后的空气"}</Text>
-											<Text>{"，清新通透，提振情绪。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/019S1080x274.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/18S1200x675.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Text>{"Gilles Andrier于1993年加入奇华顿，在2005年升任首席执行官。在他的领导下，奇华顿在全球市场中实现了显著扩张，并重新定义了公司的战略方向，巩固了奇华顿在全球香氛与美容市场的领先地位。"}</Text>
-										</Text>
-									</View>
-
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/020S1080x274.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<AutoSizeImage contentWidth={(windowD.width - 48)} src={ENV.image + "/article/690/19S1000x500.jpg"} />
-									</View>
-									<View style={styles.p}>
-										<Text style={styles.ptext}>
-											<Pressable onPress={() => {
-												gotodetail("wiki-detail", 12059302)
-											}}>
-												<Text style={styles.strong}>{"Jacques Cavallier Belletrud"}</Text>
-											</Pressable>
-											<Text>{"出生于格拉斯的香水世家，2004年曾获得Prix Francois Coty的冠军。他认为香气与记忆、情绪紧密相连。代表作数不胜数，宝格丽 大吉岭茶、三宅一生一生之水……目前他担任LV的专属调香师。"}</Text>
-										</Text>
-									</View>
-
-								</View> */}
+								/>
 							</View>
 							<View style={styles.btn_container}>
 								<View style={[styles.btn_content, styles.btn_margin]}>
 									<Icon name="time" size={16} color={theme.placeholder} />
 									<Text style={styles.btn_text}>{articledata.current.tm}</Text>
 								</View>
-								<View style={[styles.btn_content, styles.btn_margin]}>
+								<View style={styles.btn_content}>
 									<Icon name="look" size={16} color={theme.placeholder} />
 									<Text style={styles.btn_text}>{articledata.current.view}</Text>
 								</View>
-								<View style={styles.btn_content}>
+								{/* <Pressable onPress={showSharePopover} hitSlop={20} style={styles.btn_content}>
 									<Icon name="share3" size={16} color={theme.placeholder} />
-								</View>
+								</Pressable> */}
 							</View>
 							<>
 								<Text style={styles.title}>热门文章</Text>
@@ -909,10 +649,12 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 									keyExtractor={(item: any, index: number) => item.id}
 									renderItem={({ item, index }: any) => {
 										return (
-											<View style={styles.itemContainer}>
-												<Image style={styles.itemImg} source={{ uri: ENV.image + item.pic, cache: "force-cache" }} resizeMode="cover" />
+											<Pressable style={styles.itemContainer} onPress={() => {
+												gotodetail("article-detail", item.id);
+											}}>
+												<FastImage style={{ width: "100%", height: "100%", }} source={{ uri: ENV.image + item.pic }} />
 												<Text style={styles.item_tit}>{item.title}</Text>
-											</View>
+											</Pressable>
 										)
 									}}
 								/>}
@@ -933,51 +675,120 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						]}>
 							{item.uid > 0 && <Image source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} style={styles.replyitem_img} resizeMode="cover" />}
 							{!(item.uid > 0) && <Image source={{ uri: "https:" + item.wxavatar }} style={styles.replyitem_img} resizeMode="cover" />}
-							<View style={styles.replyitem_uname_con}>
-								{item.uid > 0 && <Text style={styles.replyitem_uname}>{item.uname}</Text>}
-								{!(item.uid > 0) && <Text style={styles.replyitem_uname}>{item.wxnick}</Text>}
-							</View>
-							<View style={styles.replyitem_text_con}>
-								<Text style={styles.replyitem_text} numberOfLines={5}>
-									{item.content}
-								</Text>
-							</View>
+							{item.uid > 0 && <View style={styles.replyitem_uname_con}>
+								<Text style={styles.replyitem_uname}>{item.uname}</Text>
+								<View style={Globalstyles.level}>
+									<Image
+										style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+										defaultSource={require("../../assets/images/nopic.png")}
+										source={require("../../assets/images/level.png")}
+									/>
+								</View>
+							</View>}
+							{!(item.uid > 0) && <View style={styles.replyitem_uname_con}>
+								<Text style={styles.replyitem_uname}>{item.wxnick}</Text>
+							</View>}
+							{item.content && <Pressable style={styles.replyitem_text_con} onPress={() => {
+								if (item.content2) {
+									item.isopen = !item.isopen;
+									setIsRender(val => !val);
+								}
+							}}>
+								{item.isopen && <Text style={[styles.replyitem_text, { fontFamily: "monospace" }]}>{item.content}</Text>}
+								{!item.isopen && <Text style={[styles.replyitem_text, { fontFamily: "monospace" }]}>{item.content2}</Text>}
+								{item.content2 && <View style={[Globalstyles.morebtn_con, item.isopen && Globalstyles.open_morebtn]}>
+									{!item.isopen && <Text style={[Globalstyles.ellipsis_text, { color: theme.text2 }]}>{"..."}</Text>}
+									{!item.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"展开"}</Text>}
+									{item.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"收起"}</Text>}
+									<Icon name={item.isopen ? "toparrow" : "btmarrow"} size={14} color={theme.placeholder} style={{ transform: [{ scale: 1.5 }] }} />
+								</View>}
+							</Pressable>}
 							<View style={styles.replyitem_btn_con}>
 								<Text style={styles.replyitem_time}>{item.actime}</Text>
 								<View style={styles.replyitem_btn}>
-									<Icon name="reply" size={15} color={theme.placeholder2} />
-									<View style={styles.replyitem_upbtn}>
-										{likefavs.current[item.id] ? <Icon name="up-checked" size={15} color={theme.placeholder2} /> : <Icon name="up" size={15} color={theme.placeholder2} />}
+									<Pressable onPress={() => {
+										if (item.uid > 0) {
+											reply(item, "main")
+										} else if (!(item.uid > 0)) {
+											reply(item, "wx")
+										}
+									}} hitSlop={20}>
+										<Icon name="reply" size={15} color={theme.placeholder2} />
+									</Pressable>
+									<Pressable style={styles.replyitem_upbtn} onPress={() => {
+										like_reply(item)
+									}}>
+										<Icon name={likefavs.current[item.id] ? "up-checked" : "up"} size={15} color={theme.placeholder2} />
 										{item.up > 0 && <Text style={styles.replyitem_uptext}>{item.up}</Text>}
-									</View>
+									</Pressable>
 								</View>
 							</View>
-							{item.sub && item.sub.length > 0 && <View style={styles.replysub_con}>
+							{(item.sub && item.sub.length > 0) && <View style={styles.replysub_con}>
 								{item.sub.map((sub: any, subindex: number) => {
 									return (
-										<View key={sub.id} style={{ position: "relative" }}>
-											{sub.uid > 0 && <Image source={{ uri: ENV.avatar + sub.uid + ".jpg!l?" + sub.uface }} style={styles.replysub_img} resizeMode="cover" />}
-											<View style={[styles.replysub_text_con, subindex == 0 ? styles.first_replysub_text_con : null]}>
-												<View style={styles.replysub_uname_con}>
-													<Text style={styles.replysub_uname}>{sub.uname}</Text>
-												</View>
-												<View style={{ marginTop: 6 }}>
-													<Text style={styles.replyitem_text}>{sub.content}</Text>
-												</View>
-												<View style={[styles.replyitem_btn_con, { marginTop: 6, marginLeft: 0, }]}>
-													<Text style={styles.replyitem_time}>{sub.actime}</Text>
-													<View style={styles.replyitem_btn}>
-														<Icon name="reply" size={15} color={theme.placeholder2} />
-														<View style={styles.replyitem_upbtn}>
-															{likefavs.current[sub.id] ? <Icon name="up-checked" size={15} color={theme.placeholder2} /> : <Icon name="up" size={15} color={theme.placeholder2} />}
-															{sub.up > 0 && <Text style={styles.replyitem_uptext}>{sub.up}</Text>}
+										<View key={sub.id}>
+											{show_items(item.sub, subindex) && <>
+												{sub.uid > 0 && <Image source={{ uri: ENV.avatar + sub.uid + ".jpg!l?" + sub.uface }} style={styles.replysub_img} />}
+												<View style={[styles.replysub_text_con, subindex == 0 ? styles.first_replysub_text_con : null]}>
+													<View style={styles.replysub_uname_con}>
+														<Text style={styles.replysub_uname}>{sub.uname}</Text>
+														<View style={Globalstyles.level}>
+															<Image
+																style={[Globalstyles.level_icon, handlelevelLeft(sub.ulevel), handlelevelTop(sub.ulevel)]}
+																defaultSource={require("../../assets/images/nopic.png")}
+																source={require("../../assets/images/level.png")}
+															/>
+														</View>
+													</View>
+													{(sub.refuid || sub.refuname) && <View style={styles.replysub_refuname}>
+														<Text style={styles.replyitem_text}>{"回复"}</Text>
+														<Text style={[styles.replyitem_text, { fontWeight: "600", fontFamily: "PingFang SC", marginHorizontal: 3 }]}>{sub.refuname}</Text>
+														<Text style={styles.replyitem_text}>{":"}</Text>
+													</View>}
+													{sub.content && <Pressable style={{ marginTop: 6 }} onPress={() => {
+														if (sub.content2) {
+															sub.isopen = !sub.isopen;
+															setIsRender(val => !val);
+														}
+													}}>
+														{sub.isopen && <Text style={[styles.replyitem_text, { fontFamily: "monospace" }]}>{sub.content}</Text>}
+														{!sub.isopen && <Text style={[styles.replyitem_text, { fontFamily: "monospace" }]}>{sub.content2}</Text>}
+														{sub.content2 && <View style={[Globalstyles.morebtn_con, sub.isopen && Globalstyles.open_morebtn]}>
+															{!sub.isopen && <Text style={[Globalstyles.ellipsis_text, { color: theme.text2 }]}>{"..."}</Text>}
+															{!sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"展开"}</Text>}
+															{sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"收起"}</Text>}
+															<Icon name={sub.isopen ? "toparrow" : "btmarrow"} size={14} color={theme.placeholder} style={{ transform: [{ scale: 1.5 }] }} />
+														</View>}
+													</Pressable>}
+													<View style={[styles.replyitem_btn_con, { marginTop: 8, marginLeft: 0, }]}>
+														<Text style={styles.replyitem_time}>{sub.actime}</Text>
+														<View style={styles.replyitem_btn}>
+															<Pressable onPress={() => {
+																reply(sub, "sub", item)
+															}} hitSlop={20}>
+																<Icon name="reply" size={15} color={theme.placeholder2} />
+															</Pressable>
+															<Pressable style={styles.replyitem_upbtn} onPress={() => {
+																like_reply(sub)
+															}}>
+																<Icon name={likefavs.current[sub.id] ? "up-checked" : "up"} size={15} color={theme.placeholder2} />
+																{sub.up > 0 && <Text style={styles.replyitem_uptext}>{sub.up}</Text>}
+															</Pressable>
 														</View>
 													</View>
 												</View>
-											</View>
+											</>}
 										</View>
 									)
 								})}
+								{show_items(item.sub, -1) && <Pressable onPress={() => {
+									display(item.sub);
+									setIsRender(val => !val);
+								}} style={[Globalstyles.more_reply, { marginLeft: 30 }]}>
+									{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
+									{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
+									<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
+								</Pressable>}
 							</View>}
 						</View>
 					)
@@ -987,24 +798,44 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					style={isfull && styles.hide_view}
 				/>}
 			/>
-			{isfocus && <Pressable style={[Globalstyles.keyboardmask, isfull && styles.hide_view]} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
+			<Animated.View style={[Globalstyles.keyboardmask, { opacity: footerMaskOpt, zIndex: footerMaskZ }]}>
+				<Pressable onPress={() => { Keyboard.dismiss(); }} style={{ flex: 1 }}></Pressable>
+			</Animated.View>
 			<FooterView data={{
-				placeholder: "快快告诉我，你在想什么", replytext,
+				placeholder: info.current.holder, replytext: info.current.replytext,
+				inputref,
 				opacity: footerOpt, zIndex: !isfocus ? footerZ : 13,
 				style: isfull && styles.hide_view
-			}} method={{ setReplyText }}>
+			}} method={{
+				onChangeText: (val: string) => {
+					info.current.replytext = val;
+					setIsRender(val => !val);
+				},
+				publish,
+			}}>
 				{!isfocus && <View style={styles.footer_icon_con}>
-					<View style={styles.footer_icon}>
+					<Pressable style={styles.footer_icon} onPress={() => {
+						if (listref.current) {
+							listref.current.scrollToIndex({
+								index: 0,
+								animated: true,
+								viewOffset: articledata.current.mp4URL ? 50 : 120,
+								viewPosition: 0,
+							})
+						}
+					}}>
 						<Icon name="reply" size={16} color={theme.fav} />
 						{articledata.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.replycnt)}</Text>}
-					</View>
-					<View style={styles.footer_icon}>
+					</Pressable>
+					<Pressable style={[styles.footer_icon, { marginRight: 0 }]} onPress={favarticle}>
 						<Icon name={likelist.current[id] ? "heart-checked" : "heart"}
 							size={16} color={likelist.current[id] ? theme.redchecked : theme.fav}
 						/>
 						{articledata.current.favcnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.favcnt)}</Text>}
-					</View>
-					<Icon name="share2" size={14} color={theme.fav} />
+					</Pressable>
+					{/* <Pressable onPress={showSharePopover} hitSlop={20}>
+						<Icon name="share2" size={14} color={theme.fav} />
+					</Pressable> */}
 				</View>}
 			</FooterView>
 		</>
@@ -1078,6 +909,7 @@ const styles = StyleSheet.create({
 	},
 	webview_con: {
 		width: "100%",
+		flex: 1,
 		paddingLeft: 24,
 		paddingRight: 24,
 		backgroundColor: theme.toolbarbg,
@@ -1116,21 +948,16 @@ const styles = StyleSheet.create({
 	},
 	itemContainer: {
 		width: 200,
-		aspectRatio: (200 - 15) / 120,
+		aspectRatio: 200 / 120,
 		marginLeft: 15,
 		borderRadius: 10,
 		overflow: "hidden",
-		backgroundColor: theme.bg
-	},
-	itemImg: {
-		width: "100%",
-		aspectRatio: 200 / 120,
-		borderRadius: 10,
+		backgroundColor: theme.bg,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 	item_tit: {
 		position: "absolute",
-		top: "50%",
-		transform: [{ translateY: -20 }],
 		paddingHorizontal: 15,
 		color: theme.toolbarbg,
 		textAlign: "center",
@@ -1140,7 +967,6 @@ const styles = StyleSheet.create({
 		borderTopWidth: 6,
 		borderTopColor: theme.bg,
 		backgroundColor: "#FCFCFC",
-		height: "auto",
 	},
 	flatlist_con: {
 		backgroundColor: "#FCFCFC",
@@ -1169,6 +995,11 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 		color: theme.tit2,
 	},
+	replysub_refuname: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginTop: 8,
+	},
 	replyitem_text_con: {
 		marginLeft: 40,
 		marginTop: 5,
@@ -1177,13 +1008,14 @@ const styles = StyleSheet.create({
 	replyitem_text: {
 		fontSize: 13,
 		color: theme.text2,
+		lineHeight: 20,
 	},
 	replyitem_btn_con: {
 		flexDirection: "row",
 		alignContent: "center",
 		justifyContent: "space-between",
 		marginLeft: 43,
-		marginBottom: 8,
+		marginBottom: 10,
 	},
 	replyitem_time: {
 		fontSize: 12,
@@ -1219,13 +1051,13 @@ const styles = StyleSheet.create({
 		top: 9,
 	},
 	first_replysub_text_con: {
-		borderBottomWidth: 0,
+		borderTopWidth: 0,
 	},
 	replysub_text_con: {
 		marginLeft: 30,
 		marginBottom: 10,
-		borderBottomWidth: 1,
-		borderBottomColor: "rgba(224,224,224,.8)"
+		borderTopWidth: 1,
+		borderTopColor: "rgba(224,224,224,.8)"
 	},
 	replysub_uname_con: {
 		flexDirection: "row",

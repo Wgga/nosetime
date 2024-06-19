@@ -135,18 +135,6 @@ class ArticleService {
 		data.html = data.html.replace(/<a[^>]*href=([^>]*)>([^<]*)<\/a>/g, this.changehref);
 		data.html = data.html.replace(/<a[^>]*href=([^>]*)>(<img[^<]*)<\/a>/g, this.changehref);
 
-		// data.html = `<html><head><style>
-		// 	*{padding:0;margin:0;}
-		// 	#content{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;pointer-events:none;overflow:hidden;}
-		// 	#content .article_img{display:block !important;cursor:pointer;line-height:normal;}
-		// 	.title,.author{display:none;}
-		// 	.content a{text-decoration:none !important;color:#6979bf;-webkit-tap-highlight-color:rgba(255,0,0,0);}
-		// 	.content a img,.content p img,.content center img{width: 100%;height:auto !important;background-color:#f5f5f5;}
-		// 	.content p, center {padding-left:0 !important;color:#4D4D4D;margin:0;padding:4px 0;line-height:29px;font-size:15px;}
-		// 	.content .maintitle{padding-bottom:0;margin-bottom:-3px;}
-		// 	.content .subtitle{padding-top:0;}
-		// 	</style></head><body>${data.html}</body></html>`;
-
 		return data.html;
 	}
 
@@ -258,7 +246,7 @@ class ArticleService {
 				return;
 			})
 		} else {
-			this.fetchWeb(type,newer);
+			this.fetchWeb(type, newer);
 		}
 	}
 

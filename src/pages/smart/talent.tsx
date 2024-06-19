@@ -148,7 +148,7 @@ function Talent({ navigation }: any): React.JSX.Element {
 						<Text style={[styles.talent_title_text, tab == "care" && { color: theme.tit2 }]}>{"我的关注"}</Text>
 					</Pressable>
 				</View>
-				<View style={styles.title_text_con}></View>
+				<View style={Globalstyles.title_text_con}></View>
 			</HeaderView>
 			<View style={Globalstyles.container}>
 				{(tab == "care" && carelist.current.length == 0) && <View style={styles.borderbg}>
@@ -233,11 +233,6 @@ const styles = StyleSheet.create({
 		fontSize: 17,
 		color: theme.placeholder,
 		fontWeight: "500",
-	},
-	title_text_con: {
-		width: 44,
-		height: 44,
-		justifyContent: "center",
 	},
 	borderbg: {
 		borderTopColor: theme.bg,

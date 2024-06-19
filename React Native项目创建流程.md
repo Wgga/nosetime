@@ -627,19 +627,7 @@ yarn add react-native-device-info
 -keep class com.google.android.gms.common.** {*;}
 ```
 
-### 21. react-native-blurhash
-
-react-native-blurhash 是一个 React Native 模糊效果组件。
-
-```bash
-# using npm
-npm install react-native-blurhash
-
-# OR using Yarn
-yarn add react-native-blurhash
-```
-
-### 22. @shopify/flash-list
+### 21. @shopify/flash-list
 
 @shopify/flash-list 是一个 快速和高性能的 React Native 列表组件。
 
@@ -651,7 +639,7 @@ npm install @shopify/flash-list
 yarn add @shopify/flash-list
 ```
 
-### 23. FastImage
+### 22. FastImage
 
 FastImage 是一个用于 React Native 的快速图像组件。在很大程度上像浏览器一样处理图像缓存。
 
@@ -663,7 +651,7 @@ npm install react-native-fast-image
 yarn add react-native-fast-image
 ```
 
-### 24. react-native-fast-shadow
+### 23. react-native-fast-shadow
 
 react-native-fast-shadow 是一个用于 React Native 的快速高质量Android阴影组件。
 
@@ -675,7 +663,7 @@ npm install react-native-fast-shadow
 yarn add react-native-fast-shadow
 ```
 
-### 25. react-native-image-viewing
+### 24. react-native-image-viewing
 
 react-native-image-viewing 是一个用于 React Native 的图像查看器组件。
 
@@ -687,7 +675,7 @@ npm install react-native-image-viewing
 yarn add react-native-image-viewing
 ```
 
-### 26. react-native-reanimated-carousel
+### 25. react-native-reanimated-carousel
 
 react-native-reanimated-carousel 是一个用于 React Native 的可定制的轮播组件。
 
@@ -699,7 +687,7 @@ npm install react-native-reanimated-carousel
 yarn add react-native-reanimated-carousel
 ```
 
-### 27. react-native-text-size
+### 26. react-native-text-size
 
 react-native-text-size 是一个用于 React Native 在布局之前准确测量文本，并从应用程序（Android和iOS）中获取字体信息组件。
 
@@ -711,7 +699,7 @@ npm install react-native-text-size
 yarn add react-native-text-size
 ```
 
-### 28. react-native-permissions
+### 27. react-native-permissions
 
 
 react-native-permissions 是一个适用于 iOS、Android 和 Windows 上的 React Native 的统一权限 API 组件。
@@ -913,7 +901,7 @@ setup_permissions([
 </manifest>
 ```
 
-### 29. react-native-image-crop-picker
+### 28. react-native-image-crop-picker
 
 react-native-image-crop-picker 是一个用于在 React Native 应用中裁剪和选择图片的库。
 
@@ -925,7 +913,7 @@ npm install react-native-image-crop-picker
 yarn add react-native-image-crop-picker
 ```
 
-### 30. react-native-color-matrix-image-filters
+### 29. react-native-color-matrix-image-filters
 
 react-native-color-matrix-image-filters 是一个用于在 React Native 应用中使用颜色矩阵进行图像处理的库。如滤镜。
 

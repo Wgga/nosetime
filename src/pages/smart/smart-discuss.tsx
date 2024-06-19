@@ -188,10 +188,10 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 								}}>
 									{item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc}</Text>}
 									{!item.isopen && <Text style={[styles.desc_text, { fontFamily: "monospace" }]}>{item.desc2}</Text>}
-									{item.desc2 && <View style={[styles.desc_morebtn_con, item.isopen && styles.open_morebtn]}>
+									{item.desc2 && <View style={[Globalstyles.morebtn_con, item.isopen && Globalstyles.open_morebtn]}>
 										{!item.isopen && <Text style={styles.desc_text}>{"..."}</Text>}
-										{!item.isopen && <Text style={styles.desc_morebtn_text}>{"(显示全部)"}</Text>}
-										{item.isopen && <Text style={styles.desc_morebtn_text}>{"(收起全部)"}</Text>}
+										{!item.isopen && <Text style={Globalstyles.morebtn_text}>{"(显示全部)"}</Text>}
+										{item.isopen && <Text style={Globalstyles.morebtn_text}>{"(收起全部)"}</Text>}
 									</View>}
 								</Pressable>}
 							</View>
@@ -311,22 +311,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		lineHeight: 20,
 		color: theme.text1,
-	},
-	desc_morebtn_con: {
-		position: "absolute",
-		right: 0,
-		bottom: 0,
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	open_morebtn: {
-		position: "relative",
-		justifyContent: "flex-end",
-	},
-	desc_morebtn_text: {
-		fontSize: 14,
-		color: theme.text1,
-		marginLeft: 8,
 	},
 });
 export default SmartDiscuss;

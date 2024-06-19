@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 
@@ -15,10 +15,9 @@ import cache from "../../hooks/storage/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
 
 function MallAddress({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -114,9 +113,9 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					navigation.goBack();
 				},
 			}}>
-				<Pressable style={styles.title_text_con} onPress={() => { setEdit(val => !val) }}>
-					{!edit && <Text style={styles.title_text}>{"编辑"}</Text>}
-					{edit && <Text style={styles.title_text}>{"完成"}</Text>}
+				<Pressable style={Globalstyles.title_text_con} onPress={() => { setEdit(val => !val) }}>
+					{!edit && <Text style={Globalstyles.title_text}>{"编辑"}</Text>}
+					{edit && <Text style={Globalstyles.title_text}>{"完成"}</Text>}
 				</Pressable>
 			</HeaderView>
 			{(address_list.current && address_list.current.length > 0) && <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.address_list}>
@@ -162,15 +161,6 @@ const styles = StyleSheet.create({
 	address_container: {
 		flex: 1,
 		backgroundColor: theme.bg,
-	},
-	title_text_con: {
-		width: 44,
-		height: 44,
-		justifyContent: "center",
-	},
-	title_text: {
-		fontSize: 13,
-		color: theme.tit2,
 	},
 	address_list: {
 		paddingTop: 15,
