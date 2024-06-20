@@ -42,6 +42,9 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 					source={require("../../assets/images/headbgpage/messagebg.jpg")}
 				/>
 			</View>
+			<Pressable onPress={() => { navigation.goBack() }} style={[styles.title_icon, { marginTop: insets.top }]}>
+				<Icon name="leftarrow" size={20} color={theme.toolbarbg} />
+			</Pressable>
 			<TabView navigationState={{ index, routes }}
 				renderScene={({ route }) => {
 					switch (route.key) {
@@ -55,26 +58,22 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 				}}
 				renderTabBar={(props: any) => {
 					return (
-						<>
-							<Pressable style={[styles.title_icon, { marginTop: insets.top }]}>
-								<Icon name="leftarrow" size={20} color={theme.toolbarbg} />
-							</Pressable>
-							<TabBar {...props}
-								activeColor={theme.toolbarbg}
-								inactiveColor={"rgba(255,255,255,0.7)"}
-								indicatorStyle={{
-									backgroundColor: theme.toolbarbg, width: 17, height: 1, bottom: 7,
-									left: (((width * 0.25 * 2) / 2 - 17) / 2)
-								}}
-								android_ripple={{ color: "transparent" }}
-								tabStyle={{ width: width * 0.25 }}
-								indicatorContainerStyle={{ backgroundColor: "transparent", left: width * 0.25 }}
-								contentContainerStyle={{ justifyContent: "center" }}
-								style={{ paddingTop: insets.top, shadowColor: "transparent", backgroundColor: "transparent" }}
-							/>
-						</>
+						<TabBar {...props}
+							activeColor={theme.toolbarbg}
+							inactiveColor={"rgba(255,255,255,0.7)"}
+							indicatorStyle={{
+								backgroundColor: theme.toolbarbg, width: 17, height: 1, bottom: 7,
+								left: (((width * 0.25 * 2) / 2 - 17) / 2)
+							}}
+							android_ripple={{ color: "transparent" }}
+							tabStyle={{ width: width * 0.25 }}
+							indicatorContainerStyle={{ backgroundColor: "transparent", left: width * 0.25 }}
+							contentContainerStyle={{ justifyContent: "center" }}
+							style={{ paddingTop: insets.top, shadowColor: "transparent", backgroundColor: "transparent" }}
+						/>
 					)
 				}}
+				sceneContainerStyle={Globalstyles.list_content}
 				onIndexChange={() => { }}
 				initialLayout={{ width }}
 			/>
@@ -90,6 +89,7 @@ const styles = StyleSheet.create({
 		height: 48,
 		alignItems: "center",
 		justifyContent: "center",
+		zIndex: 2
 	},
 });
 

@@ -4,8 +4,6 @@ import { View, Text, StyleSheet, TextInput, Keyboard, Animated, Pressable } from
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Icon from "../assets/iconfont";
-
 import theme from "../configs/theme";
 
 function FooterView({ data, method, children }: any): React.JSX.Element {
@@ -56,7 +54,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 					<Text style={styles.publish_text}>{"发布"}</Text>
 				</LinearGradient></Pressable>}
 			</View>
-		</Animated.View >
+		</Animated.View>
 	);
 }
 const styles = StyleSheet.create({
