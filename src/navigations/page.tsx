@@ -20,6 +20,19 @@ import Top from "../pages/smart/top";
 import PerfumeListSquare from "../pages/perfume/perfume-list-square";
 import PerfumeListTag from "../pages/perfume/perfume-list-tag";
 
+import SocialShequDetail from "../pages/social/social-shequ-detail";
+import SocialShequPost from "../pages/social/social-shequ-post";
+import SocialXiaoxi from "../pages/social/social-xiaoxi";
+
+import MallGroup from "../pages/mall/mall-group";
+import MallHeji from "../pages/mall/mall-heji";
+import MallItem from "../pages/mall/mall-item";
+import MallAddress from "../pages/mall/mall-address";
+import MallAddressEdit from "../pages/mall/mall-address-edit";
+import MallIdcardEdit from "../pages/mall/mall-idcard-edit";
+import MallCoupon from "../pages/mall/mall-coupon";
+import MallWishList from "../pages/mall/mall-wishlist";
+
 import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
 import Lottery from "../pages/user/lottery";
@@ -33,18 +46,6 @@ import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
 import UserChangeDesc from "../pages/user/user-change-desc";
 import UserCart from "../pages/user/user-cart";
 import UserFav from "../pages/user/user-fav";
-
-import SocialShequDetail from "../pages/social/social-shequ-detail";
-import SocialShequPost from "../pages/social/social-shequ-post";
-
-import MallGroup from "../pages/mall/mall-group";
-import MallHeji from "../pages/mall/mall-heji";
-import MallItem from "../pages/mall/mall-item";
-import MallAddress from "../pages/mall/mall-address";
-import MallAddressEdit from "../pages/mall/mall-address-edit";
-import MallIdcardEdit from "../pages/mall/mall-idcard-edit";
-import MallCoupon from "../pages/mall/mall-coupon";
-import MallWishList from "../pages/mall/mall-wishlist";
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,19 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="PerfumeListSquare" component={PerfumeListSquare} />
 			<Stack.Screen name="PerfumeListTag" component={PerfumeListTag} />
 
+			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
+			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />
+			<Stack.Screen name="SocialXiaoxi" component={SocialXiaoxi} />
+
+			<Stack.Screen name="MallGroup" component={MallGroup} />
+			<Stack.Screen name="MallHeji" component={MallHeji} />
+			<Stack.Screen name="MallItem" component={MallItem} />
+			<Stack.Screen name="MallAddress" component={MallAddress} />
+			<Stack.Screen name="MallAddressEdit" component={MallAddressEdit} />
+			<Stack.Screen name="MallIdcardEdit" component={MallIdcardEdit} />
+			<Stack.Screen name="MallCoupon" component={MallCoupon} />
+			<Stack.Screen name="MallWishList" component={MallWishList} />
+
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Protocol" component={Protocol} />
 			<Stack.Screen name="Lottery" component={Lottery} />
@@ -82,18 +96,6 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
 			<Stack.Screen name="UserCart" component={UserCart} />
 			<Stack.Screen name="UserFav" component={UserFav} />
-
-			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
-			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />
-
-			<Stack.Screen name="MallGroup" component={MallGroup} />
-			<Stack.Screen name="MallHeji" component={MallHeji} />
-			<Stack.Screen name="MallItem" component={MallItem} />
-			<Stack.Screen name="MallAddress" component={MallAddress} />
-			<Stack.Screen name="MallAddressEdit" component={MallAddressEdit} />
-			<Stack.Screen name="MallIdcardEdit" component={MallIdcardEdit} />
-			<Stack.Screen name="MallCoupon" component={MallCoupon} />
-			<Stack.Screen name="MallWishList" component={MallWishList} />
 		</Stack.Navigator>
 	);
 }

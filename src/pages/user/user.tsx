@@ -328,7 +328,7 @@ function User({ navigation }: any): React.JSX.Element {
 						</Pressable>
 					</View>
 					<View style={styles.btns_item_con}>
-						<Pressable onPress={() => { }} style={styles.btn_item}>
+						<Pressable onPress={() => { gotodetail("SocialXiaoxi") }} style={styles.btn_item}>
 							<Message width={24} height={24} style={styles.btn_item_icon} />
 							<Text style={styles.btn_item_text}>{"消息"}</Text>
 						</Pressable>

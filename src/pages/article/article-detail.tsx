@@ -519,8 +519,8 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<>
-			{loading && <View style={[styles.loading_con, isfull && styles.hide_view]}>
-				<Image style={styles.loading_img} source={require("../../assets/images/loading.gif")} />
+			{loading && <View style={[Globalstyles.loading_con, isfull && styles.hide_view]}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
 			</View>}
 			<HeaderView data={{
 				title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
@@ -862,22 +862,6 @@ const styles = StyleSheet.create({
 	},
 	textline: {
 		textDecorationLine: "underline"
-	},
-	loading_con: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		zIndex: 99,
-		backgroundColor: theme.toolbarbg,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	loading_img: {
-		width: 32,
-		height: 32,
-		opacity: .8,
 	},
 	notmp4: {
 		backgroundColor: "transparent",

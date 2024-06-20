@@ -84,15 +84,13 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		navigation.navigate("Page", { screen: "ArticleDetail", params: { id } });
 	}
 
-	const gotoVod = (x: any) => {
-		if (x.mid != null) {
-			// navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: x.mid, viid: x.viid } });
+	const gotoVod = (item: any) => {
+		if (item.mid != null) {
+			// navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, viid: item.viid } });
 		} else {
-			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: x.viid } });
+			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.viid } });
 		}
 	}
-
-	const [isvisible, setIsVisible] = React.useState(false);
 
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
 	return (
@@ -181,7 +179,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 					renderItem={({ item, index }: any) => {
 						return (
 							<Pressable onPress={() => {
-								setIsVisible(true)
+								navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.id, ctdlgid: item.dlgid } });
 							}} style={styles.topicitem}>
 								<View style={[styles.topicitemImg, styles.homebrs6]}>
 									{(homedataref.current.topiclist && homedataref.current.topiclist.length > 0) &&

@@ -332,6 +332,23 @@ const Globalstyles: any = StyleSheet.create({
 		color: theme.text1,
 		marginLeft: 8,
 	},
+	// 页面数据加载中遮罩
+	loading_con: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		zIndex: 999,
+		backgroundColor: theme.toolbarbg,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	loading_img: {
+		width: 32,
+		height: 32,
+		opacity: .8,
+	},
 });
 
 export {

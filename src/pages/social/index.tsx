@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Animated, TextInput } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated } from "react-native";
 
 import { TabView, TabBar } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,6 +33,13 @@ function Social({ navigation, route }: any): React.JSX.Element {
 		{ text: "气味", id: "3" },
 		{ text: "沙龙", id: "4" },
 	]
+	const [routes] = React.useState([
+		{ key: "new", title: "最新", text: "最新" },
+		{ key: "chat", title: "闲谈", text: "香水闲谈" },
+		{ key: "resort", title: "求助", text: "荐香求助" },
+		{ key: "smell", title: "气味", text: "有关气味" },
+		{ key: "salon", title: "沙龙", text: "小众沙龙" },
+	]);
 	// 变量
 	const [index, setIndex] = React.useState(0);
 	let fids = React.useRef<string>("1234");
@@ -42,13 +49,6 @@ function Social({ navigation, route }: any): React.JSX.Element {
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	let headerZ = React.useRef(new Animated.Value(-1)).current; // 底部层级动画
 	// 数据
-	const [routes] = React.useState([
-		{ key: "new", title: "最新", text: "最新" },
-		{ key: "chat", title: "闲谈", text: "香水闲谈" },
-		{ key: "resort", title: "求助", text: "荐香求助" },
-		{ key: "smell", title: "气味", text: "有关气味" },
-		{ key: "salon", title: "沙龙", text: "小众沙龙" },
-	]);
 	// 状态
 	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染

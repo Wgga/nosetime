@@ -211,7 +211,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		if (type == "article") {
 			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.id, src: "APP搜索" } });
 		} else if (type == "topic") {
-			navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.id, title: item.title, src: "APP搜索" } });
+			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.id, src: "APP搜索" } });
 		} else if (type == "item") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "APP搜索" } });
 		} else if (type == "brand" || type == "odor" || type == "perfumer") {
@@ -285,7 +285,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.articles.map((item: any, index: number) => {
 							return (
-								<View style={[styles.wiki_list_con, styles.item_flex]} key={item.id}>
+								<Pressable key={item.id} onPress={() => { gotodetail("article", item) }} style={[styles.wiki_list_con, styles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -296,7 +296,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>
 										<Text numberOfLines={2} style={styles.wiki_list_desc}>{item.desc}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>
@@ -309,7 +309,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.brands.map((item: any, index: number) => {
 							return (
-								<View style={[styles.wiki_list_con, styles.item_flex]} key={item.id}>
+								<Pressable onPress={() => { gotodetail("brand", item) }} key={item.id} style={[styles.wiki_list_con, styles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -320,7 +320,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>
 										<Text numberOfLines={2} style={styles.wiki_list_desc}>{item.desc}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>
@@ -333,7 +333,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.odors.map((item: any, index: number) => {
 							return (
-								<View style={[styles.wiki_list_con, styles.item_flex]} key={item.id}>
+								<Pressable onPress={() => { gotodetail("odor", item) }} key={item.id} style={[styles.wiki_list_con, styles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -344,7 +344,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>
 										<Text numberOfLines={2} style={styles.wiki_list_desc}>{item.desc}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>
@@ -357,7 +357,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.perfumers.map((item: any, index: number) => {
 							return (
-								<View style={[styles.wiki_list_con, styles.item_flex]} key={item.id}>
+								<Pressable key={item.id} onPress={() => { gotodetail("perfumer", item) }} style={[styles.wiki_list_con, styles.item_flex]}>
 									<RnImage style={styles.wiki_list_image}
 										source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
 										resizeMode="contain"
@@ -366,7 +366,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>
 										<Text numberOfLines={2} style={styles.wiki_list_desc}>{item.desc}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>
@@ -435,7 +435,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.topics.map((item: any, index: number) => {
 							return (
-								<View style={styles.social_list_con} key={item.id}>
+								<Pressable key={item.id} onPress={() => { gotodetail("topic", item) }} style={styles.social_list_con}>
 									<Image
 										style={[styles.wiki_list_image, styles.social_list_image]}
 										defaultSource={require("../../assets/images/default_avatar.png")}
@@ -446,7 +446,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text numberOfLines={1} style={styles.wiki_list_title}>{item.title}</Text>
 										<Text numberOfLines={2} style={styles.wiki_list_desc}>{item.desc}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>

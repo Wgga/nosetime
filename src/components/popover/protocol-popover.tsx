@@ -55,7 +55,7 @@ function ProtocolPopover({ modalparams }: any): React.JSX.Element {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<View style={[styles.title_con, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+			<View style={[styles.title_con, { paddingTop: insets.top }]}>
 				<Pressable style={{ zIndex: 1 }} onPress={() => {
 					ModalPortal.dismiss(modalkey);
 					StatusBar.setBarStyle("default", true);

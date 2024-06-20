@@ -663,16 +663,16 @@ npm install react-native-fast-shadow
 yarn add react-native-fast-shadow
 ```
 
-### 24. react-native-image-viewing
+### 24. react-native-gallery-preview
 
-react-native-image-viewing 是一个用于 React Native 的图像查看器组件。
+react-native-gallery-preview 是一个用于 React Native 的图像查看器组件。
 
 ```bash
 # using npm
-npm install react-native-image-viewing
+npm install react-native-gallery-preview
 
 # OR using Yarn
-yarn add react-native-image-viewing
+yarn add react-native-gallery-preview
 ```
 
 ### 25. react-native-reanimated-carousel

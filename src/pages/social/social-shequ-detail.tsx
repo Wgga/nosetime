@@ -26,6 +26,8 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
+import { ModalPortal } from "../../components/modals";
+import PhotoPopover from "../../components/popover/photo-popover";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,7 +43,7 @@ const ReplyItem = React.memo(({ item, islike }: any) => {
 
 	return (
 		<View style={styles.reply_item}>
-			<FastImage style={styles.reply_image}
+			<FastImage style={styles.reply_avatar}
 				source={{ uri: ENV.avatar + item.uid + ".jpg?!l" + item.uface }}
 				resizeMode="contain"
 			/>
@@ -74,20 +76,19 @@ const ReplyItem = React.memo(({ item, islike }: any) => {
 	)
 })
 
-const ReplyImage = React.memo(({ index, uri }: any) => {
+const ReplyImage = React.memo(({ uri }: any) => {
 
 	const [imagedata, setImageData] = React.useState<any>({
-		width: 1,
-		height: 1,
+		width: 0,
+		height: 0,
 	});
 
 	return (
-		<Image key={"image" + index}
-			source={{ uri: ENV.image + uri }}
+		<Image source={{ uri: ENV.image + uri }}
 			onLoad={({ nativeEvent: { source: { width, height } } }: any) => {
 				setImageData({ width, height })
 			}}
-			style={{ marginBottom: 13, width: width - 40, aspectRatio: imagedata.width / imagedata.height }}
+			style={[styles.reply_image, (imagedata.height && imagedata.width) && { aspectRatio: imagedata.width / imagedata.height }]}
 		/>
 	)
 })
@@ -114,6 +115,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	let pages = React.useRef<any>({
 		page: 1, items: [], loaded: 0, full: 0,
 	});
+	let slideimglist = React.useRef<any[]>([]);
 	let item0 = React.useRef<any>({ uid: 0, desc: "" });
 	let items_top = React.useRef<any[]>([]);
 	let pagecnt = React.useRef<number>(0);
@@ -123,6 +125,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	// 状态
 	let noMore = React.useRef<boolean>(false);
 	let isemptydata = React.useRef<boolean>(false);
+	const [loading, setLoading] = React.useState<boolean>(true); // 是否加载中
 	const [isfocus, setIsFocus] = React.useState<boolean>(false); // 是否获取焦点
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
@@ -136,7 +139,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 
 		Keyboard.addListener("keyboardDidShow", () => { setIsFocus(true); })
 		Keyboard.addListener("keyboardDidHide", () => { setIsFocus(false); })
-
 		init()
 	}, [])
 
@@ -145,7 +147,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		load("init");
 		if (fromid.current && fromid.current > 0) {
 			http.get(ENV.shequ + "?method=getshequdetailpage&dlgid=" + id.current + "&fromid=" + fromid.current).then((resp_data: any) => {
-				console.log("%c Line:44 🍊 resp_data", "color:#42b983", resp_data);
 				//当页面大于1执行。。
 				setTimeout(() => {
 					if (resp_data.page > 1) {
@@ -171,7 +172,17 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 			format_time(resp_data);
 
 			if (pages.current.page == 1 && resp_data.items_top) items_top.current = resp_data.items_top;
-			if (pages.current.page == 1 && item0.current.uid == 0) item0.current = resp_data.item0;
+			if (pages.current.page == 1 && item0.current.uid == 0) {
+				slideimglist.current = [];
+				let imagelist = resp_data.item0.desc.match(/\[img\]([^\[]*)\[\/img\]/g);
+				if (imagelist && imagelist.length > 0) {
+					imagelist.forEach((item: any) => {
+						slideimglist.current.push(ENV.image + item.replace(/\[img\]|\[\/img\]/g, ""))
+					});
+				}
+				item0.current = resp_data.item0;
+				setTimeout(() => { setLoading(false) }, 1000);
+			}
 
 			if (resp_data.page > 1) {
 				pagecnt.current = resp_data.page;
@@ -283,11 +294,46 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
+	const open_PhotoPopover = (slideimgindex: number) => {
+		ModalPortal.show((
+			<PhotoPopover modalparams={{
+				key: "social_photo_popover",
+				slideimgindex,
+				slideimglist: slideimglist.current
+			}} />
+		), {
+			key: "social_photo_popover",
+			width,
+			height,
+			rounded: false,
+			useNativeDriver: true,
+			onShow: () => { },
+			onDismiss: () => { },
+			onTouchOutside: () => {
+				ModalPortal.dismiss("social_photo_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("social_photo_popover");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
 	const handledesc = (desc: string) => {
 		let sz: any[] = [];
-		sz = desc.split(/\[img\]|\[\/img\]/).map((part: string, index: number) => {
+		sz = desc.split(/\[img\]|\[\/img\]/g).map((part: string, index: number) => {
 			if (part.includes(".jpg")) {
-				return <ReplyImage index={index} uri={part} />
+				return (
+					<Pressable key={"img" + index} onPress={() => {
+						let slideimgindex = slideimglist.current.findIndex((item: any) => {
+							return item == ENV.image + part;
+						})
+						open_PhotoPopover(slideimgindex);
+					}}>
+						<ReplyImage uri={part} />
+					</Pressable>
+				)
 			} else if (part) {
 				return <Text key={"text" + index} style={styles.reply_text}>{part}</Text>;
 			}
@@ -310,6 +356,9 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<View style={Globalstyles.container}>
+			{loading && <View style={Globalstyles.loading_con}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
+			</View>}
 			<HeaderView data={{
 				title: item0.current.title,
 				isShowSearch: false,
@@ -349,45 +398,47 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
 				</Pressable>
 			</HeaderView>
-			{showPage && <Pressable style={styles.pagemask} onPress={() => { setShowPage(false); }}></Pressable>}
-			<View style={[styles.select_page_con, { bottom: 77 + insets.bottom }]}>
-				{!showPage && <Pressable style={styles.page_btn} onPress={() => {
-					setShowPage(true);
-				}}>
-					<Text style={styles.currentpage}>{currentpage.current}</Text>
-					<Text style={styles.allpage}>{"/" + pagecnt.current + "页"}</Text>
-				</Pressable>}
-				{showPage && <ShadowedView style={styles.gopage_btn_con}>
-					<View style={styles.gopage_title}>
-						<Pressable style={[styles.page_btn_con, { alignItems: "flex-start" }]}
-							onPress={() => {
-								goPage(1);
-							}}>
-							<Text style={[styles.btn_text, { color: theme.num }]}>首页</Text>
-						</Pressable>
-						<View style={styles.page_btn_con}>
-							<Text style={styles.btn_text}>翻页</Text>
-						</View>
-						<Pressable style={[styles.page_btn_con, { alignItems: "flex-end" }]}
-							onPress={() => {
-								goPage(pagecnt.current);
-							}}>
-							<Text style={[styles.btn_text, { color: theme.num }]}>末页</Text>
-						</Pressable>
-					</View>
-					<ScrollView contentContainerStyle={styles.gopage_btn} showsVerticalScrollIndicator={false}>
-						{pagenum.current.map((item: any, index: number) => {
-							return (
-								<Pressable key={item} style={styles.page_item} onPress={() => {
-									goPage(item);
+			{pagecnt.current > 3 && <>
+				{showPage && <Pressable style={styles.pagemask} onPress={() => { setShowPage(false); }}></Pressable>}
+				<View style={[styles.select_page_con, { bottom: 77 + insets.bottom }]}>
+					{!showPage && <Pressable style={styles.page_btn} onPress={() => {
+						setShowPage(true);
+					}}>
+						<Text style={styles.currentpage}>{currentpage.current}</Text>
+						<Text style={styles.allpage}>{"/" + pagecnt.current + "页"}</Text>
+					</Pressable>}
+					{showPage && <ShadowedView style={styles.gopage_btn_con}>
+						<View style={styles.gopage_title}>
+							<Pressable style={[styles.page_btn_con, { alignItems: "flex-start" }]}
+								onPress={() => {
+									goPage(1);
 								}}>
-									<Text style={[styles.page_item_text, currentpage.current == item && styles.active_page]}>{item}</Text>
-								</Pressable>
-							)
-						})}
-					</ScrollView>
-				</ShadowedView>}
-			</View>
+								<Text style={[styles.btn_text, { color: theme.num }]}>首页</Text>
+							</Pressable>
+							<View style={styles.page_btn_con}>
+								<Text style={styles.btn_text}>翻页</Text>
+							</View>
+							<Pressable style={[styles.page_btn_con, { alignItems: "flex-end" }]}
+								onPress={() => {
+									goPage(pagecnt.current);
+								}}>
+								<Text style={[styles.btn_text, { color: theme.num }]}>末页</Text>
+							</Pressable>
+						</View>
+						<ScrollView contentContainerStyle={styles.gopage_btn} showsVerticalScrollIndicator={false}>
+							{pagenum.current.map((item: any, index: number) => {
+								return (
+									<Pressable key={item} style={styles.page_item} onPress={() => {
+										goPage(item);
+									}}>
+										<Text style={[styles.page_item_text, currentpage.current == item && styles.active_page]}>{item}</Text>
+									</Pressable>
+								)
+							})}
+						</ScrollView>
+					</ShadowedView>}
+				</View>
+			</>}
 			<View style={[Globalstyles.list_content, Globalstyles.container]}>
 				<FlashList data={pages.current.items}
 					extraData={isrender}
@@ -618,6 +669,10 @@ const styles = StyleSheet.create({
 		width: "100%",
 		marginTop: 13,
 	},
+	reply_image: {
+		marginBottom: 13,
+		width: width - 40
+	},
 	reply_text: {
 		fontSize: 13,
 		color: theme.text2,
@@ -649,7 +704,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		flexDirection: "row",
 	},
-	reply_image: {
+	reply_avatar: {
 		width: 30,
 		height: 30,
 		borderRadius: 50,

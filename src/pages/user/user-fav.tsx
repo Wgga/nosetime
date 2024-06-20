@@ -466,8 +466,7 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 					/>
 				</View>
 			</HeaderView>
-			<TabView
-				navigationState={{ index, routes }}
+			<TabView navigationState={{ index, routes }}
 				renderScene={({ route }) => {
 					switch (route.key) {
 						case "article":

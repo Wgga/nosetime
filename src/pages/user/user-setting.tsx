@@ -784,8 +784,8 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 				</Pressable>
 				<Text style={styles.setting_text}>{"个人设置"}</Text>
 			</View>
-			<TabView style={{ backgroundColor: "transparent", marginTop: 20 }}
-				navigationState={{ index, routes }}
+			<TabView navigationState={{ index, routes }}
+				style={{ backgroundColor: "transparent", marginTop: 20 }}
 				renderScene={SceneMap({
 					person: () => <Person navigation={navigation} changeAvatar={changeAvatar} />,
 					account: () => <Account navigation={navigation} showgiftcode={showgiftcode.current} />,

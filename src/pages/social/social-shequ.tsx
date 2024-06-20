@@ -70,11 +70,9 @@ const SocialShequ = React.memo(({ navigation, type, showHeaderView }: any) => {
 		}
 	}, [])
 
-	useFocusEffect(
-		React.useCallback(() => {
-			init()
-		}, [])
-	)
+	React.useEffect(() => {
+		init()
+	}, [])
 
 	const init = () => {
 		if (currentword.current == "最新") {
