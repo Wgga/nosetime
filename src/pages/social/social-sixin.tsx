@@ -15,12 +15,13 @@ import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-function SocialSixin({ navigation, route }: any): React.JSX.Element {
+const SocialSixin = React.memo(({ navigation, route }: any) => {
 
 	// 控件
 	// 参数
 	// 变量
 	// 数据
+	let kfmsg = React.useRef<any>({ content: "", sztime: "", new: 0 });
 	// 状态
 
 	return (
@@ -28,7 +29,7 @@ function SocialSixin({ navigation, route }: any): React.JSX.Element {
 			<Text>SocialSixin!</Text>
 		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 });

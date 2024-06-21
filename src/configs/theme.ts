@@ -21,4 +21,5 @@ export default {
 	star:         "#F3BF51",
 	redchecked:   "#E93D4D",
 	transparent:  "rgba(0, 0, 0, 0)",
+	btnLinearGradient: "linear-gradient(90deg, #81B4EC 0%, #9BA6F5 100%)",
 };

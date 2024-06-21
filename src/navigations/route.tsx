@@ -27,7 +27,7 @@ function Route(): React.JSX.Element {
 				"Home", "Lottery",
 				"ItemDetail",
 				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
-				"SocialShequDetail",
+				"SocialShequDetail", "SocialXiaoxi",
 				"Login", "User", "UserJifen", "Lottery", "UserFav",
 			];
 			const unsubscribe = navigation.addListener("state", () => {

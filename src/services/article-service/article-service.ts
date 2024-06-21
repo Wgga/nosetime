@@ -6,6 +6,7 @@ import cache from "../../hooks/storage/storage";
 import events from "../../hooks/events/events";
 
 import { ENV } from "../../configs/ENV";
+import us from "../user-service/user-service";
 
 const Winwidth = Dimensions.get("window").width;
 
@@ -123,6 +124,89 @@ class ArticleService {
 		return `<a target="_blank" href=${url}>${title}</a>`;
 	}
 
+	changevote = (match: any, voteid: string) => {
+		let id = voteid.replace("vote_", "");
+		let index = this.getVoteData(this.classname, this.id).findIndex((item: any) => item.id == id);
+		let votedata = this.getVoteData(this.classname, this.id)[index];
+		let sz = `
+			<div class="vote_list">
+				<div class="vote_title">${votedata.title}（${votedata.choose_classify}）</div>
+				<span class="vote_desc">${votedata.introduction}</span>
+				<div class="vote_item_con">
+					${(function () {
+						let votesz = "";
+						votedata.list.forEach((item: any) => {
+							votesz += `<div id="${id}_${item.id}_${item.info}"><div class="vote_item">`;
+							if (votedata.checked || votedata.isclose) {
+								votesz += `<span class="vote_bg ${(votedata.checked && item.checked) ? "checkedbg" : ""}" style="width:${item.accounted}"></span>`;
+							}
+							votesz += `<div class="vote_item_msg ${(votedata.vote_classify == "2") ? "textleft" : ""}">`;
+							if (item.info && votedata.vote_classify == "1") {
+								votesz += `<img onerror="javascript:this.src='assets/img/noxx.png'" class="voteitemimg"
+												src="${ENV.image + "/perfume/" + item.info}.jpg" />`;
+							}
+							if (votedata.vote_classify == "1") {
+								votesz += `<span class="name_con"><span class="item_cname">${item.cnname}</span><span class="item_ename">${item.enname}</span></span>`;
+							}
+							if (votedata.vote_classify == "2") {
+								votesz += `<span class="vote_item_info">${item.info}</span>`;
+							}
+							if (votedata.checked) {
+								votesz += `<div class="vote_num_con ${item.checked ? "ischecked" : ""}">`;
+								if (item.checked) {
+									votesz += `<span class="iconseled">
+									<svg t="1718963693471" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10550" width="12" height="12">
+									<path d="M58.514286 632.685714s138.971429 47.542857 219.428571 142.628572 157.257143 171.885714 157.257143 171.885714 62.171429-135.314286 226.742857-314.514286 274.285714-226.742857 274.285714-226.742857-14.628571-73.142857-14.628571-138.971428c-3.657143-98.742857 0-186.514286 0-186.514286s-128 21.942857-299.885714 274.285714-201.142857 358.4-201.142857 358.4l-120.685715-245.028571c0-3.657143-241.371429 164.571429-241.371428 164.571428z" fill="#6979BF" p-id="10551"></path>
+									</svg></span>`;
+								}
+								votesz += `<span>${item.select_num}票</span></div>`;
+							}
+							votesz += `</div></div>`;
+							if (!votedata.isclose && !votedata.checked) {
+								votesz += `<div class="sel_btn">`;
+								if (votedata.choose_classify == "单选") {
+									votesz += `<span class="radio ${item.ischecked ? "radio_checked" : ""}"></span>`;
+								} else if (votedata.choose_classify == "多选") {
+									votesz += `<span class="checkbox">`;
+									if (item.ischecked) {
+										votesz += `<span class="iconseled">
+										<svg t="1718963693471" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10550" width="11" height="11">
+										<path d="M58.514286 632.685714s138.971429 47.542857 219.428571 142.628572 157.257143 171.885714 157.257143 171.885714 62.171429-135.314286 226.742857-314.514286 274.285714-226.742857 274.285714-226.742857-14.628571-73.142857-14.628571-138.971428c-3.657143-98.742857 0-186.514286 0-186.514286s-128 21.942857-299.885714 274.285714-201.142857 358.4-201.142857 358.4l-120.685715-245.028571c0-3.657143-241.371429 164.571429-241.371428 164.571428z" fill="#6979BF" p-id="10551"></path>
+										</svg></span>`;
+									}
+									votesz += `</span>`;
+								}
+								votesz += `</div>`;
+							}
+							votesz += `</div>`;
+						});
+						return votesz;
+					})()}
+				</div>
+				<div class="vote_message">
+					<span class="vote_num">${votedata.user_num}人已参与</span>
+					${(function () {
+						if (votedata.toend) {
+							return `<span class="vote_days">，${votedata.toend}</span>`;
+						} else {
+							return "";
+						}
+					})()}
+				</div>
+				${(function (that) {
+					if (votedata.checked) {
+						return `<div class="vote_btn gary">你已投票</div>`;
+					} else if (votedata.isclose && !votedata.checked) {
+						return `<div class="vote_btn gary">投票已结束</div>`;
+					} else if (!votedata.checked && !votedata.isclose) {
+						return `<div class="vote_btn" id="${voteid}">投票</div>`;
+					}
+				})(this)}
+			</div>
+		`;
+		return sz;
+	}
+
 	// 处理html中的a标签返回整个html
 	changeurl = (data: any) => {
 		var cover = data.html.match(/<img [^>]+>/g);
@@ -134,38 +218,53 @@ class ArticleService {
 		//data.html=data.html.replace(/<a\s(?:\w*?=".*?"\s)*(?:href=")(.*?)(?:")(?:\s\w*?=".*?")*>(.+?)<\/a>/g,$scope.changehref);
 		data.html = data.html.replace(/<a[^>]*href=([^>]*)>([^<]*)<\/a>/g, this.changehref);
 		data.html = data.html.replace(/<a[^>]*href=([^>]*)>(<img[^<]*)<\/a>/g, this.changehref);
+		data.html = data.html.replace(/<vote id="([^"]+)"><\/vote>/g, this.changevote);
 
 		return data.html;
 	}
 
 	getArticleData = (classname: string, id: number) => {
-		return this.articledata[classname + id];
+		return this.articledata[classname + id]["articledata"];
+	}
+
+	getVoteData = (classname: string, id: number) => {
+		return this.articledata[classname + id]["votedata"];
 	}
 
 	// 获取文章列表
 	fetchArticleData = (classname: string, id: number) => {
 		this.classname = classname;
 		this.id = id;
-		cache.getItem(classname + id).then((cacheobj: any) => {
-			if (cacheobj) {
-				this.articledata[classname + id] = cacheobj;
-				events.publish(classname + id + "ArticleData", { classname, id });
+		// cache.getItem(classname + id).then((cacheobj: any) => {
+		// 	if (cacheobj) {
+		// 		this.articledata[classname + id] = { "articledata": cacheobj };
+		// 		this.getvotedata("cache");
+		// 		events.publish(classname + id + "ArticleData", { classname, id });
+		// 	}
+		// }).catch(() => {
+		http.get(ENV.article + "?id=" + id).then((resp_data: any) => {
+			this.getvotedata("request", { classname, id });
+			let covers = resp_data.coverimg.split("/"),
+				coverimgname = covers[covers.length - 1], imgWH = [];
+			if (coverimgname.match(/S(\d+)x(\d+)/g)) {
+				imgWH = covers[covers.length - 1].split(/S(\d+)x(\d+)/g);
+				resp_data.tempH = imgWH[2] * Winwidth / imgWH[1];
+			} else {
+				resp_data.tempH = 527 * Winwidth / 900;
 			}
-		}).catch(() => {
-			http.get(ENV.article + "?id=" + id).then((resp_data: any) => {
-				resp_data.html = this.changeurl(resp_data);
-				let covers = resp_data.coverimg.split("/"),
-					coverimgname = covers[covers.length - 1], imgWH = [];
-				if (coverimgname.match(/S(\d+)x(\d+)/g)) {
-					imgWH = covers[covers.length - 1].split(/S(\d+)x(\d+)/g);
-					resp_data.tempH = imgWH[2] * Winwidth / imgWH[1];
-				} else {
-					resp_data.tempH = 527 * Winwidth / 900;
-				}
-				cache.saveItem(classname + id, resp_data, 60);
-				this.articledata[classname + id] = resp_data;
-				events.publish(classname + id + "ArticleData", { classname, id });
-			}).catch((error: any) => { });
+			cache.saveItem(classname + id, resp_data, 60);
+			this.articledata[classname + id] = { "articledata": resp_data };
+		}).catch((error: any) => { });
+		// })
+	}
+
+	getvotedata = (type: string, data: any) => {
+		http.post(ENV.api + ENV.vote, { method: "getvote_uid", uid: us.user.uid, aid: data.id }).then((resp_data: any) => {
+			this.articledata[data.classname + data.id]["votedata"] = resp_data.data
+			if (type == "request") {
+				resp_data.html = this.changeurl(this.articledata[data.classname + data.id]["articledata"]);
+				events.publish(this.classname + this.id + "ArticleData", data);
+			}
 		})
 	}
 

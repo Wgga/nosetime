@@ -23,12 +23,14 @@ import http from "../../utils/api/http";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { articlestyle } from "../../configs/articlestyle";
 import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 import { useFocusEffect } from "@react-navigation/native";
 import cache from "../../hooks/storage/storage";
 import reactNativeTextSize from "react-native-text-size";
+import AlertCtrl from "../../components/alertctrl";
 
 const classname = "ArticleDetail";
 
@@ -59,6 +61,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	});
 	let acidtoname = React.useRef<any>({});
 	let articledata = React.useRef<any>({}); // 文章数据
+	let votelist = React.useRef<any>([]);
 	let hotarticle = React.useRef<any>([]); // 热门文章
 	let replydata = React.useRef<any>({}); // 评论数据
 	let likelist = React.useRef<any>({}); // 是否收藏文章
@@ -96,6 +99,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 		events.subscribe(classname + id + "ArticleData", (data) => {
 			articledata.current = articleService.getArticleData(classname, id);
+			votelist.current = articleService.getVoteData(classname, id);
 			articleService.fetchHotArticle(articledata.current.tag);
 		})
 
@@ -358,7 +362,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 	// 处理webview中的链接与RN通信
 	const INJECTED_JAVASCRIPT = `(function () {
-		var allLinks = document.querySelectorAll("a");
+		let allLinks = document.querySelectorAll("a");
 		allLinks.forEach((link)=>{
 			link.addEventListener("click", (ev)=>{
 				ev.preventDefault();
@@ -372,8 +376,51 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				if (e.nodeName != "A") return;
 				let href = e.getAttribute("href");
 				let obj = href.substr(href.indexOf("?") + 1).replace(/%22/g, '"');
-				window.ReactNativeWebView.postMessage(obj);
+				window.ReactNativeWebView.postMessage(JSON.stringify({ data: obj, type: "link" }));
 			});
+		})
+		let sel_btn = document.querySelectorAll(".sel_btn");
+		sel_btn.forEach((btnlink) => {
+			btnlink.addEventListener("click", (ev) => {
+				let e = ev.srcElement || ev.target;
+				for (let i = 0; i < 3; ++i) {
+					if (e.nodeName == "DIV" && e.id)
+						break;
+					else
+						e = e.parentNode;
+				}
+				window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "sel" }));
+				let voteitem = document.getElementById(e.id);
+				if (voteitem && voteitem.querySelector(".radio").className.indexOf("radio_checked") == -1) {
+					document.querySelectorAll(".radio").forEach((radio)=>{ radio.classList.remove("radio_checked"); });
+					voteitem.querySelector(".radio").classList.add("radio_checked");
+				}
+			})
+		})
+		let vote_btn = document.querySelector(".vote_btn");
+		vote_btn.addEventListener("click", (ev) => {
+			let e = ev.srcElement || ev.target;
+			if (e.innerText == "投票") {
+				window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "vote" }));
+			}
+		})
+		function toPage(ele) {
+			ele.addEventListener("click", (ev) => {
+				let e = ev.srcElement || ev.target;
+				for (let i = 0; i < 4; ++i) {
+					if (e.nodeName == "DIV" && e.id)
+						break;
+					else
+						e = e.parentNode;
+				}
+				window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "topage" }));
+			})
+		}
+		let vote_item = document.querySelectorAll(".vote_item");
+		vote_item.forEach((itemlink) => {
+			toPage(itemlink.querySelector(".item_cname"))
+			toPage(itemlink.querySelector(".item_ename"))
+			toPage(itemlink.querySelector(".voteitemimg"))
 		})
 	})();`;
 
@@ -381,12 +428,76 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	const handleMessage = (event: any) => {
 		if (!event.nativeEvent.data) return;
 		let data = JSON.parse(event.nativeEvent.data);
-		if (data.page && data.page.length > 3) {
-			gotodetail(data.page, data.id);
-			let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: data.page, code: data.id };
-			http.post(ENV.mall + "?uid=" + us.user.uid, params);
+		if (data) {
+			if (data.type == "link") {
+				if (data.page && data.page.length > 3) {
+					gotodetail(data.page, data.id);
+					let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: data.page, code: data.id };
+					http.post(ENV.mall + "?uid=" + us.user.uid, params);
+				}
+			} else if (data.type == "sel") {
+				sel_vote_item(data.id);
+			} else if (data.type == "vote") {
+				vote(data.id);
+			} else if (data.type == "topage") {
+				let id = data.id.split("_")[2];
+				gotodetail("mall-item", id);
+			}
 		}
 	};
+
+	const sel_vote_item = (id: string) => {
+		let ids = id.split("_");
+		let voteid = ids[0], itemid = ids[1], iteminfo = ids[2];
+		let voteindex = votelist.current.findIndex((item: any) => item.id == voteid);
+		let votedata = votelist.current[voteindex];
+		let itemindex = votedata.list.findIndex((item: any) => (item.id == itemid && item.info == iteminfo));
+		let itemdata = votedata.list[itemindex];
+		if (votedata.choose_classify == "单选") {
+			votedata.list.forEach((item: any) => { item.ischecked = false });
+			itemdata.ischecked = true;
+		} else {
+			itemdata.ischecked = !itemdata.ischecked;
+		}
+	}
+
+	const vote = (voteid: string) => {
+		let id = voteid.replace("vote_", "");
+		let index = votelist.current.findIndex((item: any) => item.id == id);
+		let votedata = votelist.current[index];
+		if (!us.user.uid) {
+			navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+			return;
+		}
+		let selvoteitem: any = {};
+		votedata.list.forEach((item: any) => { if (item.ischecked) selvoteitem[item.id] = 1; });
+		console.log("%c Line:423 🍫 selvoteitem", "color:#f5ce50", selvoteitem);
+		return
+		if (Object.keys(selvoteitem).length == 0) {
+			AlertCtrl.show({
+				header: "请先选择投票内容",
+				key: "empty_vitecon_alert",
+				message: "",
+				buttons: [{
+					text: "确定",
+					handler: () => {
+						AlertCtrl.close("empty_vitecon_alert")
+					}
+				}]
+			});
+			return
+		}
+		http.post(ENV.api + ENV.vote, { method: "to_vote", uid: us.user.uid, data: votedata, token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				events.publish("update_votedata", { type: "to_vote", data: resp_data.data });
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
+			} else {
+				return ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "vote_error_toast" });
+			}
+		});
+	}
 
 	// 跳转页面
 	const gotodetail = (page: any, id: number) => {
@@ -614,15 +725,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 									showsVerticalScrollIndicator={false}
 									customScript={INJECTED_JAVASCRIPT}
 									onMessage={handleMessage}
-									customStyle={`*{padding:0;margin:0;}
-									#content{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;pointer-events:none;overflow:hidden;}
-									#content .article_img{display:block !important;cursor:pointer;line-height:normal;}
-									.title,.author{display:none;}
-									.content a{pointer-events: auto;text-decoration:none !important;color:#6979bf;-webkit-tap-highlight-color:rgba(255,0,0,0);}
-									.content a img,.content p img,.content center img{width: 100%;height:auto !important;background-color:#f5f5f5;}
-									.content p, center {padding-left:0 !important;color:#4D4D4D;margin:0;padding:4px 0;line-height:29px;font-size:15px;}
-									.content .maintitle{padding-bottom:0;margin-bottom:-3px;}
-									.content .subtitle{padding-top:0;}`}
+									customStyle={articlestyle.style}
 									source={{ html: articledata.current.html }}
 								/>
 							</View>
