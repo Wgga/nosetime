@@ -20,7 +20,7 @@ import { ENV } from "./src/configs/ENV";
 
 import http from "./src/utils/api/http";
 import us from "./src/services/user-service/user-service";
-import cache from "./src/hooks/storage/storage";
+import cache from "./src/hooks/storage";
 
 function App(): React.JSX.Element {
 

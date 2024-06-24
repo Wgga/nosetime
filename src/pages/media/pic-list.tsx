@@ -8,7 +8,7 @@ import ListBottomTip from "../../components/listbottomtip";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
+import cache from "../../hooks/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";

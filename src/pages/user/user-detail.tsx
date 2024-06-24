@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
-import events from "../../hooks/events/events";
+import cache from "../../hooks/storage";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";

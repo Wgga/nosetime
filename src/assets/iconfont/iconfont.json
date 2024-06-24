@@ -6,6 +6,27 @@
   "description": "app专用",
   "glyphs": [
     {
+      "icon_id": "40834698",
+      "name": "plus2",
+      "font_class": "plus2",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "40834697",
+      "name": "advance",
+      "font_class": "advance",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "40834746",
+      "name": "txcheckmark",
+      "font_class": "txcheckmark",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
       "icon_id": "40708556",
       "name": "reply2",
       "font_class": "comment",

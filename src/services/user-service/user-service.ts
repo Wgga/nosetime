@@ -2,10 +2,12 @@ import { Platform } from "react-native";
 
 import DeviceInfo from "react-native-device-info";
 
+import wss from "../wss-service/wss-service";
+
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
-import events from "../../hooks/events/events";
+import cache from "../../hooks/storage";
+import events from "../../hooks/events";
 
 import { ENV } from "../../configs/ENV";
 
@@ -161,7 +163,7 @@ class UserService {
 			if (this.isandroid) p = "ANDROID ";
 			else if (this.isios) p = "IOS ";
 
-			// this.wss.userlogin(this.user.uid, this.user.token, p + AppVersion);
+			wss.userlogin(this.user.uid, this.user.token, p + AppVersion);
 		}
 		if (this.timer_savedeviceinfo) {
 			clearTimeout(this.timer_savedeviceinfo);

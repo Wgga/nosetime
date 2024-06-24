@@ -12,7 +12,7 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import events from "../../hooks/events/events";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 

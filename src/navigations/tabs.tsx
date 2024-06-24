@@ -12,7 +12,7 @@ import User from "../pages/user/user";
 
 import us from "../services/user-service/user-service";
 
-import events from "../hooks/events/events";
+import events from "../hooks/events";
 
 import { Globalstyles } from "../configs/globalstyles";
 

@@ -8,7 +8,7 @@ import us from "../user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import events from "../../hooks/events/events";
+import events from "../../hooks/events";
 
 import { ENV } from "../../configs/ENV";
 

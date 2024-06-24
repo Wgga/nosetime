@@ -9,8 +9,8 @@ import searchService from "../../services/search-service/search-service";
 
 import http from "../../utils/api/http";
 
-import cache from "../../hooks/storage/storage";
-import events from "../../hooks/events/events";
+import cache from "../../hooks/storage";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";

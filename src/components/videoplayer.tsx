@@ -18,7 +18,7 @@ import Slider from "@react-native-community/slider";
 import LinearGradient from "react-native-linear-gradient";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 
-import events from "../hooks/events/events";
+import events from "../hooks/events";
 
 import Icon from "../assets/iconfont";
 

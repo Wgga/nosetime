@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, Pressable, Dimensions, BackHandler } from "reac
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 import ProtocolPopover from "../../components/popover/protocol-popover";
 
-import cache from "../../hooks/storage/storage";
-import events from "../../hooks/events/events";
+import cache from "../../hooks/storage";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 

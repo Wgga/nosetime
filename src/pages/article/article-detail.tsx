@@ -17,7 +17,7 @@ import AutoHeightWebView from "../../components/autoHeightWebview";
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
 
-import events from "../../hooks/events/events";
+import events from "../../hooks/events";
 
 import http from "../../utils/api/http";
 
@@ -28,7 +28,7 @@ import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, set
 
 import Icon from "../../assets/iconfont";
 import { useFocusEffect } from "@react-navigation/native";
-import cache from "../../hooks/storage/storage";
+import cache from "../../hooks/storage";
 import reactNativeTextSize from "react-native-text-size";
 import AlertCtrl from "../../components/alertctrl";
 
@@ -380,30 +380,34 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			});
 		})
 		let sel_btn = document.querySelectorAll(".sel_btn");
-		sel_btn.forEach((btnlink) => {
-			btnlink.addEventListener("click", (ev) => {
+		if (sel_btn && sel_btn.length > 0) {
+			sel_btn.forEach((btnlink) => {
+				btnlink.addEventListener("click", (ev) => {
+					let e = ev.srcElement || ev.target;
+					for (let i = 0; i < 3; ++i) {
+						if (e.nodeName == "DIV" && e.id)
+							break;
+						else
+							e = e.parentNode;
+					}
+					window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "sel" }));
+					let voteitem = document.getElementById(e.id);
+					if (voteitem && voteitem.querySelector(".radio").className.indexOf("radio_checked") == -1) {
+						document.querySelectorAll(".radio").forEach((radio)=>{ radio.classList.remove("radio_checked"); });
+						voteitem.querySelector(".radio").classList.add("radio_checked");
+					}
+				})
+			})
+		}
+		let vote_btn = document.querySelector(".vote_btn");
+		if (vote_btn) {
+			vote_btn.addEventListener("click", (ev) => {
 				let e = ev.srcElement || ev.target;
-				for (let i = 0; i < 3; ++i) {
-					if (e.nodeName == "DIV" && e.id)
-						break;
-					else
-						e = e.parentNode;
-				}
-				window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "sel" }));
-				let voteitem = document.getElementById(e.id);
-				if (voteitem && voteitem.querySelector(".radio").className.indexOf("radio_checked") == -1) {
-					document.querySelectorAll(".radio").forEach((radio)=>{ radio.classList.remove("radio_checked"); });
-					voteitem.querySelector(".radio").classList.add("radio_checked");
+				if (e.innerText == "投票") {
+					window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "vote" }));
 				}
 			})
-		})
-		let vote_btn = document.querySelector(".vote_btn");
-		vote_btn.addEventListener("click", (ev) => {
-			let e = ev.srcElement || ev.target;
-			if (e.innerText == "投票") {
-				window.ReactNativeWebView.postMessage(JSON.stringify({ id: e.id, type: "vote" }));
-			}
-		})
+		}
 		function toPage(ele) {
 			ele.addEventListener("click", (ev) => {
 				let e = ev.srcElement || ev.target;
@@ -417,11 +421,13 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			})
 		}
 		let vote_item = document.querySelectorAll(".vote_item");
-		vote_item.forEach((itemlink) => {
-			toPage(itemlink.querySelector(".item_cname"))
-			toPage(itemlink.querySelector(".item_ename"))
-			toPage(itemlink.querySelector(".voteitemimg"))
-		})
+		if (vote_item && vote_item.length > 0) {
+			vote_item.forEach((itemlink) => {
+				toPage(itemlink.querySelector(".item_cname"))
+				toPage(itemlink.querySelector(".item_ename"))
+				toPage(itemlink.querySelector(".voteitemimg"))
+			})
+		}
 	})();`;
 
 	// 监听webview内容并获取其高度和处理webview内点击事件
@@ -430,9 +436,10 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		let data = JSON.parse(event.nativeEvent.data);
 		if (data) {
 			if (data.type == "link") {
-				if (data.page && data.page.length > 3) {
-					gotodetail(data.page, data.id);
-					let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: data.page, code: data.id };
+				let linkdata = JSON.parse(data.data);
+				if (linkdata.page && linkdata.page.length > 3) {
+					gotodetail(linkdata.page, linkdata.id);
+					let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: linkdata.page, code: linkdata.id };
 					http.post(ENV.mall + "?uid=" + us.user.uid, params);
 				}
 			} else if (data.type == "sel") {
@@ -471,8 +478,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		}
 		let selvoteitem: any = {};
 		votedata.list.forEach((item: any) => { if (item.ischecked) selvoteitem[item.id] = 1; });
-		console.log("%c Line:423 🍫 selvoteitem", "color:#f5ce50", selvoteitem);
-		return
 		if (Object.keys(selvoteitem).length == 0) {
 			AlertCtrl.show({
 				header: "请先选择投票内容",
@@ -683,8 +688,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
 				</Pressable> */}
 			</HeaderView>
-			<FlashList ref={listref}
-				data={replydata.current.items}
+			<FlashList ref={listref} data={replydata.current.items}
 				onScroll={(e) => {
 					showHeaderView(e);
 					showFooterView(e);

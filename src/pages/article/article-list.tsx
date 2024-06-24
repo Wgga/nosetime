@@ -5,8 +5,8 @@ import FastImage from "react-native-fast-image";
 
 import articleService from "../../services/article-service/article-service";
 
-import cache from "../../hooks/storage/storage";
-import events from "../../hooks/events/events";
+import cache from "../../hooks/storage";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";

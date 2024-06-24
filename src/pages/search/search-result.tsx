@@ -12,7 +12,7 @@ import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
 
-import events from "../../hooks/events/events";
+import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
@@ -234,8 +234,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.items && searchdata.items.length > 0 && <View style={styles.item_list}>
-					<FlashList
-						data={searchdata.items}
+					<FlashList data={searchdata.items}
 						renderItem={({ item }: any) => {
 							return (
 								<Pressable onPress={() => { gotodetail("item", item) }} style={styles.list_brand}>
@@ -491,8 +490,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					resizeMode="contain"
 					source={require("../../assets/images/empty/sr_blank.png")} />}
 				{searchdata.vods && searchdata.vods.length > 0 && <View style={styles.item_list}>
-					<FlashList
-						data={searchdata.vods}
+					<FlashList data={searchdata.vods}
 						renderItem={({ item }: any) => {
 							return (
 								<View style={styles.list_vod}>
