@@ -4,6 +4,7 @@ import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard
 import { FlashList } from "@shopify/flash-list";
 import Orientation from "react-native-orientation-locker";
 import FastImage from "react-native-fast-image";
+import { useFocusEffect } from "@react-navigation/native";
 
 import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
@@ -13,11 +14,13 @@ import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 import AutoHeightWebView from "../../components/autoHeightWebview";
+import AlertCtrl from "../../components/alertctrl";
 
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
 
 import events from "../../hooks/events";
+import cache from "../../hooks/storage";
 
 import http from "../../utils/api/http";
 
@@ -27,16 +30,12 @@ import { articlestyle } from "../../configs/articlestyle";
 import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
-import { useFocusEffect } from "@react-navigation/native";
-import cache from "../../hooks/storage";
-import reactNativeTextSize from "react-native-text-size";
-import AlertCtrl from "../../components/alertctrl";
 
-const classname = "ArticleDetail";
 
 const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	// 参数
 	const { id } = route.params;
+	const classname = "ArticleDetail";
 	// 控件
 	const windowD = useWindowDimensions();
 	const webviewref = React.useRef<any>(null); // webview Ref
@@ -93,7 +92,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	React.useEffect(() => {
 		articleService.fetchArticleData(classname, id);
 		// 监听文章内视频是否全屏显示
-		events.subscribe(classname + id + "fullScreenChange", (fullval) => {
+		events.subscribe(classname + id + "fullScreenChange", (fullval: boolean) => {
 			setIsfull(fullval);
 		})
 
@@ -709,7 +708,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						poster={articledata.current.picURL}
 						classname={classname + id}>
 					</VideoPlayer>}
-
 					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
 						<View>
 							{!articledata.current.mp4URL && <View style={styles.content_img}>

@@ -118,7 +118,7 @@ const SocialShequ = React.memo(({ navigation, type, showHeaderView }: any) => {
 							defaultIndex={0}
 							autoPlayInterval={3000}
 							scrollAnimationDuration={500}
-							autoPlay={true}
+							autoPlay={false}
 							autoFillData
 							panGestureHandlerProps={{
 								activeOffsetX: [-10, 10],

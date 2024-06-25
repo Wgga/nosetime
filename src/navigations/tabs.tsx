@@ -38,18 +38,17 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<>
-			<Tab.Navigator
-				screenOptions={({ route }: any) => ({
-					...TabOption(route),
-					tabBarStyle: {
-						shadowColor: "transparent",
-						borderColor: "transparent",
-					},
-					tabBarItemStyle: {
-						borderColor: "transparent",
-						flexDirection: "column",
-					},
-				})}>
+			<Tab.Navigator screenOptions={({ route }: any) => ({
+				...TabOption(route),
+				tabBarStyle: {
+					shadowColor: "transparent",
+					borderColor: "transparent",
+				},
+				tabBarItemStyle: {
+					borderColor: "transparent",
+					flexDirection: "column",
+				},
+			})}>
 				<Tab.Screen name="Home" options={{ title: "首页" }} component={Home} />
 				<Tab.Screen name="Smart" options={{ title: "发现" }} component={Smart} />
 				<Tab.Screen name="Social" options={{ title: "圈子" }} listeners={({ navigation, route }: any) => ({

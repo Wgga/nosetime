@@ -22,8 +22,6 @@ import events from "../hooks/events";
 
 import Icon from "../assets/iconfont";
 
-import theme from "../configs/theme";
-
 const screenWidth = Dimensions.get("window").width;
 
 function formatTime(second: string) {

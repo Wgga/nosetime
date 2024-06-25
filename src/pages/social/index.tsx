@@ -82,7 +82,7 @@ function Social({ navigation, route }: any): React.JSX.Element {
 	// 筛选弹窗动画
 	const top = showfilter.interpolate({
 		inputRange: [0, 1],
-		outputRange: [-10, tabbarH.current],
+		outputRange: [tabbarH.current - (80 + insets.top), (tabbarH.current - insets.top)],
 		extrapolate: "clamp",
 	});
 
@@ -177,21 +177,21 @@ function Social({ navigation, route }: any): React.JSX.Element {
 									indicatorStyle={{ backgroundColor: theme.tit, width: 20, height: 1, bottom: 7, left: ((width / 5 - 20) / 2) }}
 									android_ripple={{ color: "transparent" }}
 									indicatorContainerStyle={{ backgroundColor: theme.toolbarbg }}
-									style={{ paddingTop: insets.top + 8, shadowColor: "transparent" }}
+									style={{ paddingTop: insets.top, shadowColor: "transparent" }}
 								/>
-								<Animated.View style={[styles.search_con, { opacity: headerOpt, zIndex: headerZ }]}>
+								<Animated.View style={[styles.search_con, { paddingTop: insets.top, opacity: headerOpt, zIndex: headerZ }]}>
 									<Pressable onPress={() => {
 										// 跳转到搜索页面
 										navigation.navigate("Page", { screen: "Search", params: { from: "social" } });
 									}}>
-										<View style={[styles.searchbar, { marginTop: insets.top + 10 }]}>
+										<View style={[styles.searchbar]}>
 											<Text style={styles.placeholder}>搜索帖子</Text>
 											<Icon name="search" size={23} color="#adadad" style={{ marginRight: 13 }} />
 										</View>
 									</Pressable>
 								</Animated.View>
 							</View>
-							<Animated.View style={[styles.topic_con, { transform: [{ translateY: top }] }]}>
+							<Animated.View style={[styles.topic_con, { height: 80 + insets.top, paddingTop: insets.top, transform: [{ translateY: top }] }]}>
 								<Text style={styles.topic_title}>{"筛选最新话题显示"}</Text>
 								<View style={styles.topic_btn_con}>
 									{topic_btn.map((item: any, index: number) => {
@@ -225,11 +225,8 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 	},
 	search_con: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		height: 80,
+		...StyleSheet.absoluteFillObject,
+		justifyContent: "center",
 		paddingHorizontal: 13,
 		backgroundColor: theme.toolbarbg,
 	},
@@ -247,7 +244,6 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 	},
 	topic_con: {
-		height: 80,
 		position: "absolute",
 		top: 0,
 		left: 0,
