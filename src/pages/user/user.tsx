@@ -34,6 +34,7 @@ import Wishlist from "../../assets/svg/user/wishlist.svg";
 import Usercart from "../../assets/svg/user/usercart.svg";
 import Giftcode from "../../assets/svg/user/giftcode.svg";
 import Setting from "../../assets/svg/user/setting.svg";
+import { Globalstyles } from "../../configs/globalstyles";
 
 const { width, height } = Dimensions.get("window");
 const classname = "UserPage";
@@ -43,7 +44,7 @@ function User({ navigation }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 	// 参数
 	// 变量
-	let pointval = React.useRef<number>(0); // 积分-
+	let pointval = React.useRef<number>(0); // 积分
 	let avatar = React.useRef<string>(""); // 头像
 	let giftcode = React.useRef<string>("");
 	// 数据
@@ -55,6 +56,7 @@ function User({ navigation }: any): React.JSX.Element {
 	// 状态
 	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 	const [isrender, setIsRender] = React.useState(false); // 是否渲染
+	const [isShowBadge, setIsShowBadge] = React.useState(false); // 是否显示消息
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -95,29 +97,26 @@ function User({ navigation }: any): React.JSX.Element {
 		});
 	};
 
-	// 获取用户积分
-	const getjifenval = () => {
-		return new Promise((resolve, reject) => {
-			http.post(ENV.points + "?uid=" + us.user.uid, { method: "mypoints", token: us.user.token }).then((resp_data: any) => {
-				if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
-					us.delUser();
-					resolve(0);
-				}
-				pointval.current = resp_data.val > 0 ? resp_data.val : 0;
-				resolve(1);
-			})
-		});
-	}
-
 	const getmoredata = (type: string) => {
 		cache.getItem("userupdatedata").then((cacheobj) => {
 			showgiftcode.current = cacheobj && cacheobj.showgiftcode == 1 ? true : false;
 		}).catch(() => { });
-		Promise.all([getjifenval()]).then((data: any) => {
-			if (data.includes(0)) {
+		// 获取用户积分
+		http.post(ENV.points + "?uid=" + us.user.uid, { method: "mypoints", token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App我的页面" } });
 			}
+			pointval.current = resp_data.val > 0 ? resp_data.val : 0;
 			setIsRender(val => !val);
+		})
+		us.getmessagedata().then((cnt: number) => {
+			let bol = cnt > 0 ? true : false;
+			setIsShowBadge(bol);
+			events.publish("isshowbadge", bol);
+		}).catch(() => {
+			setIsShowBadge(false);
+			events.publish("isshowbadge", false);
 		})
 	}
 
@@ -329,7 +328,10 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 					<View style={styles.btns_item_con}>
 						<Pressable onPress={() => { gotodetail("SocialXiaoxi") }} style={styles.btn_item}>
-							<Message width={24} height={24} style={styles.btn_item_icon} />
+							<View>
+								<Message width={24} height={24} style={styles.btn_item_icon} />
+								{isShowBadge && <Text style={[Globalstyles.redbadge, styles.btn_badge]}></Text>}
+							</View>
 							<Text style={styles.btn_item_text}>{"消息"}</Text>
 						</Pressable>
 						<Pressable onPress={() => { gotodetail("MallWishList") }} style={styles.btn_item}>
@@ -487,8 +489,11 @@ const styles = StyleSheet.create({
 	btn_item_icon: {
 		marginBottom: 15,
 	},
-	waitpay: {
-
+	btn_badge: {
+		width: 12,
+		height: 12,
+		right: -6,
+		top: -2,
 	},
 	btn_item_text: {
 		fontSize: 12,

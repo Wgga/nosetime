@@ -19,7 +19,7 @@ import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
 
-const SocialTixing = React.memo(({ navigation, route }: any) => {
+const SocialTixing = React.memo(({ navigation, setTixing }: any) => {
 
 	// 控件
 	// 参数
@@ -35,22 +35,29 @@ const SocialTixing = React.memo(({ navigation, route }: any) => {
 
 	React.useEffect(() => {
 		init()
+		events.subscribe("cleartixing", () => {
+			for (let i = 0; i < items.current.length; i++) {
+				delete items.current[i].new;
+			}
+			setIsRender(val => !val);
+		})
+		return () => {
+			events.unsubscribe("cleartixing");
+		}
 	}, [])
 
-	const gettixing = (type: string) => {
-		let newtixing = 0, items2: any = {};
-		for (let i in items.current) {
-			items2 = items.current[i];
-			if (items2.new) {
-				newtixing += items2.new
+	const getTixingcnt = (type: string) => {
+		let newtixing = 0;
+		for (let i = 0; i < items.current.length; i++) {
+			if (type == "clear") delete items.current[i].new;
+			if (items.current[i].new) {
+				newtixing += items.current[i].new
 			}
 		}
-		if (type == "init") {
-			cache.saveItem("tixingcnt", newtixing);
-		} else {
-			cache.saveItem("tixingcnt", newtixing -= 1);
+		if (type == "click") {
+			newtixing -= 1;
 		}
-		setIsRender(val => !val);
+		setTixing(newtixing);
 	}
 
 	const init = () => {
@@ -69,7 +76,8 @@ const SocialTixing = React.memo(({ navigation, route }: any) => {
 			//未读提醒会排在前面，所以只要第一条未读就包含未读，第一条不是未读，就没有未读
 
 			if (resp_data.length < 20) noMore.current = true;
-			gettixing("init");
+			getTixingcnt("init");
+			setIsRender(val => !val);
 		});
 	}
 
@@ -152,12 +160,12 @@ const SocialTixing = React.memo(({ navigation, route }: any) => {
 
 		if (type == 1 || type == 2) {
 			// this.router.navigate(['/discuss-reply'], { queryParams: { id, uid: us.user.uid, title: item.title } })
-			setTimeout(() => { gettixing("click"); }, 100);
+			setTimeout(() => { getTixingcnt("click"); }, 100);
 		} else if (type == 3) {
 			// this.router.navigate(['/discuss-reply'], { queryParams: { id, uid: us.user.uid, titile: item.title, urtype: 3, uid2: item.uida } })
 		} else if (type == 4 || type == 5) {
 			navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.ctid, ctdlgid: id } });
-			setTimeout(() => { gettixing("click"); }, 100);
+			setTimeout(() => { getTixingcnt("click"); }, 100);
 		} else if (type == 6) {//20230510 shibo:消息列表增加类型6的跳转
 			// this.router.navigate(['/media-list-detail/' + id], { queryParams: { id: item.miid } })
 		} else if (type == 8 || type == 9) {
@@ -173,6 +181,7 @@ const SocialTixing = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<FlashList data={items.current}
+			extraData={isrender}
 			renderItem={({ item, index }: any) => {
 				return (
 					<View style={styles.notice_item}>

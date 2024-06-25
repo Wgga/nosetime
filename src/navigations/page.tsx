@@ -32,6 +32,7 @@ import MallAddressEdit from "../pages/mall/mall-address-edit";
 import MallIdcardEdit from "../pages/mall/mall-idcard-edit";
 import MallCoupon from "../pages/mall/mall-coupon";
 import MallWishList from "../pages/mall/mall-wishlist";
+import MallKefu from "../pages/mall/mall-kefu";
 
 import Login from "../pages/user/login";
 import Protocol from "../pages/user/protocol";
@@ -82,6 +83,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="MallIdcardEdit" component={MallIdcardEdit} />
 			<Stack.Screen name="MallCoupon" component={MallCoupon} />
 			<Stack.Screen name="MallWishList" component={MallWishList} />
+			<Stack.Screen name="MallKefu" component={MallKefu} />
 
 			<Stack.Screen name="Login" component={Login} />
 			<Stack.Screen name="Protocol" component={Protocol} />

@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
 	},
 	slides_title_box: {
 		...StyleSheet.absoluteFillObject,
-		paddingTop: 66,
 		alignItems: "center",
+		justifyContent: "center",
 		backgroundColor: "rgba(0,0,0,0.12)"
 	},
 	slides_title: {

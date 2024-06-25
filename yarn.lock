@@ -6336,10 +6336,10 @@ react-is@^17.0.1:
   resolved "https://registry.npmmirror.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-awesome-gallery@^0.3.9:
-  version "0.3.9"
-  resolved "https://registry.npmmirror.com/react-native-awesome-gallery/-/react-native-awesome-gallery-0.3.9.tgz#44d6696f2464266c373431068ed384c415b2bcdf"
-  integrity sha512-BmTvf0qEaPNtdojDfvGQn9V1eRSbin2dWUBv2yPUjvbBz9BxR0DhRUpdUkRAzhbazYq9jEQtSTtoYDzYMKR9Sw==
+react-native-awesome-gallery@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.npmmirror.com/react-native-awesome-gallery/-/react-native-awesome-gallery-0.4.0.tgz#87b57a59d50874161c7b6adb033048fa24bb0bd3"
+  integrity sha512-FGLwSfow5bEhXjvFDxaYWCXXY5vuwAGZXl57e87CiXha1seq/i5ptwBJ1CTIRPmh7vnUxq3Pi5hOXCTe2/k9YQ==
   dependencies:
     react-native-redash "^16.0.8"
 
@@ -6363,6 +6363,11 @@ react-native-device-info@^11.1.0:
   version "11.1.0"
   resolved "https://registry.npmmirror.com/react-native-device-info/-/react-native-device-info-11.1.0.tgz#7db5c4e5a179dce761efac155a493aa0956a40ab"
   integrity sha512-hzXJSObJdezEz0hF7MAJ3tGeoesuQWenXXt9mrQR9Mjb8kXpZ09rqSsZ/quNpJdZpQ3rYiFa3/0GFG5KNn9PBg==
+
+react-native-devsettings@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmmirror.com/react-native-devsettings/-/react-native-devsettings-1.0.5.tgz#3ee079fea99338a2b00de293340c8d11629f16dd"
+  integrity sha512-JFdE3/oqIqtAi1HgdseMB+zRHVG9CQpsxMUVd+GXmaQQIyY+Kh2bWB3wdSA8+ojTunaahZkvb9fIFRrLUWdROQ==
 
 react-native-fast-image@^8.6.3:
   version "8.6.3"
@@ -6390,10 +6395,10 @@ react-native-gif-player@^1.0.2:
   resolved "https://registry.npmmirror.com/react-native-gif-player/-/react-native-gif-player-1.0.2.tgz#b53770bbc236da9c58517562469a394fd15013b7"
   integrity sha512-FOFrailOmIamE8PR7Cpv1/RtbfGuw3ycA5QKgRJ188TfokURv4gHZ/qwJUMEqPuxH7ERs7gbXMkhKq66qaJVpw==
 
-react-native-image-crop-picker@^0.41.1:
-  version "0.41.1"
-  resolved "https://registry.npmmirror.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.41.1.tgz#f016355680a084856cfc911b6bcc223af8e99dcd"
-  integrity sha512-2O2+DeQcZABlhhyMTYUIGCJwpyUnkJwutJbQwETSQ5uwtKsmsmhM1X91bwf6XG1+c1U3kVrtTxHMakc62HPBXQ==
+react-native-image-crop-picker@^0.41.2:
+  version "0.41.2"
+  resolved "https://registry.npmmirror.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.41.2.tgz#824fa8fee8391fbb3e0b5ae2973221a2dff0cafb"
+  integrity sha512-GcDu/adXU/1y/MrxsbOfqcGRGWC2pTttt5VGy/jyRJ6GXfoC29fTQf8SG5kGtc5schSR6K+mKYO4uW6eJPljlQ==
 
 react-native-linear-gradient@^2.8.3:
   version "2.8.3"
@@ -6443,15 +6448,15 @@ react-native-redash@^16.0.8:
     normalize-svg-path "^1.0.1"
     parse-svg-path "^0.1.2"
 
-react-native-safe-area-context@^4.10.3:
-  version "4.10.3"
-  resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.10.3.tgz#ad132b64e1e7cdd043b4e82a7a2449d99f4f7630"
-  integrity sha512-nW9B0fydpJSN798awtdslamYzRqDM/FIEh80ZPDEXVYpqYNsDLpz52pMtuKyhF5aOgJlfiroQrgdOxQNFtSM8A==
+react-native-safe-area-context@^4.10.5:
+  version "4.10.5"
+  resolved "https://registry.npmmirror.com/react-native-safe-area-context/-/react-native-safe-area-context-4.10.5.tgz#a9c677a48bd273afa6876772062ce08e8af1f18d"
+  integrity sha512-Wyb0Nqw2XJ6oZxW/cK8k5q7/UAhg/wbEG6UVf89rQqecDZTDA5ic//P9J6VvJRVZerzGmxWQpVuM7f+PRYUM4g==
 
-react-native-screens@^3.31.1:
-  version "3.31.1"
-  resolved "https://registry.npmmirror.com/react-native-screens/-/react-native-screens-3.31.1.tgz#909a890f669e32b0fb1b1410278b71ad2f8238f6"
-  integrity sha512-8fRW362pfZ9y4rS8KY5P3DFScrmwo/vu1RrRMMx0PNHbeC9TLq0Kw1ubD83591yz64gLNHFLTVkTJmWeWCXKtQ==
+react-native-screens@^3.32.0:
+  version "3.32.0"
+  resolved "https://registry.npmmirror.com/react-native-screens/-/react-native-screens-3.32.0.tgz#47c3d2efc9cd5ed18af41b34efc8b46df05b87b4"
+  integrity sha512-wybqZAHX7v8ipOXhh90CqGLkBHw5JYqKNRBX7R/b0c2WQisTOgu0M0yGwBMM6LyXRBT+4k3NTGHdDbpJVpq0yQ==
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
@@ -6511,15 +6516,15 @@ react-native-vector-icons@^10.1.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native-video@^6.1.2:
-  version "6.1.2"
-  resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.1.2.tgz#84580458e0d0ebbf6ca395cc15cd2f76c337bbda"
-  integrity sha512-oKk4hLhcWiL+k5CRgqs+/Bvp23QrHFGx3ylawrF4OWjKRekGeHNCf2mSf7+er66ZmktMtJC0ofBTgEPq4rRG6A==
+react-native-video@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.3.0.tgz#c195ef4c0a6d9ad19bfca40700f1f72dccf26cf3"
+  integrity sha512-lyLjWOdw/jgVpMSrprgKVwhT0KUlGzQRBVTDGyQSYDJ0I5ZkZKcmDE32rWCOyAtWhel+GtJjIyFqgT6xIXuxgg==
 
-react-native-webview@^13.10.2:
-  version "13.10.2"
-  resolved "https://registry.npmmirror.com/react-native-webview/-/react-native-webview-13.10.2.tgz#0f9b84ab38cca022d5b1c4e77c100f4d9591e7af"
-  integrity sha512-rjrTuPBtpHbI3owoyvSR+bRJqHfsdo5V3nVfU+G65CotkSLewEcGfA9cq7Qv3nzm5t0KEDIt0G/n7hQFjsXihQ==
+react-native-webview@^13.10.4:
+  version "13.10.4"
+  resolved "https://registry.npmmirror.com/react-native-webview/-/react-native-webview-13.10.4.tgz#9b84d9ebc07f55d9e19d4e42074a77e33005fa0b"
+  integrity sha512-kRn70M7vyBS3IDaX2KqyF66ovUkrBS6LiHOgrEmRdZFO0i3hYY0wldEv1fJuKvgQIPMfo7GtGAjozFrk2vQdBw==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"

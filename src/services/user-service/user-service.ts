@@ -14,6 +14,7 @@ import { ENV } from "../../configs/ENV";
 class UserService {
 	private factoryname: string = "UserService";
 	public user: any = { uid: 0, token: null };
+	public kfmsg: any = {};
 	public gender: string = "";
 	public mobile: string = "";
 	private binit: boolean = false;
@@ -303,16 +304,79 @@ class UserService {
 		return out;
 	}
 
+	// 判断是否为Email
 	isemail(email: string) {
 		if (!email || email.length < 7) return false;
 		var regex = /^[a-z0-9]+([\+_\-\.]?[a-z0-9]+)*@([a-z0-9]+[\-]?[a-z0-9]*\.)+[a-z]{2,6}$/i;
 		return regex.test(email);
 	}
 
+	// 判断是否为手机号
 	ismobile(mobile: string) {
 		if (!mobile || mobile.length != 11) return false;
 		var regex = /^1[3-9]\d{9}$/;
 		return regex.test(mobile);
+	}
+
+	// 获取客服信息
+	async getkfmsg() {
+		try {
+			let cacheobj = await cache.getItem("messagedata");
+			cacheobj.sztime = this.formattime(cacheobj.time);
+			if (cacheobj.content.indexOf('"page"') > 0) {
+				cacheobj.content = "发来链接";
+			} else if (cacheobj.content.indexOf('"url"') > 0) {
+				cacheobj.content = "发来图片";
+			}
+			return cacheobj;
+		} catch {
+			return null;
+		}
+	}
+
+	async getmessagedata() {
+		let tixingdata: any = {};
+		let sixindata: any = {};
+		let kefudata: any = {};
+		try {
+			tixingdata = await http.post(ENV.tixing + "?uid=" + this.user.uid, { method: "newtixing", token: this.user.token })
+			sixindata = await http.post(ENV.sixin + "?uid=" + this.user.uid, { method: "newsixin", token: this.user.token })
+			kefudata = await this.getkfmsg();
+			return tixingdata.newtixing + sixindata.newsixin + (kefudata.new ? kefudata.new : 0);
+		} catch {
+			return 0;
+		}
+	}
+
+	// 处理时间
+	formattime(tm: number) {
+		//7天以前显示；？年？月？日 上午？：？
+		//7天内显示：星期几 上午？：？
+		//当天显示：上午？：？
+		//昨天显示：昨天 上午？：？
+		let now = new Date().getTime() / 1000;
+		let today = Math.floor((now + 8 * 3600) / 86400) * 86400 - 8 * 3600; //今天开始的时间
+		let yesterday = today - 86400; //昨天开始的时间
+		let day6before = today - 6 * 86400; //6天前开始的时间
+		let t = new Date(tm * 1000);
+		let am = "";
+		let szm = "";
+		let h = t.getHours();
+		let m = t.getMinutes();
+		if (m < 10) szm = "0" + m; else szm = "" + m;
+		if (h < 6) am = "凌晨"; //凌晨5:59
+		else if (h < 12) am = "上午";
+		else if (h == 12) am = "下午";
+		else if (h < 23) { am = "下午"; h -= 12; }
+		else return "";
+		if (tm > today)
+			return am + h + ":" + szm;
+		else if (tm > yesterday)
+			return "昨天 " + am + h + ":" + szm;
+		else if (tm > day6before)
+			return "周" + ["日", "一", "二", "三", "四", "五", "六"][t.getDay()] + " " + am + h + ":" + szm;
+		else
+			return t.getFullYear() + "年" + (t.getMonth() + 1) + "月" + t.getDate() + "日 " + am + h + ":" + szm;
 	}
 
 	// setLastshowtime(lastshowtime){

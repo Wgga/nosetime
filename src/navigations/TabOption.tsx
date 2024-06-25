@@ -10,6 +10,7 @@ import MallChecked from "../assets/svg/tabs/mall_checked.svg";
 import UserUnCheck from "../assets/svg/tabs/user_uncheck.svg";
 import UserChecked from "../assets/svg/tabs/user_checked.svg";
 import theme from "../configs/theme";
+import { Globalstyles } from "../configs/globalstyles";
 
 // TabOption 配置
 const TabOption = (route: any) => {
@@ -74,5 +75,9 @@ const styles = StyleSheet.create({
 		width: 45,
 		height: 45,
 	},
+	btn_badge: {
+		width: 12,
+		height: 12,
+	}
 });
 export default TabOption;

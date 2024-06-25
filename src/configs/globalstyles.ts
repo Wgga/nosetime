@@ -350,17 +350,19 @@ const Globalstyles: any = StyleSheet.create({
 		opacity: .8,
 	},
 	// 页面红点徽标
-	reddot_con: {
-		width: 14,
-		height: 14,
+	redbadge: {
+		width: 16,
+		height: 16,
 		borderRadius: 50,
 		backgroundColor: theme.redchecked,
 		position: "absolute",
 		right: 0,
 		color: theme.toolbarbg,
 		fontSize: 10,
-		lineHeight: 14,
+		lineHeight: 16,
 		textAlign: "center",
+		borderColor: theme.toolbarbg,
+		borderWidth: 1,
 	},
 });
 

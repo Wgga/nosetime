@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -14,21 +14,25 @@ import us from "../services/user-service/user-service";
 
 import events from "../hooks/events";
 
-import { Globalstyles } from "../configs/globalstyles";
+import theme from "../configs/theme";
 
 const Tab = createBottomTabNavigator();
 
 function Tabs({ navigation, route }: any): React.JSX.Element {
 	// 控件
-
 	let socialfid = React.useRef<number>(0);
+	const [ShowBadge, setShowBadge] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		events.subscribe("social_fid", (value: number) => {
 			socialfid.current = value;
 		});
+		events.subscribe("isshowbadge", (value: boolean) => {
+			setShowBadge(value);
+		});
 		return () => {
 			events.unsubscribe("social_fid");
+			events.unsubscribe("isshowbadge");
 		}
 	}, [])
 
@@ -63,7 +67,9 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 					},
 				})} component={Social} />
 				<Tab.Screen name="Mall" options={{ title: "商城" }} component={Mall} />
-				<Tab.Screen name="User" options={{ title: "我的" }} listeners={({ navigation, route }: any) => ({
+				<Tab.Screen name="User" options={{
+					title: "我的", tabBarBadge: ShowBadge ? "" : null, tabBarBadgeStyle: styles.tabbadge
+				}} listeners={({ navigation, route }: any) => ({
 					tabPress: (e: any) => {
 						e.preventDefault();
 						if (us.user.uid == 0) {
@@ -79,6 +85,15 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
+	tabbadge: {
+		transform: [{ scale: 0.5 }],
+		backgroundColor: theme.redchecked,
+		borderRadius: 50,
+		borderColor: theme.toolbarbg,
+		borderWidth: 1,
+		top: 0,
+		left: -2,
+	}
 })
 
 export default Tabs;

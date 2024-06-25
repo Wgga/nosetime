@@ -9,6 +9,7 @@ import React from "react";
 import { StyleSheet, NativeEventEmitter } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 
+import "react-native-devsettings";
 import SplashScreen from "react-native-splash-screen";
 import Orientation from "react-native-orientation-locker";
 import { ModalPortal } from "./src/components/modals";

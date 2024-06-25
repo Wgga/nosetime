@@ -35,19 +35,20 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 		{ key: "tixing", title: "提醒", text: "提醒" },
 	]);
 	// 变量
-	let sixin = React.useRef<number>(0);
-	let tixing = React.useRef<number>(0);
 	const [index, setIndex] = React.useState(0);
+	const [sixin, setSixin] = React.useState(0);
+	const [tixing, setTixing] = React.useState(0);
 	// 数据
 	// 状态
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
-	const readall = () => {
-		if (tixing.current == 0) {
+	const cleartixing = () => {
+		if (tixing == 0) {
 			return ToastCtrl.show({ message: "当前无未读消息", duration: 1500, viewstyle: "medium_toast", key: "not_msg_toast" });
 		}
 		http.post(ENV.tixing + "?method=readall&uid=" + us.user.uid, { token: us.user.token }).then((resp_data: any) => {
-			tixing.current = 0;
-			events.publish("readalltixing");
+			setTixing(0);
+			events.publish("cleartixing");
 			ToastCtrl.show({ message: "操作成功", duration: 1500, viewstyle: "short_toast", key: "read_success_toast" });
 		});
 	}
@@ -62,18 +63,18 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 			<Pressable onPress={() => { navigation.goBack() }} style={[styles.title_icon, { marginTop: insets.top }]}>
 				<Icon name="leftarrow" size={20} color={theme.toolbarbg} />
 			</Pressable>
-			{index == 1 && <Pressable onPress={readall} style={[styles.title_icon, { right: 0, marginTop: insets.top }]}>
+			{index == 1 && <Pressable onPress={cleartixing} style={[styles.title_icon, { right: 0, marginTop: insets.top }]}>
 				<View style={styles.clear_btn}>
-					<Icon name={(tixing.current > 0) ? "qingchu1" : "qingchu2"} size={16} color={theme.toolbarbg} />
+					<Icon name={(tixing > 0) ? "qingchu1" : "qingchu2"} size={16} color={theme.toolbarbg} />
 				</View>
 			</Pressable>}
 			<TabView navigationState={{ index, routes }}
 				renderScene={({ route }) => {
 					switch (route.key) {
 						case "sixin":
-							return <SocialSixin navigation={navigation} />;
+							return <SocialSixin navigation={navigation} setSixin={setSixin} />;
 						case "tixing":
-							return <SocialTixing navigation={navigation} />;
+							return <SocialTixing navigation={navigation} setTixing={setTixing} />;
 						default:
 							return null;
 					}
@@ -85,8 +86,8 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 								return (
 									<View style={styles.tab_bar_item}>
 										<Text style={[{ width: "100%", textAlign: "center", color }]}>{route.title}</Text>
-										{(route.key == "sixin" && sixin.current > 0) && <Text style={Globalstyles.reddot_con}>{sixin.current}</Text>}
-										{(route.key == "tixing" && tixing.current > 0) && <Text style={Globalstyles.reddot_con}>{tixing.current}</Text>}
+										{(route.key == "sixin" && sixin > 0) && <Text style={[Globalstyles.redbadge, { borderWidth: 0 }]}>{sixin}</Text>}
+										{(route.key == "tixing" && tixing > 0) && <Text style={[Globalstyles.redbadge, { borderWidth: 0 }]}>{tixing}</Text>}
 									</View>
 								)
 							}}
@@ -108,7 +109,6 @@ function SocialXiaoxi({ navigation, route }: any): React.JSX.Element {
 				onIndexChange={setIndex}
 				initialLayout={{ width }}
 			/>
-
 		</GestureHandlerRootView>
 	);
 }

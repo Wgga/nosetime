@@ -16,10 +16,11 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalstyles";
 
 import Icon from "../../assets/iconfont";
 
-const SocialSixin = React.memo(({ navigation, route }: any) => {
+const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 
 	// 控件
 	// 参数
@@ -34,18 +35,35 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 
 	React.useEffect(() => {
 		init()
-		setmessagedata();
+		getkfmsg();
+
+		events.subscribe("nosetime_newmsg", (data) => {
+			console.log("%c Line:41 🥒 data", "color:#e41a6a", data);
+			getkfmsg();
+		})
+
+		return () => {
+			events.unsubscribe("nosetime_newmsg");
+		}
 	}, [])
 
-	const getsixin = () => {
+	const getkfmsg = () => {
+		us.getkfmsg().then((msg: any) => {
+			if (msg) {
+				kfmsg.current = msg;
+				setIsRender(val => !val);
+			}
+		}).catch(() => { })
+	}
+
+	const getSixincnt = () => {
 		let newsixin = 0;
 		for (let i in items.current) {
 			if (items.current[i].new) {
-				newsixin += items.current[i].new
+				newsixin += items.current[i].new;
 			}
 		}
-		setIsRender(val => !val);
-		cache.saveItem("sixincnt", newsixin);
+		setSixin(newsixin + kfmsg.current.new);
 	}
 
 	const init = () => {
@@ -57,7 +75,8 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 			}
 			items.current = resp_data;
 			if (resp_data.length < 20) noMore.current = true;
-			getsixin();
+			getSixincnt();
+			setIsRender(val => !val);
 		});
 	}
 
@@ -69,52 +88,6 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 			if (resp_data.length < 20) noMore.current = true;
 			setIsRender(val => !val);
 		});
-	}
-
-	const setmessagedata = () => {
-		setTimeout(() => {
-			cache.getItem("messagedata").then((cacheobj) => {
-				if (cacheobj) {
-					cacheobj.sztime = formattime(cacheobj.time);
-					kfmsg.current = cacheobj;
-					if (kfmsg.current.content.indexOf('"page"') > 0) {
-						kfmsg.current.content = "发来链接";
-					} else if (kfmsg.current.content.indexOf('"url"') > 0) {
-						kfmsg.current.content = "发来图片";
-					}
-				}
-			}).catch(() => { });
-		}, 100)
-	}
-
-	const formattime = (tm: number) => {
-		//7天以前显示；？年？月？日 上午？：？
-		//7天内显示：星期几 上午？：？
-		//当天显示：上午？：？
-		//昨天显示：昨天 上午？：？
-		let now = new Date().getTime() / 1000;
-		let today = Math.floor((now + 8 * 3600) / 86400) * 86400 - 8 * 3600; //今天开始的时间
-		let yesterday = today - 86400; //昨天开始的时间
-		let day6before = today - 6 * 86400; //6天前开始的时间
-		let t = new Date(tm * 1000);
-		let am = "";
-		let szm = "";
-		let h = t.getHours();
-		let m = t.getMinutes();
-		if (m < 10) szm = "0" + m; else szm = "" + m;
-		if (h < 6) am = "凌晨"; //凌晨5:59
-		else if (h < 12) am = "上午";
-		else if (h == 12) am = "下午";
-		else if (h < 23) { am = "下午"; h -= 12; }
-		else return "";
-		if (tm > today)
-			return am + h + ":" + szm;
-		else if (tm > yesterday)
-			return "昨天 " + am + h + ":" + szm;
-		else if (tm > day6before)
-			return "周" + ["日", "一", "二", "三", "四", "五", "六"][t.getDay()] + " " + am + h + ":" + szm;
-		else
-			return t.getFullYear() + "年" + (t.getMonth() + 1) + "月" + t.getDate() + "日 " + am + h + ":" + szm;
 	}
 
 	// 设置消息置顶
@@ -170,12 +143,14 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 	return (
 		<FlashList data={items.current}
 			ListHeaderComponent={
-				<View style={[styles.msg_item, styles.msg_top]}>
+				<Pressable style={[styles.msg_item, styles.msg_top]} onPress={() => {
+					navigation.navigate("Page", { screen: "MallKefu" });
+				}}>
 					<View style={styles.kefu_avatar}>
 						<Image style={{ width: "100%", height: "100%", borderRadius: 50 }}
 							source={{ uri: ENV.image + "/mobileicon.png" }}
 						/>
-						<Text style={[styles.msg_badge, { opacity: kfmsg.current.new > 0 ? 1 : 0 }]}>{kfmsg.current.new}</Text>
+						<Text style={[styles.msg_badge, Globalstyles.redbadge, { opacity: kfmsg.current.new > 0 ? 1 : 0 }]}>{kfmsg.current.new}</Text>
 					</View>
 					<View style={styles.msg_con}>
 						<View style={styles.msg_tit_con}>
@@ -184,7 +159,7 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 						</View>
 						<Text numberOfLines={1} style={styles.msg_con_text}>{kfmsg.current.content}</Text>
 					</View>
-				</View>
+				</Pressable>
 			}
 			renderItem={({ item }: any) => {
 				return (
@@ -194,16 +169,14 @@ const SocialSixin = React.memo(({ navigation, route }: any) => {
 								defaultSource={require("../../assets/images/default_avatar.png")}
 								source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }}
 							/>
-							<Text style={[styles.msg_badge, { opacity: item.new > 0 ? 1 : 0 }]}>{item.new}</Text>
+							<Text style={[styles.msg_badge, Globalstyles.redbadge, { opacity: item.new > 0 ? 1 : 0 }]}>{item.new}</Text>
 						</View>
 						<View style={styles.msg_con}>
 							<View style={styles.msg_tit_con}>
 								<Text numberOfLines={1} style={styles.tit_text}>{item.uname}</Text>
 								<View style={styles.tit_btn_con}>
 									<Text style={styles.tit_time}>{item.time}</Text>
-									<Pressable onPress={() => {
-										openmenudlg(item);
-									}} style={{ marginLeft: 10 }}>
+									<Pressable onPress={() => { openmenudlg(item) }} style={{ marginLeft: 10 }}>
 										<Icon name="shequsandian" size={16} color="#808080" />
 									</Pressable>
 								</View>
@@ -236,20 +209,8 @@ const styles = StyleSheet.create({
 		height: 40,
 	},
 	msg_badge: {
-		width: 15,
-		height: 15,
-		borderRadius: 50,
-		overflow: "hidden",
-		backgroundColor: theme.redchecked,
-		position: "absolute",
-		right: -3,
-		bottom: -2,
-		fontSize: 12,
-		color: theme.toolbarbg,
-		borderColor: theme.toolbarbg,
-		borderWidth: 1,
-		textAlign: "center",
-		lineHeight: 15,
+		right: -4,
+		bottom: -3,
 	},
 	msg_con: {
 		flex: 1,
