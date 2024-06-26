@@ -164,8 +164,7 @@ const styles = StyleSheet.create({
 		overflow: "hidden"
 	},
 	popup_img: {
-		width: "100%",
-		height: 245,
+		height: width - 143,
 		backgroundColor: theme.placeholder
 	},
 	whitebg: {
@@ -173,13 +172,12 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 25,
-		top: 220,
+		top: (width - 143) - 25,
 		borderTopLeftRadius: 20,
 		borderTopRightRadius: 20,
 		backgroundColor: theme.toolbarbg
 	},
 	popup_info: {
-		width: "100%",
 		paddingHorizontal: 20,
 		backgroundColor: theme.toolbarbg,
 		alignItems: "center",
@@ -265,7 +263,7 @@ const styles = StyleSheet.create({
 		borderRadius: 30,
 	},
 	left_btn_con: {
-		backgroundColor: "#fff",
+		backgroundColor: theme.toolbarbg,
 		paddingVertical: 7,
 		paddingHorizontal: 19,
 		borderRadius: 30

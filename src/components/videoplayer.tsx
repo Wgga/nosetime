@@ -91,7 +91,6 @@ export default class VideoPlayer extends React.Component<PropsType> {
 					volume={1.0} // 播放音量
 					muted={false} // 是否设置静音
 					paused={!this.state.isPlaying} // 是否设置暂停
-					resizeMode={"cover"}
 					controls={true} // 是否显示控制条
 					playWhenInactive={false} // 当通知或控制中心位于视频前面时，是否继续播放(仅IOS)
 					playInBackground={false} // 当应用程序处于后台时，是否继续播放音频(仅IOS)
