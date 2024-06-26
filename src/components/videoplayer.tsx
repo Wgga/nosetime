@@ -7,20 +7,24 @@ import {
 	TouchableWithoutFeedback,
 	TouchableOpacity,
 	StyleSheet,
-	StatusBar,
 	ActivityIndicator,
-	Pressable
+	Pressable,
+	StatusBar,
 } from "react-native";
 
 import Video from "react-native-video";
 import Orientation from "react-native-orientation-locker";
 import Slider from "@react-native-community/slider";
 import LinearGradient from "react-native-linear-gradient";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+
+import Switch from "./switch";
 
 import events from "../hooks/events";
 
 import Icon from "../assets/iconfont";
+import theme from "../configs/theme";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -67,9 +71,10 @@ export default class VideoPlayer extends React.Component<PropsType> {
 		currentTime: 0,	// 当前播放时间
 		duration: 0,	// 视频总时长
 		isFullScreen: false,	// 是否全屏
-		playFromBeginning: false,	// 是否从头开始播放
+		playFromBeginning: this.props.playFromBeginning ? this.props.playFromBeginning : false,	// 是否从头开始播放
 		isBuffering: false,	// 是否正在缓冲
 		isShowMenu: false,	// 是否显示菜单
+		isRepeat: false,	// 是否循环播放
 		children: this.props.children ? this.props.children : null,	// 子组件
 	} as any;
 
@@ -82,21 +87,34 @@ export default class VideoPlayer extends React.Component<PropsType> {
 			<View style={styles.container} onLayout={this._onLayout}>
 				<Video ref={(ref: any) => this.videoRef = ref}
 					source={{ uri: this.state.source }}
-					rate={1.0}
-					volume={1.0}
-					muted={false}
-					paused={!this.state.isPlaying}
+					rate={1.0} // 播放速度
+					volume={1.0} // 播放音量
+					muted={false} // 是否设置静音
+					paused={!this.state.isPlaying} // 是否设置暂停
 					resizeMode={"cover"}
-					playWhenInactive={false}
-					playInBackground={false}
-					ignoreSilentSwitch={"ignore"}
-					progressUpdateInterval={250.0}
-					onLoadStart={this._onLoadStart}
-					onLoad={this._onLoaded}
-					onProgress={this._onProgressChanged}
-					onEnd={this._onPlayEnd}
-					onError={this._onPlayError}
-					onBuffer={this._onBuffering}
+					controls={true} // 是否显示控制条
+					playWhenInactive={false} // 当通知或控制中心位于视频前面时，是否继续播放(仅IOS)
+					playInBackground={false} // 当应用程序处于后台时，是否继续播放音频(仅IOS)
+					ignoreSilentSwitch={"ignore"} // 控制 iOS 静默开关行为( ignore 即使设置了静音开关，也可以播放音频)
+					progressUpdateInterval={250.0} // onProgress 事件之间的延迟
+					onLoadStart={this._onLoadStart} // 视频加载开始
+					onLoad={this._onLoaded} // 视频加载完成
+					onProgress={this._onProgressChanged} // 视频播放进度
+					onEnd={this._onPlayEnd} // 视频播放结束
+					onError={this._onPlayError} // 视频播放失败
+					onBuffer={this._onBuffering} // 视频缓冲
+					onFullscreenPlayerWillPresent={() => {
+						Orientation.lockToLandscape();
+						this.setState((state: any) => {
+							state.isFullScreen = true;
+						})
+					}}
+					onFullscreenPlayerWillDismiss={()=>{
+						Orientation.lockToPortrait();
+						this.setState((state: any) => {
+							state.isFullScreen = false;
+						})
+					}}
 					style={{ width: this.state.videoWidth, height: this.state.videoHeight }}
 				/>
 				{this.state.showPoster && <Pressable style={[styles.poster_con, { width: this.state.videoWidth, height: this.state.videoHeight }]} onPress={() => { this.hidePoster() }}>
@@ -114,7 +132,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 						</View>
 					</View>
 				</Pressable>}
-				{!this.state.showPoster && <TouchableWithoutFeedback onPress={() => { this.hideControl() }}>
+				{/* {!this.state.showPoster && <TouchableWithoutFeedback onPress={() => { this.hideControl() }}>
 					<View style={[styles.video_con, { zIndex: 1 }]}>
 						{(!this.state.isPlaying || this.state.showControl) &&
 							<TouchableWithoutFeedback onPress={() => { this.onPressPlayButton() }}>
@@ -122,11 +140,11 @@ export default class VideoPlayer extends React.Component<PropsType> {
 							</TouchableWithoutFeedback>
 						}
 					</View>
-				</TouchableWithoutFeedback>}
+				</TouchableWithoutFeedback>} */}
 				{(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
 					<ActivityIndicator size="large" color="#fff" />
 				</View>}
-				{this.state.showControl && <LinearGradient
+				{/* {this.state.showControl && <LinearGradient
 					colors={["transparent", "rgba(0,0,0,0.8)"]}
 					start={{ x: 0.5, y: 0 }}
 					end={{ x: 0.5, y: 1 }}
@@ -144,34 +162,41 @@ export default class VideoPlayer extends React.Component<PropsType> {
 						<TouchableOpacity style={styles.setting1} activeOpacity={0.3} onPress={() => { this.onControlMenuPress() }}>
 							<Icon name="setting1" size={18} color="#fff" />
 						</TouchableOpacity>
-						{this.state.isShowMenu &&
-							<Animated.View entering={ZoomIn} exiting={ZoomOut} style={styles.setting_con}>
-								<View>
-									<View style={styles.setting_item}>
-										<Text style={styles.setting_label}>{"速度"}</Text>
-										<Icon name="r-return" size={16} color={"#fff"} />
-									</View>
-									<View style={styles.setting_item}>
-										<Text style={styles.setting_label}>{"洗脑循环"}</Text>
-									</View>
-								</View>
-							</Animated.View>
-						}
+						{this.state.isShowMenu && <Animated.View entering={ZoomIn} exiting={ZoomOut} style={styles.setting_con}>
+							<View style={styles.setting_item}>
+								<Text style={styles.setting_label}>{"速度"}</Text>
+								<Icon name="r-return" size={16} color={"#fff"} />
+							</View>
+							<Pressable style={styles.setting_item} onPress={() => {
+								this.setState({ isRepeat: !this.state.isRepeat });
+							}}>
+								<Text style={styles.setting_label}>{"洗脑循环"}</Text>
+								<GestureHandlerRootView style={{ alignItems: "flex-end" }}>
+									<Switch value={this.state.isRepeat}
+										onValueChange={(val: boolean) => { }}
+										activeColor={"rgba(255,255,255,0.5)"}
+										inactiveColor={"transparent"}
+										containerStyle={{ width: 32, height: 20, borderColor: "rgba(255,255,255,0.5)", borderWidth: 1, paddingHorizontal: 0 }}
+										circleStyle={{ width: 18, height: 18, backgroundColor: theme.toolbarbg }}
+									/>
+								</GestureHandlerRootView>
+							</Pressable>
+						</Animated.View>}
 						<TouchableOpacity activeOpacity={0.3} onPress={() => { this.onControlShrinkPress() }}>
 							{this.state.isFullScreen ? <Icon name="exitfull" size={18} color="#fff" /> : <Icon name="full" size={18} color="#fff" />}
 						</TouchableOpacity>
 					</View>
 					<Slider
 						style={styles.slider_con}
-						maximumTrackTintColor={"#999999"}
-						minimumTrackTintColor={"#00c06d"}
+						maximumTrackTintColor={"rgba(255,255,255,0.2)"}
+						minimumTrackTintColor={"rgb(183,218,255)"}
 						thumbImage={require("../assets/images/player/icon_slider.png")}
 						value={this.state.currentTime}
 						minimumValue={0}
 						maximumValue={this.state.duration}
 						onValueChange={(currentTime) => { this.onSliderValueChanged(currentTime) }}
 					/>
-				</LinearGradient>}
+				</LinearGradient>} */}
 			</View>
 		)
 	}
@@ -205,11 +230,19 @@ export default class VideoPlayer extends React.Component<PropsType> {
 
 	_onPlayEnd = () => {
 		// console.log("视频播放结束");
-		this.setState({
-			currentTime: 0,
-			isPlaying: false,
-			playFromBeginning: true
-		});
+		if (this.state.isRepeat) {
+			this.videoRef.seek(0);
+			this.setState({
+				currentTime: 0,
+				isPlaying: true,
+				playFromBeginning: true
+			});
+		} else {
+			this.setState({
+				isPlaying: false,
+				playFromBeginning: true
+			});
+		}
 	};
 
 	_onPlayError = () => {
@@ -356,13 +389,9 @@ const styles = StyleSheet.create({
 		// height: screenWidth * 1080 / 1728,
 	},
 	video_con: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		bottom: 0,
-		right: 0,
+		...StyleSheet.absoluteFillObject,
 		alignItems: "center",
-		justifyContent: "center"
+		justifyContent: "center",
 	},
 	poster_con: {
 		position: "absolute",
@@ -429,7 +458,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		borderRadius: 10,
-		zIndex: 2,
+		zIndex: 99,
 	},
 	setting_item: {
 		width: "100%",

@@ -82,9 +82,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				if (articledata.current && articledata.current.mp4URL) {
 					StatusBar.setBarStyle("dark-content", true);
 				} else {
-					StatusBar.setBarStyle("light-content", true);
+					StatusBar.setBarStyle("default", true);
 				}
-			}, 100);
+			}, 500);
 		}, [])
 	)
 

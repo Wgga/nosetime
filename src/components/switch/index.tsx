@@ -94,17 +94,17 @@ const Switch: FC<SwitchProps> = ({
 	);
 	const currentCircleStyle = StyleSheet.compose(styles.circle, circleStyle);
 
-	const containerWidth =
-		(containerStyle as { width: number })?.width || styles.container.width;
-	const circleWidth =
-		(circleStyle as { width: number })?.width || styles.circle.width;
-	const containerPaddingHorizontal =
-		(containerStyle as { paddingHorizontal: number })?.paddingHorizontal ||
-		styles.container.paddingHorizontal;
-
-	const TRACK_CIRCLE_WIDTH =
-		containerWidth - circleWidth - containerPaddingHorizontal * 2;
-
+	const containerWidth = (containerStyle as { width: number })?.width || styles.container.width;
+	const circleWidth = (circleStyle as { width: number })?.width || styles.circle.width;
+	let containerPaddingHorizontal = styles.container.paddingHorizontal;
+	if ((containerStyle as { paddingHorizontal: number })?.paddingHorizontal != null) {
+		containerPaddingHorizontal = (containerStyle as { paddingHorizontal: number })?.paddingHorizontal
+	}
+	let containerBorderWidth = 0;
+	if ((containerStyle as { borderWidth: number })?.borderWidth != null) {
+		containerBorderWidth = (containerStyle as { borderWidth: number })?.borderWidth * 2
+	}
+	const TRACK_CIRCLE_WIDTH = containerWidth - circleWidth - containerPaddingHorizontal * 2 - containerBorderWidth;
 	const translateX = useSharedValue(value ? TRACK_CIRCLE_WIDTH : 0);
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
