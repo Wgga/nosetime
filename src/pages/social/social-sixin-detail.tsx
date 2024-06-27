@@ -2,9 +2,9 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
-import { Messy } from "@vokhuyet/react-native-messy";
 
 import HeaderView from "../../components/headerview";
+import { Messy } from "../../components/chatlist";
 
 import us from "../../services/user-service/user-service";
 
@@ -18,6 +18,9 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import { BottomSheetModalProvider } from "@discord/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
@@ -97,6 +100,7 @@ function SocialSixinDetail({ navigation, route }: any): React.JSX.Element {
 		lasttime.current = 0;
 		us.calc_sztime(items.current, lasttime.current);
 		scrollend();
+		console.log("%c Line:101 🥝", "color:#4fff4B", items.current);
 		setIsRender(val => !val);
 	}
 
@@ -115,7 +119,6 @@ function SocialSixinDetail({ navigation, route }: any): React.JSX.Element {
 					navigation.goBack();
 				},
 			}}></HeaderView>
-			<Messy />
 		</View>
 	);
 }
