@@ -6,8 +6,8 @@ import theme from "../configs/theme";
 function ListBottomTip({ noMore, isShowTip, style }: any): React.JSX.Element {
 	return (
 		<View style={[styles.loading_con, style]}>
-			{(!noMore && isShowTip) && <Image style={styles.loading_img} source={require("../assets/images/loading.gif")} />}
-			{(noMore && isShowTip) && <Text style={styles.tip_text}>{"没有更多内容了"}</Text>}
+			{(noMore != null && !noMore && isShowTip) && <Image style={styles.loading_img} source={require("../assets/images/loading.gif")} />}
+			{(noMore != null && noMore && isShowTip) && <Text style={styles.tip_text}>{"没有更多内容了"}</Text>}
 		</View>
 	);
 }

@@ -17,7 +17,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft } from "../../configs/globalstyles";
+import { Globalstyles, handlestarLeft } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -239,6 +239,8 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 										/>}
 										{current_tab.current == "perfumer" && <RnImage style={styles.like_avatar}
 											source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
+											errsrc={require("../../assets/images/perfumer.png")}
+											type="perfumer"
 											resizeMode="contain"
 										/>}
 									</View>
@@ -278,6 +280,8 @@ const SmartWiki = React.memo(({ navigation }: any) => {
 								/>}
 								{item.type == "perfumer" && <RnImage style={styles.wiki_brand_img}
 									source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
+									errsrc={require("../../assets/images/perfumer.png")}
+									type="perfumer"
 									resizeMode="contain"
 								/>}
 								{item.type == "fragrance" && <Image style={styles.wiki_brand_img}

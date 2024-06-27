@@ -27,7 +27,7 @@ import http from "../../utils/api/http";
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { articlestyle } from "../../configs/articlestyle";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalstyles";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 
 import theme from "../configs/theme";
-import { Globalstyles, handlestarLeft } from "../configs/globalstyles";
+import { Globalstyles, handlestarLeft } from "../configs/globalmethod";
 
 function StarImage({ item, style }: any): React.JSX.Element {
 	return (

@@ -2,7 +2,7 @@ import React from "react";
 
 import FastImage from "react-native-fast-image";
 
-const RnImage = React.memo(({ source, style, resizeMode }: any) => {
+const RnImage = React.memo(({ source, errsrc, type, style, resizeMode }: any) => {
 	// 控件
 	// 变量
 	const [isError, setIsError] = React.useState<boolean>(false);
@@ -12,8 +12,8 @@ const RnImage = React.memo(({ source, style, resizeMode }: any) => {
 
 	return (
 		<FastImage style={style}
-			source={isError ? require("../assets/images/perfumer.png") : source}
-			resizeMode={resizeMode ? resizeMode : isError ? "contain" : "cover"}
+			source={isError ? errsrc : source}
+			resizeMode={resizeMode ? resizeMode : (isError && type == "perfumer") ? "contain" : "cover"}
 			onError={() => { setIsError(true) }}
 		/>
 	);

@@ -9,7 +9,7 @@ import { ModalPortal } from "../components/modals";
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
-import { Globalstyles } from "../configs/globalstyles";
+import { Globalstyles } from "../configs/globalmethod";
 
 const Stack = createNativeStackNavigator();
 

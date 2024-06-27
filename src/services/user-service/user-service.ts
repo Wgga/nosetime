@@ -379,6 +379,28 @@ class UserService {
 			return t.getFullYear() + "年" + (t.getMonth() + 1) + "月" + t.getDate() + "日 " + am + h + ":" + szm;
 	}
 
+	calc_sztime(items: any, lasttime: number) {
+		lasttime = 0;
+		for (let i in items) {
+			if (items[i].time - lasttime > 60) {
+				items[i].sztime = this.formattime(items[i].time);
+			} else {
+				items[i].sztime = '';
+			}
+			lasttime = items[i].time;
+		}
+	}
+
+	calc_last_sztime(items: any, lasttime: number) {
+		let i = items.length - 1;
+		if (items[i].time - lasttime > 60) {
+			items[i].sztime = this.formattime(items[i].time);
+		} else {
+			items[i].sztime = '';
+		}
+		lasttime = items[i].time;
+	}
+
 	// setLastshowtime(lastshowtime){
 	// 	this.lastshowtime=lastshowtime;
 	// 	this.cache.saveItem(this.factoryname+"lastshowtime",this.lastshowtime,this.factoryname,30*24*3600);

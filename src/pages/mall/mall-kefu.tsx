@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, useWindowDimensions, Image } from "react-native";
 
 import us from "../../services/user-service/user-service";
 
@@ -11,13 +11,17 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles, toCamelCase } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import HeaderView from "../../components/headerview";
 import wss from "../../services/wss-service/wss-service";
 import { FlashList } from "@shopify/flash-list";
 import FastImage from "react-native-fast-image";
+import AutoHeightWebView from "../../components/autoHeightWebview";
+import RnImage from "../../components/RnImage";
+import ListBottomTip from "../../components/listbottomtip";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,6 +30,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	// 控件
 	const classname: string = "MallKefuPage";
 	let listref = React.useRef<any>(null);
+	const windowD = useWindowDimensions();
 	// 参数
 	// 变量
 	// 数据
@@ -36,8 +41,10 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
 	React.useEffect(() => {
-		init()
+		init();
 		subscribe();
+
+		events.publish("nosetime_kfnotify", false);
 
 		return () => {
 			events.unsubscribe("nosetime_oldmsg");
@@ -47,6 +54,18 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			events.unsubscribe("nosetime_revoke");
 		}
 	}, [])
+
+	useFocusEffect(
+		React.useCallback(() => {
+			events.publish("nosetime_kfnotify", false);
+			// 进入/离开客服页面改变缓存中消息到new参数, 代表客服消息已读
+			cache.getItem("messagedata").then((cacheobj) => {
+				cacheobj.new = 0;
+				cache.saveItem("messagedata", cacheobj, 24 * 3600);
+				events.publish("nosetime_newmsg");
+			}).catch(() => { });
+		}, [])
+	)
 
 	const subscribe = () => {
 		events.subscribe("nosetime_oldmsg", (data: any) => {
@@ -60,15 +79,15 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			items.current = data;
 			cache.saveItem(classname + us.user.uid, items.current, 600);
 			calc_sztime();
-			scrollend()
 		});
 
 		events.subscribe("nosetime_newmsg", (data: any) => {
+			if (!data) return;
 			items.current.push(data);
 			//20230825 不保存，避免中间漏了数据，lastmsg不对
 			//只在presence和oldmsg,newmsg后保存;revoke保存但是时间短
 			//this.cache.saveItem(this.classname + this.us.user.uid, this.items, this.classname, 3600);
-			calc_last_sztime();
+			us.calc_last_sztime(items.current, lasttime.current);
 			//20210427 stacie 提出不滚动到底部
 			//setTimeout(()=>{try{this.content.scrollToBottom(0)}catch(e){}},100);
 
@@ -118,7 +137,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const scrollend = () => {
-		setTimeout(() => { try { listref.current.scrollToEnd({ animated: true }) } catch (e) { } }, 100);
+		setTimeout(() => { try { listref.current?.scrollToEnd({ animated: false }) } catch (e) { } }, 100);
 	}
 
 	const setoktag = (item: any) => {
@@ -138,28 +157,27 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		}
 		// items.current.push(item);
 		//this.cache.saveItem(this.classname + this.us.user.uid, this.items, this.classname, 3600);
-		scrollend()
+		scrollend();
 	}
 
 	const oldmsg = (items: any) => {
+		if (items && items.length > 0) {
+			items = items.concat(items.current);
+			items.sort(sortByID);
+			let lastid = 0;
+			for (let i = items.length - 1; i >= 0; --i) {
+				//20230915 时间，方向，内容完全一样才识别为一样，进行除重
+				if (lastid == items[i].id) {
+					items.splice(i, 1);
+				}
+				lastid = items[i].time;
+			}
+			items.current = items;
+			cache.saveItem(classname + us.user.uid, items.current, 600);
+			calc_sztime();
+		}
 		/* this.content.getScrollElement().then((res) => {
 			let scrollHeight = res.scrollHeight;
-			if (items && items.length > 0) {
-				//this.items = items.concat(this.items);
-				items = items.concat(this.items);
-				items.sort(this.sortByID);
-				let lastid = 0;
-				for (let i = items.length - 1; i >= 0; --i) {
-					//20230915 时间，方向，内容完全一样才识别为一样，进行除重
-					if (lastid == items[i].id) {
-						items.splice(i, 1);
-					}
-					lastid = items[i].time;
-				}
-				this.items = items;
-				this.cache.saveItem(this.classname + this.us.user.uid, this.items, this.classname, 600);
-				this.calc_sztime();
-			}
 			if (this.refresher) {
 				setTimeout(() => {
 					this.content.getScrollElement().then((res) => {
@@ -175,13 +193,14 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const init = () => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
+		}
 		cache.getItem(classname + us.user.uid).then((cacheobj) => {
 			if (cacheobj && cacheobj.length > 0) {
-				console.log("from cache", cacheobj);
 				items.current = cacheobj;
 				lastmsg.current = items.current[items.current.length - 1].time;
 				calc_sztime();
-				scrollend();
 			}
 			checkin();
 		}).catch(() => {
@@ -192,26 +211,11 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		});
 	}
 
-	const calc_last_sztime = () => {
-		let i = items.current.length - 1;
-		if (items.current[i].time - lasttime.current > 60) {
-			items.current[i].sztime = us.formattime(items.current[i].time);
-		} else {
-			items.current[i].sztime = "";
-		}
-		lasttime.current = items.current[i].time;
-	}
-
 	const calc_sztime = () => {
 		lasttime.current = 0;
-		for (let i in items.current) {
-			if (items.current[i].time - lasttime.current > 60) {
-				items.current[i].sztime = us.formattime(items.current[i].time);
-			} else {
-				items.current[i].sztime = "";
-			}
-			lasttime.current = items.current[i].time;
-		}
+		us.calc_sztime(items.current, lasttime.current);
+		scrollend();
+		setIsRender(val => !val);
 	}
 
 	const checkin = () => {
@@ -257,11 +261,61 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			items.current = data;
 			//20230909 新消息不缓存，避免取不到以前的消息
 			//cache.saveItem(classname + us.user.uid, items.current, 3600);
-			calc_sztime();
-
 			lastmsg.current = items.current[items.current.length - 1].time;
-			setIsRender(val => !val);
+			calc_sztime();
 		}
+	}
+
+	// 处理内容中的【&nbsp;】字符
+	const handleblank = (sz: string) => {
+		sz = sz.replace(/&nbsp;/g, " ");
+		return sz;
+	}
+
+	const handleAutomsg = (sz: string) => {
+		sz = sz.replace(/<(?!br).*?>/gi, "").replace(/\n<br>|<br>/g, "\n");
+		return <Text style={styles.item_automsg_text}>{sz}</Text>
+	}
+
+	// 跳转链接
+	const gotolink = (item: any) => {
+		if (item.link_href && item.page == "media-list-detail") {
+			navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid, src: "APP客服页" } });
+			return;
+		}
+		if (item.link_href && item.page == "social-shequ-detail") {
+			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.id, src: "APP客服页" } });
+			return;
+		}
+		let screen = toCamelCase(item.page);
+		navigation.navigate("Page", { screen: screen, params: { id: item.id, src: "APP客服页" } });
+	}
+
+	const handlelink = (sz: string) => {
+		let link = JSON.parse(sz);
+		let msg = (
+			<Pressable onPress={() => { gotolink(link) }}>
+				{link.link_href && <Text style={styles.link_msg}>{"给您发了一篇" + link.type}</Text>}
+				<View style={styles.link_msg_con}>
+					{link.img && <RnImage style={styles.link_msg_img}
+						source={{ uri: ENV.image + link.img }}
+						errsrc={require("../../assets/images/noxx.png")}
+						resizeMode={"contain"}
+					/>}
+					{link.pic_src && <RnImage style={[styles.link_msg_img, !(link.link_href.match(/topic|pinpai|qiwei/g)) && { width: 105 }]}
+						source={{ uri: link.pic_src.indexOf("https:") < 0 ? "https:" + link.pic_src : link.pic_src }}
+						errsrc={require("../../assets/images/noxx.png")}
+						resizeMode={"contain"}
+					/>}
+					<View style={styles.link_info}>
+						<Text numberOfLines={2} style={styles.link_info_tit}>{handleblank(link.title)}</Text>
+						{link.link_href && <Text style={styles.link_info_tit}>{link.page == "article-detail" ? "点击查看全文>>" : `点击查看${link.type}>>`}</Text>}
+						{!link.link_href && <Text style={styles.link_info_price}>{handleblank(link.price)}</Text>}
+					</View>
+				</View>
+			</Pressable>
+		)
+		return msg;
 	}
 
 	return (
@@ -285,23 +339,32 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 					return (
 						<View style={styles.list_item}>
 							{(item.sztime != undefined && item.sztime != "") && <Text style={styles.item_sztime}>{item.sztime}</Text>}
-							<View style={[styles.item_container, {
+							{item.type == 2 && <View style={styles.item_automsg}>{handleAutomsg(item.content)}</View>}
+							{item.type != 2 && <View style={[styles.item_container, {
 								flexDirection: item.dir == 1 ? "row" : "row-reverse",
 							}]}>
-								{item.dir == 1 && <FastImage style={styles.head_pic} source={{ uri: ENV.image + "/mobileicon.png" }} />}
-								{item.dir == 2 && <FastImage style={styles.head_pic} source={{ uri: ENV.avatar + us.user.uid + ".jpg!l?" + us.user.uface }} />}
-								<View style={styles.item_content}>
-									<View style={styles.item_triangle}></View>
-									{item.type == 1 && <Text style={styles.item_text}>{item.content}</Text>}
-									{item.type == 2 && <Text style={styles.item_text}>{item.content}</Text>}
-									{item.type == 3 && <Text style={styles.item_text}>{item.content}</Text>}
+								<View style={styles.item_avatar_con}>
+									{item.dir == 1 && <FastImage style={styles.item_avatar} source={{ uri: ENV.image + "/mobileicon.png" }} />}
+									{item.dir == 2 && <FastImage style={styles.item_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg!l?" + us.user.uface }} />}
+									<View style={[styles.item_triangle, item.dir == 2 && styles.item_triangle_right]}></View>
 								</View>
-							</View>
+								<View style={[
+									styles.item_content,
+									item.dir == 2 && styles.item_content_right,
+									(item.type == 3 && item.dir == 1) && { flexShrink: 0, width: windowD.width * 0.85 },
+									(item.type == 3 && item.dir == 2) && { flexShrink: 0, width: windowD.width * 0.70 }
+								]}>
+									{item.type == 1 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleblank(item.content)}</Text>}
+									{item.type == 2 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{item.content}</Text>}
+									{item.type == 3 && <View style={[styles.item_msg, item.dir == 2 && { ...styles.item_msg_right, paddingVertical: 0 }]}>{handlelink(item.content)}</View>}
+								</View>
+							</View>}
 						</View>
 					)
 				}}
+				ListFooterComponent={< ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
 			/>
-		</View>
+		</View >
 	);
 }
 
@@ -316,18 +379,41 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: theme.placeholder2
 	},
+	item_automsg: {
+		width: width * 0.9,
+		padding: 14,
+		marginVertical: 15,
+		marginHorizontal: "auto",
+		backgroundColor: theme.toolbarbg,
+		borderRadius: 5,
+		overflow: "hidden",
+	},
+	item_automsg_text: {
+		fontSize: 14,
+		color: theme.tit2,
+		lineHeight: 21,
+	},
 	item_container: {
 		padding: 7,
+		alignItems: "flex-start",
 	},
-	head_pic: {
+	item_avatar_con: {
+		justifyContent: "center",
+	},
+	item_avatar: {
 		height: 36,
 		width: 36,
 		borderRadius: 50,
 	},
+	item_triangle_right: {
+		left: -13,
+		right: 0,
+		borderRightColor: "transparent",
+		borderLeftColor: theme.dialogbox,
+	},
 	item_triangle: {
 		position: "absolute",
-		left: -5,
-		top: "17%",
+		right: -13,
 		width: 0,
 		height: 0,
 		borderWidth: 8,
@@ -338,14 +424,56 @@ const styles = StyleSheet.create({
 	},
 	item_content: {
 		flexShrink: 1,
+		marginRight: 10,
 	},
-	item_text: {
+	item_content_right: {
+		marginRight: 0,
+		marginLeft: 10
+	},
+	item_msg: {
 		backgroundColor: theme.toolbarbg,
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		borderRadius: 5,
-		marginLeft: 11,
-		overflow: "hidden"
+		marginLeft: 13,
+		lineHeight: 26,
+		overflow: "hidden",
+	},
+	item_msg_right: {
+		marginLeft: 0,
+		marginRight: 13,
+		backgroundColor: theme.dialogbox,
+	},
+	link_msg: {
+		fontSize: 15,
+		fontWeight: "500",
+		fontFamily: "PingFang SC",
+		color: theme.text1,
+	},
+	link_msg_con: {
+		marginVertical: 10,
+		flexDirection: "row",
+	},
+	link_msg_img: {
+		width: 66,
+		height: 66,
+		borderRadius: 8,
+		backgroundColor: theme.toolbarbg,
+		overflow: "hidden",
+	},
+	link_info: {
+		marginLeft: 10,
+		flex: 1
+	},
+	link_info_tit: {
+		fontSize: 13,
+		color: theme.tit2,
+		lineHeight: 20
+	},
+	link_info_price: {
+		fontSize: 14,
+		lineHeight: 26,
+		color: theme.color
 	}
 });
 

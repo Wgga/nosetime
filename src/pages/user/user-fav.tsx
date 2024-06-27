@@ -22,7 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -331,6 +331,8 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 											/>}
 											{item == "perfumers" && <RnImage style={{ width: "100%", height: "100%" }}
 												source={{ uri: ENV.image + "/nosevi/" + item2.id + ".jpg" }}
+												errsrc={require("../../assets/images/perfumer.png")}
+												type="perfumer"
 											/>}
 										</View>
 										<View style={styles.wiki_list_info}>

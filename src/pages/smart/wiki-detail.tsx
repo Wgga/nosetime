@@ -18,7 +18,7 @@ import cache from "../../hooks/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -261,6 +261,8 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 							/>}
 							{type.current == "perfumer" && <RnImage style={{ width: "100%", height: "100%" }}
 								source={{ uri: ENV.image + "/nosevi/" + wikidata.current.id + ".jpg" }}
+								errsrc={require("../../assets/images/perfumer.png")}
+								type="perfumer"
 								resizeMode="contain"
 							/>}
 							{(type.current == "fragrance" && ((wikidata.current.id >= 14000001 && wikidata.current.id <= 14000012) || wikidata.current.id == 14000021)) && <Image style={{ width: "100%", height: "100%" }}

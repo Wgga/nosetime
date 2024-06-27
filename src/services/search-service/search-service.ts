@@ -6,7 +6,7 @@ import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import { ENV } from "../../configs/ENV";
-import { setContentFold } from "../../configs/globalstyles";
+import { setContentFold } from "../../configs/globalmethod";
 
 const Winwidth = Dimensions.get("window").width;
 

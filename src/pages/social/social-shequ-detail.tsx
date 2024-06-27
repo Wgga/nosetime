@@ -23,7 +23,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalstyles";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import { ModalPortal } from "../../components/modals";

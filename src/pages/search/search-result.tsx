@@ -16,7 +16,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalstyles";
+import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
@@ -359,6 +359,8 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 								<Pressable key={item.id} onPress={() => { gotodetail("perfumer", item) }} style={[styles.wiki_list_con, styles.item_flex]}>
 									<RnImage style={styles.wiki_list_image}
 										source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
+										errsrc={require("../../assets/images/perfumer.png")}
+										type="perfumer"
 										resizeMode="contain"
 									/>
 									<View style={styles.wiki_list_info}>

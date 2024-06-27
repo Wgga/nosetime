@@ -9,7 +9,7 @@ import http from "../../utils/api/http";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 function Protocol({ navigation, route }: any): React.JSX.Element {
 

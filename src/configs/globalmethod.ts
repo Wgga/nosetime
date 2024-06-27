@@ -78,6 +78,20 @@ const display = (items: any) => {
 }
 
 // 设置内容折叠
+const setContentFold = (params: any) => {
+	let srclist = ["smart", "article"]
+	if (srclist.includes(params.src)) {
+		handleContent(params.item, params);
+	} else {
+		params.items.forEach((item: any) => {
+			item[params.key + "2"] = "";
+			item["isopen"] = true;
+			if (item[params.key].length > 0) {
+				handleContent(item, params);
+			}
+		});
+	}
+}
 const handleContent = (item: any, params: any) => {
 	reactNativeTextSize.measure({
 		width: params.width,
@@ -99,19 +113,16 @@ const handleContent = (item: any, params: any) => {
 		item["isopen"] = true;
 	});
 }
-const setContentFold = (params: any) => {
-	let srclist = ["smart", "article"]
-	if (srclist.includes(params.src)) {
-		handleContent(params.item, params);
-	} else {
-		params.items.forEach((item: any) => {
-			item[params.key + "2"] = "";
-			item["isopen"] = true;
-			if (item[params.key].length > 0) {
-				handleContent(item, params);
-			}
-		});
-	}
+
+// 转化page首字母大写
+const toCamelCase = (page: string) => {
+	return page.split("-").map((word: string, index: number) => {
+		if (index === 0) {
+			return word.charAt(0).toUpperCase() + word.slice(1);
+		} else {
+			return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+		}
+	}).join("");
 }
 
 const Globalstyles: any = StyleSheet.create({
@@ -366,10 +377,13 @@ const Globalstyles: any = StyleSheet.create({
 	},
 });
 
+
+
 export {
 	Globalstyles,
 	handlelevelLeft, handlelevelTop,
 	handlestarLeft, handlereplystarLeft,
 	show_items, display,
-	setContentFold
+	setContentFold,
+	toCamelCase
 };

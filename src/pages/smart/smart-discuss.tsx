@@ -15,7 +15,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft } from "../../configs/globalstyles";
+import { Globalstyles, handlestarLeft } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

@@ -23,6 +23,7 @@ import PerfumeListTag from "../pages/perfume/perfume-list-tag";
 import SocialShequDetail from "../pages/social/social-shequ-detail";
 import SocialShequPost from "../pages/social/social-shequ-post";
 import SocialXiaoxi from "../pages/social/social-xiaoxi";
+import SocialSixinDetail from "../pages/social/social-sixin-detail";
 
 import MallGroup from "../pages/mall/mall-group";
 import MallHeji from "../pages/mall/mall-heji";
@@ -74,6 +75,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
 			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />
 			<Stack.Screen name="SocialXiaoxi" component={SocialXiaoxi} />
+			<Stack.Screen name="SocialSixinDetail" component={SocialSixinDetail} />
 
 			<Stack.Screen name="MallGroup" component={MallGroup} />
 			<Stack.Screen name="MallHeji" component={MallHeji} />

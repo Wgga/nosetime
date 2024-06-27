@@ -34,7 +34,7 @@ import Wishlist from "../../assets/svg/user/wishlist.svg";
 import Usercart from "../../assets/svg/user/usercart.svg";
 import Giftcode from "../../assets/svg/user/giftcode.svg";
 import Setting from "../../assets/svg/user/setting.svg";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 const classname = "UserPage";

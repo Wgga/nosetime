@@ -8,7 +8,7 @@ import WebView from "react-native-webview";
 import { ModalPortal } from "../modals";
 
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 

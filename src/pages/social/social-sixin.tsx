@@ -16,7 +16,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalstyles";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -38,7 +38,6 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 		getkfmsg();
 
 		events.subscribe("nosetime_newmsg", (data) => {
-			console.log("%c Line:41 🥒 data", "color:#e41a6a", data);
 			getkfmsg();
 		})
 
@@ -51,6 +50,7 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 		us.getkfmsg().then((msg: any) => {
 			if (msg) {
 				kfmsg.current = msg;
+				getSixincnt();
 				setIsRender(val => !val);
 			}
 		}).catch(() => { })
@@ -163,7 +163,9 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 			}
 			renderItem={({ item }: any) => {
 				return (
-					<View style={[styles.msg_item, item.top && styles.msg_top]}>
+					<Pressable style={[styles.msg_item, item.top && styles.msg_top]} onPress={() => {
+						navigation.navigate("Page", { screen: "SocialSixinDetail", params: { fromuser: { uid: item.uid, uname: item.uname, uface: item.uface } } });
+					}}>
 						<View style={styles.kefu_avatar}>
 							<Image style={{ width: "100%", height: "100%", borderRadius: 50 }}
 								defaultSource={require("../../assets/images/default_avatar.png")}
@@ -183,7 +185,7 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 							</View>
 							<Text numberOfLines={1} style={styles.msg_con_text}>{item.desc}</Text>
 						</View>
-					</View>
+					</Pressable>
 				)
 			}}
 			contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
