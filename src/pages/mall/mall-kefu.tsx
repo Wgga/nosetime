@@ -2,7 +2,15 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions, useWindowDimensions, Image } from "react-native";
 
+import { useFocusEffect } from "@react-navigation/native";
+import FastImage from "react-native-fast-image";
+import { FlashList } from "@shopify/flash-list";
+
+import ListBottomTip from "../../components/listbottomtip";
+import RnImage from "../../components/RnImage";
+
 import us from "../../services/user-service/user-service";
+import wss from "../../services/wss-service/wss-service";
 
 import http from "../../utils/api/http";
 
@@ -15,13 +23,6 @@ import { Globalstyles, toCamelCase } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import HeaderView from "../../components/headerview";
-import wss from "../../services/wss-service/wss-service";
-import { FlashList } from "@shopify/flash-list";
-import FastImage from "react-native-fast-image";
-import AutoHeightWebView from "../../components/autoHeightWebview";
-import RnImage from "../../components/RnImage";
-import ListBottomTip from "../../components/listbottomtip";
-import { useFocusEffect } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -137,7 +138,13 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const scrollend = () => {
-		setTimeout(() => { try { listref.current?.scrollToEnd({ animated: false }) } catch (e) { } }, 100);
+		// setTimeout(() => { try { listref.current?.scrollToEnd({ animated: false }) } catch (e) { } }, 100);
+		let timeout = setTimeout(() => {
+			try {
+				// listref.current?.scrollToEnd({ animated: true });
+				clearTimeout(timeout);
+			} catch { }
+		}, 100);
 	}
 
 	const setoktag = (item: any) => {
@@ -214,7 +221,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	const calc_sztime = () => {
 		lasttime.current = 0;
 		us.calc_sztime(items.current, lasttime.current);
-		scrollend();
+		items.current = items.current.reverse();
 		setIsRender(val => !val);
 	}
 
@@ -331,6 +338,8 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			}}></HeaderView>
 			<FlashList ref={listref} data={items.current}
 				extraData={isrender}
+				inverted
+				onContentSizeChange={scrollend}
 				estimatedItemSize={100}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.bg }}
@@ -362,7 +371,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 						</View>
 					)
 				}}
-				ListFooterComponent={< ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
+				ListHeaderComponent={< ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
 			/>
 		</View >
 	);
@@ -406,14 +415,14 @@ const styles = StyleSheet.create({
 		borderRadius: 50,
 	},
 	item_triangle_right: {
-		left: -13,
+		left: -16,
 		right: 0,
 		borderRightColor: "transparent",
 		borderLeftColor: theme.dialogbox,
 	},
 	item_triangle: {
 		position: "absolute",
-		right: -13,
+		right: -16,
 		width: 0,
 		height: 0,
 		borderWidth: 8,
@@ -435,13 +444,13 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		borderRadius: 5,
-		marginLeft: 13,
+		marginLeft: 16,
 		lineHeight: 26,
 		overflow: "hidden",
 	},
 	item_msg_right: {
 		marginLeft: 0,
-		marginRight: 13,
+		marginRight: 16,
 		backgroundColor: theme.dialogbox,
 	},
 	link_msg: {

@@ -4,7 +4,6 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
 
 import HeaderView from "../../components/headerview";
-import { Messy } from "../../components/chatlist";
 
 import us from "../../services/user-service/user-service";
 
@@ -18,9 +17,6 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import { KeyboardProvider } from "react-native-keyboard-controller";
-import { BottomSheetModalProvider } from "@discord/bottom-sheet";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
