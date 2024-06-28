@@ -63,6 +63,7 @@ class UserService {
 			this.binit = true;
 			if (cacheobj) {
 				this.user = cacheobj;
+				this.userlogin();
 			}
 		}).catch(() => {
 			this.binit = true;
@@ -223,7 +224,7 @@ class UserService {
 			//新安装app，登录状态下直接提问
 			this._showreq();
 		} else {
-			cache.getItem(this.factoryname + "showreq").then((cacheobj) => {
+			cache.getItem(this.factoryname + "showreq").then((cacheobj: any) => {
 			}).catch(() => {
 				http.post(ENV.user, {
 					method: "showreq", uid: this.user.uid, token: this.user.token, brand: this.deviceinfo.brand, did: this.did

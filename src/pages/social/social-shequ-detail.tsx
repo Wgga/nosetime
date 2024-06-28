@@ -12,6 +12,9 @@ import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
 import ListBottomTip from "../../components/listbottomtip";
 import FooterView from "../../components/footerview";
+import { ModalPortal } from "../../components/modals";
+import PhotoPopover from "../../components/popover/photo-popover";
+import AutoSizeImage from "../../components/autosizeimage";
 
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
@@ -26,8 +29,6 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import { ModalPortal } from "../../components/modals";
-import PhotoPopover from "../../components/popover/photo-popover";
 
 const { width, height } = Dimensions.get("window");
 
@@ -73,23 +74,6 @@ const ReplyItem = React.memo(({ item, islike }: any) => {
 				</View>
 			</View>
 		</View>
-	)
-})
-
-const ReplyImage = React.memo(({ uri }: any) => {
-
-	const [imagedata, setImageData] = React.useState<any>({
-		width: 0,
-		height: 0,
-	});
-
-	return (
-		<Image source={{ uri: ENV.image + uri }}
-			onLoad={({ nativeEvent: { source: { width, height } } }: any) => {
-				setImageData({ width, height })
-			}}
-			style={[styles.reply_image, (imagedata.height && imagedata.width) && { aspectRatio: imagedata.width / imagedata.height }]}
-		/>
 	)
 })
 
@@ -331,7 +315,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 						})
 						open_PhotoPopover(slideimgindex);
 					}}>
-						<ReplyImage uri={part} />
+						<AutoSizeImage style={styles.reply_image} uri={part} />
 					</Pressable>
 				)
 			} else if (part) {

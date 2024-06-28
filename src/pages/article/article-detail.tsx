@@ -706,8 +706,8 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					{articledata.current.mp4URL && <VideoPlayer
 						source={articledata.current.mp4URL}
 						poster={articledata.current.picURL}
-						classname={classname + id}>
-					</VideoPlayer>}
+						classname={classname + id}
+					></VideoPlayer>}
 					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
 						<View>
 							{!articledata.current.mp4URL && <View style={styles.content_img}>

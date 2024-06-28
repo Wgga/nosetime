@@ -8,6 +8,8 @@ import { FlashList } from "@shopify/flash-list";
 
 import ListBottomTip from "../../components/listbottomtip";
 import RnImage from "../../components/RnImage";
+import HeaderView from "../../components/headerview";
+import AutoSizeImage from "../../components/autosizeimage";
 
 import us from "../../services/user-service/user-service";
 import wss from "../../services/wss-service/wss-service";
@@ -22,11 +24,12 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, toCamelCase } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import HeaderView from "../../components/headerview";
+import { ModalPortal } from "../../components/modals";
+import PhotoPopover from "../../components/popover/photo-popover";
 
 const { width, height } = Dimensions.get("window");
 
-function MallKefu({ navigation, route }: any): React.JSX.Element {
+const MallKefu = React.memo(({ navigation, route }: any) => {
 
 	// 控件
 	const classname: string = "MallKefuPage";
@@ -41,6 +44,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 	// 状态
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
+	// 页面初始化触发
 	React.useEffect(() => {
 		init();
 		subscribe();
@@ -56,6 +60,7 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		}
 	}, [])
 
+	// 进入页面触发
 	useFocusEffect(
 		React.useCallback(() => {
 			events.publish("nosetime_kfnotify", false);
@@ -70,51 +75,44 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 
 	const subscribe = () => {
 		events.subscribe("nosetime_oldmsg", (data: any) => {
-			oldmsg(data);
+			setmsg(data, "events_old");
 		});
 
 		events.subscribe("nosetime_presence", (data: any) => {
-			if (!items || data.length == 0) {
-				return;
-			}
-			items.current = data;
-			cache.saveItem(classname + us.user.uid, items.current, 600);
-			calc_sztime();
+			if (!data || data.length == 0) return;
+			setmsg(data, "events_presence");
 		});
 
-		events.subscribe("nosetime_newmsg", (data: any) => {
-			if (!data) return;
-			items.current.push(data);
+		events.subscribe("nosetime_newmsg", (item: any) => {
+			if (!item) return;
+			setmsg([item], "events_new");
 			//20230825 不保存，避免中间漏了数据，lastmsg不对
 			//只在presence和oldmsg,newmsg后保存;revoke保存但是时间短
 			//this.cache.saveItem(this.classname + this.us.user.uid, this.items, this.classname, 3600);
 			us.calc_last_sztime(items.current, lasttime.current);
-			//20210427 stacie 提出不滚动到底部
-			//setTimeout(()=>{try{this.content.scrollToBottom(0)}catch(e){}},100);
 
 			//20230915 yy 有可能上面有一条或者多条没有收到，没触发这个消息，通过https获取一下
-			http.post(ENV.kefu + "?uid=" + us.user.uid, { method: "newmsg", token: us.user.token, fromtm: lastmsg.current }).then((resp_data: any) => {
-				if (resp_data.msg == "OK") {
-					newmsg(resp_data.items);
+			console.log("%c Line:96 🥛 resp_data", "color:#93c0a4", lastmsg.current);
+			// http.post(ENV.kefu + "?uid=" + us.user.uid, { method: "newmsg", token: us.user.token, fromtm: lastmsg.current }).then((resp_data: any) => {
+			// 	if (resp_data.msg == "OK") {
+			// 		setmsg(resp_data.items, "new");
 
-
-
-					cache.getItem("userupdatedata").then((cacheobj) => {
-						if (cacheobj && cacheobj.dbgkf1841) {
-							let res: any = [];
-							let start = items.current.length - 20;
-							if (start < 0) start = 0;
-							for (let i = start; i < items.current.length; ++i) {
-								res.push(items.current[i].id);
-							}
-							http.post(ENV.usage, { method: "kf", uid: us.user.uid, data: res }).then((resp_data: any) => { });
-						}
-					})
-				} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") { //20240229 shibo:处理token失效
-					us.delUser();
-					return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
-				}
-			})
+			// 		cache.getItem("userupdatedata").then((cacheobj) => {
+			// 			if (cacheobj && cacheobj.dbgkf1841) {
+			// 				let res: any = [];
+			// 				let start = items.current.length - 20;
+			// 				if (start < 0) start = 0;
+			// 				for (let i = start; i < items.current.length; ++i) {
+			// 					res.push(items.current[i].id);
+			// 				}
+			// 				http.post(ENV.usage, { method: "kf", uid: us.user.uid, data: res }).then((resp_data: any) => { });
+			// 			}
+			// 		})
+			// 	} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") { //20240229 shibo:处理token失效
+			// 		us.delUser();
+			// 		return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
+			// 	}
+			// })
 		})
 
 		events.subscribe("nosetime_echo", (item) => {
@@ -137,16 +135,6 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		});
 	}
 
-	const scrollend = () => {
-		// setTimeout(() => { try { listref.current?.scrollToEnd({ animated: false }) } catch (e) { } }, 100);
-		let timeout = setTimeout(() => {
-			try {
-				// listref.current?.scrollToEnd({ animated: true });
-				clearTimeout(timeout);
-			} catch { }
-		}, 100);
-	}
-
 	const setoktag = (item: any) => {
 		if (item.id == undefined) return;
 		for (var i in items.current) {
@@ -164,39 +152,6 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		}
 		// items.current.push(item);
 		//this.cache.saveItem(this.classname + this.us.user.uid, this.items, this.classname, 3600);
-		scrollend();
-	}
-
-	const oldmsg = (items: any) => {
-		if (items && items.length > 0) {
-			items = items.concat(items.current);
-			items.sort(sortByID);
-			let lastid = 0;
-			for (let i = items.length - 1; i >= 0; --i) {
-				//20230915 时间，方向，内容完全一样才识别为一样，进行除重
-				if (lastid == items[i].id) {
-					items.splice(i, 1);
-				}
-				lastid = items[i].time;
-			}
-			items.current = items;
-			cache.saveItem(classname + us.user.uid, items.current, 600);
-			calc_sztime();
-		}
-		/* this.content.getScrollElement().then((res) => {
-			let scrollHeight = res.scrollHeight;
-			if (this.refresher) {
-				setTimeout(() => {
-					this.content.getScrollElement().then((res) => {
-						let scrollHeightDiff = res.scrollHeight - scrollHeight - 100;
-						this.content.scrollToPoint(0, scrollHeightDiff, 0);
-						this.refresher.target.complete();
-						this.refresher = null;
-					})
-
-				}, 100);
-			}
-		}); */
 	}
 
 	const init = () => {
@@ -204,25 +159,14 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
 		}
 		cache.getItem(classname + us.user.uid).then((cacheobj) => {
-			if (cacheobj && cacheobj.length > 0) {
-				items.current = cacheobj;
-				lastmsg.current = items.current[items.current.length - 1].time;
-				calc_sztime();
-			}
+			if (cacheobj && cacheobj.length == 0) return;
+			setmsg(cacheobj, "init");
 			checkin();
 		}).catch(() => {
 			// fall here if item is expired or doesn't exist 
 			//console.log("this.cache.getItem:NO RESULT",this.classname+"publish",this.id);
 			checkin();
-			return;
 		});
-	}
-
-	const calc_sztime = () => {
-		lasttime.current = 0;
-		us.calc_sztime(items.current, lasttime.current);
-		items.current = items.current.reverse();
-		setIsRender(val => !val);
 	}
 
 	const checkin = () => {
@@ -234,12 +178,11 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			console.log("is send1");
 			//临时测试代码
 			http.post(ENV.kefu + "?uid=" + us.user.uid, { method: "checkinok", token: us.user.token }).then((resp_data: any) => { });
-			setIsRender(val => !val);
 		}, (T: any) => {
 			console.log("not send1");
 			http.post(ENV.kefu + "?uid=" + us.user.uid, { method: "newmsg", token: us.user.token, fromtm: lastmsg.current }).then((resp_data: any) => {
 				if (resp_data.msg == "OK") {
-					newmsg(resp_data.items);
+					setmsg(resp_data.items, "new");
 				} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {//20240229 shibo:处理token失效
 					us.delUser();
 					return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
@@ -248,56 +191,60 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		});
 	}
 
+	const calc_sztime = () => {
+		lasttime.current = 0;
+		us.calc_sztime(items.current, lasttime.current);
+		setIsRender(val => !val);
+	}
+
 	const sortByID = (a: any, b: any) => {
 		return a.id - b.id;
 	}
 
-	//20230825 数据与现有显示数据合并，去除重复，并缓存
-	const newmsg = (data: any) => {
-		if (data && data.length > 0) {
-			data = data.concat(items.current);
-			data.sort(sortByID);
-			let lastid = 0;
-			for (let i = data.length - 1; i >= 0; --i) {
-				//20230915 时间，方向，内容完全一样才识别为一样，进行除重
-				if (lastid == data[i].id) {
-					data.splice(i, 1);
-				}
-				lastid = data[i].id;
+	const uniqueitems = (items: any, key: string) => {
+		const map = new Map();
+		return items.reduce((acc: any, obj: any) => {
+			if (!map.has(obj[key])) {
+				map.set(obj[key], true);
+				acc.push(obj);
 			}
-			items.current = data;
-			//20230909 新消息不缓存，避免取不到以前的消息
-			//cache.saveItem(classname + us.user.uid, items.current, 3600);
-			lastmsg.current = items.current[items.current.length - 1].time;
-			calc_sztime();
-		}
+			return acc;
+		}, []);
 	}
 
-	// 处理内容中的【&nbsp;】字符
+	// 设置新/旧信息，并更新缓存，type: new/old
+	const setmsg = (data: any, type: string) => {
+		if (!data || data.length == 0) return;
+		let redata = [...data].reverse();
+		if (type != "init" && !type.includes("events")) {
+			data.sort(sortByID);
+		}
+		if (type == "events_new") {
+			items.current = uniqueitems(redata.concat(items.current), "id");
+		} else {
+			items.current = uniqueitems(items.current.concat(redata), "id");
+		}
+		if (type == "new" || type == "init") {
+			// 由于使用列表翻转，所以此处取lastmsg也需要翻转
+			lastmsg.current = items.current[0].time;
+		}
+		if (type == "old" || type.includes("events")) {
+			cache.saveItem(classname + us.user.uid, items.current, 600);
+		}
+		calc_sztime();
+	}
+
+	// 处理信息中的特殊字符(&nbsp;、<p>)
 	const handleblank = (sz: string) => {
-		sz = sz.replace(/&nbsp;/g, " ");
+		sz = sz.replace(/&nbsp;/g, " ").replace(/<\/p>/g, "").replace(/<p>/g, "\n");
 		return sz;
 	}
-
+	// 处理自动回复信息
 	const handleAutomsg = (sz: string) => {
 		sz = sz.replace(/<(?!br).*?>/gi, "").replace(/\n<br>|<br>/g, "\n");
 		return <Text style={styles.item_automsg_text}>{sz}</Text>
 	}
-
-	// 跳转链接
-	const gotolink = (item: any) => {
-		if (item.link_href && item.page == "media-list-detail") {
-			navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid, src: "APP客服页" } });
-			return;
-		}
-		if (item.link_href && item.page == "social-shequ-detail") {
-			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.id, src: "APP客服页" } });
-			return;
-		}
-		let screen = toCamelCase(item.page);
-		navigation.navigate("Page", { screen: screen, params: { id: item.id, src: "APP客服页" } });
-	}
-
+	// 处理链接信息
 	const handlelink = (sz: string) => {
 		let link = JSON.parse(sz);
 		let msg = (
@@ -324,6 +271,83 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 		)
 		return msg;
 	}
+	// 跳转链接
+	const gotolink = (item: any) => {
+		if (item.link_href && item.page == "media-list-detail") {
+			navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid, src: "APP客服页" } });
+			return;
+		}
+		if (item.link_href && item.page == "social-shequ-detail") {
+			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.id, src: "APP客服页" } });
+			return;
+		}
+		let screen = toCamelCase(item.page);
+		navigation.navigate("Page", { screen: screen, params: { id: item.id, src: "APP客服页" } });
+	}
+	// 处理图片信息
+	const handleimg = (sz: string) => {
+		let data = JSON.parse(sz), uri = "";
+
+		if (data.uri) {
+			if (data.uri.indexOf("data:image") == 0) {
+				uri = data.uri;
+			} else {
+				uri = "data:image/jpeg;base64," + data.uri;
+			}
+		} else {
+			uri = ENV.image + data.url;
+		}
+		return (
+			<Pressable onPress={() => { open_PhotoPopover(uri) }}>
+				<AutoSizeImage style={{ width: "100%", minHeight: 100 }} uri={uri} />
+			</Pressable>
+		);
+	}
+	// 查看图片大图
+	const open_PhotoPopover = (uri: string) => {
+		ModalPortal.show((
+			<PhotoPopover modalparams={{
+				key: "kefu_photo_popover",
+				slideimgindex: 0,
+				slideimglist: [uri]
+			}} />
+		), {
+			key: "kefu_photo_popover",
+			width,
+			height,
+			rounded: false,
+			useNativeDriver: true,
+			onShow: () => { },
+			onDismiss: () => { },
+			onTouchOutside: () => {
+				ModalPortal.dismiss("kefu_photo_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("kefu_photo_popover");
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	// 加载上一页
+	const fetch = () => {
+		// 由于使用列表翻转，所以此处取lastmsg也需要翻转
+		let totm = items.current.length > 0 ? items.current[items.current.length - 1].time : lastmsg.current;
+		wss.send({ method: "oldmsg", totm: totm, uid: us.user.uid, token: us.user.token }).then((T: any) => {
+			console.log("is send2", T);
+		}, (T: any) => {
+			console.log("not send2", T);
+			http.post(ENV.kefu + "?uid=" + us.user.uid, { method: "oldmsg", token: us.user.token, totm: totm }).then((resp_data: any) => {
+				if (resp_data.msg == "OK") {
+					setmsg(resp_data.items, "old");
+				} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {//20240229 shibo:处理token失效
+					us.delUser();
+					return navigation.navigate("Page", { screen: "Login", params: { src: "App客服页" } });
+				}
+			});
+		});
+	}
 
 	return (
 		<View style={[Globalstyles.container, { backgroundColor: theme.bg }]}>
@@ -339,11 +363,14 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 			<FlashList ref={listref} data={items.current}
 				extraData={isrender}
 				inverted
-				onContentSizeChange={scrollend}
 				estimatedItemSize={100}
+				onEndReachedThreshold={0.1}
+				onEndReached={() => {
+					items.current.length > 0 && fetch();
+				}}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.bg }}
-				keyExtractor={(item: any) => item.id}
+				keyExtractor={(item: any, index: number) => item.id + "_" + index}
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.list_item}>
@@ -366,16 +393,17 @@ function MallKefu({ navigation, route }: any): React.JSX.Element {
 									{item.type == 1 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleblank(item.content)}</Text>}
 									{item.type == 2 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{item.content}</Text>}
 									{item.type == 3 && <View style={[styles.item_msg, item.dir == 2 && { ...styles.item_msg_right, paddingVertical: 0 }]}>{handlelink(item.content)}</View>}
+									{item.type == 4 && <View style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleimg(item.content)}</View>}
 								</View>
 							</View>}
 						</View>
 					)
 				}}
-				ListHeaderComponent={< ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
+				ListHeaderComponent={<ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
 			/>
 		</View >
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	list_item: {

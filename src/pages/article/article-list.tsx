@@ -78,7 +78,7 @@ const ArticleList = React.memo(({ navigation, type }: any) => {
 			scrollEnabled={false}
 			showsVerticalScrollIndicator={false}
 			contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
-			keyExtractor={(item: any) => item.id}
+			keyExtractor={(item: any) => item.apptag + "_" + item.id}
 			renderItem={({ item, index }: any) => {
 				return (
 					<View style={styles.article_con}>

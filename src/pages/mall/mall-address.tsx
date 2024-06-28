@@ -98,8 +98,8 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 		});
 	}
 
-	const gotodetail = (item: any) => {
-		navigation.navigate("Page", { screen: "MallAddressEdit", params: { item, cnt: address_list.current.length } });
+	const gotodetail = (id: any) => {
+		navigation.navigate("Page", { screen: "MallAddressEdit", params: { id, cnt: address_list.current.length } });
 	}
 
 	return (
