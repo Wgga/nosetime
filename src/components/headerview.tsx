@@ -93,8 +93,7 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 					/>
 				</Pressable>
 				{isShowSearch && <View style={styles.searchbar_con}>
-					<TextInput
-						ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
+					<TextInput ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
 						style={styles.searchbar}
 						placeholder={placeholder}
 						autoFocus={isautoFocus}
@@ -195,7 +194,6 @@ const styles = StyleSheet.create({
 		marginBottom: 4,
 	},
 	searchbar: {
-		height: "100%",
 		backgroundColor: "transparent",
 		fontSize: 12,
 		flex: 1,

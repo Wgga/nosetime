@@ -8,6 +8,7 @@ import Switch from "../../components/switch";
 import LinearButton from "../../components/linearbutton";
 import AlertCtrl from "../../components/alertctrl";
 import WheelPicker from "../../components/wheelpicker";
+import { ModalPortal, SlideAnimation } from "../../components/modals";
 
 import us from "../../services/user-service/user-service";
 
@@ -20,8 +21,39 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import { Globalstyles } from "../../configs/globalmethod";
 
 const { width, height } = Dimensions.get("window");
+
+const AddressPicker = ({ params }: any) => {
+
+	const { data, index, key, type, title, SelectedAddress } = params;
+
+	const [selectedIndex, setSelectedIndex] = React.useState(index == -1 ? 0 : index);
+
+	return (
+		<View style={styles.picker_content}>
+			<View style={styles.picker_header}>
+				<Pressable style={{ marginLeft: 10 }} hitSlop={16} onPress={() => {
+					ModalPortal.dismiss(key)
+				}}><Text style={styles.picker_btn}>{"取消"}</Text></Pressable>
+				<Text style={styles.picker_title}>{title}</Text>
+				<Pressable style={{ marginRight: 10 }} hitSlop={16} onPress={() => {
+					SelectedAddress(type, data[selectedIndex]);
+					ModalPortal.dismiss(key);
+				}}><Text style={[styles.picker_btn, { fontWeight: "500" }]}>{"确定"}</Text></Pressable>
+			</View>
+			<WheelPicker options={data}
+				selectedIndex={selectedIndex}
+				visibleRest={3}
+				onChange={(index: number) => setSelectedIndex(index)}
+				selectedIndicatorStyle={{ backgroundColor: "#EFEFEF", borderRadius: 10 }}
+				itemTextStyle={{ fontSize: 16, color: "#333333" }}
+				containerStyle={{ backgroundColor: theme.toolbarbg }}
+			/>
+		</View>
+	)
+}
 
 function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	// 控件
@@ -30,10 +62,12 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	let add = React.useRef<any>({});
 	let id = React.useRef<number>(0);
 	let cnt = React.useRef<number>(0);
-	let provs = React.useRef<any>([]);
-	let citys = React.useRef<any>([]);
-	let regions = React.useRef<any>([]);
-	let streets = React.useRef<any>([]);
+	let lists = React.useRef<any>({
+		provs: { items: [], title: "选择省" },
+		citys: { items: [], title: "选择市" },
+		regions: { items: [], title: "选择区" },
+		streets: { items: [], title: "选择街道" }
+	});
 	let ipadd = React.useRef<any>({});
 	// 数据
 	// 状态
@@ -133,125 +167,137 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 
 	const getbasearea = () => {
 		http.get(ENV.mall + "?method=basearea").then((resp_data: any) => {
-			provs.current = resp_data;
+			lists.current.provs.items = resp_data;
 			defaultprov();
 		});
 	}
 
-	const defaultprov = () => {
-		if (!provs.current) return;
-		if (provs.current.length == 0) return;
+	const getmindata = (type: string) => {
 		let mini = "0";
-		let minc = provs.current[mini].c;
-		let minn = provs.current[mini].n;
-		for (let i in provs.current) {
-			if (provs.current[i].n == add.current.maprov || provs.current[i].n == ipadd.current.prov) {
+		let key = type + "s";
+		let minc = lists.current[key].items[mini].c;
+		let minn = lists.current[key].items[mini].n;
+		for (let i in lists.current[key].items) {
+			if (lists.current[key].items[i].n == add.current["ma" + type] || lists.current[key].items[i].n == ipadd.current[type]) {
 				mini = i;
-				minc = provs.current[mini].c;
-				minn = provs.current[mini].n;
+				minc = lists.current[key].items[mini].c;
+				minn = lists.current[key].items[mini].n;
 				break;
 			}
-			if (provs.current[i].c < minc) {
+			if (lists.current[key].items[i].c < minc) {
 				mini = i;
-				minc = provs.current[mini].c;
-				minn = provs.current[mini].n;
+				minc = lists.current[key].items[mini].c;
+				minn = lists.current[key].items[mini].n;
 			}
 		}
-		if (minn != add.current.maprov) {
-			add.current.maprov = minn;
+		if (minn != add.current["ma" + type]) {
+			add.current["ma" + type] = minn;
 		}
-		citys.current = provs.current[mini].sub;
-		defaultcity();
+		return { minn, mini, minc };
 	}
 
+	const defaultprov = () => {
+		if (!lists.current.provs.items) return;
+		if (lists.current.provs.items.length == 0) return;
+		let mindata = getmindata("prov");
+		lists.current.citys.items = lists.current.provs.items[mindata.mini].sub;
+		defaultcity();
+	}
 	const defaultcity = () => {
-		if (!citys.current) return;
-		let mini = "0";
-		let minc = citys.current[mini].c;
-		let minn = citys.current[mini].n;
-		for (let i in citys.current) {
-			if (citys.current[i].n == add.current.macity || citys.current[i].n == ipadd.current.city) {
-				mini = i;
-				minc = citys.current[mini].c;
-				minn = citys.current[mini].n;
-				break;
-			}
-			if (citys.current[i].c < minc) {
-				mini = i;
-				minc = citys.current[mini].c;
-				minn = citys.current[mini].n;
-			}
-		}
-		if (minn != add.current.macity)
-			add.current.macity = minn;
-		if (citys.current[mini].sub.length) {
-			regions.current = citys.current[mini].sub;
+		if (!lists.current.citys.items) return;
+		let mindata = getmindata("city");
+		if (lists.current.citys.items[mindata.mini].sub.length) {
+			lists.current.regions.items = lists.current.citys.items[mindata.mini].sub;
 		} else {
-			regions.current = null;
-			streets.current = null;
+			lists.current.regions.items = null;
+			lists.current.streets.items = null;
 			add.current.maregion = "";
 			add.current.mastreet = "";
 		}
 		defaultregion();
 	}
-
 	const defaultregion = () => {
-		if (!regions.current) return;
-		let mini = "0";
-		let minc = regions.current[mini].c;
-		let minn = regions.current[mini].n;
-		for (let i in regions.current) {
-			if (regions.current[i].n == add.current.maregion) {
-				mini = i;
-				minc = regions.current[mini].c;
-				minn = regions.current[mini].n;
-				break;
-			}
-			if (regions.current[i].c < minc) {
-				mini = i;
-				minc = regions.current[mini].c;
-				minn = regions.current[mini].n;
-			}
-		}
-		if (minn != add.current.maregion)
-			add.current.maregion = minn;
-		if (minc > 0) {
-			http.get(ENV.mall + "?method=street&id=" + minc).then((resp_data: any) => {
+		if (!lists.current.regions.items) return;
+		let mindata = getmindata("region");
+		if (mindata.minc > 0) {
+			http.get(ENV.mall + "?method=street&id=" + mindata.minc).then((resp_data: any) => {
 				if (resp_data.length) {
-					streets.current = resp_data;
+					lists.current.streets.items = resp_data;
 					defaultstreet();
 				} else {
-					streets.current = null;
+					lists.current.streets.items = null;
 					add.current.mastreet = "";
 				}
 			});
 		}
 	}
 	const defaultstreet = () => {
-		if (!streets.current) return;
-		let mini = "0";
-		let minc = streets.current[mini].c;
-		let minn = streets.current[mini].n;
-		for (let i in streets.current) {
-			if (streets.current[i].n == add.current.mastreet) {
-				mini = i;
-				minc = streets.current[mini].c;
-				minn = streets.current[mini].n;
-				break;
+		if (!lists.current.streets.items) return;
+		getmindata("street");
+		setIsRender(val => !val);
+	}
+
+	const SelectedAddress = (type: string, data: any) => {
+		add.current["ma" + type] = data.n;
+		if (type == "prov") {
+			add.current.macity = "";
+			add.current.maregion = "";
+			add.current.mastreet = "";
+
+			if (data.sub.length) {
+				lists.current.citys.items = data.sub;
+				defaultcity();
 			}
-			if (streets.current[i].c < minc) {
-				mini = i;
-				minc = streets.current[mini].c;
-				minn = streets.current[mini].n;
+		} else if (type == "city") {
+			add.current.maregion = "";
+			add.current.mastreet = "";
+
+			if (data.sub.length) {
+				lists.current.regions.items = data.sub;
+				defaultregion();
 			}
-		}
-		if (minn != add.current.mastreet) {
-			add.current.mastreet = minn;
+		} else if (type == "region") {
+			add.current.mastreet = "";
+
+			if (parseInt(data.c) > 0) {
+				http.get(ENV.mall + "?method=street&id=" + data.c).then((resp_data: any) => {
+					if (resp_data.length) {
+						lists.current.streets.items = resp_data;
+						defaultstreet();
+					}
+				});
+
+			}
+		} else if (type == "street") {
+			add.current.mastreet = data.n;
 		}
 		setIsRender(val => !val);
 	}
 
-	const seladdress = () => {
+	const seladdress = (type: string) => {
+		let key = type + "s";
+		let data = lists.current[key].items,
+			index = lists.current[key].items.findIndex((item: any) => item.n == add.current["ma" + type]),
+			title = lists.current[key].title;
+		ModalPortal.show((
+			<AddressPicker params={{ data, index, type, title, key: "address_picker_popover", SelectedAddress, }} />
+		), {
+			key: "address_picker_popover",
+			width,
+			rounded: false,
+			useNativeDriver: true,
+			modalAnimation: new SlideAnimation({
+				initialValue: 0,
+				slideFrom: "bottom",
+				useNativeDriver: true,
+			}),
+			onTouchOutside: () => {
+				ModalPortal.dismiss("address_picker_popover");
+			},
+			swipeDirection: "down",
+			animationDuration: 300,
+			type: "bottomModal",
+		})
 	};
 
 	const onChange = (type: string, value: string | boolean) => {
@@ -260,7 +306,7 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={styles.address_edit_con}>
+		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: id.current > 0 ? "编辑地址" : "添加新地址",
 				isShowSearch: false,
@@ -293,19 +339,19 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 						placeholderTextColor={theme.placeholder}
 					/>
 				</View>
-				<Pressable onPress={seladdress} style={styles.toggle_con}>
+				<Pressable onPress={() => { seladdress("prov") }} style={styles.toggle_con}>
 					<Text style={styles.address_label}>{"所在省："}<Text style={styles.address_val}>{add.current.maprov}</Text></Text>
 					<Icon name="r-return" size={16} color={theme.text1} />
 				</Pressable>
-				<Pressable onPress={seladdress} style={styles.toggle_con}>
+				<Pressable onPress={() => { seladdress("city") }} style={styles.toggle_con}>
 					<Text style={styles.address_label}>{"所在市："}<Text style={styles.address_val}>{add.current.macity}</Text></Text>
 					<Icon name="r-return" size={16} color={theme.text1} />
 				</Pressable>
-				<Pressable onPress={seladdress} style={styles.toggle_con}>
+				<Pressable onPress={() => { seladdress("region") }} style={styles.toggle_con}>
 					<Text style={styles.address_label}>{"所在区："}<Text style={styles.address_val}>{add.current.maregion}</Text></Text>
 					<Icon name="r-return" size={16} color={theme.text1} />
 				</Pressable>
-				<Pressable onPress={seladdress} style={styles.toggle_con}>
+				<Pressable onPress={() => { seladdress("street") }} style={styles.toggle_con}>
 					<Text style={styles.address_label}>{"所在街道："}<Text style={styles.address_val}>{add.current.mastreet}</Text></Text>
 					<Icon name="r-return" size={16} color={theme.text1} />
 				</Pressable>
@@ -338,10 +384,6 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	);
 }
 const styles = StyleSheet.create({
-	address_edit_con: {
-		height: "100%",
-		backgroundColor: theme.toolbarbg
-	},
 	address_list_con: {
 		paddingTop: 8,
 		paddingBottom: 50,
@@ -375,12 +417,13 @@ const styles = StyleSheet.create({
 		height: 110,
 		borderBottomWidth: 1,
 		borderBottomColor: theme.border,
-		paddingTop: 10,
-		paddingLeft: 10
+		padding: 10,
 	},
 	address_detail_input: {
 		padding: 0,
 		margin: 0,
+		flex: 1,
+		textAlignVertical: "top",
 	},
 	toggle_con: {
 		flexDirection: "row",
@@ -400,5 +443,24 @@ const styles = StyleSheet.create({
 		paddingVertical: 21,
 		backgroundColor: theme.toolbarbg,
 	},
+	picker_content: {
+		backgroundColor: "#F7F7F7",
+		paddingHorizontal: 10,
+	},
+	picker_header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingVertical: 16
+	},
+	picker_btn: {
+		fontSize: 16,
+		color: theme.tit,
+		fontFamily: "PingFang SC"
+	},
+	picker_title: {
+		fontSize: 16,
+		color: theme.color,
+	}
 });
 export default MallAddressEdit;

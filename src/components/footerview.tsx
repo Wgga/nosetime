@@ -91,13 +91,12 @@ const styles = StyleSheet.create({
 		paddingRight: 5,
 	},
 	footer_input: {
-		height: "100%",
+		flex: 1,
 		padding: 0,
 	},
 	footer_con_right: {
 		marginLeft: 20,
 	},
-
 	footer_publish: {
 		paddingHorizontal: 16,
 		height: 29,
