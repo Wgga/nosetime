@@ -41,7 +41,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 	const scorestrarr: any = { "1": "太差了", "2": "不太好", "3": "一般般", "4": "还不错", "5": "棒极了" };
 	const timevotestrarr: any = { "1": "非常短", "2": "较短", "3": "中等", "4": "较长", "5": "非常持久" };
 	// 变量
-	let info = React.useRef<any>({ type: "", score: 0 });
+	let info = React.useRef<any>({ type: "", score: 0, timevote: 0, replytext: "", udpic: "", udpichtml: "" });
 	let title = React.useRef<string>("");
 	let type1 = React.useRef<string>("");
 	let type2 = React.useRef<string>("");
@@ -96,9 +96,6 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("filedlg_action_sheet");
-			},
 		})
 	}
 
@@ -156,9 +153,6 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 					setIsRender(val => !val);
 				}
 			}],
-			onTouchOutside: () => {
-				AlertCtrl.close("del_img_alert");
-			}
 		})
 	}
 
@@ -205,8 +199,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 
 	// 设置数据
 	const setinfodata = (data: any) => {
-		let infodata = JSON.parse(JSON.stringify(data));
-		info.current = infodata;
+		Object.assign(info.current, data);
 		if (data.type == 1) type2.current = "wanted";
 		else if (data.type == 2) type2.current = "have";
 		else if (data.type == 3) type2.current = "smelt";
@@ -257,16 +250,6 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 		})
 	}
 
-	// 关闭香评结果弹窗
-	const hidevotepopover = (data: any) => {
-		ModalPortal.dismiss("vote_popover");
-		if (data.jifen > 0) {
-			ToastCtrl.show({ message: "发布成功，积分 +" + data.jifen, duration: 2000, viewstyle: "medium_toast", key: "publish_success_toast" });
-		} else {
-			ToastCtrl.show({ message: "发布成功", duration: 2000, viewstyle: "short_toast", key: "publish_success_toast" });
-		}
-	}
-
 	// 显示香评结果弹窗
 	const showvotepopover = (data: any) => {
 		ModalPortal.show((
@@ -280,7 +263,15 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 				ModalPortal.dismiss("vote_popover");
 			},
 			onDismiss: () => {
-				hidevotepopover(data)
+				if (data.jifen > 0) {
+					ToastCtrl.show({ message: "发布成功，积分 +" + data.jifen, duration: 2000, viewstyle: "medium_toast", key: "publish_success_toast" });
+				} else {
+					ToastCtrl.show({ message: "发布成功", duration: 2000, viewstyle: "short_toast", key: "publish_success_toast" });
+				}
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("vote_popover");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },

@@ -145,6 +145,10 @@ const Home = React.memo(({ navigation }: any) => {
 			onShow,
 			onDismiss,
 			onTouchOutside,
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss(modal_key);
+				return true;
+			},
 			animationDuration: 300,
 			modalStyle: modal_style,
 		})

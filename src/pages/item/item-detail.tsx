@@ -321,15 +321,13 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 			height: height * 0.7,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => {
 				ModalPortal.dismiss("intro_popover");
 			},
-			swipeDirection: "down",
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("intro_popover");
+				return true;
+			},
 			animationDuration: 300,
 			type: "bottomModal",
 			modalStyle: { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
@@ -1049,7 +1047,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			}} MenuChildren={() => {
 				return (
 					<>
-						<Pressable style={styles.menu_icon_con} onPress={() => {
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
 							ModalPortal.show((
 								<SharePopover />
 							), {
@@ -1057,15 +1055,13 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 								width,
 								rounded: false,
 								useNativeDriver: true,
-								modalAnimation: new SlideAnimation({
-									initialValue: 0,
-									slideFrom: "bottom",
-									useNativeDriver: true,
-								}),
 								onTouchOutside: () => {
 									ModalPortal.dismiss("share_popover");
 								},
-								swipeDirection: "down",
+								onHardwareBackPress: () => {
+									ModalPortal.dismiss("share_popover");
+									return true;
+								},
 								animationDuration: 300,
 								type: "bottomModal",
 								modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },

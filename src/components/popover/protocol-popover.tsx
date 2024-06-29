@@ -5,8 +5,10 @@ import { WebView } from "react-native-webview";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import http from "../../utils/api/http";
+
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -54,23 +56,23 @@ function ProtocolPopover({ modalparams }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={Globalstyles.container}>
 			<View style={[styles.title_con, { paddingTop: insets.top }]}>
-				<Pressable style={{ zIndex: 1 }} onPress={() => {
-					ModalPortal.dismiss(modalkey);
-					StatusBar.setBarStyle("default", true);
-				}}>
-					<Icon name="leftarrow" size={20} color={theme.text2} style={styles.title_icon} />
-				</Pressable>
+				<Icon name="leftarrow" size={20} color={theme.text2} style={Globalstyles.title_icon}
+					onPress={() => {
+						ModalPortal.dismiss(modalkey);
+						StatusBar.setBarStyle("default", true);
+					}}
+				/>
 				<Text style={styles.title_text}>{title}</Text>
-				<View style={styles.title_icon}></View>
+				<View style={Globalstyles.title_icon}></View>
 			</View>
-			<WebView
-				originWhitelist={["*"]}
+			<WebView originWhitelist={["*"]}
 				scalesPageToFit={false}
 				setBuiltInZoomControls={false}
 				scrollEnabled={false}
-				source={{ html: protocol }} />
+				source={{ html: protocol }}
+			/>
 		</View>
 	);
 }
@@ -81,12 +83,6 @@ const styles = StyleSheet.create({
 		alignItems: "flex-end",
 		justifyContent: "space-between",
 		zIndex: 1,
-	},
-	title_icon: {
-		width: 44,
-		height: 44,
-		textAlign: "center",
-		lineHeight: 44,
 	},
 	title_text: {
 		height: 44,

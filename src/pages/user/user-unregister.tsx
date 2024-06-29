@@ -93,6 +93,10 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 						pwd: ""
 					}
 				},
+				onHardwareBackPress: () => {
+					ModalPortal.dismiss(type + "_inputAlert");
+					return true;
+				},
 				animationDuration: 300,
 				modalStyle: { backgroundColor: "transparent" },
 			})

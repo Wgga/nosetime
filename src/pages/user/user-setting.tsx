@@ -156,6 +156,10 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 				ModalPortal.dismiss(data.type + "_inputAlert");
 				inputdata.current[data.type] = "";
 			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss(data.type + "_inputAlert");
+				return true;
+			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
 		})
@@ -201,9 +205,6 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 					ActionSheetCtrl.close("changeGender_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("changeGender_action_sheet");
-			},
 		})
 	}
 
@@ -387,7 +388,10 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			onTouchOutside: () => {
 				ModalPortal.dismiss("giftcode_inputAlert");
 				giftcode.current = "";
-
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("giftcode_inputAlert");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
@@ -420,6 +424,10 @@ const Account = React.memo(({ navigation, showgiftcode }: any) => {
 			useNativeDriver: true,
 			onTouchOutside: () => {
 				ModalPortal.dismiss("giftcode_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("giftcode_popover");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },
@@ -597,9 +605,6 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 					ToastCtrl.show({ message: "清除成功", duration: 2000, viewstyle: "short_toast", key: "clear_cache_toast" });
 				}
 			}],
-			onTouchOutside: () => {
-				AlertCtrl.close("clear_cache_alert");
-			}
 		})
 	}
 
@@ -755,9 +760,6 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 					ActionSheetCtrl.close("avatar_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("avatar_action_sheet");
-			},
 		})
 	}
 

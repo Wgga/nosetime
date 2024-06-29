@@ -543,15 +543,13 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			height: 200,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => {
 				ModalPortal.dismiss("share_popover");
 			},
-			swipeDirection: "down",
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("share_popover");
+				return true;
+			},
 			animationDuration: 300,
 			type: "bottomModal",
 			modalStyle: { borderTopLeftRadius: 30, borderTopRightRadius: 30 },

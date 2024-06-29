@@ -20,7 +20,7 @@ class Toast {
 		key: "toast",
 		onShow: () => { },
 		onDismiss: () => { },
-		onTouchOutside: () => { },
+		onTouchOutside: null,
 		hasOverlay: false,
 		animationDuration: 300,
 		modalStyle: { backgroundColor: "transparent" },
@@ -44,10 +44,12 @@ class Toast {
 			rounded: false,
 			useNativeDriver: true,
 			onShow: data.onShow,
-			onDismiss: () => {
-				data.onDismiss();
+			onDismiss: () => { data.onDismiss() },
+			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () =>{ this.close(data.key) },
+			onHardwareBackPress: () => {
+				this.close(data.key);
+				return true;
 			},
-			onTouchOutside: data.onTouchOutside,
 			hasOverlay: data.hasOverlay,
 			animationDuration: data.animationDuration,
 			modalStyle: data.modalStyle,
@@ -92,7 +94,7 @@ const styles: any = StyleSheet.create({
 			height: 0,
 		},
 	},
-	toast_permission_text:{
+	toast_permission_text: {
 		color: theme.text2,
 		fontSize: 16,
 	},

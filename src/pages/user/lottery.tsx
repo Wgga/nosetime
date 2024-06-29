@@ -89,6 +89,10 @@ function Lottery({ navigation, route }: any): React.JSX.Element {
 			onTouchOutside: () => {
 				ModalPortal.dismiss("lottery_popover");
 			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("lottery_popover");
+				return true;
+			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },
 		})

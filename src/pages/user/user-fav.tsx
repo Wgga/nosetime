@@ -76,9 +76,6 @@ const ArticlePage = React.memo(({ uid, navigation }: any) => {
 					});
 				}
 			}],
-			onTouchOutside: () => {
-				AlertCtrl.close("del_fav_alert");
-			}
 		})
 	}
 
@@ -287,9 +284,6 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 					});
 				}
 			}],
-			onTouchOutside: () => {
-				AlertCtrl.close("del_wiki_alert");
-			}
 		})
 	}
 

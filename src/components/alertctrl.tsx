@@ -18,7 +18,7 @@ class Alert {
 		btnbg: theme.text2,
 		onShow: () => { },
 		onDismiss: () => { },
-		onTouchOutside: () => { },
+		onTouchOutside: null,
 		animationDuration: 300,
 		modalStyle: { backgroundColor: "transparent" },
 	}
@@ -66,10 +66,12 @@ class Alert {
 			rounded: false,
 			useNativeDriver: true,
 			onShow: data.onShow,
-			onDismiss: () => {
-				data.onDismiss();
+			onDismiss: () => { data.onDismiss() },
+			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () => { this.close(data.key) },
+			onHardwareBackPress: () => {
+				this.close(data.key);
+				return true;
 			},
-			onTouchOutside: data.onTouchOutside,
 			animationDuration: data.animationDuration,
 			modalStyle: data.modalStyle,
 		})

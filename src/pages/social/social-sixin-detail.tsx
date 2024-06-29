@@ -96,7 +96,6 @@ function SocialSixinDetail({ navigation, route }: any): React.JSX.Element {
 		lasttime.current = 0;
 		us.calc_sztime(items.current, lasttime.current);
 		scrollend();
-		console.log("%c Line:101 🥝", "color:#4fff4B", items.current);
 		setIsRender(val => !val);
 	}
 

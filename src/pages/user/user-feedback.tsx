@@ -79,9 +79,6 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("filedlg_action_sheet");
-			},
 		})
 	}
 

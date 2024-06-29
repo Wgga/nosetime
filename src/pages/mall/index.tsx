@@ -48,7 +48,6 @@ class Mall extends React.Component {
 			onStartShouldSetPanResponder: () => true,
 			onMoveShouldSetPanResponder: () => true,
 			onPanResponderStart: (e, gestureState) => {
-				console.log("%c Line:44 🍐", "color:#fca650", "onPanResponderStart");
 				this.setState({
 					initX: e.nativeEvent.pageX,
 					initY: e.nativeEvent.pageY,
@@ -57,7 +56,6 @@ class Mall extends React.Component {
 				});
 			},
 			onPanResponderMove: (e, gestureState) => {
-				console.log("%c Line:53 🍰", "color:#7f2b82", "onPanResponderMove");
 				if (Math.abs(gestureState.dx) / Math.abs(gestureState.dy) < 1 || Math.abs(gestureState.dy) / Math.abs(gestureState.dx) === Infinity) {
 					this.setState({ cart_back: true });
 					return;
@@ -82,7 +80,6 @@ class Mall extends React.Component {
 				}
 			},
 			onPanResponderRelease: (e, gestureState) => {
-				console.log("%c Line:82 🥐", "color:#f5ce50", "onPanResponderRelease");
 				if (this.state.cart_back) return;
 				this.setState({ add_trans: true });
 				let endX = e.nativeEvent.pageX;
@@ -103,7 +100,6 @@ class Mall extends React.Component {
 				carouselStyleArr[carouselArr[1]] = { left: "27%", transform: [{ scale: 1.25 }], opacity: 1, zIndex: 3 };
 				carouselStyleArr[carouselArr[2]] = { left: "48%", transform: [{ scale: 1 }], opacity: 0.7, zIndex: 1 };
 
-				console.log("%c Line:105 🥪 carouselStyleArr", "color:#42b983", carouselArr, carouselStyleArr);
 				this.setState({ carouselStyleArr });
 			}
 		});

@@ -382,24 +382,26 @@ class UserService {
 
 	calc_sztime(items: any, lasttime: number) {
 		lasttime = 0;
-		for (let i in items) {
-			if (items[i].time - lasttime > 60) {
-				items[i].sztime = this.formattime(items[i].time);
+		let items2 = [...items].reverse();
+		for (let i in items2) {
+			if (items2[i].time - lasttime > 60) {
+				items2[i].sztime = this.formattime(items2[i].time);
 			} else {
-				items[i].sztime = '';
+				items2[i].sztime = "";
 			}
-			lasttime = items[i].time;
+			lasttime = items2[i].time;
 		}
 	}
 
 	calc_last_sztime(items: any, lasttime: number) {
-		let i = items.length - 1;
-		if (items[i].time - lasttime > 60) {
-			items[i].sztime = this.formattime(items[i].time);
+		let items2 = [...items].reverse();
+		let i = items2.length - 1;
+		if (items2[i].time - lasttime > 60) {
+			items2[i].sztime = this.formattime(items2[i].time);
 		} else {
-			items[i].sztime = '';
+			items2[i].sztime = "";
 		}
-		lasttime = items[i].time;
+		lasttime = items2[i].time;
 	}
 
 	// setLastshowtime(lastshowtime){

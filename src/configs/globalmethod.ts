@@ -260,6 +260,13 @@ const Globalstyles: any = StyleSheet.create({
 		fontSize: 13,
 		color: theme.tit2,
 	},
+	title_icon: {
+		width: 44,
+		height: 44,
+		textAlign: "center",
+		lineHeight: 44,
+		zIndex: 1
+	},
 	// 帖子首页类型筛选遮罩
 	social_mask: {
 		...StyleSheet.absoluteFillObject,

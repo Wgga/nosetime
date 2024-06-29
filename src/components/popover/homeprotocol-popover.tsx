@@ -29,15 +29,13 @@ function HomeProtocolPopover({ method }: any): React.JSX.Element {
 			height,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => { },
-			swipeDirection: "down",
-			animationDuration: 300,
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss(params.modalkey);
+				return true;
+			},
 			type: "bottomModal",
+			animationDuration: 300,
 		})
 	}
 

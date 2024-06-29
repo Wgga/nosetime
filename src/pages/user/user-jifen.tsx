@@ -134,6 +134,10 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 			onTouchOutside: () => {
 				ModalPortal.dismiss("jifen_exchange_popover");
 			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("jifen_exchange_popover");
+				return true;
+			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
 		})
@@ -171,6 +175,10 @@ function UserJifen({ navigation }: any): React.JSX.Element {
 			useNativeDriver: true,
 			onTouchOutside: () => {
 				ModalPortal.dismiss("exchange_success_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("exchange_success_popover");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },

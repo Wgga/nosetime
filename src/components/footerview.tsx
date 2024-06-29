@@ -32,15 +32,12 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 			{ paddingBottom: insets.bottom + 10 },
 			isfocus && styles.footer_radius, style
 		]}>
-			<View style={[styles.footer_con_left, { height: inputH }]}>
+			<View style={styles.footer_con_left}>
 				<TextInput ref={inputref}
 					style={styles.footer_input}
 					onChangeText={onChangeText}
 					value={replytext}
 					multiline={true}
-					onContentSizeChange={(event: any) => {
-						setInputH(event.nativeEvent.contentSize.height);
-					}}
 					placeholder={placeholder} />
 			</View>
 			<View style={styles.footer_con_right}>
@@ -84,8 +81,6 @@ const styles = StyleSheet.create({
 	footer_con_left: {
 		flex: 1,
 		backgroundColor: theme.bg,
-		maxHeight: 70,
-		minHeight: 38,
 		borderRadius: 20,
 		paddingLeft: 12,
 		paddingRight: 5,
@@ -93,6 +88,8 @@ const styles = StyleSheet.create({
 	footer_input: {
 		flex: 1,
 		padding: 0,
+		minHeight: 38,
+		maxHeight: 70,
 	},
 	footer_con_right: {
 		marginLeft: 20,

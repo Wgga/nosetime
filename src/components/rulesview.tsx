@@ -31,8 +31,10 @@ function RulesView({ rules, tip }: any): React.JSX.Element {
 				slideFrom: "bottom",
 				useNativeDriver: true,
 			}),
-			onTouchOutside: () => {
+			onTouchOutside: () => { ModalPortal.dismiss(params.modalkey) },
+			onHardwareBackPress: () => {
 				ModalPortal.dismiss(params.modalkey);
+				return true;
 			},
 			swipeDirection: "down",
 			animationDuration: 300,
@@ -42,20 +44,18 @@ function RulesView({ rules, tip }: any): React.JSX.Element {
 	}
 
 	return (
-		<View style={{ height: 50 }}>
-			<Pressable style={styles.footer_btn} onPress={() => {
-				openRule({ rulesdata: rules, modalkey: "socialrule_popover" });
-			}}>
-				<Text style={styles.footerbtn_text}>{tip}</Text>
-				<Icon name="tixing" size={14} color={theme.placeholder} />
-			</Pressable>
-		</View>
+		<Pressable style={styles.footer_btn} onPress={() => {
+			openRule({ rulesdata: rules, modalkey: "socialrule_popover" });
+		}}>
+			<Text style={styles.footerbtn_text}>{tip}</Text>
+			<Icon name="tixing" size={14} color={theme.placeholder} />
+		</Pressable>
 	);
 }
 
 const styles = StyleSheet.create({
 	footer_btn: {
-		height: "100%",
+		height: 50,
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",

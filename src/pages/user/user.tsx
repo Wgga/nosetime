@@ -53,6 +53,7 @@ function User({ navigation }: any): React.JSX.Element {
 		all: 0,
 		days: 0,
 	}); // 用户信息
+	let ordercnt = React.useRef<any[]>([])
 	// 状态
 	let showgiftcode = React.useRef<boolean>(false); // 是否显示兑换码
 	const [isrender, setIsRender] = React.useState(false); // 是否渲染
@@ -110,6 +111,10 @@ function User({ navigation }: any): React.JSX.Element {
 			pointval.current = resp_data.val > 0 ? resp_data.val : 0;
 			setIsRender(val => !val);
 		})
+		// 获取订单数量
+		http.post(ENV.mall + "?uid=" + us.user.uid, { method: "getordercnt", token: us.user.token }).then((resp_data: any) => {
+			ordercnt.current = resp_data;
+		})
 		us.getmessagedata().then((cnt: number) => {
 			let bol = cnt > 0 ? true : false;
 			setIsShowBadge(bol);
@@ -166,9 +171,6 @@ function User({ navigation }: any): React.JSX.Element {
 					ActionSheetCtrl.close("avatar_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("avatar_action_sheet");
-			},
 		})
 	}
 
@@ -212,7 +214,10 @@ function User({ navigation }: any): React.JSX.Element {
 			onTouchOutside: () => {
 				ModalPortal.dismiss("giftcode_inputAlert");
 				giftcode.current = "";
-
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("giftcode_inputAlert");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },
@@ -245,6 +250,10 @@ function User({ navigation }: any): React.JSX.Element {
 			useNativeDriver: true,
 			onTouchOutside: () => {
 				ModalPortal.dismiss("giftcode_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("giftcode_popover");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent", justifyContent: "center" },
@@ -308,11 +317,17 @@ function User({ navigation }: any): React.JSX.Element {
 				<View>
 					<View style={styles.btns_item_con}>
 						<Pressable onPress={() => { }} style={styles.btn_item}>
-							<Waitpay width={24} height={24} style={styles.btn_item_icon} />
+							<View>
+								<Waitpay width={24} height={24} style={styles.btn_item_icon} />
+								{ordercnt.current[0] > 0 && <Text style={[Globalstyles.redbadge, styles.order_badge]}>{ordercnt.current[0]}</Text>}
+							</View>
 							<Text style={styles.btn_item_text}>{"待付款"}</Text>
 						</Pressable>
 						<Pressable onPress={() => { }} style={styles.btn_item}>
-							<Transport width={24} height={24} style={styles.btn_item_icon} />
+							<View>
+								<Transport width={24} height={24} style={styles.btn_item_icon} />
+								{ordercnt.current[1] > 0 && <Text style={[Globalstyles.redbadge, styles.order_badge]}>{ordercnt.current[1]}</Text>}
+							</View>
 							<Text style={styles.btn_item_text}>{"进行中"}</Text>
 						</Pressable>
 						<Pressable onPress={() => { }} style={styles.btn_item}>
@@ -488,6 +503,10 @@ const styles = StyleSheet.create({
 	},
 	btn_item_icon: {
 		marginBottom: 15,
+	},
+	order_badge: {
+		right: -8,
+		top: -2,
 	},
 	btn_badge: {
 		width: 12,

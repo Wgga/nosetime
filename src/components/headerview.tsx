@@ -85,13 +85,12 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 	return (
 		<>
 			<View style={[styles.title_con, style, { paddingTop: insets.top }]}>
-				<Pressable style={{ zIndex: 1 }} onPress={back}>
-					<Icon name={backicon ? backicon : "leftarrow"}
-						size={backiconsize ? backiconsize : 20}
-						color={backiconcolor ? backiconcolor : theme.text2}
-						style={[styles.title_icon, childrenstyle?.headercolor]}
-					/>
-				</Pressable>
+				<Icon name={backicon ? backicon : "leftarrow"}
+					onPress={back}
+					size={backiconsize ? backiconsize : 20}
+					color={backiconcolor ? backiconcolor : theme.text2}
+					style={[styles.title_icon, childrenstyle?.headercolor]}
+				/>
 				{isShowSearch && <View style={styles.searchbar_con}>
 					<TextInput ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
 						style={styles.searchbar}
@@ -108,12 +107,8 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 						}}
 					/>
 					<View style={styles.search_icon_con}>
-						{word && <Pressable style={{ paddingRight: 7 }} onPress={fun}>
-							<Icon name="close1" size={16} color={theme.placeholder2} style={styles.search_icon} />
-						</Pressable>}
-						<Pressable style={{ borderLeftWidth: 1, borderLeftColor: theme.border, marginRight: 5, }} onPress={() => { Search(word) }}>
-							<Icon name="search2" size={16} color={theme.text2} style={styles.search_icon} />
-						</Pressable>
+						{word && <Icon name="close1" size={16} color={theme.placeholder2} onPress={fun} />}
+						<Icon name="search2" size={16} color={theme.text2} style={styles.search_icon} onPress={() => { Search(word) }} />
 					</View>
 				</View>}
 				{title && <Animated.View style={[styles.title_text_con, childrenstyle?.headertitle]}>
@@ -161,7 +156,8 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
-		fontWeight: "bold"
+		fontWeight: "bold",
+		zIndex: 1
 	},
 	title_text_con: {
 		flex: 1,
@@ -207,9 +203,9 @@ const styles = StyleSheet.create({
 	},
 	search_icon: {
 		marginLeft: 9,
-	},
-	mr50: {
-		marginRight: 50,
+		borderLeftWidth: 1,
+		borderLeftColor: theme.border,
+		paddingLeft: 9
 	},
 	menu_con: {
 		position: "absolute",

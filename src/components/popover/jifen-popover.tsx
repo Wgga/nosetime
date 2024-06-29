@@ -30,13 +30,11 @@ function ExchangePopover({ params }: any): React.JSX.Element {
 			height,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => { },
-			swipeDirection: "down",
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss(params.modalkey);
+				return true;
+			},
 			animationDuration: 300,
 			type: "bottomModal",
 		})

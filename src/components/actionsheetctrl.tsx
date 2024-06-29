@@ -15,7 +15,7 @@ class ActionSheet {
 		btnbg: theme.text2,
 		onShow: () => { },
 		onDismiss: () => { },
-		onTouchOutside: () => { },
+		onTouchOutside: null,
 		animationDuration: 300,
 		modalStyle: { backgroundColor: "transparent" },
 	}
@@ -51,27 +51,21 @@ class ActionSheet {
 			width: width,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
-			swipeDirection: "down",
 			type: "bottomModal",
 			onShow: data.onShow,
-			onDismiss: () => {
-				data.onDismiss();
+			onDismiss: () => { data.onDismiss() },
+			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () => { this.close(data.key) },
+			onHardwareBackPress: () => {
+				this.close(data.key);
+				return true;
 			},
-			onTouchOutside: data.onTouchOutside,
 			animationDuration: data.animationDuration,
 			modalStyle: data.modalStyle,
 		})
 	}
 
 	close(key: string) {
-		if (key) {
-			ModalPortal.dismiss(key);
-		}
+		if (key) ModalPortal.dismiss(key);
 	}
 }
 

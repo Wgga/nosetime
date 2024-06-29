@@ -55,11 +55,13 @@ const AddressPicker = ({ params }: any) => {
 	)
 }
 
-function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
+const MallAddressEdit = React.memo(({ navigation, route }: any) => {
 	// 控件
 	// 参数
 	// 变量
-	let add = React.useRef<any>({});
+	let add = React.useRef<any>({
+		maid: 0, maname: "", mamobile: "", maidcard: "", maaddress: "", madefault: 0, maprov: "", macity: "", maregion: "", mastreet: ""
+	});
 	let id = React.useRef<number>(0);
 	let cnt = React.useRef<number>(0);
 	let lists = React.useRef<any>({
@@ -74,11 +76,11 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		init()
 		if (route.params) {
 			id.current = route.params.id ? route.params.id : 0;
 			cnt.current = route.params.cnt ? route.params.cnt : 0;
 		}
+		init()
 	}, [])
 
 	const init = () => {
@@ -286,15 +288,13 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 			width,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => {
 				ModalPortal.dismiss("address_picker_popover");
 			},
-			swipeDirection: "down",
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("address_picker_popover");
+				return true;
+			},
 			animationDuration: 300,
 			type: "bottomModal",
 		})
@@ -379,10 +379,10 @@ function MallAddressEdit({ navigation, route }: any): React.JSX.Element {
 					</GestureHandlerRootView>
 				</View>
 			</ScrollView>
-			<LinearButton containerStyle={styles.footer_con} text="保存" onPress={() => { }} />
+			<LinearButton containerStyle={styles.footer_con} text="保存" onPress={save} />
 		</View>
 	);
-}
+})
 const styles = StyleSheet.create({
 	address_list_con: {
 		paddingTop: 8,

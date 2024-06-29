@@ -112,9 +112,6 @@ const SocialTixing = React.memo(({ navigation, setTixing }: any) => {
 						_care(type, item.uida, index);
 					}
 				}],
-				onTouchOutside: () => {
-					AlertCtrl.close("del_img_alert");
-				}
 			})
 
 		} else {

@@ -291,13 +291,12 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 			height,
 			rounded: false,
 			useNativeDriver: true,
-			onShow: () => { },
-			onDismiss: () => { },
 			onTouchOutside: () => {
 				ModalPortal.dismiss("social_photo_popover");
 			},
 			onHardwareBackPress: () => {
 				ModalPortal.dismiss("social_photo_popover");
+				return true;
 			},
 			animationDuration: 300,
 			modalStyle: { backgroundColor: "transparent" },

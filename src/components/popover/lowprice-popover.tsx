@@ -140,9 +140,7 @@ function lowPricePopover({ modalparams, navigation }: any): React.JSX.Element {
 						</View>
 					</>}
 				</View>}
-				<Pressable style={styles.close_btn} onPress={closepopover}>
-					<Icon name="close" size={25} color={theme.toolbarbg} />
-				</Pressable>
+				<Icon name="close" size={25} color={theme.toolbarbg} style={styles.close_btn} onPress={closepopover} />
 			</View >}
 		</>
 	);
@@ -224,8 +222,8 @@ const styles = StyleSheet.create({
 		backgroundColor: "rgba(0,0,0,0.5)",
 		marginTop: 34,
 		borderRadius: 50,
-		alignItems: "center",
-		justifyContent: "center",
+		textAlign: "center",
+		lineHeight: 43,
 	},
 	points_title_con: {
 		marginVertical: 5,

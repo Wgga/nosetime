@@ -1,4 +1,4 @@
-[简体中文](https://github.com/Wgga/React-Native-Example/blob/main/READNE_CN.md) | English
+[简体中文](https://github.com/Wgga/nosetime/blob/main/READNE_CN.md) | English
 
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 

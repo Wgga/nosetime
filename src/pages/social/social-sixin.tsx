@@ -134,9 +134,6 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 					ActionSheetCtrl.close("menudlg_action_sheet");
 				}
 			}],
-			onTouchOutside: () => {
-				ActionSheetCtrl.close("menudlg_action_sheet");
-			},
 		})
 	}
 

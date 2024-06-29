@@ -18,8 +18,9 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import { useFocusEffect } from "@react-navigation/native";
 
-function MallAddress({ navigation }: any): React.JSX.Element {
+const MallAddress = React.memo(({ navigation }: any) => {
 	// 控件
 	// 变量
 	// 数据
@@ -29,9 +30,11 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 	const [edit, setEdit] = React.useState<boolean>(false); // 是否编辑
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
-	React.useEffect(() => {
-		init()
-	}, [])
+	useFocusEffect(
+		React.useCallback(() => {
+			init()
+		}, [])
+	)
 
 	const init = () => {
 		if (!us.user.uid) {
@@ -98,7 +101,7 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 		});
 	}
 
-	const gotodetail = (id: any) => {
+	const gotodetail = (id: number) => {
 		navigation.navigate("Page", { screen: "MallAddressEdit", params: { id, cnt: address_list.current.length } });
 	}
 
@@ -138,7 +141,9 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 								<Text style={[styles.item_text, { marginRight: 25 }]}>{item.maname}</Text>
 								<Text style={styles.item_text}>{item.mamobile}</Text>
 							</View>
-							<Icon name="edit1" size={20} color={theme.placeholder} style={styles.edit_icon} />
+							<Pressable onPress={() => { gotodetail(item.maid) }} style={styles.edit_icon}>
+								<Icon name="edit1" size={20} color={theme.placeholder} />
+							</Pressable>
 							{edit && <View style={styles.edit_con}>
 								<Pressable style={styles.default_btn} onPress={() => { defaultaddress(item) }}>
 									{item.madefault == 0 && < Icon name="radio-button-off" size={18} color={theme.text1} />}
@@ -153,10 +158,10 @@ function MallAddress({ navigation }: any): React.JSX.Element {
 					)
 				})}
 			</ScrollView>}
-			<LinearButton containerStyle={styles.footer_con} text="+ 添加新地址" onPress={() => { gotodetail(null) }} />
+			<LinearButton containerStyle={styles.footer_con} text="+ 添加新地址" onPress={() => { gotodetail(0) }} />
 		</View>
 	);
-}
+})
 const styles = StyleSheet.create({
 	address_container: {
 		flex: 1,
