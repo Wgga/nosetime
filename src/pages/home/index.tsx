@@ -353,7 +353,6 @@ const styles = StyleSheet.create({
 		paddingLeft: 16,
 		marginTop: 6,
 		marginBottom: 6,
-		fontSize: 13,
 		borderRadius: 30,
 		alignItems: "center",
 		flexDirection: "row",

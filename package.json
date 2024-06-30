@@ -18,6 +18,7 @@
 		"@shopify/flash-list": "^1.6.4",
 		"axios": "^1.7.2",
 		"deprecated-react-native-prop-types": "^5.0.0",
+		"native-wechat": "^1.0.15",
 		"react": "18.2.0",
 		"react-native": "0.74.1",
 		"react-native-awesome-gallery": "^0.4.0",
