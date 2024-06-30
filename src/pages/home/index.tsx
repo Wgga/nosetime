@@ -17,6 +17,8 @@ import Header from "./header";
 import ArticleList from "../article/article-list";
 
 import us from "../../services/user-service/user-service";
+import articleService from "../../services/article-service/article-service";
+import permissionService from "../../services/permission-service/permission-service";
 
 import http from "../../utils/api/http";
 
@@ -27,7 +29,6 @@ import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
 
 import Icon from "../../assets/iconfont";
-import articleService from "../../services/article-service/article-service";
 
 const { width, height } = Dimensions.get("window");
 
@@ -236,17 +237,23 @@ const Home = React.memo(({ navigation }: any) => {
 		})
 	}
 
+	const scan = async () => {
+		if (!(await permissionService.checkPermission("scan"))) return;
+		navigation.navigate("Page", { screen: "Scanner", params: { src: "home" } });
+	}
+
 	return (
 		<>
 			<View onLayout={onLayout} style={[styles.search_con, { paddingTop: insets.top ? insets.top : 24 }]}>
 				<Animated.View style={[{ opacity }, styles.searchbg]}></Animated.View>
 				<Pressable onPress={() => {
 					// 跳转到搜索页面
-					navigation.navigate("Page", { screen: "Search", params: { from: "home" } });
+					navigation.navigate("Page", { screen: "Search", params: { src: "home" } });
 				}}>
 					<Animated.View style={[{ backgroundColor: color }, styles.Searchbar]}>
+						<Icon name="scan" size={20} color="#adadad" style={{ marginRight: 13 }} onPress={scan} />
 						<Text style={styles.placeholder}>搜索香水、品牌、气味、帖子</Text>
-						<Icon name="search" size={23} color="#adadad" style={{ marginRight: 13 }} />
+						<Icon name="search" size={23} color={theme.placeholder2} style={{ marginRight: 13 }} />
 					</Animated.View>
 				</Pressable>
 			</View>

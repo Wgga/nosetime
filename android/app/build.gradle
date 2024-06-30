@@ -69,6 +69,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+def enableCodeScanner = safeExtGet("VisionCamera_enableCodeScanner", false)
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -123,10 +129,20 @@ dependencies {
     // 设置支持WebP格式，包括WebP动图
     implementation 'com.facebook.fresco:animated-webp:3.1.3'
     implementation 'com.facebook.fresco:webpsupport:3.1.3'
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+
+    if (enableCodeScanner) {
+        // User enabled code-scanner, so we bundle the 2.4 MB model in the app.
+        implementation 'com.google.mlkit:barcode-scanning:17.2.0'
+    } else {
+        // Fall-back to just including the code for the CodeScanner to avoid the 2.4 MB bundle in the app.
+        // On devices with Google Play Services, this can also download the CodeScanner model on-demand.
+        implementation "com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0"
     }
 }
 

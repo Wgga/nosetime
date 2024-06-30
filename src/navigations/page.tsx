@@ -1,11 +1,11 @@
 import React from "react";
-import { View } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import ArticleDetail from "../pages/article/article-detail";
 
 import Search from "../pages/search/search";
 import SearchResult from "../pages/search/search-result";
+import Scanner from "../pages/scanner";
 
 import ItemDetail from "../pages/item/item-detail";
 import ItemVote from "../pages/item/item-vote";
@@ -58,6 +58,7 @@ function Page(): React.JSX.Element {
 
 			<Stack.Screen name="Search" component={Search} />
 			<Stack.Screen name="SearchResult" component={SearchResult} />
+			<Stack.Screen name="Scanner" component={Scanner} />
 
 			<Stack.Screen name="ItemDetail" component={ItemDetail} />
 			<Stack.Screen name="ItemVote" component={ItemVote} />

@@ -31,13 +31,13 @@ function Search({ navigation, route }: any): React.JSX.Element {
 	// 变量
 	const [placeholder, setPlaceholder] = React.useState<string>(""); // 搜索框placeholder
 	const [word, setWord] = React.useState<string>(""); // 搜索框内容
-	let from = React.useRef<string>(""); // 来源
+	let src = React.useRef<string>(""); // 来源
 	let cid = React.useRef<string>(""); // 分类id
 
 	React.useEffect(() => {
-		from.current = route.params?.from;
+		src.current = route.params?.src;
 		cid.current = route.params?.cid;
-		switch (from.current) {
+		switch (src.current) {
 			case "home":
 				setPlaceholder("搜索香水、品牌、气味、帖子");
 				break;
@@ -83,7 +83,7 @@ function Search({ navigation, route }: any): React.JSX.Element {
 
 	const Search = (word: string) => {
 		if (word == "") return;
-		events.publish(classname + "gotoPage", from);
+		events.publish(classname + "gotoPage", src);
 		let obj = {
 			screen: "SearchResult",
 			params: {
@@ -92,7 +92,7 @@ function Search({ navigation, route }: any): React.JSX.Element {
 				holder: placeholder
 			}
 		}
-		switch (from.current) {
+		switch (src.current) {
 			case "mall":
 				obj.screen = "MallSearchResult";
 				break;
