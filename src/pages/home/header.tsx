@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-native";
+import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions, Linking } from "react-native";
 
 import FastImage from "react-native-fast-image";
 

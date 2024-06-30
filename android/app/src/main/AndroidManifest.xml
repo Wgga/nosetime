@@ -24,6 +24,9 @@
 	<!-- 适配Android11添加微信包名 -->
     <queries>
         <package android:name="com.tencent.mm" />
+        <package android:name="com.taobao.taobao" />
+        <package android:name="com.tencent.mobileqq" />
+        <package android:name="com.sina.weibo" />
     </queries>
     <application
       android:name=".MainApplication"
