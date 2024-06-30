@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Pressable, Dimensions, useWindowDimensions, Ima
 
 import { useFocusEffect } from "@react-navigation/native";
 import { FlashList } from "@shopify/flash-list";
+import { AvoidSoftInputView } from "react-native-avoid-softinput";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ListBottomTip from "../../components/listbottomtip";
 import RnImage from "../../components/RnImage";
@@ -36,6 +38,7 @@ const { width, height } = Dimensions.get("window");
 const MallKefu = React.memo(({ navigation, route }: any) => {
 
 	// 控件
+	const insets = useSafeAreaInsets();
 	const classname: string = "MallKefuPage";
 	const windowD = useWindowDimensions();
 	let listref = React.useRef<any>(null);
@@ -572,25 +575,27 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 				}}
 				ListHeaderComponent={<ListBottomTip noMore={null} isShowTip={items.current.length > 0} />}
 			/>
-			<View style={styles.footer_con}>
-				<Pressable style={styles.footer_icon}>
-					<Photo width={27} height={27} />
-				</Pressable>
-				<View style={styles.footer_input_con}>
-					<TextInput ref={inputref}
-						style={styles.footer_input}
-						onChangeText={(val: string) => {
-							send_content.current = val;
-							setIsRender(val => !val);
-						}}
-						value={send_content.current}
-						multiline={true}
-					/>
+			<AvoidSoftInputView avoidOffset={10} showAnimationDuration={0} hideAnimationDuration={0} showAnimationDelay={0} hideAnimationDelay={0}>
+				<View style={[styles.footer_con, { paddingBottom: insets.bottom + 10 }]}>
+					<Pressable style={styles.footer_icon}>
+						<Photo width={27} height={27} />
+					</Pressable>
+					<View style={styles.footer_input_con}>
+						<TextInput ref={inputref}
+							style={styles.footer_input}
+							onChangeText={(val: string) => {
+								send_content.current = val;
+								setIsRender(val => !val);
+							}}
+							value={send_content.current}
+							multiline={true}
+						/>
+					</View>
+					<Pressable style={styles.footer_icon} onPress={() => { publish("send", 1) }}>
+						<Text style={styles.send_text}>{"发送"}</Text>
+					</Pressable>
 				</View>
-				<Pressable style={styles.footer_icon} onPress={() => { publish("send", 1) }}>
-					<Text style={styles.send_text}>{"发送"}</Text>
-				</Pressable>
-			</View>
+			</AvoidSoftInputView>
 		</View>
 	);
 })

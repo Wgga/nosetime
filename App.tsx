@@ -11,6 +11,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import SplashScreen from "react-native-splash-screen";
 import Orientation from "react-native-orientation-locker";
+import AndroidSystemBars from "react-native-system-bars";
 import { ModalPortal } from "./src/components/modals";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -42,6 +43,11 @@ function App(): React.JSX.Element {
 	}, [])
 
 	const initializeApp = () => {
+		AndroidSystemBars.setSystemUIVisibility(
+			"SYSTEM_UI_FLAG_LAYOUT_STABLE",
+			"SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",
+			"SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION",
+		);
 		setTimeout(() => { checkUpdate() }, 500);
 	}
 

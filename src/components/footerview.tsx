@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Keyboard, Animated, Pressable } from
 
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AvoidSoftInput, AvoidSoftInputView } from "react-native-avoid-softinput";
 
 import theme from "../configs/theme";
 
@@ -16,7 +17,6 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	const { onChangeText, publish } = method;
 
 	// 数据
-	const [inputH, setInputH] = React.useState(0); // 输入框高度
 	const [isfocus, setIsFocus] = React.useState(false); // 是否聚焦输入框
 
 	React.useEffect(() => {
@@ -25,46 +25,35 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	}, [])
 
 	return (
-		<Animated.View style={[
-			styles.footer_con,
-			zIndex && { zIndex },
-			opacity && { opacity },
-			{ paddingBottom: insets.bottom + 10 },
-			isfocus && styles.footer_radius, style
-		]}>
-			<View style={styles.footer_con_left}>
-				<TextInput ref={inputref}
-					style={styles.footer_input}
-					onChangeText={onChangeText}
-					value={replytext}
-					multiline={true}
-					placeholder={placeholder} />
-			</View>
-			<View style={styles.footer_con_right}>
-				{children}
-				{isfocus && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
-					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-				>
-					<Text style={styles.publish_text}>{"发布"}</Text>
-				</LinearGradient></Pressable>}
-			</View>
+		<Animated.View style={[styles.footer_container, zIndex && { zIndex }, opacity && { opacity }, style]}>
+			<AvoidSoftInputView avoidOffset={10} showAnimationDuration={0} hideAnimationDuration={0} showAnimationDelay={0} hideAnimationDelay={0}>
+				<View style={[styles.footer_con, { paddingBottom: insets.bottom + 10 }, isfocus && styles.footer_radius]}>
+					<View style={styles.footer_con_left}>
+						<TextInput ref={inputref}
+							style={styles.footer_input}
+							onChangeText={onChangeText}
+							value={replytext}
+							multiline={true}
+							placeholder={placeholder} />
+					</View>
+					<View style={styles.footer_con_right}>
+						{children}
+						{isfocus && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
+							colors={["#81B4EC", "#9BA6F5"]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 0 }}
+							locations={[0, 1]}
+						>
+							<Text style={styles.publish_text}>{"发布"}</Text>
+						</LinearGradient></Pressable>}
+					</View>
+				</View>
+			</AvoidSoftInputView>
 		</Animated.View>
 	);
 }
 const styles = StyleSheet.create({
-	footer_con: {
-		paddingTop: 15,
-		paddingHorizontal: 24,
-		backgroundColor: theme.toolbarbg,
-		borderTopWidth: 1,
-		borderTopColor: theme.bg,
-		maxHeight: 96,
-		minHeight: 58,
-		flexDirection: "row",
-		alignItems: "center",
+	footer_container: {
 		position: "absolute",
 		left: 0,
 		right: 0,
@@ -77,6 +66,15 @@ const styles = StyleSheet.create({
 		borderTopWidth: 0,
 		overflow: "hidden",
 		alignItems: "flex-end",
+	},
+	footer_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: theme.toolbarbg,
+		borderTopWidth: 1,
+		borderTopColor: theme.bg,
+		paddingTop: 15,
+		paddingHorizontal: 24,
 	},
 	footer_con_left: {
 		flex: 1,
