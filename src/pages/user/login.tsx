@@ -17,6 +17,7 @@ import AlertCtrl from "../../components/alertctrl";
 import ToastCtrl from "../../components/toastctrl";
 
 import us from "../../services/user-service/user-service";
+import wechatService from "../../services/wechat-service/wechat-service";
 
 import http from "../../utils/api/http";
 
@@ -30,7 +31,32 @@ import Icon from "../../assets/iconfont";
 
 const { height, width } = Dimensions.get("window");
 
-const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
+const LoginScreen = React.memo(({ data, method }: any) => {
+
+	// 参数
+	const { user } = data;
+	const { setstep, setuser, signIn, goback, login } = method;
+
+	const [hasweixin, sethasweixin] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		wechatService.isInstalled((result) => {
+			sethasweixin(result);
+		}, () => {
+			sethasweixin(false);
+		});
+	}, [])
+
+	const wxlogin = () => {
+		let scope = "snsapi_userinfo", state = "_" + (+new Date());
+		wechatService.auth(scope, state, (response: any) => {
+			ToastCtrl.show({ message: "正在验证，请稍等...", duration: 0, viewstyle: "short_toast", key: "loading_toast" });
+			login({ method: "loginweixinmobile", code: response.code });
+		}, (reason: any) => {
+			ToastCtrl.show({ message: "登录失败: " + reason, duration: 1000, viewstyle: "short_toast", key: "wxlogin_error_toast" });
+		})
+	}
+
 	return (
 		<>
 			<View style={styles.inputview}>
@@ -55,7 +81,7 @@ const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 				/>
 				<Icon name="query" style={styles.inputrighticon} onPress={() => { setstep("1") }} />
 			</View>
-			<Pressable style={styles.landingbtn} onPress={login}>
+			<Pressable style={styles.landingbtn} onPress={signIn}>
 				<Text style={styles.landingtext}>登录</Text>
 			</Pressable>
 			<Pressable onPress={() => setstep("register")}>
@@ -63,14 +89,14 @@ const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 			</Pressable>
 			<View style={styles.otherlogin}>
 				<View style={styles.otherloginView}>
-					<View style={styles.otherloginicon}>
+					{hasweixin && <Pressable style={styles.otherloginicon} onPress={wxlogin}>
 						<Icon name="weixin" size={30} style={styles.anticon} />
 						<Text style={styles.otherloginname}>微信登陆</Text>
-					</View>
-					<View style={styles.otherloginicon}>
+					</Pressable>}
+					<Pressable style={styles.otherloginicon}>
 						<Icon name="weibo" size={30} style={styles.anticon} />
 						<Text style={styles.otherloginname}>微博登陆</Text>
-					</View>
+					</Pressable>
 				</View>
 				<Pressable onPress={goback}>
 					<Text style={styles.suibian}>{"> 随便逛逛"}</Text>
@@ -78,10 +104,13 @@ const LoginScreen = ({ user, setstep, setuser, login, goback }: any) => {
 			</View>
 		</>
 	)
-}
+})
 
-const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, login }: any) => {
+const RegisterScreen = React.memo(({ data, method }: any) => {
 
+	// 参数
+	const { navigation, user } = data;
+	const { setuser, setstep, setwaitbtnsz, signIn } = method;
 	// 状态
 	const [agree, setagree] = React.useState(false);
 
@@ -132,7 +161,7 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 		http.post(ENV.user, { method: "registerv2", mobile: mobile, pwd: pwd, name: name, gender: user.gender, from: "app" }).then((resp_data: any) => {
 			if (resp_data.msg == "OK") {
 				ToastCtrl.show({ message: "恭喜！您已注册成功", duration: 2000, viewstyle: "medium_toast", key: "register_toast" });
-				login(mobile, user.pwd);
+				signIn(mobile, user.pwd);
 			} else if (resp_data.msg == "verify") {
 				setstep("verify");
 				setwaitbtnsz("获取验证码");
@@ -229,9 +258,13 @@ const RegisterScreen = ({ navigation, user, setuser, setstep, setwaitbtnsz, logi
 			</Pressable>
 		</>
 	)
-}
+})
 
-const ResetScreen = ({ user, setuser, result, resetpwd, waitbtnsz }: any) => {
+const ResetScreen = React.memo(({ data, method }: any) => {
+
+	// 参数
+	const { user, result, waitbtnsz } = data;
+	const { setuser, reset_verify } = method;
 
 	return (
 		<>
@@ -257,13 +290,13 @@ const ResetScreen = ({ user, setuser, result, resetpwd, waitbtnsz }: any) => {
 							placeholderTextColor="#fff"
 						/>
 						<Pressable onPress={() => {
-							resetpwd("1", "resetpwd");
+							reset_verify("1", "resetpwd");
 						}}>
 							<Text style={styles.codetext}>{waitbtnsz}</Text>
 						</Pressable>
 					</View>
 					<Pressable style={styles.landingbtn} onPress={() => {
-						resetpwd("2", "resetpwd");
+						reset_verify("2", "resetpwd");
 					}}>
 						<Text style={styles.landingtext}>下一步</Text>
 					</Pressable>
@@ -294,7 +327,7 @@ const ResetScreen = ({ user, setuser, result, resetpwd, waitbtnsz }: any) => {
 						/>
 					</View>
 					<Pressable style={styles.landingbtn} onPress={() => {
-						resetpwd("3", "resetpwd");
+						reset_verify("3", "resetpwd");
 					}}>
 						<Text style={styles.landingtext}>下一步</Text>
 					</Pressable>
@@ -308,9 +341,13 @@ const ResetScreen = ({ user, setuser, result, resetpwd, waitbtnsz }: any) => {
 			}
 		</>
 	)
-}
+})
 
-const VerifyScreen = ({ user, setuser, verify, waitbtnsz }: any) => {
+const VerifyScreen = React.memo(({ data, method }: any) => {
+
+	// 参数
+	const { user, waitbtnsz } = data;
+	const { setuser, reset_verify } = method;
 
 	return (
 		<>
@@ -325,11 +362,11 @@ const VerifyScreen = ({ user, setuser, verify, waitbtnsz }: any) => {
 							placeholder="验证码"
 							placeholderTextColor="#fff"
 						/>
-						<Pressable onPress={() => { verify("1", "verify"); }}>
+						<Pressable onPress={() => { reset_verify("1", "verify"); }}>
 							<Text style={styles.codetext}>{waitbtnsz}</Text>
 						</Pressable>
 					</View>
-					<Pressable style={styles.landingbtn} onPress={() => { verify("2", "verify"); }}>
+					<Pressable style={styles.landingbtn} onPress={() => { reset_verify("2", "verify"); }}>
 						<Text style={styles.landingtext}>确定</Text>
 					</Pressable>
 				</>
@@ -341,9 +378,9 @@ const VerifyScreen = ({ user, setuser, verify, waitbtnsz }: any) => {
 			}
 		</>
 	)
-}
+})
 
-function Login({ route, navigation }: any): React.JSX.Element {
+const Login = React.memo(({ route, navigation }: any) => {
 
 	// 控件
 	const insets = useSafeAreaInsets();
@@ -583,23 +620,50 @@ function Login({ route, navigation }: any): React.JSX.Element {
 		events.publish("nosetime_userlogin");
 	}
 
-	//登录验证
-	const post = (mobile: string, pwd: string, token: string) => {
-		// console.log("method=login&mobile="+mobile+"&pwd="+pwd+"&token="+token);
-		http.post(ENV.user, { method: "login", mobile: mobile, pwd: pwd, token: token }).then((resp_data: any) => {
-			console.log("login resp_data= ", resp_data);
+	const login = (params: any) => {
+		http.post(ENV.user, params).then((resp_data: any) => {
+			if (params.method == "loginweixinmobile") ToastCtrl.close("loading_toast");
 			if (resp_data.msg == "OK") {
 				//登录后处理，需要同步修改RegisterCtrl相关代码
 				ToastCtrl.show({ message: "您已成功登录", duration: 1000, viewstyle: "medium_toast", key: "login_toast" });
 
 				us.saveUser(resp_data);
-				us.setMobile(mobile);
+				if (params.method == "login") us.setMobile(params.mobile);
 				us.setGender(resp_data.ugender);
+
+				//旧版代码先不删，留着以后清理网站数据
+				//try{
+				//if(this.us.user.ufav)
+				//	this.us.user.ufav=JSON.parse(this.us.user.ufav);
+				//if(this.us.user.uvoteiid)
+				//	this.us.user.uvoteiid=JSON.parse(this.us.user.uvoteiid);
+				//if(this.us.user.uvoteudid)
+				//	this.us.user.uvoteudid=JSON.parse(this.us.user.uvoteudid);
+				//if(this.us.user.udiscussiid)
+				//	this.us.user.udiscussiid=JSON.parse(this.us.user.udiscussiid);
+				//if(this.us.user.uid){
+				//	this.uid=this.us.user.uid;
+				//	this.avatar="https://avatar.xssdcdn.com/avatar/"+this.us.user.uid+".jpg?"+this.us.user.uface;
+				//}
+				//	this.us.saveUser(this.us.user);
+				//}catch(err){}
+
+				///try{
+				//if(this.us.user.uid && !this.us.user.ufav)
+				//	this.us.user.ufav={};
+				//if(this.us.user.uid && !this.us.user.uvoteiid)
+				//	this.us.user.uvoteiid={};
+				//if(this.us.user.uid && !this.us.user.uvoteudid)
+				//	this.us.user.uvoteudid={};
+				//if(this.us.user.uid && !this.us.user.udiscussiid)
+				//	this.us.user.udiscussiid={};
+				//window.localStorage.setItem('user',JSON.stringify(this.us.user));
+				//this.us.saveUser(this.us.user);
+				//}catch(err){}
 
 				if (us.user.ugender != "f" && us.user.ugender != "m") {
 					changegender();
 				}
-				//console.log("login =>request");
 				//2020-3-11yak这个http请求会让页面跳转延迟
 				http.post(ENV.points + "?uid=" + us.user.uid, { method: "increasetip", token: us.user.token }).then((resp_data: any) => {
 					console.log("increasetip resp_data=", resp_data);
@@ -609,31 +673,17 @@ function Login({ route, navigation }: any): React.JSX.Element {
 					goBackAfterLogin();
 				});
 			} else {
-				AlertCtrl.show({
-					header: "登录失败!",
-					key: "login_err_alert",
-					message: resp_data.msg,
-					buttons: [{
-						text: "确定",
-						handler: () => {
-							AlertCtrl.close("login_err_alert")
-						}
-					}]
-				});
+				AlertCtrl.show({ header: "登录失败!", key: "login_err_alert", message: resp_data.msg, buttons: [{ text: "确定", handler: () => { AlertCtrl.close("login_err_alert") } }] });
 			}
 		}).catch((error: any) => {
-			AlertCtrl.show({
-				header: error,
-				message: "",
-				key: "post_err_alert",
-				buttons: [{
-					text: "确定",
-					handler: () => {
-						AlertCtrl.close("post_err_alert")
-					}
-				}]
-			});
+			AlertCtrl.show({ header: error, message: "", key: "post_err_alert", buttons: [{ text: "确定", handler: () => { AlertCtrl.close("post_err_alert") } }] });
 		});
+	}
+
+	//登录验证
+	const post = (mobile: string, pwd: string, token: string) => {
+		// console.log("method=login&mobile="+mobile+"&pwd="+pwd+"&token="+token);
+		login({ method: "login", mobile: mobile, pwd: pwd, token: token });
 	}
 
 	// 预登录
@@ -744,48 +794,49 @@ function Login({ route, navigation }: any): React.JSX.Element {
 					{user.step === "verify" && <Text style={styles.resetText}>安全验证</Text>}
 					{user.step === "5" && <Text style={styles.resetText}>恭喜您，验证成功！</Text>}
 					{user.step === "login" &&
-						<LoginScreen
-							user={user}
-							step={step}
-							setstep={(val: string) => {
-								step.current = val;
-								setuser({ ...user, step: val });
+						<LoginScreen data={{ user, step }}
+							method={{
+								setstep: (val: string) => {
+									step.current = val;
+									setuser({ ...user, step: val });
+								},
+								setuser,
+								signIn,
+								goback,
+								login,
 							}}
-							setuser={setuser}
-							login={signIn}
-							goback={goback}
 						/>
 					}
 					{user.step === "register" &&
-						<RegisterScreen
-							user={user}
-							setuser={setuser}
-							login={signIn}
-							navigation={navigation}
+						<RegisterScreen data={{ user, navigation }}
+							method={{
+								setuser,
+								signIn,
+								setwaitbtnsz
+							}}
 						/>
 					}
 					{(user.step === "1" || user.step === "2" || user.step === "3" || user.step === "4") &&
-						<ResetScreen
-							user={user}
-							setuser={setuser}
-							result={result}
-							resetpwd={reset_verify}
-							waitbtnsz={waitbtnsz}
+						<ResetScreen data={{ user, result, waitbtnsz }}
+							method={{
+								setuser,
+								reset_verify,
+							}}
 						/>
 					}
 					{(user.step === "verify" || user.step === "5") &&
-						<VerifyScreen
-							user={user}
-							setuser={setuser}
-							verify={reset_verify}
-							waitbtnsz={waitbtnsz}
+						<VerifyScreen data={{ user, waitbtnsz }}
+							method={{
+								setuser,
+								reset_verify,
+							}}
 						/>
 					}
 				</View>
 			</ImageBackground>
 		</>
 	)
-}
+})
 
 const styles = StyleSheet.create({
 	leftback: {

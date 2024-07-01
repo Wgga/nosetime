@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, TextInput, I
 import Stars from "react-native-stars";
 import Slider from "@react-native-community/slider";
 import { Brightness } from "react-native-color-matrix-image-filters";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ActionSheetCtrl from "../../components/actionsheetctrl";
 import AlertCtrl from "../../components/alertctrl";
@@ -36,6 +37,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 
 	// 控件
 	const classname = "ItemVotePage";
+	const insets = useSafeAreaInsets();
 	// 参数
 	const { type, optionaltype, id, name, enname, src } = route.params;
 	const scorestrarr: any = { "1": "太差了", "2": "不太好", "3": "一般般", "4": "还不错", "5": "棒极了" };
@@ -111,7 +113,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 			maxWidth: 1024,
 			maxHeight: 1024,
 		}
-		upService.buttonClicked(params);
+		upService.buttonClicked(params, { marginTop: insets.top });
 	}
 
 	// 请求上传图片接口

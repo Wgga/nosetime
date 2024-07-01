@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, TextInput } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
-import WebView from "react-native-webview";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
 import LinearButton from "../../components/linearbutton";
@@ -26,6 +26,7 @@ const { width, height } = Dimensions.get("window");
 
 function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 	// 控件
+	const insets = useSafeAreaInsets();
 	// 变量
 	let imgface = React.useRef<string>("https://img.xssdcdn.com/static/mall/idcard/imgface.jpg");
 	let imgbage = React.useRef<string>("https://img.xssdcdn.com/static/mall/idcard/imgbage.jpg");
@@ -256,7 +257,7 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 			maxWidth: 1024,
 			maxHeight: 1024,
 		}
-		upService.buttonClicked(params);
+		upService.buttonClicked(params, { marginTop: insets.top });
 	}
 
 	const uploadpic_by_dataurl = (dataurl: string) => {

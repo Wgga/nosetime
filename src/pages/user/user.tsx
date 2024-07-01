@@ -154,7 +154,7 @@ function User({ navigation }: any): React.JSX.Element {
 				style: { color: theme.redchecked },
 				handler: () => {
 					ActionSheetCtrl.close("avatar_action_sheet");
-					setTimeout(() => { upService.buttonClicked(params) }, 300);
+					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
 				}
 			}, {
 				text: "从相册选择",
@@ -162,7 +162,7 @@ function User({ navigation }: any): React.JSX.Element {
 				handler: () => {
 					ActionSheetCtrl.close("avatar_action_sheet");
 					params["index"] = 1;
-					setTimeout(() => { upService.buttonClicked(params) }, 300);
+					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
 				}
 			}, {
 				text: "取消",

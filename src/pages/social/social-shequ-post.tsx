@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Image, Activi
 import LinearGradient from "react-native-linear-gradient";
 import { ShadowedView } from "react-native-fast-shadow";
 import { Brightness } from "react-native-color-matrix-image-filters";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ActionSheetCtrl from "../../components/actionsheetctrl";
 import HeaderView from "../../components/headerview";
@@ -28,6 +29,7 @@ import Icon from "../../assets/iconfont";
 function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 
 	// 控件
+	const insets = useSafeAreaInsets();
 	const classname = "SocialShequPostPage";
 	// 参数
 	const forum_name = ["", "香水闲谈", "荐香求助", "有关气味", "小众沙龙"];
@@ -202,7 +204,7 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 			maxWidth: 1024,
 			maxHeight: 1024,
 		}
-		upService.buttonClicked(params);
+		upService.buttonClicked(params, { marginTop: insets.top });
 	}
 
 	// 请求上传图片接口

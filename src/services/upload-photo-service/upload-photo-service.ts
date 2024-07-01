@@ -23,9 +23,9 @@ class UploadPhotoService {
 		src: ""
 	}
 
-	async buttonClicked(params: any) {
+	async buttonClicked(params: any, style?: any) {
 		let type = params.index == 0 ? "camera" : "write";
-		if (!(await permissionService.checkPermission(type))) return;
+		if (!(await permissionService.checkPermission(type, style))) return;
 		this.params = params;
 		let options = {
 			includeBase64: true,

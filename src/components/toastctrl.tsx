@@ -24,6 +24,7 @@ class Toast {
 		hasOverlay: false,
 		animationDuration: 300,
 		modalStyle: { backgroundColor: "transparent" },
+		containerStyle: {},
 		textStyle: {},
 	}
 
@@ -31,10 +32,13 @@ class Toast {
 		let data: any = { ...Object.assign(this.toast_data, toastdata) };
 		ModalPortal.show((
 			<View style={styles.containerView}>
-				{data.key != "permission_toast" && <View style={[styles.toast_wrapper, data.viewstyle && styles[data.viewstyle]]}>
+				{data.key == "loading_toast" && <View style={styles.toast_loading_wrapper}>
+					<Text style={styles.toast_loading_text}>{data.message}</Text>
+				</View>}
+				{(data.key != "permission_toast" && data.key != "loading_toast") && <View style={[styles.toast_wrapper, data.viewstyle && styles[data.viewstyle]]}>
 					<Text style={styles.toast_text}>{data.message}</Text>
 				</View>}
-				{data.key == "permission_toast" && <ShadowedView style={styles.toast_permission_wrapper}>
+				{data.key == "permission_toast" && <ShadowedView style={[styles.toast_permission_wrapper, data.containerStyle]}>
 					<Text style={styles.toast_permission_text}>{data.message}</Text>
 				</ShadowedView>}
 			</View>
@@ -45,12 +49,12 @@ class Toast {
 			useNativeDriver: true,
 			onShow: data.onShow,
 			onDismiss: () => { data.onDismiss() },
-			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () =>{ this.close(data.key) },
+			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () => { this.close(data.key) },
 			onHardwareBackPress: () => {
 				this.close(data.key);
 				return true;
 			},
-			hasOverlay: data.hasOverlay,
+			hasOverlay: data.key == "loading_toast" ? true : data.hasOverlay,
 			animationDuration: data.animationDuration,
 			modalStyle: data.modalStyle,
 			style: { justifyContent: data.position == "top" ? "flex-start" : "center" }
@@ -80,6 +84,15 @@ const styles: any = StyleSheet.create({
 		borderRadius: 5,
 		overflow: "hidden",
 		padding: 15,
+	},
+	toast_loading_wrapper: {
+		backgroundColor: "#F2F2F2",
+		padding: 24,
+		borderRadius: 2,
+	},
+	toast_loading_text: {
+		color: "#262626",
+		fontSize: 14,
 	},
 	toast_permission_wrapper: {
 		backgroundColor: theme.toolbarbg,

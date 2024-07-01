@@ -2,6 +2,7 @@ import React from "react";
 import { Platform, View, Text, StyleSheet, Pressable, ScrollView, TextInput, Image, ActivityIndicator } from "react-native";
 
 import { Brightness } from "react-native-color-matrix-image-filters";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
 import ActionSheetCtrl from "../../components/actionsheetctrl";
@@ -25,6 +26,7 @@ import Icon from "../../assets/iconfont";
 function UserFeedback({ navigation, route }: any): React.JSX.Element {
 	// 控件
 	const classname = "FeedbackPage";
+	const insets = useSafeAreaInsets();
 	// 参数
 	const { title } = route.params;
 	// 变量
@@ -93,7 +95,7 @@ function UserFeedback({ navigation, route }: any): React.JSX.Element {
 			maxWidth: 1024,
 			maxHeight: 1024,
 		}
-		upService.buttonClicked(params);
+		upService.buttonClicked(params, { marginTop: insets.top });
 	}
 
 	const uploadpic_by_dataurl = (dataurl: string) => {

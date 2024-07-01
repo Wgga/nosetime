@@ -14,6 +14,7 @@ import Orientation from "react-native-orientation-locker";
 import AndroidSystemBars from "react-native-system-bars";
 import { ModalPortal } from "./src/components/modals";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { registerApp } from "native-wechat";
 
 import Route from "./src/navigations/route";
 
@@ -37,12 +38,15 @@ function App(): React.JSX.Element {
 		});
 
 		// Orientation.lockToPortrait();
+		registerApp({ appid: "wxf82220e9d9de30c7", universalLink: "https://www.nosetime.com/goapp/" });
 		return () => {
 			events.unsubscribe("nosetime_tokenerr");
 		}
 	}, [])
 
 	const initializeApp = () => {
+		// 注册微信
+		// 沉浸式状态/导航栏
 		AndroidSystemBars.setSystemUIVisibility(
 			"SYSTEM_UI_FLAG_LAYOUT_STABLE",
 			"SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",

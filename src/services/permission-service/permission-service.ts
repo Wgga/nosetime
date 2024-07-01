@@ -60,7 +60,7 @@ class PermissionService {
 		}
 	}
 
-	checkPermission(type: string) {
+	checkPermission(type: string, style?: any) {
 		return new Promise(async (resolve, reject) => {
 			if (Platform.OS == "android") {
 				const hasPermission = await this.checkPermissions(this.permissionmsg[type].permissions);
@@ -73,31 +73,34 @@ class PermissionService {
 						key: "permission_toast",
 						position: "top",
 						viewstyle: "",
+						containerStyle: style || {},
 					});
-					requestMultiple(this.permissionmsg[type].permissions).then((result) => {
-						let hasPermission: any[] = [];
-						Object.values(result).forEach((item) => {
-							hasPermission.push(item === "granted");
-						})
-						const allTrue = hasPermission.every((item) => item === true);
-						if (allTrue) {
-							this.closeToast();
-							resolve(true);
-						} else {
-							AlertCtrl.show({
-								header: "授予权限",
-								key: "permission_alert",
-								message: this.permissionmsg[type].alertmsg,
-								buttons: [{
-									text: "确定",
-									handler: () => {
-										AlertCtrl.close("permission_alert");
-									}
-								}]
+					setTimeout(() => {
+						requestMultiple(this.permissionmsg[type].permissions).then((result) => {
+							let hasPermission: any[] = [];
+							Object.values(result).forEach((item) => {
+								hasPermission.push(item === "granted");
 							})
-							resolve(false);
-						}
-					}).catch((error) => { });
+							const allTrue = hasPermission.every((item) => item === true);
+							if (allTrue) {
+								this.closeToast();
+								resolve(true);
+							} else {
+								AlertCtrl.show({
+									header: "授予权限",
+									key: "permission_alert",
+									message: this.permissionmsg[type].alertmsg,
+									buttons: [{
+										text: "确定",
+										handler: () => {
+											AlertCtrl.close("permission_alert");
+										}
+									}]
+								})
+								resolve(false);
+							}
+						}).catch((error) => { });
+					}, 200)
 				}
 			} else {
 				resolve(true);

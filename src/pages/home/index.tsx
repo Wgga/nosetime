@@ -238,7 +238,7 @@ const Home = React.memo(({ navigation }: any) => {
 	}
 
 	const scan = async () => {
-		if (!(await permissionService.checkPermission("scan"))) return;
+		if (!(await permissionService.checkPermission("scan", { marginTop: insets.top }))) return;
 		navigation.navigate("Page", { screen: "Scanner", params: { src: "home" } });
 	}
 
