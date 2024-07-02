@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, TextInput, Keyboard, Animated, Pressable } from
 
 import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AvoidSoftInput, AvoidSoftInputView } from "react-native-avoid-softinput";
+import { AvoidSoftInputView } from "react-native-avoid-softinput";
+
+import events from "../hooks/events";
 
 import theme from "../configs/theme";
 
@@ -13,15 +15,26 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 
 	// 参数
-	const { placeholder, replytext, style, opacity, zIndex, inputref } = data;
+	const { placeholder, replytext, style, opacity, zIndex, inputref, classname } = data;
 	const { onChangeText, publish } = method;
 
 	// 数据
 	const [isfocus, setIsFocus] = React.useState(false); // 是否聚焦输入框
 
 	React.useEffect(() => {
-		Keyboard.addListener("keyboardDidShow", () => { setIsFocus(true); })
-		Keyboard.addListener("keyboardDidHide", () => { setIsFocus(false); })
+		Keyboard.addListener("keyboardDidShow", () => {
+			setIsFocus(true);
+			events.publish(classname + "isShowKeyboard", true);
+		})
+		Keyboard.addListener("keyboardDidHide", () => {
+			setIsFocus(false);
+			events.publish(classname + "isShowKeyboard", false);
+		})
+
+		return () => {
+			Keyboard.removeAllListeners("keyboardDidShow");
+			Keyboard.removeAllListeners("keyboardDidHide");
+		}
 	}, [])
 
 	return (

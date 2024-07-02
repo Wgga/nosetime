@@ -343,7 +343,7 @@ class UserService {
 			tixingdata = await http.post(ENV.tixing + "?uid=" + this.user.uid, { method: "newtixing", token: this.user.token })
 			sixindata = await http.post(ENV.sixin + "?uid=" + this.user.uid, { method: "newsixin", token: this.user.token })
 			kefudata = await this.getkfmsg();
-			return tixingdata.newtixing + sixindata.newsixin + (kefudata.new ? kefudata.new : 0);
+			return tixingdata.newtixing + sixindata.newsixin + ((kefudata && kefudata.new) ? kefudata.new : 0);
 		} catch {
 			return 0;
 		}

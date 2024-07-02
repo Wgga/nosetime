@@ -41,8 +41,18 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 			getkfmsg();
 		})
 
+		events.subscribe("EnterSocialSixinDetailPage", (data: any) => {
+			let index = items.current.findIndex((item: any) => item.uid == data.uid);
+			if (index > -1 && items.current[index].new){
+				delete items.current[index].new;
+				getSixincnt();
+				setIsRender(val => !val);
+			}
+		})
+
 		return () => {
 			events.unsubscribe("nosetime_newmsg");
+			events.unsubscribe("EnterSocialSixinDetailPage");
 		}
 	}, [])
 
@@ -139,6 +149,7 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 
 	return (
 		<FlashList data={items.current}
+			extraData={isrender}
 			ListHeaderComponent={
 				<Pressable style={[styles.msg_item, styles.msg_top]} onPress={() => {
 					navigation.navigate("Page", { screen: "MallKefu" });

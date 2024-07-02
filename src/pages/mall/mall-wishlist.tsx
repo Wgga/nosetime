@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList } from "
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
+import Swipeable from "../../components/swipeable";
 
 import us from "../../services/user-service/user-service";
 
@@ -18,15 +19,18 @@ import { Globalstyles } from "../../configs/globalmethod";
 import Icon from "../../assets/iconfont";
 import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("window");
 
 function MallWishList({ navigation }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
+	let swipeabled = React.useRef<any>(null);
 	// 变量
 	const [edit, setEdit] = React.useState<boolean>(false); // 是否编辑
 	const [tab, setTab] = React.useState<string>("wishlist"); // 当前tab
+	const [currentItem, setCurrentItem] = React.useState<any>(null); // 当前选中项
 	// 数据
 	let wishlist = React.useRef<any[]>([]);
 	let stocktip = React.useRef<any[]>([]);
@@ -140,7 +144,28 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 					keyExtractor={(item: any) => item.id}
 					renderItem={({ item }: any) => {
 						return (
-							<View style={styles.wish_or_stip_item}>
+							<Swipeable contentContainerStyle={styles.wish_or_stip_item}
+								rightButtonWidth={86}
+								rightButtonsActivationDistance={20}
+								rightButtonContainerStyle={styles.right_btn_con}
+								rightButtons={[
+									<Pressable style={styles.btn_con}>
+										<Text style={styles.btn_text}>{"加购"}</Text>
+									</Pressable>,
+									<Pressable style={[styles.btn_con, styles.del_btn]}>
+										<Text style={styles.btn_text}>{"删除"}</Text>
+									</Pressable>
+								]}
+								onRightButtonsOpenRelease={(event: any, gestureState: any, swipeable: any) => {
+									if (swipeabled.current && swipeabled.current !== swipeable) {
+										swipeabled.current.recenter();
+									}
+									swipeabled.current = swipeable;
+								}}
+								onRightButtonsCloseRelease={() => {
+									swipeabled.current = null;
+								}}
+							>
 								<View style={styles.item_img_con}>
 									{((tab == "wishlist" && item.type == 1) || tab == "stocktip") && <Image style={styles.item_img}
 										source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!l" }}
@@ -179,14 +204,13 @@ function MallWishList({ navigation }: any): React.JSX.Element {
 										{item.sample && <Sample width={31} height={15} />}
 									</View>}
 								</View>
-							</View>
-
+							</Swipeable>
 						)
 					}}
 				/>}
 				{(!stocktip_isempty.current && tab == "stocktip")}
 			</View>
-		</View >
+		</View>
 	);
 }
 const styles = StyleSheet.create({
@@ -208,12 +232,16 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	btn_con: {
+		height: "100%",
 		backgroundColor: "#92abf2",
+		justifyContent: "center",
+		paddingLeft: 30,
 	},
 	del_btn: {
 		backgroundColor: "#D77878",
 	},
 	btn_text: {
+		width: 86,
 		fontSize: 13,
 		color: theme.toolbarbg,
 	},

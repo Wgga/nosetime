@@ -1,13 +1,11 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, useWindowDimensions, Image, TextInput } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, useWindowDimensions, Image, TextInput, ActivityIndicator, FlatList, Keyboard } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
-import { FlashList } from "@shopify/flash-list";
 import { AvoidSoftInputView } from "react-native-avoid-softinput";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ListBottomTip from "../../components/listbottomtip";
 import RnImage from "../../components/RnImage";
 import HeaderView from "../../components/headerview";
 import AutoSizeImage from "../../components/autosizeimage";
@@ -41,8 +39,6 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 	const insets = useSafeAreaInsets();
 	const classname: string = "MallKefuPage";
 	const windowD = useWindowDimensions();
-	let listref = React.useRef<any>(null);
-	let inputref = React.useRef<any>(null);
 	// 参数
 	// 变量
 	let send_content = React.useRef<string>("");
@@ -88,7 +84,7 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 			cache.getItem("messagedata").then((cacheobj) => {
 				cacheobj.new = 0;
 				cache.saveItem("messagedata", cacheobj, 24 * 3600);
-				events.publish("nosetime_newmsg");
+				events.publish("nosetime_newmsg", {});
 			}).catch(() => { });
 			return () => {
 				events.publish("nosetime_kfnotify", true);
@@ -208,6 +204,7 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 		return a.id - b.id;
 	}
 
+	// 去重
 	const uniqueitems = (items: any, key: string) => {
 		const map = new Map();
 		return items.reduce((acc: any, obj: any) => {
@@ -453,6 +450,7 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 		let id = Math.floor((new Date().getTime()));
 
 		var replytext = send_content.current.trim();
+		Keyboard.dismiss();
 		//类型：1文本 2html 3链接 4图片 10回执（不显）
 		if (link && link != "send") {
 			replytext = JSON.stringify(link);
@@ -493,6 +491,13 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 			});
 		}
 	};
+
+	//20230308 shibo:点击图标重新发送
+	const clickerr = (item: any) => {
+		item.error = 0;
+		item.loading = 1;
+		backupupload(item, "clickerr");
+	}
 
 	// 设置信息超时标志
 	const seterrortag = (item: any) => {
@@ -542,71 +547,67 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 			}}></HeaderView>
 			<AvoidSoftInputView avoidOffset={10} showAnimationDuration={50} hideAnimationDuration={50} showAnimationDelay={0} hideAnimationDelay={0}
 				style={{ flex: 1 }}>
-				<FlashList ref={listref} data={items.current}
+				<FlatList data={items.current}
 					extraData={isrender}
 					inverted
-					estimatedItemSize={100}
+					// estimatedItemSize={100}
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={{ backgroundColor: theme.bg, minHeight: "100%", justifyContent: "flex-end" }}
 					onEndReachedThreshold={0.1}
 					onEndReached={() => {
 						items.current.length > 0 && fetch();
 					}}
-					showsVerticalScrollIndicator={false}
-					contentContainerStyle={{ backgroundColor: theme.bg }}
+					onScrollBeginDrag={() => { Keyboard.dismiss() }}
 					keyExtractor={(item: any, index: number) => item.id + "_" + item.time}
-					renderItem={({ item, index }: any) => {
-						return (
-							<>
-								{(item.sztime != undefined && item.sztime != "") && <Text style={styles.item_sztime}>{item.sztime}</Text>}
-								{item.type == 2 && <View style={styles.item_automsg}>{handleAutomsg(item.content)}</View>}
-								{item.type != 2 && <View style={[styles.item_container, {
-									flexDirection: item.dir == 1 ? "row" : "row-reverse",
-								}]}>
-									<View style={styles.item_avatar_con}>
-										{item.dir == 1 && <Image style={styles.item_avatar} source={{ uri: ENV.image + "/mobileicon.png" }} />}
-										{item.dir == 2 && <Image style={styles.item_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg!l?" + us.user.uface }} />}
-										<View style={[styles.item_triangle, item.dir == 2 && styles.item_triangle_right]}></View>
-									</View>
-									<View style={[
-										styles.item_content,
-										item.dir == 2 && styles.item_content_right,
-										(item.type == 3 && item.dir == 1) && { flexShrink: 0, width: windowD.width * 0.85 },
-										(item.type == 3 && item.dir == 2) && { flexShrink: 0, width: windowD.width * 0.70 }
-									]}>
-										{item.type == 1 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleblank(item.content)}</Text>}
-										{item.type == 2 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{item.content}</Text>}
-										{item.type == 3 && <View style={[styles.item_msg, item.dir == 2 && { ...styles.item_msg_right, paddingVertical: 0 }]}>{handlelink(item.content)}</View>}
-										{item.type == 4 && <View style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleimg(item.content)}</View>}
-									</View>
-								</View>}
-							</>
-						)
-					}}
-					ListHeaderComponent={
-						<View style={{ marginBottom: 100 + insets.bottom }}>
-							{currentLink.current && <View style={styles.link_container}>
-								<View style={styles.link_msg_con}>
-									<RnImage style={styles.link_msg_img}
-										source={{ uri: ENV.image + currentLink.current.img }}
-										errsrc={require("../../assets/images/noxx.png")}
-										resizeMode={"contain"}
-									/>
-									<View style={styles.link_info}>
-										<Text numberOfLines={2} style={styles.link_info_tit}>{currentLink.current.title}</Text>
-										<Text style={[styles.link_info_price, { color: theme.num }]}>{currentLink.current.price}</Text>
-									</View>
+					renderItem={({ item, index }: any) => (<>
+						{item.type == 2 && <View style={styles.item_automsg}>{handleAutomsg(item.content)}</View>}
+						{item.type != 2 && <View style={[styles.item_container, {
+							flexDirection: item.dir == 1 ? "row" : "row-reverse",
+						}]}>
+							<View style={styles.item_avatar_con}>
+								{item.dir == 1 && <Image style={styles.item_avatar} source={{ uri: ENV.image + "/mobileicon.png" }} />}
+								{item.dir == 2 && <Image style={styles.item_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg!l?" + us.user.uface }} />}
+								<View style={[styles.item_triangle, item.dir == 2 && styles.item_triangle_right]}></View>
+							</View>
+							<View style={[
+								styles.item_content,
+								item.dir == 2 && styles.item_content_right,
+								(item.type == 3 && item.dir == 1) && { flexShrink: 0, width: windowD.width * 0.85 },
+								(item.type == 3 && item.dir == 2) && { flexShrink: 0, width: windowD.width * 0.70 }
+							]}>
+								{item.type == 1 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleblank(item.content)}</Text>}
+								{item.type == 2 && <Text style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{item.content}</Text>}
+								{item.type == 3 && <View style={[styles.item_msg, item.dir == 2 && { ...styles.item_msg_right, paddingVertical: 0 }]}>{handlelink(item.content)}</View>}
+								{item.type == 4 && <View style={[styles.item_msg, item.dir == 2 && styles.item_msg_right]}>{handleimg(item.content)}</View>}
+							</View>
+							{item.loading == 1 && <ActivityIndicator color={"gray"} />}
+							{item.error == 1 && <Icon name="warn" size={19} color={"#FC6274"} onPress={() => { clickerr(item) }} />}
+						</View>}
+						{(item.sztime != undefined && item.sztime != "") && <Text style={styles.item_sztime}>{item.sztime}</Text>}
+					</>)}
+					ListHeaderComponent={<View style={{ marginBottom: 100 + insets.bottom }}>
+						{currentLink.current && <View style={styles.link_container}>
+							<View style={styles.link_msg_con}>
+								<RnImage style={styles.link_msg_img}
+									source={{ uri: ENV.image + currentLink.current.img }}
+									errsrc={require("../../assets/images/noxx.png")}
+									resizeMode={"contain"}
+								/>
+								<View style={styles.link_info}>
+									<Text numberOfLines={2} style={styles.link_info_tit}>{currentLink.current.title}</Text>
+									<Text style={[styles.link_info_price, { color: theme.num }]}>{currentLink.current.price}</Text>
 								</View>
-								<Text style={styles.link_btn} onPress={() => { publish(currentLink.current, null) }}>{"发送香水链接"}</Text>
-							</View>}
-						</View>
-					}
+							</View>
+							<Text style={styles.link_btn} onPress={() => { publish(currentLink.current, null) }}>{"发送香水链接"}</Text>
+						</View>}
+					</View>}
 				/>
 				<View style={[styles.footer_con, { paddingBottom: insets.bottom + 10 }]}>
 					<Pressable style={styles.footer_icon} onPress={openfiledlg}>
 						<Photo width={27} height={27} />
 					</Pressable>
 					<View style={styles.footer_input_con}>
-						<TextInput ref={inputref}
-							style={styles.footer_input}
+						<TextInput style={styles.footer_input}
 							onChangeText={(val: string) => {
 								send_content.current = val;
 								setIsRender(val => !val);

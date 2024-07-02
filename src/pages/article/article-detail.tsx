@@ -12,7 +12,7 @@ import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
-import { ModalPortal, SlideAnimation } from "../../components/modals";
+import { ModalPortal } from "../../components/modals";
 import AutoHeightWebView from "../../components/autoHeightWebview";
 import AlertCtrl from "../../components/alertctrl";
 
@@ -114,25 +114,26 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			}).then(() => { }).catch(() => { });
 		})
 
-		Keyboard.addListener("keyboardDidShow", () => { showFooterMask(true); })
-		Keyboard.addListener("keyboardDidHide", () => {
-			if (inputref.current) inputref.current.blur();
-			info.current = {
-				refid: 0,
-				refuid: 0,
-				parentid: 0,
-				refuname: "",
-				holder: "快快告诉我，你在想什么",
-				replytext: "",
-				refcontent: "",
-			};
-			showFooterMask(false);
+		events.subscribe(classname + id + "isShowKeyboard", (val: boolean) => {
+			showFooterMask(val);
+			if (!val) {
+				info.current = {
+					refid: 0,
+					refuid: 0,
+					parentid: 0,
+					refuname: "",
+					holder: "快快告诉我，你在想什么",
+					replytext: "",
+					refcontent: "",
+				};
+			}
 		})
 
 		return () => {
 			events.unsubscribe(classname + id + "fullScreenChange");
 			events.unsubscribe(classname + id + "ArticleData");
 			events.unsubscribe(classname + id + "HotArticle");
+			events.unsubscribe(classname + id + "isShowKeyboard");
 		}
 	}, []);
 
@@ -606,11 +607,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		if (replytext == "") return;
 
 		cache.saveItem(classname + "publish" + id, info.current, 24 * 3600);
+		Keyboard.dismiss();
 		if (!us.user.uid) {
-			if (Keyboard.isVisible()) Keyboard.dismiss();
-			setTimeout(() => {
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
-			}, 500);
+			navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			return;
 		}
 		http.post(ENV.reply + "?method=post&type=article&id=" + id + "&uid=" + us.user.uid + "&refid=" + info.current.refid, {
@@ -908,7 +907,8 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				placeholder: info.current.holder, replytext: info.current.replytext,
 				inputref,
 				opacity: footerOpt, zIndex: !isfocus ? footerZ : 13,
-				style: isfull && styles.hide_view
+				style: isfull && styles.hide_view,
+				classname: classname + id
 			}} method={{
 				onChangeText: (val: string) => {
 					info.current.replytext = val;

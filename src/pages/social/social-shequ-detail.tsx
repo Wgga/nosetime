@@ -82,6 +82,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	// 控件
 	const insets = useSafeAreaInsets();
 	const classname = "SocialShequDetailPage";
+	const inputref = React.useRef<any>(null); // 评论输入框 Ref
 	// 参数
 	// 变量
 	let fromid = React.useRef<number>(0);
@@ -121,9 +122,13 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 			id.current = route.params.ctdlgid ? route.params.ctdlgid : 0;
 		}
 
-		Keyboard.addListener("keyboardDidShow", () => { setIsFocus(true); })
-		Keyboard.addListener("keyboardDidHide", () => { setIsFocus(false); })
 		init()
+		events.subscribe(classname + id.current + "isShowKeyboard", (val: boolean) => {
+			setIsFocus(val);
+		})
+		return () => {
+			events.unsubscribe(classname + id.current + "isShowKeyboard");
+		}
 	}, [])
 
 	const init = () => {
@@ -501,7 +506,12 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 				/>
 			</View>
 			{isfocus && <Pressable style={Globalstyles.keyboardmask} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
-			<FooterView data={{ placeholder: "点击楼层文字，回复层主", replytext, }} method={{ setReplyText }}>
+			<FooterView data={{
+				placeholder: "点击楼层文字，回复层主",
+				replytext,
+				inputref,
+				classname: classname + id.current
+			}} method={{ setReplyText }}>
 				{!isfocus && <View style={styles.footer_flex}>
 					<View style={[styles.footer_flex, { marginRight: 20 }]}>
 						<Icon name="reply" size={16} color={theme.fav} />
@@ -515,7 +525,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					</View>
 				</View>}
 			</FooterView>
-		</View >
+		</View>
 	);
 })
 
