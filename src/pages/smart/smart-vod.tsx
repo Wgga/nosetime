@@ -89,6 +89,14 @@ const SmartVod = React.memo(({ navigation }: any) => {
 		})
 	}
 
+	const gotodetail = (item: any) => {
+		if (item.mid != null) {
+			navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid } });
+		} else {
+			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.viid } });
+		}
+	}
+
 	return (
 		<ScrollView style={[styles.vodelist_con, Globalstyles.container]}
 			showsVerticalScrollIndicator={false}>
@@ -104,14 +112,16 @@ const SmartVod = React.memo(({ navigation }: any) => {
 								<Icon name="r-return" size={15} color={theme.text1} />
 							</Pressable>
 						</View>
-						{item.firstvod && <View style={styles.vod_first_con}>
+						{item.firstvod && <Pressable style={styles.vod_first_con} onPress={()=>{
+							gotodetail(item.firstvod);
+						}}>
 							<View style={[styles.first_img_con, styles.vode_brs]}>
 								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: item.firstvod.vpicurl }} />
 								<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
 							</View>
 							{item.firstvod.mainname && <Text numberOfLines={1} style={styles.vod_mainname}>{item.firstvod.mainname}</Text>}
 							{item.firstvod.subname && <Text numberOfLines={1} style={styles.vod_subname}>{item.firstvod.subname}</Text>}
-						</View>}
+						</Pressable>}
 						{(item.items && item.items.length > 0) && <View style={styles.vod_list}>
 							{item.items.map((item2: any, index: number) => {
 								return (

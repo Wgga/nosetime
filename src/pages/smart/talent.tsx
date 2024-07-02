@@ -26,7 +26,7 @@ function Talent({ navigation }: any): React.JSX.Element {
 	let like_ = React.useRef<any>({});
 	// 参数
 	// 状态
-	const [isrender, setIsRender] = React.useState(false); // 是否渲染
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
 		init();
@@ -86,7 +86,7 @@ function Talent({ navigation }: any): React.JSX.Element {
 	const islike = (ids: any) => {
 		if (!us.user.uid) {
 			setIsRender(val => !val);
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App资深评论家页" } });
+			return
 		}
 		http.post(ENV.user, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
 			for (var i in resp_data) {

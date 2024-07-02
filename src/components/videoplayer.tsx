@@ -91,7 +91,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 					volume={1.0} // 播放音量
 					muted={false} // 是否设置静音
 					paused={!this.state.isPlaying} // 是否设置暂停
-					controls={true} // 是否显示控制条
+					controls={!this.state.showPoster} // 是否显示控制条
 					playWhenInactive={false} // 当通知或控制中心位于视频前面时，是否继续播放(仅IOS)
 					playInBackground={false} // 当应用程序处于后台时，是否继续播放音频(仅IOS)
 					ignoreSilentSwitch={"ignore"} // 控制 iOS 静默开关行为( ignore 即使设置了静音开关，也可以播放音频)
@@ -140,9 +140,9 @@ export default class VideoPlayer extends React.Component<PropsType> {
 						}
 					</View>
 				</TouchableWithoutFeedback>} */}
-				{(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
+				{/* {(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
 					<ActivityIndicator size="large" color="#fff" />
-				</View>}
+				</View>} */}
 				{/* {this.state.showControl && <LinearGradient
 					colors={["transparent", "rgba(0,0,0,0.8)"]}
 					start={{ x: 0.5, y: 0 }}
@@ -203,7 +203,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	/// -------Video组件回调事件-------
 
 	_onLoadStart = () => {
-		// console.log("视频开始加载");
+		console.log("%c Line:207 🥐 视频开始加载", "color:#3f7cff");
 	};
 
 	_onBuffering = ({ isBuffering }: any) => {
@@ -211,7 +211,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	};
 
 	_onLoaded = (data: any) => {
-		// console.log("视频加载完成");
+		console.log("%c Line:215 🧀 视频加载完成", "color:#ed9ec7");
 		this.setState({
 			duration: data.duration,
 			isBuffering: false
@@ -219,7 +219,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	};
 
 	_onProgressChanged = (data: any) => {
-		// console.log("视频进度更新");
+		console.log("%c Line:223 🍏 视频进度更新", "color:#7f2b82");
 		if (this.state.isPlaying) {
 			this.setState({
 				currentTime: data.currentTime,
@@ -228,7 +228,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	};
 
 	_onPlayEnd = () => {
-		// console.log("视频播放结束");
+		console.log("%c Line:232 🍞 视频播放结束", "color:#33a5ff");
 		if (this.state.isRepeat) {
 			this.videoRef.seek(0);
 			this.setState({
@@ -245,7 +245,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	};
 
 	_onPlayError = () => {
-		console.log("视频播放失败");
+		console.log("%c Line:249 🌭 视频播放失败", "color:#93c0a4");
 	};
 
 	///-------控件点击事件-------

@@ -694,7 +694,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				estimatedItemSize={100}
 				onEndReachedThreshold={0.1}
 				onEndReached={() => {
-					if (replydata.current.items) {
+					if (replydata.current.items && replydata.current.length > 0) {
 						page.current++;
 						getArticleReply();
 					}

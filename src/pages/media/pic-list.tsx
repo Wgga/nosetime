@@ -144,6 +144,27 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 		}
 	}
 
+	const gotodetail = (item: any, index?: number, data?: any) => {
+		if (params.current.src != "itemdetail") {
+			if (item.mid != null) {
+				navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid } });
+			} else {
+				navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.viid } });
+			}
+		} else {
+			if (item.mtype == 10) {
+				navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid } });
+			} else {
+				navigation.navigate("Page", {
+					screen: "PicListDetail", params: {
+						mid: item.mid, index, id: item.viid,
+						vodlen: data.length, total: total.current, type: item.mtype
+					}
+				});
+			}
+		}
+	}
+
 	return (
 		<>
 			<HeaderView data={{
@@ -210,11 +231,11 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 				onEndReached={loadMore}
 				renderItem={({ item, index }: any) => {
 					return (
-						<View style={{
+						<Pressable style={{
 							marginBottom: 14,
 							marginLeft: (index + 1) % 2 == 0 ? 7 : 0,
 							marginRight: (index + 1) % 2 == 1 ? 7 : 0
-						}}>
+						}} onPress={() => { gotodetail(item) }}>
 							<View style={styles.list_img_con}>
 								<FastImage style={{ width: "100%", height: "100%" }}
 									defaultSource={require("../../assets/images/nopic.png")}
@@ -226,7 +247,7 @@ function PicList({ route, navigation }: any): React.JSX.Element {
 							</View>
 							{item.mainname && <Text numberOfLines={1} style={[styles.vod_mainname, styles.vod_width]}>{item.mainname}</Text>}
 							{item.subname && <Text numberOfLines={1} style={[styles.vod_subname, styles.vod_width]}>{item.subname}</Text>}
-						</View>
+						</Pressable>
 					)
 				}}
 				ListFooterComponent={

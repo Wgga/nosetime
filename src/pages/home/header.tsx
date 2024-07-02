@@ -86,7 +86,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 
 	const gotoVod = (item: any) => {
 		if (item.mid != null) {
-			// navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, viid: item.viid } });
+			navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid } });
 		} else {
 			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.viid } });
 		}
