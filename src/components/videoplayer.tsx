@@ -43,7 +43,7 @@ function formatTime(second: string) {
 
 
 interface PropsType {
-	ref?: any,
+	videoref?: any,
 	source: string,	// 视频源
 	poster?: string,	// 封面
 	classname?: string,	// 当前页面名称
@@ -61,7 +61,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 
 	public videoRef: any = null;
 	public readonly state: any = {
-		ref: this.props.ref,
+		videoref: this.props.videoref,
 		source: this.props.source,	// 视频源
 		poster: this.props.poster ? this.props.poster : "",	// 封面
 		classname: this.props.classname ? this.props.classname : "",	// 当前页面名称
@@ -87,7 +87,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={styles.container} onLayout={this._onLayout}>
-				<Video ref={(ref: any) => this.state.ref = ref}
+				<Video ref={(ref: any) => this.state.videoref = ref}
 					source={{ uri: this.state.source }}
 					rate={1.0} // 播放速度
 					volume={1.0} // 播放音量
