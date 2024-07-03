@@ -257,12 +257,12 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 											</Pressable>}
 										</View>
 										<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
-										<StarImage item={{
-											istotal: item.istotal,
-											s0: item.s0,
-											s1: item.s1,
-											isscore: item.isscore,
-										}} />
+										<StarImage isShowScore={true}
+											item={{
+												istotal: item.istotal, isscore: item.isscore,
+												s0: item.s0, s1: item.s1
+											}}
+										/>
 									</View>
 								</Pressable>
 							)
@@ -495,7 +495,9 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<FlashList data={searchdata.vods}
 						renderItem={({ item }: any) => {
 							return (
-								<View style={styles.list_vod}>
+								<Pressable style={styles.list_vod} onPress={() => {
+									navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.viid } });
+								}}>
 									<View style={styles.vod_image_con}>
 										{(item.murls && item.murls.length > 0) && <Image
 											style={styles.vod_image}
@@ -503,7 +505,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 											source={{ uri: ENV.image + item.murls[0].img + "!l" }}
 											resizeMode="cover"
 										/>}
-										{((item.murls && item.murls.length == 0) || !item.murls) && <Image
+										{(!item.murls || item.murls.length == 0) && <Image
 											style={styles.vod_image}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={{ uri: item.vpicurl }}
@@ -515,7 +517,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<Text style={styles.vod_main_title}>{item.main_title}</Text>
 										<Text style={styles.vod_sub_title}>{item.sub_title}</Text>
 									</View>
-								</View>
+								</Pressable>
 							)
 						}}
 						estimatedItemSize={100}

@@ -112,9 +112,7 @@ const SmartVod = React.memo(({ navigation }: any) => {
 								<Icon name="r-return" size={15} color={theme.text1} />
 							</Pressable>
 						</View>
-						{item.firstvod && <Pressable style={styles.vod_first_con} onPress={()=>{
-							gotodetail(item.firstvod);
-						}}>
+						{item.firstvod && <Pressable style={styles.vod_first_con} onPress={() => { gotodetail(item.firstvod) }}>
 							<View style={[styles.first_img_con, styles.vode_brs]}>
 								<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: item.firstvod.vpicurl }} />
 								<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} />
@@ -125,18 +123,18 @@ const SmartVod = React.memo(({ navigation }: any) => {
 						{(item.items && item.items.length > 0) && <View style={styles.vod_list}>
 							{item.items.map((item2: any, index: number) => {
 								return (
-									<View key={item2.viid} style={{
+									<Pressable key={item2.viid} style={{
 										marginBottom: 14,
 										marginLeft: (index + 1) % 2 == 0 ? 7 : 0,
 										marginRight: (index + 1) % 2 == 1 ? 7 : 0
-									}}>
+									}} onPress={() => { gotodetail(item2) }}>
 										<View style={[styles.list_img_con, styles.vode_brs]}>
 											<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: item2.vpicurl }} />
 											<Image style={[styles.triangle, styles.list_triangle]} source={require("../../assets/images/player/play.png")} />
 										</View>
 										{item2.mainname && <Text numberOfLines={1} style={[styles.vod_mainname, styles.vod_width]}>{item2.mainname}</Text>}
 										{item2.subname && <Text numberOfLines={1} style={[styles.vod_subname, styles.vod_width]}>{item2.subname}</Text>}
-									</View>
+									</Pressable>
 								)
 							})}
 						</View>}

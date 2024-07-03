@@ -4,7 +4,7 @@ import { View, StyleSheet, Image, Text } from "react-native";
 import theme from "../configs/theme";
 import { Globalstyles, handlestarLeft } from "../configs/globalmethod";
 
-function StarImage({ item, style }: any): React.JSX.Element {
+function StarImage({ item, style, isShowScore }: any): React.JSX.Element {
 	return (
 		<>
 			{item.istotal >= 10 && <View style={styles.item_star}>
@@ -20,7 +20,7 @@ function StarImage({ item, style }: any): React.JSX.Element {
 						source={require("../assets/images/star/star.png")}
 					/>}
 				</View>
-				<Text style={[styles.score_total, style]}>&nbsp;{item.isscore}分&nbsp;/&nbsp;{item.istotal}人</Text>
+				{isShowScore && <Text style={[styles.score_total, style]}>&nbsp;{item.isscore}分&nbsp;/&nbsp;{item.istotal}人</Text>}
 			</View>}
 			{item.istotal < 10 && <View style={styles.item_star}>
 				<View style={Globalstyles.star}>
@@ -30,7 +30,7 @@ function StarImage({ item, style }: any): React.JSX.Element {
 						source={require("../assets/images/star/star.png")}
 					/>
 				</View>
-				<Text style={[styles.score_total, style]}>&nbsp;{item.istotal}人</Text>
+				{isShowScore && <Text style={[styles.score_total, style]}>&nbsp;{item.istotal}人</Text>}
 			</View>}
 		</>
 	)

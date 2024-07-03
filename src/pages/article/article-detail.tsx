@@ -67,7 +67,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	let likefavs = React.useRef<any>({}); // 点赞列表
 	// 状态
 	const [loading, setLoading] = React.useState<boolean>(true); // 是否加载中
-	const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏显示
+	// const [isfull, setIsfull] = React.useState<boolean>(false); // 是否全屏显示
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isfocus, setIsFocus] = React.useState<boolean>(false); // 是否获取焦点
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
@@ -92,9 +92,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 	React.useEffect(() => {
 		articleService.fetchArticleData(classname, id);
 		// 监听文章内视频是否全屏显示
-		events.subscribe(classname + id + "fullScreenChange", (fullval: boolean) => {
+		/* events.subscribe(classname + id + "fullScreenChange", (fullval: boolean) => {
 			setIsfull(fullval);
-		})
+		}) */
 
 		events.subscribe(classname + id + "ArticleData", (data) => {
 			articledata.current = articleService.getArticleData(classname, id);
@@ -130,7 +130,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		})
 
 		return () => {
-			events.unsubscribe(classname + id + "fullScreenChange");
+			// events.unsubscribe(classname + id + "fullScreenChange");
 			events.unsubscribe(classname + id + "ArticleData");
 			events.unsubscribe(classname + id + "HotArticle");
 			events.unsubscribe(classname + id + "isShowKeyboard");
@@ -631,7 +631,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<>
-			{loading && <View style={[Globalstyles.loading_con, isfull && styles.hide_view]}>
+			{loading && <View style={Globalstyles.loading_con}>
 				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
 			</View>}
 			<HeaderView data={{
@@ -639,7 +639,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				isShowSearch: false,
 				// showmenu,
 				style: [
-					isfull && styles.hide_view,
+					// isfull && styles.hide_view,
 					!articledata.current.mp4URL && styles.notmp4
 				],
 				childrenstyle: {
@@ -704,8 +704,11 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						source={articledata.current.mp4URL}
 						poster={articledata.current.picURL}
 						classname={classname + id}
-					></VideoPlayer>}
-					<View style={[styles.scrollview_con, isfull && styles.hide_view]}>
+					/>}
+					<View style={[
+						styles.scrollview_con,
+						// isfull && styles.hide_view
+					]}>
 						<View>
 							{!articledata.current.mp4URL && <View style={styles.content_img}>
 								<Image source={{ uri: ENV.image + articledata.current.coverimg }}
@@ -772,7 +775,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					return (
 						<View style={[
 							styles.replyitem_con,
-							isfull && styles.hide_view,
+							// isfull && styles.hide_view,
 							{ borderBottomColor: index == replydata.current.items.length - 1 ? "transparent" : theme.bg }
 						]}>
 							{item.uid > 0 && <Image source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} style={styles.replyitem_img} resizeMode="cover" />}
@@ -897,7 +900,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				}}
 				ListFooterComponent={<ListBottomTip noMore={noMore.current}
 					isShowTip={replydata.current.items && replydata.current.items.length > 0}
-					style={isfull && styles.hide_view}
+				// style={isfull && styles.hide_view}
 				/>}
 			/>
 			<Animated.View style={[Globalstyles.keyboardmask, { opacity: footerMaskOpt, zIndex: footerMaskZ }]}>
@@ -907,7 +910,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				placeholder: info.current.holder, replytext: info.current.replytext,
 				inputref,
 				opacity: footerOpt, zIndex: !isfocus ? footerZ : 13,
-				style: isfull && styles.hide_view,
+				// style: isfull && styles.hide_view,
 				classname: classname + id
 			}} method={{
 				onChangeText: (val: string) => {

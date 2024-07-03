@@ -15,7 +15,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 	const insets = useSafeAreaInsets();
 
 	// 参数
-	const { placeholder, replytext, style, opacity, zIndex, inputref, classname } = data;
+	const { placeholder, replytext, style, opacity, zIndex, inputref, classname, showBtn } = data;
 	const { onChangeText, publish } = method;
 
 	// 数据
@@ -39,7 +39,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 
 	return (
 		<Animated.View style={[styles.footer_container, zIndex && { zIndex }, opacity && { opacity }, style]}>
-			<AvoidSoftInputView avoidOffset={10} showAnimationDuration={0} hideAnimationDuration={0} showAnimationDelay={0} hideAnimationDelay={0}>
+			<AvoidSoftInputView avoidOffset={10} showAnimationDuration={80} hideAnimationDuration={80} showAnimationDelay={0} hideAnimationDelay={0}>
 				<View style={[styles.footer_con, { paddingBottom: insets.bottom + 10 }, isfocus && styles.footer_radius]}>
 					<View style={styles.footer_con_left}>
 						<TextInput ref={inputref}
@@ -51,7 +51,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 					</View>
 					<View style={styles.footer_con_right}>
 						{children}
-						{isfocus && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
+						{(showBtn || isfocus) && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
 							colors={["#81B4EC", "#9BA6F5"]}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 0 }}
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
 		paddingRight: 5,
 	},
 	footer_input: {
-		flex: 1,
 		padding: 0,
 		minHeight: 38,
 		maxHeight: 70,

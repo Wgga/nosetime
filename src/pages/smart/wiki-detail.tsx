@@ -319,12 +319,12 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 									{canbuy_.current[item.id] && <Icon name="shopcart" size={16} color={theme.placeholder} />}
 								</View>
 								<Text style={[styles.item_name_text, { marginBottom: 5 }]}>{item.enname}</Text>
-								<StarImage item={{
-									istotal: item.istotal,
-									s0: item.s0,
-									s1: item.s1,
-									isscore: item.isscore,
-								}} />
+								<StarImage isShowScore={true}
+									item={{
+										istotal: item.istotal, isscore: item.isscore,
+										s0: item.s0, s1: item.s1,
+									}}
+								/>
 								<Text numberOfLines={3} style={styles.item_desc}>{item.desc}</Text>
 							</View>
 						</Pressable>

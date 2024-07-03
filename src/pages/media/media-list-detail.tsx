@@ -1,11 +1,15 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image, FlatList, Keyboard, Animated } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
+import FastImage from "react-native-fast-image";
 
 import HeaderView from "../../components/headerview";
 import ListBottomTip from "../../components/listbottomtip";
+import VideoPlayer from "../../components/videoplayer";
+import StarImage from "../../components/starimage";
+import FooterView from "../../components/footerview";
 
 import us from "../../services/user-service/user-service";
 
@@ -16,31 +20,41 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles, toCamelCase, show_items, display } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import VideoPlayer from "../../components/videoplayer";
+import ReplyView from "../../components/replyview";
 
-const { width, height } = Dimensions.get("window");
 
-function MediaListDetail({ navigation, route }: any): React.JSX.Element {
-
+const MediaListDetail = React.memo(({ navigation, route }: any) => {
 	// 控件
 	const classname = "MediaListDetailPage";
+	const inputref = React.useRef<any>(null);
+	const listref = React.useRef<any>(null);
+	const videoRef = React.useRef<any>(null);
 	// 参数
 	// 变量
 	let id = React.useRef<number>(0);
 	let mid = React.useRef<number>(0);
+	let info = React.useRef<any>({
+		replytext: "",
+		holder: "我此刻的想法是...",
+	});
 	let itemdata = React.useRef<any>({});
 	let mediadata = React.useRef<any>({});
 	let statdata = React.useRef<any>({});
 	let like_ = React.useRef<any>({});
 	let curpage = React.useRef<number>(1);
 	let replydata = React.useRef<any[]>([]);
+	let moremediadata = React.useRef<any[]>([]);
+	let footerMaskOpt = React.useRef(new Animated.Value(0)).current; // 底部遮罩透明度动画
+	let footerMaskZ = React.useRef(new Animated.Value(-1)).current; // 底部遮罩层级动画
 	// 数据
 	// 状态
 	let noMore = React.useRef<boolean>(false);
+	let loading = React.useRef<boolean>(true);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
+	const [isfocus, setIsFocus] = React.useState(false); // 是否聚焦输入框
 
 	React.useEffect(() => {
 		if (route.params) {
@@ -48,6 +62,14 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 			mid.current = route.params.mid ? route.params.mid : 0;
 		}
 		init();
+
+		events.subscribe(classname + id.current + "isShowKeyboard", (val: boolean) => {
+			showFooterMask(val);
+		})
+
+		return () => {
+			events.unsubscribe(classname + id.current + "isShowKeyboard");
+		}
 	}, []);
 
 	// 获取单品页数据
@@ -79,16 +101,12 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 	}
 	// 设置视频数据
 	const setmediadata = (data: any) => {
+		data.newvname = data.vname.replace(/\d{6}|.mp4/g, "").trim();
+		data.mainvname = data.newvname.split(/:|：/)[0];
+		data.subvname = data.newvname.split(/:|：/)[1];
+		data.time = data.tm.slice(0, 10);
+
 		mediadata.current = data;
-		if (mediadata.current.mtype == 10) {
-			//20220516 shibo:去除视频名称的多ID
-			mediadata.current.newvname = mediadata.current.vname.replace(/\d{6}|.mp4/g, '').trim();
-			mediadata.current.mainvname = mediadata.current.newvname.split(/:|：/)[0];
-			mediadata.current.subvname = mediadata.current.newvname.split(/:|：/)[1];
-			mediadata.current.time = mediadata.current.tm.slice(0, 10);
-		} else {
-			mediadata.current.time = mediadata.current.mtime.slice(0, 10);
-		}
 	}
 
 	const getStatData = () => {
@@ -116,14 +134,27 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 	const getReplyData = (page: number) => {
 		http.get(ENV.pic + "?method=getreply&mid=" + mid.current + "&page=" + curpage.current + "&t=" + (new Date).getTime()).then((resp_data: any) => {
 			replydata.current = resp_data.items
+			if (resp_data.items.length < 50) noMore.current = true;
 			curpage.current = page;
 			favs(resp_data)
 		})
 	}
 
+	// 获取更多影像数据
+	const getMoreMediaData = () => {
+		http.get(ENV.pic + "?method=getmorevod&iid=" + id.current).then((resp_data: any) => {
+			for (let i in resp_data) {
+				resp_data[i].maintit = resp_data[i].name.split("：")[0];
+				resp_data[i].subtit = resp_data[i].name.split("：")[1];
+			}
+			moremediadata.current = resp_data;
+		});
+	}
+
 	//获取用户曾点过的赞
 	const favs = (resp: any) => {
 		if (!us.user.uid) {
+			loading.current = false;
 			setIsRender(val => !val);
 			return;
 		}
@@ -140,19 +171,85 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 			for (var i in resp_data) {
 				like_.current[resp_data[i]] = 1;
 			}
+			loading.current = false;
 			setIsRender(val => !val);
 		});
 	}
 
 	const init = () => {
-		Promise.all([getItemData(), getMediaDetail(), getStatData()]).then((data: any) => {
+		Promise.all([getItemData(), getMediaDetail(), getStatData(), getMoreMediaData()]).then((data: any) => {
 			islike();
 			getReplyData(1);
 		})
 	}
 
+	// 收藏视频
+	const fav = () => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品视频页" } });
+		}
+		http.post(ENV.pic + "?uid=" + us.user.uid, { method: "togglefav", mid: mid.current, token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "ADD") {
+				like_.current[mid.current] = true;
+				statdata.current.fav = parseInt(statdata.current.fav) + 1;
+			} else if (resp_data.msg == "REMOVE") {
+				like_.current[mid.current] = false;
+				statdata.current.fav = parseInt(statdata.current.fav) - 1;
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品视频页" } });
+			}
+			setIsRender(val => !val);
+		})
+	}
+
+	const publish = () => {
+
+	}
+
+	// 动态修改底部输入框遮罩透明度和层级
+	const showFooterMask = (bol: boolean) => {
+		if (bol) {
+			Animated.timing(footerMaskOpt, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			Animated.timing(footerMaskOpt, {
+				toValue: 0,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: -1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		}
+		setIsFocus(bol);
+	}
+
+	const gotodetail = (page: any, item: any) => {
+		if (videoRef) videoRef.current.state.ref.pause();
+		let screen = toCamelCase(page);
+		if (screen == "MediaListDetail") {
+			navigation.push("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.url.substring(0, 6) } });
+		} else {
+			navigation.push("Page", { screen, params: { id: item.id, src: "App单品视频页" } });
+		}
+	}
+
 	return (
 		<View style={Globalstyles.container}>
+			{loading.current && <View style={Globalstyles.loading_con}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
+			</View>}
 			<HeaderView data={{
 				title: itemdata.current.title,
 				isShowSearch: false,
@@ -165,6 +262,7 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 				back: () => { navigation.goBack(); },
 			}} />
 			<FlashList data={replydata.current}
+				ref={listref}
 				keyExtractor={(item: any, index: number) => item.id}
 				extraData={isrender}
 				estimatedItemSize={100}
@@ -176,13 +274,16 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 				}}
 				ListHeaderComponent={<>
 					{mediadata.current.mp4URL && <VideoPlayer
+						ref={videoRef}
 						source={mediadata.current.mp4URL}
 						poster={mediadata.current.vpicurl}
 						classname={classname + mid.current}
-					></VideoPlayer>}
+						showPoster={false}
+						isPlaying={true} />}
 					<View style={styles.media_info}>
 						{mediadata.current.mainvname && <Text style={styles.main_name}>{mediadata.current.mainvname}</Text>}
 						{mediadata.current.subvname && <Text style={styles.sub_name}>{mediadata.current.subvname}</Text>}
+						{mediadata.current.vdesc && <Text style={styles.media_desc}>{mediadata.current.vdesc}</Text>}
 						{itemdata.current.fragrance && <View style={styles.fragrance_con}>
 							<Text style={styles.fragrance_title}>{"香调："}</Text>
 							<Text style={styles.fragrance_text} onPress={() => { }}>{itemdata.current.fragrance}</Text>
@@ -220,29 +321,122 @@ function MediaListDetail({ navigation, route }: any): React.JSX.Element {
 							</View>
 							<View style={styles.btn_con}>
 								<>
-									<Icon name={like_.current[mid.current] ? "heart-checked" : "heart"} size={16} color={like_.current[mid.current] ? theme.redchecked : "#808080"} />
+									<Icon name={like_.current[mid.current] ? "heart-checked" : "heart"} size={16}
+										color={like_.current[mid.current] ? theme.redchecked : "#808080"}
+										onPress={fav}
+									/>
 									{statdata.current.fav && <Text style={styles.btn_text}>{statdata.current.fav}</Text>}
 								</>
 								<>
-									<Icon name="message" size={16} color={"#808080"} />
+									<Icon name="message" size={16} color={"#808080"}
+										onPress={() => {
+											if (listref.current && replydata.current.length > 0) {
+												listref.current.scrollToIndex({
+													index: 0,
+													animated: true,
+													viewOffset: 50,
+													viewPosition: 0,
+												})
+											}
+										}}
+									/>
 									{replydata.current.length > 0 && <Text style={[styles.btn_text, { marginRight: 0 }]}>{replydata.current.length}</Text>}
 								</>
 								{/* <Icon name="share2" size={16} color={"#808080"} /> */}
 							</View>
 						</View>
+						<View style={styles.item_con}>
+							<Pressable onPress={() => { gotodetail("item-detail", itemdata.current) }}>
+								<Image source={{ uri: ENV.image + "/perfume/" + itemdata.current.id + ".jpg" }}
+									resizeMode="contain"
+									style={styles.item_img} />
+							</Pressable>
+							<View style={{ flex: 1 }}>
+								<View style={styles.item_name_con}>
+									<Text numberOfLines={1} style={styles.item_cnname}
+										onPress={() => { gotodetail("item-detail", itemdata.current) }}>{itemdata.current.cnname}</Text>
+									{itemdata.current.onsale && <Icon name="shopcart" size={16}
+										color={theme.placeholder} style={{ marginLeft: 8 }}
+										onPress={() => { gotodetail("mall-item", itemdata.current) }}
+									/>}
+								</View>
+								<Text numberOfLines={1} style={styles.item_enname} onPress={() => { gotodetail("item-detail", itemdata.current) }}>{itemdata.current.enname}</Text>
+								<View style={styles.star_con}>
+									<StarImage
+										item={{
+											istotal: itemdata.current.istotal, isscore: itemdata.current.isscore,
+											s0: itemdata.current.s0, s1: itemdata.current.s1,
+										}}
+									/>
+									<Text style={styles.item_score}>{itemdata.current.isscore + "分"}</Text>
+								</View>
+							</View>
+						</View>
+					</View>
+					{(moremediadata.current && moremediadata.current.length > 0) && <View style={styles.more_media_con}>
+						<Text style={styles.more_media_title}>{"更多影像"}</Text>
+						<FlatList data={moremediadata.current}
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+							contentContainerStyle={{ paddingRight: 15, marginTop: 10 }}
+							keyExtractor={(item: any) => item.mid}
+							renderItem={({ item, index }: any) => {
+								return (
+									<View style={styles.more_item_con}>
+										<Pressable onPress={() => { gotodetail("media-list-detail", item) }}>
+											<View style={styles.more_item_img}>
+												<FastImage style={{ width: "100%", height: "100%" }}
+													source={{ uri: item.picurl }} />
+												<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} resizeMode="contain" />
+											</View>
+											<Text numberOfLines={1} style={styles.more_item_mtit}>{item.maintit}</Text>
+											<Text numberOfLines={1} style={styles.more_item_stit}>{item.subtit}</Text>
+										</Pressable>
+									</View>
+								)
+							}}
+						/>
+					</View>}
+					<View style={styles.reply_con}>
+						<Text style={styles.reply_title}>{"评论（" + replydata.current.length + "）"}</Text>
 					</View>
 				</>}
-				contentContainerStyle={{}}
+				ListEmptyComponent={<Text style={styles.reply_empty_con}>{"评论暂缺，快来写第一个评论吧！"}</Text>}
 				renderItem={({ item, index }: any) => {
 					return (
-						<></>
+						<ReplyView data={{
+							contentkey: "content",
+							timekey: "mctime",
+							item,
+							likedata: like_.current
+						}} method={{
+							display: () => {
+								display(item.sub);
+								setIsRender(val => !val);
+							},
+							show_items,
+						}} />
 					)
 				}}
 				ListFooterComponent={< ListBottomTip noMore={noMore.current} isShowTip={replydata.current && replydata.current.length > 0} />}
 			/>
-		</View >
+			<Animated.View style={[Globalstyles.keyboardmask, { opacity: footerMaskOpt, zIndex: footerMaskZ }]}>
+				<Pressable onPress={() => { Keyboard.dismiss(); }} style={{ flex: 1 }}></Pressable>
+			</Animated.View>
+			{id.current > 0 && <FooterView data={{
+				placeholder: info.current.holder, replytext: info.current.replytext,
+				inputref, classname: classname + id.current,
+				showBtn: true
+			}} method={{
+				onChangeText: (val: string) => {
+					info.current.replytext = val;
+					setIsRender(val => !val);
+				},
+				publish,
+			}} />}
+		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	media_info: {
@@ -260,6 +454,11 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: theme.text2,
 		marginTop: 5
+	},
+	media_desc: {
+		marginTop: 10,
+		color: theme.comment,
+		fontSize: 15,
 	},
 	fragrance_con: {
 		flexDirection: "row",
@@ -297,7 +496,160 @@ const styles = StyleSheet.create({
 		color: "#808080",
 		marginLeft: 5,
 		marginRight: 15,
-	}
+	},
+	item_con: {
+		paddingVertical: 10,
+		paddingHorizontal: 7,
+		marginTop: 26,
+		backgroundColor: theme.bg,
+		borderRadius: 6.7,
+		overflow: "hidden",
+		flexDirection: "row"
+	},
+	item_img: {
+		width: 68,
+		height: 68,
+		backgroundColor: theme.toolbarbg,
+		borderRadius: 6.7,
+		overflow: "hidden",
+		paddingVertical: 5,
+		marginRight: 12,
+	},
+	item_name_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between"
+	},
+	item_cnname: {
+		flex: 1,
+		fontSize: 14,
+		color: theme.tit2,
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
+	},
+	item_enname: {
+		fontSize: 13,
+		color: theme.comment,
+		marginTop: 4,
+	},
+	star_con: {
+		marginTop: 6,
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	item_score: {
+		color: "#FEB73D",
+		fontSize: 16,
+		marginLeft: 8,
+		fontWeight: "500",
+		fontFamily: "PingFang SC",
+	},
+	more_media_con: {
+		borderTopColor: theme.bg,
+		borderTopWidth: 8,
+		paddingTop: 15,
+		paddingBottom: 20,
+		backgroundColor: theme.toolbarbg,
+	},
+	more_media_title: {
+		fontSize: 16,
+		color: theme.tit2,
+		marginLeft: 15,
+	},
+	more_item_con: {
+		width: 155,
+		marginLeft: 15,
+	},
+	more_item_img: {
+		width: "100%",
+		aspectRatio: 1728 / 1080,
+		borderRadius: 6,
+		overflow: "hidden",
+	},
+	triangle: {
+		position: "absolute",
+		right: 0,
+		bottom: 0,
+		width: 30,
+		height: 30,
+		zIndex: 9,
+		marginRight: 10,
+		marginBottom: 10,
+	},
+	more_item_mtit: {
+		marginTop: 10,
+		fontSize: 14,
+		color: theme.tit2,
+	},
+	more_item_stit: {
+		marginTop: 5,
+		fontSize: 14,
+		color: theme.comment,
+	},
+	reply_con: {
+		borderTopColor: theme.bg,
+		borderTopWidth: 8,
+	},
+	reply_title: {
+		paddingHorizontal: 15,
+		paddingVertical: 10,
+		fontSize: 16,
+		color: theme.tit2
+	},
+	reply_empty_con: {
+		paddingVertical: 12,
+		paddingHorizontal: 16,
+		fontSize: 14,
+		color: theme.placeholder,
+		textAlign: "center"
+	},
+	list_item: {
+		paddingHorizontal: 5,
+		borderBottomColor: theme.bg,
+		borderBottomWidth: 1,
+	},
+	footer_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		backgroundColor: theme.toolbarbg,
+		borderTopWidth: 1,
+		borderTopColor: theme.bg,
+		paddingTop: 15,
+		paddingHorizontal: 24,
+	},
+	footer_radius: {
+		borderTopRightRadius: 20,
+		borderTopLeftRadius: 20,
+		borderTopWidth: 0,
+		overflow: "hidden",
+		alignItems: "flex-end",
+	},
+	footer_con_left: {
+		flex: 1,
+		backgroundColor: theme.bg,
+		borderRadius: 20,
+		paddingLeft: 12,
+		paddingRight: 5,
+	},
+	footer_input: {
+		padding: 0,
+		minHeight: 38,
+		maxHeight: 70,
+	},
+	footer_con_right: {
+		marginLeft: 20,
+	},
+	footer_publish: {
+		paddingHorizontal: 16,
+		height: 29,
+		borderRadius: 20,
+		marginBottom: 4,
+		justifyContent: "center",
+	},
+	publish_text: {
+		fontSize: 14,
+		color: theme.toolbarbg,
+	},
 });
 
 export default MediaListDetail;

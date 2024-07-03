@@ -43,6 +43,7 @@ function formatTime(second: string) {
 
 
 interface PropsType {
+	ref?: any,
 	source: string,	// 视频源
 	poster?: string,	// 封面
 	classname?: string,	// 当前页面名称
@@ -60,14 +61,15 @@ export default class VideoPlayer extends React.Component<PropsType> {
 
 	public videoRef: any = null;
 	public readonly state: any = {
+		ref: this.props.ref,
 		source: this.props.source,	// 视频源
 		poster: this.props.poster ? this.props.poster : "",	// 封面
 		classname: this.props.classname ? this.props.classname : "",	// 当前页面名称
 		videoWidth: screenWidth,	// 默认视频宽度
 		videoHeight: screenWidth * 1080 / 1728,	// 默认视频高度
-		showPoster: true,	// 是否显示视频封面
+		showPoster: this.props.showPoster != undefined ? this.props.showPoster : true,	// 是否显示视频封面
 		showControl: false,	// 是否显示控制条
-		isPlaying: false,	// 是否正在播放
+		isPlaying: this.props.isPlaying != undefined ? this.props.isPlaying : false,	// 是否正在播放
 		currentTime: 0,	// 当前播放时间
 		duration: 0,	// 视频总时长
 		isFullScreen: false,	// 是否全屏
@@ -85,7 +87,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={styles.container} onLayout={this._onLayout}>
-				<Video ref={(ref: any) => this.videoRef = ref}
+				<Video ref={(ref: any) => this.state.ref = ref}
 					source={{ uri: this.state.source }}
 					rate={1.0} // 播放速度
 					volume={1.0} // 播放音量
@@ -108,7 +110,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 							state.isFullScreen = true;
 						})
 					}}
-					onFullscreenPlayerWillDismiss={()=>{
+					onFullscreenPlayerWillDismiss={() => {
 						Orientation.lockToPortrait();
 						this.setState((state: any) => {
 							state.isFullScreen = false;
@@ -139,11 +141,11 @@ export default class VideoPlayer extends React.Component<PropsType> {
 							</TouchableWithoutFeedback>
 						}
 					</View>
-				</TouchableWithoutFeedback>} */}
-				{/* {(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
+				</TouchableWithoutFeedback>}
+				{(!this.state.showPoster && this.state.isBuffering) && <View style={[styles.video_con, { zIndex: 0 }]}>
 					<ActivityIndicator size="large" color="#fff" />
-				</View>} */}
-				{/* {this.state.showControl && <LinearGradient
+				</View>}
+				{this.state.showControl && <LinearGradient
 					colors={["transparent", "rgba(0,0,0,0.8)"]}
 					start={{ x: 0.5, y: 0 }}
 					end={{ x: 0.5, y: 1 }}
@@ -219,7 +221,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 	};
 
 	_onProgressChanged = (data: any) => {
-		console.log("%c Line:223 🍏 视频进度更新", "color:#7f2b82");
+		// console.log("%c Line:223 🍏 视频进度更新", "color:#7f2b82");
 		if (this.state.isPlaying) {
 			this.setState({
 				currentTime: data.currentTime,
@@ -324,7 +326,7 @@ export default class VideoPlayer extends React.Component<PropsType> {
 			})
 			StatusBar.setHidden(false);
 		}
-		events.publish(this.state.classname + "fullScreenChange", !this.state.isFullScreen);
+		// events.publish(this.state.classname + "fullScreenChange", !this.state.isFullScreen);
 	}
 
 	/// 进度条值改变

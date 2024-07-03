@@ -184,11 +184,10 @@ function Top({ navigation, route }: any): React.JSX.Element {
 									<Text style={styles.item_name}>{item.enname}</Text>
 								</Pressable>
 								<StarImage style={{ fontSize: 14, color: theme.comment }}
+									isShowScore={true}
 									item={{
-										istotal: item.istotal,
-										s0: item.s0,
-										s1: item.s1,
-										isscore: item.isscore,
+										istotal: item.istotal, isscore: item.isscore,
+										s0: item.s0, s1: item.s1,
 									}}
 								/>
 								<View style={styles.item_odor}>

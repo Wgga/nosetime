@@ -15,6 +15,7 @@ import FooterView from "../../components/footerview";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
 import AutoSizeImage from "../../components/autosizeimage";
+import ReplyView from "../../components/replyview";
 
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";
@@ -31,51 +32,6 @@ import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } fr
 import Icon from "../../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
-
-const ReplyItem = React.memo(({ item, islike }: any) => {
-
-	const handledesc = (desc: string) => {
-		let sz: any[] = [];
-		sz = desc.replace(/\r/g, "").replace(/\n\n/g, "\n").split(/\n/g).map((item: string, index: number) => {
-			return (<Text key={index} style={styles.reply_text}>{item}</Text>)
-		})
-		return sz;
-	};
-
-	return (
-		<View style={styles.reply_item}>
-			<FastImage style={styles.reply_avatar}
-				source={{ uri: ENV.avatar + item.uid + ".jpg?!l" + item.uface }}
-				resizeMode="contain"
-			/>
-			<View style={{ flex: 1, marginLeft: 11 }}>
-				<View style={styles.item_flex_row}>
-					<View style={[styles.info_name_con, { marginLeft: 0 }]}>
-						<Text style={[styles.info_name, { fontSize: 13 }]}>{item.uname}</Text>
-						<View style={Globalstyles.level}>
-							<Image
-								style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-								defaultSource={require("../../assets/images/nopic.png")}
-								source={require("../../assets/images/level.png")}
-							/>
-						</View>
-					</View>
-					<Pressable onPress={() => { }}>
-						<Icon name="shequsandian" size={16} color={theme.placeholder} />
-					</Pressable>
-				</View>
-				<View style={styles.main_desc}>{handledesc(item.desc)}</View>
-				<View style={[styles.item_flex_row, { marginBottom: 8 }]}>
-					<Text style={styles.main_time}>{item.cttime}</Text>
-					<View style={styles.reply_up}>
-						<Icon name={islike ? "up-checked" : "up"} size={15} color={theme.placeholder2} />
-						<Text style={styles.up_cnt}>{item.up}</Text>
-					</View>
-				</View>
-			</View>
-		</View>
-	)
-})
 
 const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 
@@ -469,7 +425,13 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 								{items_top.current.map((hot: any, index: number) => {
 									return (
 										<View key={hot.id}>
-											<ReplyItem item={hot} islike={like_.current[hot.id]} />
+											<ReplyView data={{
+												contentkey: "desc",
+												timekey: "cttime",
+												item: hot,
+												likedata: like_.current,
+												isShowSub: false,
+											}} />
 										</View>
 
 									)
@@ -480,26 +442,18 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					</>}
 					renderItem={({ item, index }: any) => {
 						return (
-							<View style={styles.list_item}>
-								<ReplyItem item={item} islike={like_.current[item.id]} />
-								{(item.sub && item.sub.length > 0) && <View style={styles.list_sub_item}>
-									{item.sub.map((sub: any, index: number) => {
-										return (
-											<View key={sub.id}>
-												{show_items(item.sub, index) && <ReplyItem item={sub} islike={like_.current[sub.id]} />}
-											</View>
-										)
-									})}
-									{show_items(item.sub, -1) && <Pressable onPress={() => {
-										display(item.sub);
-										setIsRender(val => !val);
-									}} style={Globalstyles.more_reply}>
-										{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
-										{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
-										<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
-									</Pressable>}
-								</View>}
-							</View>
+							<ReplyView data={{
+								contentkey: "desc",
+								timekey: "cttime",
+								item,
+								likedata: like_.current
+							}} method={{
+								display: () => {
+									display(item.sub);
+									setIsRender(val => !val);
+								},
+								show_items,
+							}} />
 						)
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={pages.current.items.length > 0} />}
@@ -689,45 +643,6 @@ const styles = StyleSheet.create({
 	hot_list_con: {
 		margin: 20,
 		backgroundColor: theme.bg,
-		borderRadius: 8,
-		overflow: "hidden",
-	},
-	reply_item: {
-		paddingVertical: 11,
-		paddingHorizontal: 15,
-		flexDirection: "row",
-	},
-	reply_avatar: {
-		width: 30,
-		height: 30,
-		borderRadius: 50,
-		overflow: "hidden",
-	},
-	item_flex_row: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
-	},
-	reply_up: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	up_cnt: {
-		fontSize: 12,
-		marginLeft: 3,
-		color: theme.placeholder2,
-		transform: [{ translateY: 1 }]
-	},
-	list_item: {
-		paddingHorizontal: 5,
-		borderBottomColor: theme.bg,
-		borderBottomWidth: 1,
-	},
-	list_sub_item: {
-		backgroundColor: theme.bg,
-		marginLeft: 50,
-		marginRight: 15,
-		marginBottom: 12,
 		borderRadius: 8,
 		overflow: "hidden",
 	},

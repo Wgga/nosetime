@@ -52,6 +52,8 @@ class ModalPortal extends React.Component {
 
 	show = (props) => {
 		const mergedProps = this.getProps(props);
+		const index = this.getIndex(mergedProps.key);
+		if (index > -1) return;
 		this.setState(({ stack }) => {
 			return { stack: stack.concat(mergedProps) };
 		});

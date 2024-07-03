@@ -30,7 +30,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 
 	// 状态
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
-	let homedataref = React.useRef<any>({
+	let homedata = React.useRef<any>({
 		banner: [],
 		newitem: {},
 		smellitems: [],
@@ -50,7 +50,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 	// 初始化首页数据
 	React.useEffect(() => {
 		http.get(ENV.article + "?method=gethomearticles").then((resp_data: any) => {
-			Object.assign(homedataref.current, resp_data);
+			Object.assign(homedata.current, resp_data);
 			http.get(ENV.evaluate + "?method=gethomemorevod").then((resp_data2: any) => {
 				resp_data2.items_heji.map((item: any) => {
 					item["maintit"] = item["name"].split("：")[0];
@@ -58,12 +58,12 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				});
 				// 处理本期视频数据
 				if (resp_data2.items_heji.length > 0 && resp_data.newitem.id == resp_data2.items_heji[0].viid) {
-					homedataref.current.newvod = resp_data2.items_heji[1];
+					homedata.current.newvod = resp_data2.items_heji[1];
 				} else {
-					homedataref.current.newvod = resp_data2.items_heji[0];
+					homedata.current.newvod = resp_data2.items_heji[0];
 				}
 				setIsRender(val => !val);
-				cache.saveItem("newitemid", [resp_data.newitem.id, homedataref.current.newvod.viid], 12 * 3600);
+				cache.saveItem("newitemid", [resp_data.newitem.id, homedata.current.newvod.viid], 12 * 3600);
 			}).catch((error: any) => { });
 		}).catch((error: any) => { });
 
@@ -72,11 +72,11 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				item["maintit"] = item["name"].split("：")[0];
 				item["subtit"] = item["name"].split("：")[1];
 			});
-			homedataref.current.hotvod = resp_data;
+			homedata.current.hotvod = resp_data;
 		}).catch((error: any) => { });
 
 		http.get(ENV.shequ + "?method=gettopiclist&forum=热门讨论").then((resp_data: any) => {
-			homedataref.current.topiclist = resp_data;
+			homedata.current.topiclist = resp_data;
 		}).catch((error: any) => { });
 	}, []);
 
@@ -95,22 +95,22 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
 	return (
 		<View onLayout={onLayout}>
-			<Slider navigation={navigation} banner={homedataref.current.banner} setSliderHeight={setSliderHeight} />
+			<Slider navigation={navigation} banner={homedata.current.banner} setSliderHeight={setSliderHeight} />
 			<View style={styles.homepart}>
-				<Pressable onPress={() => { gotoArticle(homedataref.current.newitem.id) }}>
-					<Text style={styles.title}>本期专题</Text>
+				<Pressable onPress={() => { gotoArticle(homedata.current.newitem.id) }}>
+					<Text style={styles.title}>{"本期专题"}</Text>
 					<View style={[styles.newarticleimg, styles.homemargin, styles.homebrs8]}>
-						<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + homedataref.current.newitem.pic }} />
+						<FastImage style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + homedata.current.newitem.pic }} />
 					</View>
 					<View style={styles.title_box}>
-						<Text numberOfLines={1} style={[styles.newitemtit2, styles.newitemtit]}>{homedataref.current.newitem?.title2}</Text>
-						<Text numberOfLines={1} style={[styles.newitemtit3, styles.newitemtit]}>{homedataref.current.newitem?.title3}</Text>
+						<Text numberOfLines={1} style={[styles.newitemtit2, styles.newitemtit]}>{homedata.current.newitem?.title2}</Text>
+						<Text numberOfLines={1} style={[styles.newitemtit3, styles.newitemtit]}>{homedata.current.newitem?.title3}</Text>
 					</View>
 				</Pressable>
 			</View>
 			<View style={styles.homepart}>
-				<Text style={styles.title}>寻味之旅</Text>
-				<FlatList data={homedataref.current.smellitems}
+				<Text style={styles.title}>{"寻味之旅"}</Text>
+				<FlatList data={homedata.current.smellitems}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{ paddingRight: 20 }}
@@ -120,7 +120,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							<View style={styles.itemContainer}>
 								<Pressable onPress={() => { gotoArticle(item.id) }}>
 									<View style={[styles.itemImg, styles.homebrs6]}>
-										{(homedataref.current.smellitems && homedataref.current.smellitems.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
+										{(homedata.current.smellitems && homedata.current.smellitems.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
 											source={{ uri: ENV.image + item.pic }} />}
 									</View>
 									<Text numberOfLines={1} style={styles.smellitemtit2}>{item.title2}</Text>
@@ -132,22 +132,22 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				/>
 			</View>
 			<View style={styles.homepart}>
-				<Text style={styles.title}>本期视频</Text>
+				<Text style={styles.title}>{"本期视频"}</Text>
 				<View style={styles.homemargin}>
-					<Pressable onPress={() => { gotoArticle(homedataref.current.newvod.viid) }}>
+					<Pressable onPress={() => { gotoArticle(homedata.current.newvod.viid) }}>
 						<View style={[styles.newvideoimg, styles.homebrs8]}>
-							{(homedataref.current.newvod && homedataref.current.newvod.vpicurl) && <FastImage style={{ width: "100%", height: "100%" }}
-								source={{ uri: homedataref.current.newvod.vpicurl }} />}
+							{(homedata.current.newvod && homedata.current.newvod.vpicurl) && <FastImage style={{ width: "100%", height: "100%" }}
+								source={{ uri: homedata.current.newvod.vpicurl }} />}
 							<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} resizeMode="contain" />
 						</View>
-						<Text numberOfLines={1} style={[styles.newvideomaintit]}>{homedataref.current.newvod.maintit}</Text>
-						{homedataref.current.newvod.subtit && <Text numberOfLines={1} style={[styles.newvideosubtit]}>{homedataref.current.newvod.subtit}</Text>}
+						<Text numberOfLines={1} style={[styles.newvideomaintit]}>{homedata.current.newvod.maintit}</Text>
+						{homedata.current.newvod.subtit && <Text numberOfLines={1} style={[styles.newvideosubtit]}>{homedata.current.newvod.subtit}</Text>}
 					</Pressable>
 				</View>
 			</View>
 			<View style={styles.homepart}>
-				<Text style={styles.title}>热门视频</Text>
-				<FlatList data={homedataref.current.hotvod}
+				<Text style={styles.title}>{"热门视频"}</Text>
+				<FlatList data={homedata.current.hotvod}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={{ paddingRight: 20 }}
@@ -157,7 +157,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							<View style={[styles.itemContainer, { width: 264 }]}>
 								<Pressable onPress={() => { gotoVod(item) }}>
 									<View style={[styles.itemvodImg, styles.homebrs6]}>
-										{(homedataref.current.hotvod && homedataref.current.hotvod.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
+										{(homedata.current.hotvod && homedata.current.hotvod.length > 0) && <FastImage style={{ width: "100%", height: "100%" }}
 											source={{ uri: item.vpicurl }} />}
 										<Image style={styles.triangle} source={require("../../assets/images/player/play.png")} resizeMode="contain" />
 									</View>
@@ -170,8 +170,8 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 				/>
 			</View>
 			<View style={styles.homepart}>
-				<Text style={styles.title}>热门讨论</Text>
-				<FlatList data={homedataref.current.topiclist}
+				<Text style={styles.title}>{"热门讨论"}</Text>
+				<FlatList data={homedata.current.topiclist}
 					horizontal={true}
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={styles.topicContent}
@@ -182,7 +182,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 								navigation.navigate("Page", { screen: "SocialShequDetail", params: { id: item.id, ctdlgid: item.dlgid } });
 							}} style={styles.topicitem}>
 								<View style={[styles.topicitemImg, styles.homebrs6]}>
-									{(homedataref.current.topiclist && homedataref.current.topiclist.length > 0) &&
+									{(homedata.current.topiclist && homedata.current.topiclist.length > 0) &&
 										<Image style={styles.topicitemImg} source={(imagelist[(index % 5)])} />}
 								</View>
 								<View style={styles.topic_title_box}>

@@ -180,8 +180,8 @@ const styles = StyleSheet.create({
 	},
 	searchbar_con: {
 		position: "relative",
-		height: 36,
 		flex: 1,
+		height: 36,
 		borderRadius: 30,
 		backgroundColor: theme.bg,
 		alignItems: "center",
@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		flex: 1,
 		color: theme.text2,
+		padding: 0,
 		paddingLeft: 20,
 	},
 	search_icon_con: {

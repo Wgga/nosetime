@@ -861,7 +861,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	// 状态
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
-
+	let loading = React.useRef<boolean>(true);
 	// 变量
 	let allodorcnt = React.useRef<number>(0); // 所有气味数量
 	let title = React.useRef<string>(""); // 标题
@@ -965,6 +965,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 	// 获取用户是否订阅当前商品到货
 	const getIsSubscribe = () => {
 		if (!us.user.uid) {
+			loading.current = false;
 			setIsRender(val => !val);
 			return;
 		}
@@ -976,6 +977,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 			for (var i in resp_data) {
 				issubscription_.current[resp_data[i]] = 1;
 			}
+			loading.current = false;
 			setIsRender(val => !val);
 		});
 	}
@@ -1033,6 +1035,9 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 
 	return (
 		<>
+			{loading.current && <View style={Globalstyles.loading_con}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
+			</View>}
 			<HeaderView data={{
 				title: title.current,
 				isShowSearch: false,
