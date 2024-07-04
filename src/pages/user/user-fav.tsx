@@ -347,7 +347,7 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 								loadMore(item)
 							}} style={styles.wiki_more_btn}>
 								<Text style={styles.more_text}>{"查看更多" + wikidata.current[item].text}</Text>
-								<Icon name="btmarrow" size={16} color={theme.text1} />
+								<Icon name="btmarrow" size={8} color={theme.text1} style={{ marginLeft: 4 }} />
 							</Pressable>}
 						</>}
 					</View>

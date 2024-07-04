@@ -805,7 +805,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 									{!item.isopen && <Text style={[Globalstyles.ellipsis_text, { color: theme.text2 }]}>{"..."}</Text>}
 									{!item.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"展开"}</Text>}
 									{item.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"收起"}</Text>}
-									<Icon name={item.isopen ? "toparrow" : "btmarrow"} size={14} color={theme.placeholder} style={{ transform: [{ scale: 1.5 }] }} />
+									<Icon name={item.isopen ? "toparrow" : "btmarrow"} size={10} color={theme.placeholder} style={{ marginLeft: 4 }} />
 								</View>}
 							</Pressable>}
 							<View style={styles.replyitem_btn_con}>
@@ -862,7 +862,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 															{!sub.isopen && <Text style={[Globalstyles.ellipsis_text, { color: theme.text2 }]}>{"..."}</Text>}
 															{!sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"展开"}</Text>}
 															{sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"收起"}</Text>}
-															<Icon name={sub.isopen ? "toparrow" : "btmarrow"} size={14} color={theme.placeholder} style={{ transform: [{ scale: 1.5 }] }} />
+															<Icon name={sub.isopen ? "toparrow" : "btmarrow"} size={10} color={theme.placeholder} style={{ marginLeft: 4 }}/>
 														</View>}
 													</Pressable>}
 													<View style={[styles.replyitem_btn_con, { marginTop: 8, marginLeft: 0, }]}>
@@ -892,7 +892,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 								}} style={[Globalstyles.more_reply, { marginLeft: 30 }]}>
 									{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
 									{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
-									<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
+									<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={8} color={theme.tit} style={{ marginLeft: 4 }} />
 								</Pressable>}
 							</View>}
 						</View>

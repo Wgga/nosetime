@@ -87,7 +87,7 @@ const ReplyView = React.memo(({ data, method = {} }: any) => {
 				}} style={Globalstyles.more_reply}>
 					{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
 					{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
-					<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
+					<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={8} style={{ marginLeft: 4 }} color={theme.tit} />
 				</Pressable>}
 			</View>}
 		</View>

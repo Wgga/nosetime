@@ -284,7 +284,10 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 		}).then((data: any) => {
 			maxtotal.current = data.lineInfo.start - 4;
 			setIntroContent(itemdata.current.intro.slice(0, maxtotal.current));
-		}).catch(() => { });
+		}).catch(() => {
+			maxtotal.current = itemdata.current.intro.length;
+			setIntroContent(itemdata.current.intro.slice(0, maxtotal.current));
+		});
 	}
 	// 显示全部简介
 	const showPopover = () => {
@@ -726,12 +729,14 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 							onPress={showPopover}>
 							{itemdata.current.poster && <Image style={styles.intro_img} source={{ uri: ENV.image + "/post/" + itemdata.current.poster + ".jpg" }} />}
 							{itemdata.current.intro && <View style={{ flex: 1 }} onLayout={setIntrodata}>
-								<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
-								{itemdata.current.intro.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
-									<Text style={styles.intro_text}>{"..."}</Text>
-									<Text style={styles.intro_morebtn_text}>{"展开"}</Text>
-									<Icon style={{ transform: [{ translateY: 1 }] }} name="btmarrow" size={28} color={"rgba(255,255,255,0.3)"} />
-								</View>}
+								{introcontent && <>
+									<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
+									{itemdata.current.intro.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
+										<Text style={styles.intro_text}>{"..."}</Text>
+										<Text style={styles.intro_morebtn_text}>{"展开"}</Text>
+										<Icon style={{ marginLeft: 5 }} name="btmarrow" size={10} color={"rgba(255,255,255,0.3)"} />
+									</View>}
+								</>}
 							</View>}
 						</Pressable>}
 					</View>}
@@ -1643,15 +1648,15 @@ const styles = StyleSheet.create({
 	},
 	intro_morebtn_con: {
 		position: "absolute",
-		right: -5,
-		bottom: -3,
+		right: 0,
+		bottom: 0,
 		flexDirection: "row",
 		alignItems: "center",
 	},
 	intro_morebtn_text: {
 		fontSize: 14,
-		transform: [{ translateX: 5 }],
 		color: "rgba(255,255,255,0.3)",
+		marginLeft: 5
 	},
 	h_list_item_con: {
 		width: 103,

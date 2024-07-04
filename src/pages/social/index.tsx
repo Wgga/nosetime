@@ -160,7 +160,7 @@ function Social({ navigation, route }: any): React.JSX.Element {
 										return (
 											<View style={styles.tabbar_con}>
 												<Text style={[styles.title_text, { color }]}>{route.title}</Text>
-												{route.key == "new" && <Icon name={isShowfilter ? "toparrow" : "btmarrow"} size={16} color={color} />}
+												{route.key == "new" && <Icon name={isShowfilter ? "toparrow" : "btmarrow"} size={8} color={color} style={{ marginLeft: 4 }} />}
 											</View>
 										)
 									}}
