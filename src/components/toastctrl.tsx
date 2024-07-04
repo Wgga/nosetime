@@ -29,7 +29,7 @@ class Toast {
 	}
 
 	show(toastdata: any) {
-		let data: any = { ...Object.assign(this.toast_data, toastdata) };
+		let data: any = Object.assign({ ...this.toast_data }, toastdata);
 		ModalPortal.show((
 			<View style={styles.containerView}>
 				{data.key == "loading_toast" && <View style={styles.toast_loading_wrapper}>

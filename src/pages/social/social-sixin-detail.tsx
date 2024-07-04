@@ -202,7 +202,7 @@ const SocialSixinDetail = React.memo(({ navigation, route }: any) => {
 					onEndReached={() => {
 						items.current.length > 0 && fetch();
 					}}
-					onScrollBeginDrag={() => { Keyboard.dismiss() }}
+					keyboardDismissMode="on-drag"
 					keyExtractor={(item: any, index: number) => item.time}
 					renderItem={({ item, index }: any) => (<>
 						{item.type != 2 && <View style={[styles.item_container, {

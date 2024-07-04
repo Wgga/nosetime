@@ -28,7 +28,7 @@ function Route(): React.JSX.Element {
 				"ItemDetail",
 				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
 				"SocialShequDetail", "SocialXiaoxi",
-				"Login", "User", "UserJifen", "Lottery", "UserFav",
+				"Login", "User", "UserJifen", "Lottery", "UserFav", "UserDetail",
 			];
 			const unsubscribe = navigation.addListener("state", () => {
 				let isMatched = urlRegex.find((item) => { return item == navigation.getCurrentRoute().name });

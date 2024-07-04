@@ -267,6 +267,14 @@ const Globalstyles: any = StyleSheet.create({
 		lineHeight: 44,
 		zIndex: 1
 	},
+	// 头部View脱离文档流
+	absolute: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		backgroundColor: "transparent",
+	},
 	// 帖子首页类型筛选遮罩
 	social_mask: {
 		...StyleSheet.absoluteFillObject,

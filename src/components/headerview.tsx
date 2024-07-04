@@ -94,16 +94,16 @@ const HeaderView = React.memo(({ data, method, children, MenuChildren = null }: 
 				{isShowSearch && <View style={styles.searchbar_con}>
 					<TextInput ref={ref => { if (ref && isautoFocus) { ref.focus() } }}
 						style={styles.searchbar}
+						multiline={false}
 						placeholder={placeholder}
 						autoFocus={isautoFocus}
 						onChangeText={text => {
 							setWord(text)
 						}}
 						value={word}
-						onKeyPress={(e) => {
-							if (e.nativeEvent.key === "Enter") {
-								Search(word);
-							}
+						onSubmitEditing={(e) => {
+							if (!e.nativeEvent.text) return
+							Search(word);
 						}}
 					/>
 					<View style={styles.search_icon_con}>

@@ -115,7 +115,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		})
 
 		events.subscribe(classname + id + "isShowKeyboard", (val: boolean) => {
-			showFooterMask(val);
 			if (!val) {
 				info.current = {
 					refid: 0,
@@ -127,6 +126,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					refcontent: "",
 				};
 			}
+			showFooterMask(val);
 		})
 
 		return () => {
@@ -640,7 +640,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				// showmenu,
 				style: [
 					// isfull && styles.hide_view,
-					!articledata.current.mp4URL && styles.notmp4
+					!articledata.current.mp4URL && Globalstyles.absolute
 				],
 				childrenstyle: {
 					headercolor: { color: !articledata.current.mp4URL ? theme.toolbarbg : theme.text2 },
@@ -968,13 +968,6 @@ const styles = StyleSheet.create({
 	},
 	textline: {
 		textDecorationLine: "underline"
-	},
-	notmp4: {
-		backgroundColor: "transparent",
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
 	},
 	scrollview_con: {
 		width: "100%",

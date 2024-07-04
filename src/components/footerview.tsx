@@ -51,7 +51,7 @@ function FooterView({ data, method, children }: any): React.JSX.Element {
 					</View>
 					<View style={styles.footer_con_right}>
 						{children}
-						{(showBtn || isfocus) && <Pressable onPress={publish}><LinearGradient style={styles.footer_publish}
+						{(showBtn || isfocus) && <Pressable onPress={publish}><LinearGradient style={[styles.footer_publish, , isfocus && { marginBottom: 5 }]}
 							colors={["#81B4EC", "#9BA6F5"]}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 0 }}
@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		height: 29,
 		borderRadius: 20,
-		marginBottom: 4,
 		justifyContent: "center",
 	},
 	publish_text: {

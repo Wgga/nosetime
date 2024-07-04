@@ -286,33 +286,38 @@ function User({ navigation }: any): React.JSX.Element {
 					</View>
 				</View>
 				<Brightness amount={0.85} style={styles.user_page_con}>
-					<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
-					<Image style={styles.user_page_msk}
-						source={require("../../assets/images/user/userpage.png")}
-					/>
-					<View style={styles.page_text_con}>
-						<Text style={styles.page_main_text}>{"个人主页"}</Text>
-						<View style={styles.page_sub_text_con}>
-							<Text style={styles.sub_text}>{"我的香路历程"}</Text>
-							<Icon name="r-return" size={14} color={theme.toolbarbg} />
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "UserDetail", params: { uid: us.user.uid } })
+					}}>
+						<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+						<Image style={styles.user_page_msk}
+							source={require("../../assets/images/user/userpage.png")}
+						/>
+						<View style={styles.page_text_con}>
+							<Text style={styles.page_main_text}>{"个人主页"}</Text>
+							<View style={styles.page_sub_text_con}>
+								<Text style={styles.sub_text}>{"我的香路历程"}</Text>
+								<Icon name="r-return" size={14} color={theme.toolbarbg} />
+							</View>
 						</View>
-					</View>
+					</Pressable>
 				</Brightness>
 				<View style={styles.user_page_btn}>
-					<Pressable onPress={() => { gotodetail("UserJifen") }} style={[styles.page_btn_item, { marginRight: 7.5 }]}>
+					<Pressable onPress={() => { gotodetail("UserJifen") }} style={styles.page_btn_item}>
 						<Text style={styles.item_main_tit}>{"积分集市"}</Text>
 						<View style={styles.item_sub_tit_con}>
 							<Text style={styles.item_sub_tit}>{"我的积分 " + pointval.current}</Text>
 							<Icon name="r-return" size={12} color={theme.comment} />
 						</View>
+						<Image style={styles.page_bg} source={require("../../assets/images/user/jifen.png")} resizeMode="contain" />
 					</Pressable>
-					<View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
+					{/* <View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
 						<Text style={styles.item_main_tit}>{"香水学院"}</Text>
 						<View style={styles.item_sub_tit_con}>
 							<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
 							<Icon name="r-return" size={12} color={theme.comment} />
 						</View>
-					</View>
+					</View> */}
 				</View>
 				<View>
 					<View style={styles.btns_item_con}>
@@ -475,6 +480,13 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		color: theme.comment,
 		marginRight: 5,
+	},
+	page_bg: {
+		width: 55,
+		height: 55,
+		position: "absolute",
+		right: 10,
+		bottom: 20,
 	},
 	btns_item_con: {
 		flexDirection: "row",

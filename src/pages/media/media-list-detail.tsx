@@ -20,10 +20,12 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, toCamelCase, show_items, display } from "../../configs/globalmethod";
+import { Globalstyles, toCamelCase, display } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import ReplyView from "../../components/replyview";
+import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ToastCtrl from "../../components/toastctrl";
 
 
 const MediaListDetail = React.memo(({ navigation, route }: any) => {
@@ -36,9 +38,16 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 	// 变量
 	let id = React.useRef<number>(0);
 	let mid = React.useRef<number>(0);
-	let info = React.useRef<any>({
+	let replyinfo = React.useRef<any>({
+		refid: 0,
 		replytext: "",
+		refuname: "",
 		holder: "我此刻的想法是...",
+	});
+	let info = React.useRef<any>({
+		mid: 0,
+		iid: 0,
+		cotnet: "",
 	});
 	let itemdata = React.useRef<any>({});
 	let mediadata = React.useRef<any>({});
@@ -64,6 +73,14 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		init();
 
 		events.subscribe(classname + id.current + "isShowKeyboard", (val: boolean) => {
+			if (!val) {
+				replyinfo.current = {
+					refid: 0,
+					replytext: "",
+					refuname: "",
+					holder: "我此刻的想法是...",
+				};
+			}
 			showFooterMask(val);
 		})
 
@@ -92,7 +109,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 				}
 			}).catch(() => {
 				http.get(ENV.item + "?method=mediadetail&id=" + id.current + "&mid=" + mid.current).then((resp_data: any) => {
-					cache.saveItem(classname + mid.current + "piclist", resp_data, 600);
+					cache.saveItem(classname + mid.current + "medialist", resp_data, 600);
 					setmediadata(resp_data);
 					resolve(1);
 				})
@@ -109,6 +126,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		mediadata.current = data;
 	}
 
+	// 获取统计数据
 	const getStatData = () => {
 		return new Promise((resolve, reject) => {
 			http.get(ENV.pic + "?method=getstat&mid=" + mid.current + "&t=" + (new Date).getTime()).then((resp_data: any) => {
@@ -176,6 +194,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
+	// 初始化
 	const init = () => {
 		Promise.all([getItemData(), getMediaDetail(), getStatData(), getMoreMediaData()]).then((data: any) => {
 			islike();
@@ -203,8 +222,31 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 发布评论
 	const publish = () => {
+		var replytext = "";
+		if (replyinfo.current.replytext) replytext = replyinfo.current.replytext.trim();
+		if (replytext == "") return;
+		info.current.mid = mid.current;
+		info.current.iid = id.current;
+		info.current.content = replytext;
 
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App单品视频页" } });
+		}
+		http.post(ENV.pic + "?uid=" + us.user.uid, { method: "replymedia", token: us.user.token, refid: replyinfo.current.refid, info: info.current }).then((resp_data: any) => {
+			Keyboard.dismiss();
+			if (resp_data.msg == "OK") {
+				replyinfo.current.replytext = "";
+				getReplyData(1);
+				ToastCtrl.show({ message: "发布成功", duration: 1000, viewstyle: "short_toast", key: "publish_success_toast" });
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品视频页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_error_toast" });
+			}
+		});
 	}
 
 	// 动态修改底部输入框遮罩透明度和层级
@@ -235,6 +277,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		setIsFocus(bol);
 	}
 
+	// 跳转详情
 	const gotodetail = (page: any, item: any) => {
 		if (videoRef) videoRef.current.state.ref.pause();
 		let screen = toCamelCase(page);
@@ -243,6 +286,66 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 		} else {
 			navigation.push("Page", { screen, params: { id: item.id, src: "App单品视频页" } });
 		}
+	}
+
+	// 打开评论回复菜单
+	const reply_menu = (item: any) => {
+		ActionSheetCtrl.show({
+			key: "reply_action_sheet",
+			buttons: [{
+				text: "回复",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("reply_action_sheet");
+					replyinfo.current.refid = item.id;
+					replyinfo.current.refuname = item.uname;
+					replyinfo.current.holder = "回复 " + item.uname;
+					if (inputref.current) inputref.current.focus();
+					setIsRender(val => !val);
+				}
+			}, {
+				text: "取消",
+				style: { color: theme.tit },
+				handler: () => {
+					ActionSheetCtrl.close("reply_action_sheet");
+				}
+			}],
+		})
+	}
+
+	// 点赞评论
+	const like_reply = (item: any) => {
+		if (!us.user.uid) {
+			return navigation.push("Page", { screen: "Login", params: { src: "App单品视频页" } });
+		}
+		http.post(ENV.pic + "?uid=" + us.user.uid, { method: "togglefavcomment", mcid: item.id, token: us.user.token }).then((resp_data: any) => {
+			if (resp_data.msg == "ADD") {
+				like_.current[item.id] = 1;
+				item.up = parseInt(item.up) + 1;
+			} else if (resp_data.msg == "REMOVE") {
+				like_.current[item.id] = 0;
+				item.up = parseInt(item.up) - 1;
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.push("Page", { screen: "Login", params: { src: "App单品视频页" } });
+			}
+			setIsRender(val => !val);
+		})
+	}
+
+	// 点击评论回复
+	const reply = (refid: number, refuname: string) => {
+		if (refid == replyinfo.current.refid) {
+			replyinfo.current.refid = 0;
+			replyinfo.current.refuname = "";
+			replyinfo.current.holder = "写跟帖";
+		} else {
+			replyinfo.current.refid = refid;
+			replyinfo.current.refuname = refuname;
+			replyinfo.current.holder = "回复 " + refuname;
+		}
+		if (inputref.current) inputref.current.focus();
+		setIsRender(val => !val);
 	}
 
 	return (
@@ -286,7 +389,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 						{mediadata.current.vdesc && <Text style={styles.media_desc}>{mediadata.current.vdesc}</Text>}
 						{itemdata.current.fragrance && <View style={styles.fragrance_con}>
 							<Text style={styles.fragrance_title}>{"香调："}</Text>
-							<Text style={styles.fragrance_text} onPress={() => { }}>{itemdata.current.fragrance}</Text>
+							<Text style={styles.fragrance_text}>{itemdata.current.fragrance}</Text>
 						</View>}
 						<View style={styles.fragrance_list}>
 							{(itemdata.current.top && itemdata.current.top.length > 0) && <View style={[styles.fragrance_con, styles.list_con]}>
@@ -410,11 +513,9 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 							item,
 							likedata: like_.current
 						}} method={{
-							display: () => {
-								display(item.sub);
-								setIsRender(val => !val);
-							},
-							show_items,
+							reply_menu,
+							like_reply,
+							reply,
 						}} />
 					)
 				}}
@@ -424,12 +525,12 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 				<Pressable onPress={() => { Keyboard.dismiss(); }} style={{ flex: 1 }}></Pressable>
 			</Animated.View>
 			{id.current > 0 && <FooterView data={{
-				placeholder: info.current.holder, replytext: info.current.replytext,
+				placeholder: replyinfo.current.holder, replytext: replyinfo.current.replytext,
 				inputref, classname: classname + id.current,
 				showBtn: true
 			}} method={{
 				onChangeText: (val: string) => {
-					info.current.replytext = val;
+					replyinfo.current.replytext = val;
 					setIsRender(val => !val);
 				},
 				publish,

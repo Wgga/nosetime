@@ -5,15 +5,16 @@ import FastImage from "react-native-fast-image";
 
 import theme from "../configs/theme";
 import { ENV } from "../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../configs/globalmethod";
 
 import Icon from "../assets/iconfont";
 
 const { width, height } = Dimensions.get("window");
 
-const ReplyItem = React.memo(({ data }: any) => {
+const ReplyItem = React.memo(({ data, method = {} }: any) => {
 
 	const { contentkey, timekey, item, islike } = data;
+	const { reply_menu, like_reply, reply } = method;
 
 	const handledesc = (desc: string) => {
 		let sz: any[] = [];
@@ -40,17 +41,17 @@ const ReplyItem = React.memo(({ data }: any) => {
 							/>
 						</View>
 					</View>
-					<Pressable onPress={() => { }}>
+					<Pressable hitSlop={10} onPress={() => { reply_menu(item) }}>
 						<Icon name="shequsandian" size={16} color={theme.placeholder} />
 					</Pressable>
 				</View>
-				<View style={styles.main_desc}>{handledesc(item[contentkey])}</View>
+				<Pressable style={styles.main_desc} onPress={() => { reply(item.id, item.uname) }}>{handledesc(item[contentkey])}</Pressable>
 				<View style={[styles.item_flex_row, { marginBottom: 8 }]}>
 					<Text style={styles.main_time}>{item[timekey]}</Text>
-					<View style={styles.reply_up}>
+					<Pressable hitSlop={10} style={styles.reply_up} onPress={() => { like_reply(item) }}>
 						<Icon name={islike ? "up-checked" : "up"} size={15} color={theme.placeholder2} />
-						<Text style={styles.up_cnt}>{item.up}</Text>
-					</View>
+						{item.up > 0 && <Text style={styles.up_cnt}>{item.up}</Text>}
+					</Pressable>
 				</View>
 			</View>
 		</View>
@@ -60,20 +61,30 @@ const ReplyItem = React.memo(({ data }: any) => {
 const ReplyView = React.memo(({ data, method = {} }: any) => {
 
 	const { contentkey, timekey, item, likedata, isShowSub } = data;
-	const { show_items, display } = method;
+	const { reply_menu, like_reply, reply } = method;
+
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	return (
 		<View style={styles.list_item}>
-			<ReplyItem data={{ contentkey, timekey, item, islike: likedata[item.id] }} />
+			<ReplyItem data={{ contentkey, timekey, item, islike: likedata[item.id] }} method={{ reply_menu, like_reply, reply }} />
 			{(isShowSub || (item.sub && item.sub.length > 0)) && <View style={styles.list_sub_item}>
 				{item.sub.map((sub: any, index: number) => {
 					return (
 						<View key={sub.id}>
-							{show_items(item.sub, index) && <ReplyItem data={{ contentkey, timekey, item: sub, islike: likedata[sub.id] }} />}
+							{show_items(item.sub, index) && <ReplyItem data={{
+								contentkey,
+								timekey,
+								item: sub,
+								islike: likedata[sub.id]
+							}} method={{ reply_menu, like_reply, reply }} />}
 						</View>
 					)
 				})}
-				{show_items(item.sub, -1) && <Pressable onPress={display} style={Globalstyles.more_reply}>
+				{show_items(item.sub, -1) && <Pressable onPress={() => {
+					display(item.sub);
+					setIsRender(val => !val);
+				}} style={Globalstyles.more_reply}>
 					{!item.sub.show && <Text style={Globalstyles.more_reply_text}>{"共" + item.sub.length + "条回复"}</Text>}
 					{item.sub.show && <Text style={Globalstyles.more_reply_text}>{"收起回复"}</Text>}
 					<Icon name={item.sub.show ? "toparrow" : "btmarrow"} size={16} color={theme.tit} />
