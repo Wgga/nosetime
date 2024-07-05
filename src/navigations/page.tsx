@@ -19,6 +19,8 @@ import Top from "../pages/smart/top";
 
 import PerfumeListSquare from "../pages/perfume/perfume-list-square";
 import PerfumeListTag from "../pages/perfume/perfume-list-tag";
+import PerfumeListEdit from "../pages/perfume/perfume-list-edit";
+import PerfumeList from "../pages/perfume/perfume-list";
 
 import SocialShequDetail from "../pages/social/social-shequ-detail";
 import SocialShequPost from "../pages/social/social-shequ-post";
@@ -72,6 +74,8 @@ function Page(): React.JSX.Element {
 
 			<Stack.Screen name="PerfumeListSquare" component={PerfumeListSquare} />
 			<Stack.Screen name="PerfumeListTag" component={PerfumeListTag} />
+			<Stack.Screen name="PerfumeListEdit" component={PerfumeListEdit} />
+			<Stack.Screen name="PerfumeList" component={PerfumeList} />
 
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
 			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />

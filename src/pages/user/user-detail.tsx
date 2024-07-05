@@ -15,11 +15,14 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles, handlestarLeft, toCamelCase } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import { ShadowedView } from "react-native-fast-shadow";
 import reactNativeTextSize from "react-native-text-size";
+import { ModalPortal } from "../../components/modals";
+import PhotoPopover from "../../components/popover/photo-popover";
+import ActionSheetCtrl from "../../components/actionsheetctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,7 +36,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let uface = React.useRef<number>(0);
 	let avatar = React.useRef<string>("");
 	let who = React.useRef<string>("");
-	let topic_type = React.useRef<string>("");
+	let topicTab = React.useRef<string>("");
 	let colTab = React.useRef<string>("");
 	let maxtotal = React.useRef<number>(0);
 	const [curTab, setCurTab] = React.useState<string>("home");
@@ -50,10 +53,13 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	});
 	let favcnt = React.useRef<number>(0);
 	let commoncnt = React.useRef<number>(0);
+	let aImages = React.useRef<any[]>([]);
 	// 参数
 	// 状态
-	let isShowCol = React.useRef<boolean>(false);
-	let isShowTopic = React.useRef<boolean>(false);
+	let isShowUsercol = React.useRef<boolean>(false);
+	let isShowFavcol = React.useRef<boolean>(false);
+	let isShowUserTopic = React.useRef<boolean>(false);
+	let isShowFavTopic = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
@@ -87,11 +93,14 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		if (!data) return;
 		if (data.shorts) data.shorts = data.shorts.slice(0, 2);
 		if (data.discusss) data.discusss = data.discusss.slice(0, 2);
-		if (data.topics && data.topics.length > 0) isShowTopic.current = true;
-		topic_type.current = data.topics && data.topics.length > 0 ? who.current : "collect";
+		if (data.topics && data.topics.length > 0) isShowUserTopic.current = true;
+		topicTab.current = isShowUserTopic.current ? who.current : "fav";
 		data.friend = parseInt(data.care) + parseInt(data.fans);
 		data.records = parseInt(data.wanted) + parseInt(data.smelt) + parseInt(data.have);
 		data.udesc = data.udesc ? data.udesc.replace(/\n/g, "") : "";
+		for (let i = 0; i < data.photos.length; i++) {
+			aImages.current.push(ENV.image + "/uploads/" + data.photos[i] + ".jpg");
+		}
 		info.current = data;
 		avatar.current = ENV.avatar + info.current.uid + ".jpg?" + info.current.uface;
 		// this.getaddtiondata();
@@ -102,7 +111,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		return new Promise((resolve, reject) => {
 			http.post(ENV.shequ, { method: "getfavtopic", id: uid.current }).then((resp_data: any) => {
 				favTopics.current = resp_data.slice(0, 2);
-				if (resp_data.length > 0) isShowTopic.current = true;
+				if (resp_data.length > 0) isShowFavTopic.current = true;
 				resolve(1);
 			})
 		})
@@ -129,6 +138,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				resolve(0);
 			} else {
 				http.get(ENV.collection + "?method=getusercollections&uid=" + uid.current).then((resp_data: any) => {
+					if (resp_data.length > 0) isShowUsercol.current = true;
 					usercol.current = resp_data;
 					resolve(1);
 				})
@@ -143,6 +153,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				resolve(0);
 			} else {
 				http.get(ENV.collection + "?method=getfavcollections&uid=" + uid.current).then((resp_data: any) => {
+					if (resp_data.length > 0) isShowFavcol.current = true;
 					favcol.current = resp_data;
 					resolve(1);
 				});
@@ -156,7 +167,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			if (uid.current == us.user.uid) {
 				resolve(0);
 			} else {
-				http.get(ENV.user + "?method=compare&uida=" + uid.current + '&uidb=' + us.user.uid).then((resp: any) => {
+				http.get(ENV.user + "?method=compare&uida=" + uid.current + "&uidb=" + us.user.uid).then((resp: any) => {
 					commonfavs.current = resp;
 					commoncnt.current = 0;
 					for (var i in resp) {
@@ -172,6 +183,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 初始化
 	const init = () => {
 		Promise.all([
 			getUserData(),
@@ -182,7 +194,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			getCompare()
 		]).then(() => {
 			colTab.current = usercol.current.length == 0 && favcol.current.length > 0 ? "fav" : "user";
-			if (usercol.current.length > 0 || favcol.current.length > 0) isShowCol.current = true;
 			setIsRender(val => !val);
 		})
 	}
@@ -203,6 +214,58 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			maxtotal.current = info.current.udesc.length;
 			setIntroContent(info.current.udesc.slice(0, maxtotal.current));
 		});
+	}
+
+	// 切换香单类型
+	const toggleCol = (type: string) => {
+		if (colTab.current == type) return;
+		colTab.current = type;
+		setIsRender(val => !val);
+	}
+
+	// 切换话题类型
+	const toggleTopic = (type: string) => {
+		if (topicTab.current == type) return;
+		topicTab.current = type;
+		setIsRender(val => !val);
+	}
+
+	// 跳转页面
+	const gotodetail = (page: string, item?: any) => {
+		if (page == "user-fav") {
+			navigation.navigate("Page", { screen: "UserFav", params: { id: 0, uid: uid.current } });
+		} else if (page == "item-detail") {
+			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id } });
+		} else {
+			let screen = toCamelCase(page);
+			navigation.navigate("Page", { screen: screen, params: { uid: uid.current } });
+		}
+	}
+
+	// 查看相册大图
+	const open_PhotoPopover = (slideimgindex: number) => {
+		ModalPortal.show((
+			<PhotoPopover modalparams={{
+				key: "user_photo_popover",
+				slideimgindex,
+				slideimglist: aImages.current,
+			}} />
+		), {
+			key: "user_photo_popover",
+			width,
+			height,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("user_photo_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("user_photo_popover");
+				return true;
+			},
+			animationDuration: 300,
+			modalStyle: { backgroundColor: "transparent" },
+		})
 	}
 
 	return (
@@ -236,7 +299,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
-						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-fav") }}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
 					</View>}
 				</View>
 				{info.current.name != "[已注销] " && <View style={styles.page_tabbar_con}>
@@ -254,17 +317,17 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						source={require("../../assets/images/empty/ohomepage_blank.png")}
 						resizeMode="contain"
 					/>}
-					{(info.current.name != "[已注销] " && curTab == "home") && <View style={styles.page_home_con}>
+					{(info.current.name != "[已注销] " && curTab == "home") && <View>
 						{(
 							us.user.uid != uid &&
 							info.current.uiid == 0 && info.current.photo == 0 && commoncnt.current == 0 &&
 							info.current.short == 0 && info.current.discuss == 0 &&
-							isShowCol.current && isShowTopic.current
+							isShowUsercol.current && isShowFavcol.current && isShowFavTopic.current && isShowUserTopic.current
 						) && <Image style={Globalstyles.emptyimg}
 							source={require("../../assets/images/empty/ohomepage_blank.png")}
 							resizeMode="contain" />
 						}
-						{(us.user.uid != uid.current && commoncnt.current > 0) && <View style={styles.commonfav_container}>
+						{(us.user.uid != uid.current && commoncnt.current > 0) && <View style={styles.item_padding}>
 							<ShadowedView style={styles.commonfav_con}>
 								<View style={styles.commonfav_avatar_con}>
 									{avatar.current && <Image style={styles.commonfav_avatar} source={{ uri: avatar.current }} />}
@@ -289,47 +352,41 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							<View style={styles.item_title}>
 								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{"签名香"}</Text>
 							</View>
-							<View style={styles.mine_perfume}>
+							<Pressable style={styles.mine_perfume} onPress={() => { gotodetail("item-detail", { id: info.current.uiid }) }}>
 								<Image style={styles.mine_perfume_img} source={{ uri: ENV.image + "/perfume/" + info.current.uiid + ".jpg!m" }} resizeMode="contain" />
-							</View>
+								<View>
+									<Text style={styles.mine_perfume_name}>{info.current.uitem.cnname}</Text>
+									<Text style={[styles.mine_perfume_name, { color: theme.text2 }]}>{info.current.uitem.enname}</Text>
+								</View>
+							</Pressable>
 						</View>}
-						{(isShowCol.current || us.user.uid == uid.current) && <View style={styles.item_list}>
+						{(isShowUsercol.current || isShowFavcol.current || us.user.uid == uid.current) && <View style={styles.item_list}>
 							<View style={styles.item_title}>
 								<View style={styles.item_flex_row}>
-									<Text style={[
-										styles.tit_text,
-										colTab.current == "user" && { color: theme.tit2 }
-									]} onPress={() => {
-										colTab.current = "user"
-										setIsRender(val => !val)
-									}}>{"自建香单"}</Text>
-									<Text style={styles.tit_text}>|</Text>
-									<Text style={[
-										styles.tit_text,
-										colTab.current == "fav" && { color: theme.tit2 }
-									]} onPress={() => {
-										colTab.current = "fav"
-										setIsRender(val => !val)
-									}}>{"收藏香单"}</Text>
+									{isShowUsercol.current && <Text style={[styles.tit_text, colTab.current == "user" && { color: theme.tit2 }]} onPress={() => { toggleCol("user") }}>{"自建香单"}</Text>}
+									{(isShowUsercol.current && isShowFavcol.current) && <Text style={styles.tit_text}>|</Text>}
+									{isShowFavcol.current && <Text style={[styles.tit_text, colTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleCol("fav") }}>{"收藏香单"}</Text>}
 								</View>
-								<View style={styles.item_flex_row}>
+								<Pressable hitSlop={10} style={styles.item_flex_row} onPress={() => { gotodetail("perfume-list") }}>
 									<Text style={styles.col_btn}>{"全部"}</Text>
 									<Icon name="advance" size={14} color={theme.color} />
-								</View>
+								</Pressable>
 							</View>
 							<FlatList data={colTab.current == "user" ? usercol.current : favcol.current}
 								horizontal={true}
 								showsHorizontalScrollIndicator={false}
-								contentContainerStyle={styles.perfume_list}
+								contentContainerStyle={styles.item_padding}
 								keyExtractor={(item: any) => item.cid}
 								ListFooterComponent={
 									<>
-										{(uid.current == us.user.uid && usercol.current.length < 4 && colTab.current == "user") && <View style={styles.perfume_item}>
-											<Image style={styles.item_image}
-												source={require("../../assets/images/edit.png")}
-											/>
-											<Text numberOfLines={2} style={styles.item_cname}>{"新建香单"}</Text>
-										</View>}
+										{(uid.current == us.user.uid && usercol.current.length < 4 && colTab.current == "user") &&
+											<Pressable style={styles.perfume_item} onPress={() => { gotodetail("perfume-list-edit") }}>
+												<Image style={styles.item_image}
+													source={require("../../assets/images/edit.png")}
+												/>
+												<Text numberOfLines={2} style={styles.item_cname}>{"新建香单"}</Text>
+											</Pressable>
+										}
 									</>
 								}
 								renderItem={({ item }: any) => {
@@ -344,6 +401,119 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 								}}
 							/>
 						</View>}
+						{info.current.photo > 0 && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的相册 (" + info.current.photo + ")"}</Text>
+							</View>
+							{(info.current.photos && info.current.photos.length > 0) && <FlatList data={info.current.photos}
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.item_padding}
+								keyExtractor={(item: any) => item}
+								renderItem={({ item, index }: any) => {
+									return (
+										<Pressable onPress={() => { open_PhotoPopover(index) }}>
+											<Image style={[styles.item_image, { marginRight: 13 }]}
+												source={{ uri: ENV.image + "/uploads/" + item + ".jpg!l" }}
+											/>
+										</Pressable>
+									)
+								}}
+							/>}
+						</View>}
+						{(isShowUserTopic.current || isShowFavTopic.current) && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<View style={styles.item_flex_row}>
+									{isShowUserTopic.current && <Text style={[styles.tit_text, topicTab.current == who.current && { color: theme.tit2 }]} onPress={() => { toggleTopic(who.current) }}>{who.current + "的话题"}</Text>}
+									{(isShowUserTopic.current && isShowFavTopic.current) && <Text style={styles.tit_text}>|</Text>}
+									{isShowFavTopic.current && <Text style={[styles.tit_text, topicTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleTopic("fav") }}>{"收藏话题"}</Text>}
+								</View>
+								<Icon name="advance" size={14} color={theme.color} />
+							</View>
+							{topicTab.current == who.current && info.current.topics.map((item: any) => {
+								return (
+									<View key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}>
+										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: avatar.current }} />}
+										<Text style={styles.topic_tit}>{item.cttitle}</Text>
+									</View>
+								)
+							})}
+							{topicTab.current == "fav" && favTopics.current.map((item: any) => {
+								return (
+									<View key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}>
+										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} />}
+										<Text style={styles.topic_tit}>{item.cttitle}</Text>
+									</View>
+								)
+							})}
+						</View>}
+						{info.current.short > 0 && <View style={styles.item_list}>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的一句话香评 (" + info.current.short + ")"}</Text>
+								<Icon name="advance" size={14} color={theme.color} />
+							</Pressable>
+							{(info.current.shorts && info.current.shorts.length > 0) && info.current.shorts.map((item: any) => {
+								return (
+									<View key={item.id} style={styles.item_padding}>
+										<View style={{ flexDirection: "row" }}>
+											<View style={styles.discuss_image_info}>
+												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<View style={styles.img_traiangle}></View>
+											</View>
+											<View style={{ marginLeft: 10 }}>
+												<Text style={styles.discuss_name}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+											</View>
+										</View>
+										<View style={styles.discuss_info}>
+											{item.score > 0 && <View style={Globalstyles.star}>
+												<Image
+													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={require("../../assets/images/star/star.png")}
+												/>
+											</View>}
+											<Text numberOfLines={1} style={styles.discuss_desc}>{item.desc}</Text>
+										</View>
+									</View>
+								)
+							})}
+						</View>}
+						{info.current.discuss > 0 && <>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的香水评论 (" + info.current.discuss + ")"}</Text>
+								<Icon name="advance" size={14} color={theme.color} />
+							</Pressable>
+							{(info.current.discusss && info.current.discusss.length > 0) && info.current.discusss.map((item: any) => {
+								return (
+									<View key={item.id} style={styles.item_padding}>
+										<View style={{ flexDirection: "row" }}>
+											<View style={styles.discuss_image_info}>
+												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<View style={styles.img_traiangle}></View>
+											</View>
+											<View style={{ marginLeft: 10 }}>
+												<Text style={styles.discuss_name}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+											</View>
+										</View>
+										<View style={styles.discuss_info}>
+											{item.score > 0 && <View style={Globalstyles.star}>
+												<Image
+													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={require("../../assets/images/star/star.png")}
+												/>
+											</View>}
+											<Text numberOfLines={4} style={styles.discuss_desc}>{item.desc}</Text>
+										</View>
+									</View>
+								)
+							})}
+							<View style={{ alignItems: "center" }}>
+								<Text style={styles.discuss_morebtn}>{"查看全部"}</Text>
+							</View>
+						</>}
 					</View>}
 					{(info.current.name != "[已注销] " && curTab == "gene") && <View style={styles.page_gene_con}>
 
@@ -415,7 +585,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		padding: 5,
 		flexGrow: 1,
-		flexBasis: 0,
 	},
 	tabbar_num: {
 		fontSize: 11,
@@ -430,7 +599,6 @@ const styles = StyleSheet.create({
 	page_tabbar: {
 		height: 60,
 		flexGrow: 1,
-		flexBasis: 0,
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -451,10 +619,7 @@ const styles = StyleSheet.create({
 	page_container: {
 		backgroundColor: theme.toolbarbg
 	},
-	page_home_con: {
-
-	},
-	commonfav_container: {
+	item_padding: {
 		paddingVertical: 15,
 		paddingHorizontal: 13
 	},
@@ -514,11 +679,19 @@ const styles = StyleSheet.create({
 	},
 	mine_perfume: {
 		flexDirection: "row",
-		alignItems: "center",
+		marginTop: 20,
+		marginLeft: 13,
+		marginBottom: 15,
 	},
 	mine_perfume_img: {
 		width: 50,
 		height: 50,
+	},
+	mine_perfume_name: {
+		fontSize: 14,
+		color: theme.text1,
+		marginBottom: 10,
+		marginLeft: 6,
 	},
 	item_flex_row: {
 		flexDirection: "row",
@@ -533,10 +706,6 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		color: theme.tit2,
 		marginRight: 5,
-	},
-	perfume_list: {
-		paddingVertical: 16,
-		paddingHorizontal: 13,
 	},
 	perfume_item: {
 		width: 80,
@@ -554,6 +723,67 @@ const styles = StyleSheet.create({
 		color: theme.text2,
 		marginTop: 12,
 		textAlign: "center",
+		height: 32,
+	},
+	topic_avatar: {
+		width: 30,
+		height: 30,
+		borderRadius: 50,
+	},
+	topic_tit: {
+		fontSize: 13,
+		color: theme.tit2,
+		marginLeft: 10,
+	},
+	discuss_image_info: {
+		alignItems: "center",
+		height: 80,
+	},
+	discuss_img: {
+		width: 50,
+		height: 60,
+	},
+	discuss_name: {
+		fontSize: 14,
+		marginTop: 5,
+		color: theme.tit2,
+		lineHeight: 20,
+	},
+	img_traiangle: {
+		position: "absolute",
+		bottom: 0,
+		width: 0,
+		height: 0,
+		borderTopColor: "transparent",
+		borderBottomColor: "#F7F7F7",
+		borderRightColor: "transparent",
+		borderLeftColor: "transparent",
+		borderWidth: 10,
+	},
+	discuss_info: {
+		paddingVertical: 10,
+		paddingHorizontal: 13,
+		backgroundColor: "#F7F7F7",
+		borderRadius: 5,
+		overflow: "hidden",
+	},
+	discuss_desc: {
+		fontSize: 14,
+		color: theme.comment,
+		marginVertical: 5,
+	},
+	discuss_morebtn: {
+		width: 175,
+		height: 34,
+		textAlign: "center",
+		lineHeight: 34,
+		fontSize: 12,
+		letterSpacing: 2,
+		color: theme.comment,
+		borderRadius: 3,
+		overflow: "hidden",
+		marginVertical: 15,
+		backgroundColor: theme.bg,
 	},
 	page_gene_con: {
 

@@ -121,8 +121,8 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const gotodetail = (page: string, item: any = null) => {
-		if (page == "PerfumeListTag") {
-			navigation.navigate("Page", { screen: page, params: { tags: tags.current, src: "square" } });
+		if (page == "perfume-list-tag") {
+			navigation.navigate("Page", { screen: "PerfumeListTag", params: { tags: tags.current, src: "square" } });
 		} else {
 			navigation.navigate("Page", { screen: page, params: { id: item.cid } });
 		}
@@ -140,7 +140,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 				},
 			}}>
 				{title.current == "香单广场" && <Pressable style={Globalstyles.title_text_con} onPress={() => {
-					gotodetail("PerfumeListTag")
+					gotodetail("perfume-list-tag")
 				}}>
 					<Text style={Globalstyles.title_text}>{"分类"}</Text>
 				</Pressable>}

@@ -390,6 +390,16 @@ const Globalstyles: any = StyleSheet.create({
 		borderColor: theme.toolbarbg,
 		borderWidth: 1,
 	},
+	// 确认按钮
+	confirm_btn: {
+		height: 50,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	btn_text: {
+		fontSize: 14,
+		color: theme.toolbarbg,
+	},
 });
 
 
