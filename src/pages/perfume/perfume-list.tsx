@@ -2,7 +2,13 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
 
+import { FlashList } from "@shopify/flash-list";
+import LinearGradient from "react-native-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import HeaderView from "../../components/headerview";
+import ListBottomTip from "../../components/listbottomtip";
 
 import us from "../../services/user-service/user-service";
 
@@ -16,28 +22,25 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import { useFocusEffect } from "@react-navigation/native";
-import ListBottomTip from "../../components/listbottomtip";
-import { FlashList } from "@shopify/flash-list";
-import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
 function PerfumeList({ navigation, route }: any): React.JSX.Element {
 
 	// 控件
+	const insets = useSafeAreaInsets();
 	// 参数
 	// 变量
 	let uid = React.useRef<number>(0);
 	const [curTab, setCurTab] = React.useState<string>("user");
-	// 数据
-	let usercoldata = React.useRef<any>([]);
-	let favcoldata = React.useRef<any>([]);
-	// 状态
 	let cur_page = React.useRef<any>({
 		user: 1,
 		fav: 1
 	});
+	// 数据
+	let usercoldata = React.useRef<any>([]);
+	let favcoldata = React.useRef<any>([]);
+	// 状态
 	let UsernoMore = React.useRef<boolean>(false);
 	let FavnoMore = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
@@ -82,7 +85,6 @@ function PerfumeList({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const loadMore = () => {
-		console.log("%c Line:85 🍆", "color:#93c0a4");
 		if ((curTab == "user" && UsernoMore.current) || (curTab == "fav" && FavnoMore.current)) return;
 		cur_page.current[curTab] += 1;
 		let method = curTab == "user" ? "getusercollections" : "getfavcollections";
@@ -108,18 +110,18 @@ function PerfumeList({ navigation, route }: any): React.JSX.Element {
 					navigation.goBack();
 				},
 			}} />
-			<View style={styles.perfume_tit_con}>
-				{uid.current == us.user.uid && <Pressable style={styles.perfume_tit} onPress={() => { setCurTab("user") }}>
-					<Text style={[styles.tabtext, curTab == "user" && styles.activetab]}>{"我的"}</Text>
-					{curTab == "user" && <Text style={styles.tabline}></Text>}
+			<View style={Globalstyles.tab_tit_con}>
+				{uid.current == us.user.uid && <Pressable style={Globalstyles.tab_tit} onPress={() => { setCurTab("user") }}>
+					<Text style={[Globalstyles.tabtext, curTab == "user" && Globalstyles.activetab]}>{"我的"}</Text>
+					{curTab == "user" && <Text style={Globalstyles.tabline}></Text>}
 				</Pressable>}
-				{uid.current != us.user.uid && <Pressable style={styles.perfume_tit} onPress={() => { setCurTab("user") }}>
-					<Text style={[styles.tabtext, curTab == "user" && styles.activetab]}>{"自建"}</Text>
-					{curTab == "user" && <Text style={styles.tabline}></Text>}
+				{uid.current != us.user.uid && <Pressable style={Globalstyles.tab_tit} onPress={() => { setCurTab("user") }}>
+					<Text style={[Globalstyles.tabtext, curTab == "user" && Globalstyles.activetab]}>{"自建"}</Text>
+					{curTab == "user" && <Text style={Globalstyles.tabline}></Text>}
 				</Pressable>}
-				<Pressable style={styles.perfume_tit} onPress={() => { setCurTab("fav") }}>
-					<Text style={[styles.tabtext, curTab == "fav" && styles.activetab]}>{"收藏"}</Text>
-					{curTab == "fav" && <Text style={styles.tabline}></Text>}
+				<Pressable style={Globalstyles.tab_tit} onPress={() => { setCurTab("fav") }}>
+					<Text style={[Globalstyles.tabtext, curTab == "fav" && Globalstyles.activetab]}>{"收藏"}</Text>
+					{curTab == "fav" && <Text style={Globalstyles.tabline}></Text>}
 				</Pressable>
 			</View>
 			{(usercoldata.current.length > 0 || favcoldata.current.length > 0) && <FlashList data={curTab == "user" ? usercoldata.current : favcoldata.current}
@@ -153,7 +155,7 @@ function PerfumeList({ navigation, route }: any): React.JSX.Element {
 				<LinearGradient colors={["#81B4EC", "#9BA6F5"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
-					locations={[0, 1]} style={Globalstyles.confirm_btn}>
+					locations={[0, 1]} style={[Globalstyles.confirm_btn, { height: 50 + insets.bottom, paddingBottom: insets.bottom }]}>
 					<Text style={Globalstyles.btn_text}>{"新建香单"}</Text>
 				</LinearGradient>
 			</Pressable>}
@@ -162,36 +164,12 @@ function PerfumeList({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-	perfume_tit_con: {
-		flexDirection: "row",
-		alignItems: "center",
-		borderBottomColor: theme.bg,
-		borderBottomWidth: 1,
-	},
-	perfume_tit: {
-		flexGrow: 1,
-		height: 40,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	tabtext: {
-		fontSize: 16,
-		color: theme.color
-	},
-	tabline: {
-		position: "absolute",
-		bottom: 5,
-		width: 20,
-		height: 1.5,
-		backgroundColor: theme.tit
-	},
-	activetab: {
-		color: theme.tit
-	},
 	perfume_item: {
 		paddingHorizontal: 20,
 		paddingVertical: 10,
 		flexDirection: "row",
+		borderBottomColor: theme.bg,
+		borderBottomWidth: 1
 	},
 	item_image: {
 		width: 60,
@@ -199,6 +177,7 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		borderColor: theme.bg,
 		borderWidth: 0.5,
+		backgroundColor: theme.bg,
 	},
 	item_info: {
 		flex: 1,

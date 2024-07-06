@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated, ScrollView } from "react-native";
+import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard, useWindowDimensions, Animated, ScrollView, Linking } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
 import Orientation from "react-native-orientation-locker";
@@ -375,8 +375,12 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				}
 				if (e.nodeName != "A") return;
 				let href = e.getAttribute("href");
-				let obj = href.substr(href.indexOf("?") + 1).replace(/%22/g, '"');
-				window.ReactNativeWebView.postMessage(JSON.stringify({ data: obj, type: "link" }));
+				if (href.includes("taobao") || href.includes("weidian")) {
+					window.ReactNativeWebView.postMessage(JSON.stringify({ data: href, type: "scheme" }));
+				} else {
+					let obj = href.substr(href.indexOf("?") + 1).replace(/%22/g, '"');
+					window.ReactNativeWebView.postMessage(JSON.stringify({ data: obj, type: "link" }));
+				}
 			});
 		})
 		let sel_btn = document.querySelectorAll(".sel_btn");
@@ -441,6 +445,24 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 					gotodetail(linkdata.page, linkdata.id);
 					let params = { token: us.user.token, method: "clickarticle", did: us.user.did, page: linkdata.page, code: linkdata.id };
 					http.post(ENV.mall + "?uid=" + us.user.uid, params);
+				}
+			} else if (data.type == "scheme") {
+				let scheme = data.data;
+				if (scheme.includes("https://item.taobao.com/item.htm") || scheme.includes("https://shop115648872.taobao.com/")) {
+					let href = scheme.replace("https", "taobao");
+					Linking.canOpenURL(href).then((supported) => {
+						if (supported) {
+							Linking.openURL(href);
+						} else {
+							ToastCtrl.show({ message: "未安装淘宝", duration: 1000, viewstyle: "short_toast", key: "goto_error_toast" });
+						}
+					});
+				} else if (scheme.includes("https://weidian.com/item.html")) {
+					let match = scheme.match(/itemId=(\d+)/), path = "lib/shop/dist/pages/index/index";
+					if (match) {
+						path = `lib/item/dist/pages/index/index?feeSource=&itemId=${match[1]}&id=${match[1]}&vrk=&wfr=`;
+					}
+					console.log("%c Line:466 🥖 path", "color:#42b983", path);
 				}
 			} else if (data.type == "sel") {
 				sel_vote_item(data.id);
@@ -631,9 +653,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<>
-			{loading && <View style={Globalstyles.loading_con}>
+			{/* {loading && <View style={Globalstyles.loading_con}>
 				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
-			</View>}
+			</View>} */}
 			<HeaderView data={{
 				title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
 				isShowSearch: false,
@@ -672,14 +694,12 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			// 	)
 			// }}
 			>
-				{!articledata.current.mp4URL && <Animated.View style={[styles.coverimg_con, { opacity: headerOpt }]}>
+				{!articledata.current.mp4URL && <Animated.View style={[{ ...StyleSheet.absoluteFillObject, zIndex: 0, opacity: headerOpt }]}>
 					<View style={styles.coverimg_msk}></View>
-					<Image source={{ uri: ENV.image + articledata.current.coverimg, cache: "force-cache" }} style={styles.coverimg} resizeMode="cover" />
+					<Image source={{ uri: ENV.image + articledata.current.coverimg }} style={{ width: "100%", height: "100%", zIndex: 0, }} />
 				</Animated.View>}
-				<Pressable onPress={favarticle}>
-					<Icon style={styles.title_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={20}
-						color={likelist.current[id] ? theme.redchecked : !articledata.current.mp4URL ? theme.toolbarbg : theme.text2} />
-				</Pressable>
+				<Icon style={styles.title_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={20} onPress={favarticle}
+					color={likelist.current[id] ? theme.redchecked : !articledata.current.mp4URL ? theme.toolbarbg : theme.text2} />
 				{/* <Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
 					<Icon name="sandian" size={20} color={!articledata.current.mp4URL ? theme.toolbarbg : theme.text2} style={styles.title_icon} />
 				</Pressable> */}
@@ -862,7 +882,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 															{!sub.isopen && <Text style={[Globalstyles.ellipsis_text, { color: theme.text2 }]}>{"..."}</Text>}
 															{!sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"展开"}</Text>}
 															{sub.isopen && <Text style={[Globalstyles.morebtn_text, { fontSize: 13, color: theme.placeholder }]}>{"收起"}</Text>}
-															<Icon name={sub.isopen ? "toparrow" : "btmarrow"} size={10} color={theme.placeholder} style={{ marginLeft: 4 }}/>
+															<Icon name={sub.isopen ? "toparrow" : "btmarrow"} size={10} color={theme.placeholder} style={{ marginLeft: 4 }} />
 														</View>}
 													</Pressable>}
 													<View style={[styles.replyitem_btn_con, { marginTop: 8, marginLeft: 0, }]}>
@@ -1151,14 +1171,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: theme.tit2,
 	},
-	coverimg_con: {
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		zIndex: 0,
-	},
 	coverimg_msk: {
 		position: "absolute",
 		width: "100%",
@@ -1166,18 +1178,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "rgba(0,0,0,0.3)",
 		zIndex: 1,
 	},
-	coverimg: {
-		width: "100%",
-		height: "100%",
-		zIndex: 0,
-	},
 	title_icon: {
 		width: 44,
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
 	},
-
 	footer_icon_con: {
 		flexDirection: "row",
 		alignItems: "center",

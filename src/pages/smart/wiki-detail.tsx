@@ -120,7 +120,7 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 
 	// 筛选类型
 	const setOrderby = (order: string) => {
-		var orderchange = false;
+		let orderchange = false;
 		if (["brand", "year"].indexOf(order) >= 0) {
 			orderchange = true;
 			if (desc.current[order] == undefined || desc.current[order] == "-") {
@@ -152,7 +152,7 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 		}
 		http.get(url).then((resp_data: any) => {
 			if (items.current.length != 0 && items.current.length > cnt.current) {
-				if (items.current[items.current.length - 1].id == resp_data.item.data[resp_data.item.data.length - 1].id) {
+				if (items.current[items.current.length - 1]?.id == resp_data.item.data[resp_data.item.data.length - 1]?.id) {
 					noMore.current = true;
 					page.current++;
 					return;
@@ -241,7 +241,9 @@ function WikiDetail({ navigation, route }: any): React.JSX.Element {
 			<FlashList data={items.current}
 				extraData={isrender}
 				estimatedItemSize={100}
-				onEndReached={loadMore}
+				onEndReached={() => {
+					if (items.current.length > 0) loadMore();
+				}}
 				onEndReachedThreshold={0.1}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg, paddingTop: 20, }}

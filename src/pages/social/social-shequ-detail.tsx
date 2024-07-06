@@ -275,7 +275,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 						})
 						open_PhotoPopover(slideimgindex);
 					}}>
-						<AutoSizeImage style={styles.reply_image} uri={part} />
+						<AutoSizeImage style={styles.reply_image} uri={ENV.image + part} />
 					</Pressable>
 				)
 			} else if (part) {

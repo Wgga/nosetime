@@ -39,7 +39,7 @@ export const articlestyle = {
 	.discenter{display:flex;justify-content:center}
 	.disleft{display:flex;justify-content:left}
 	.vote_list{padding:24px 14px 18px;background-color:${theme.bg};border-radius:5px;margin-bottom:19px;}
-	.vote_list>span{display:block;text-align:center;line-height:normal;}
+	.vote_list>span,.vote_list .vote_title{display:block;text-align:center;line-height:normal;}
 	.vote_tit{color:${theme.text2};font-size:15px;font-weight:500;}
 	.vote_desc{margin-top:7px;color:${theme.comment};font-size:12px;}
 	.vote_item_con>div,.vote_item .vote_item_msg,.name_con{display:flex;}

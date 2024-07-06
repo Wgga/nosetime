@@ -50,6 +50,9 @@ import UserChangeSignPerfume from "../pages/user/user-change-sign-perfume";
 import UserChangeDesc from "../pages/user/user-change-desc";
 import UserCart from "../pages/user/user-cart";
 import UserFav from "../pages/user/user-fav";
+import UserShequ from "../pages/user/user-shequ";
+import UserIntro from "../pages/user/user-intro";
+import UserLevelIntro from "../pages/user/user-level-intro";
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +108,9 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserChangeDesc" component={UserChangeDesc} />
 			<Stack.Screen name="UserCart" component={UserCart} />
 			<Stack.Screen name="UserFav" component={UserFav} />
+			<Stack.Screen name="UserShequ" component={UserShequ} />
+			<Stack.Screen name="UserIntro" component={UserIntro} />
+			<Stack.Screen name="UserLevelIntro" component={UserLevelIntro} />
 		</Stack.Navigator>
 	);
 }

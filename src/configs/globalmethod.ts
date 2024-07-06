@@ -390,15 +390,41 @@ const Globalstyles: any = StyleSheet.create({
 		borderColor: theme.toolbarbg,
 		borderWidth: 1,
 	},
-	// 确认按钮
+	// flex居中
 	confirm_btn: {
-		height: 50,
 		justifyContent: "center",
 		alignItems: "center",
 	},
 	btn_text: {
 		fontSize: 14,
 		color: theme.toolbarbg,
+	},
+	// 列表Tab(个人页面 话题/香单 列表)
+	tab_tit_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderBottomColor: theme.bg,
+		borderBottomWidth: 1,
+	},
+	tab_tit: {
+		flexGrow: 1,
+		height: 40,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	tabtext: {
+		fontSize: 16,
+		color: theme.color
+	},
+	tabline: {
+		position: "absolute",
+		bottom: 5,
+		width: 20,
+		height: 1.5,
+		backgroundColor: theme.tit
+	},
+	activetab: {
+		color: theme.tit
 	},
 });
 

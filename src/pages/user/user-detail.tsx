@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList, Animated } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -33,13 +33,13 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	const insets = useSafeAreaInsets();
 	// 变量
 	let uid = React.useRef<number>(0);
-	let uface = React.useRef<number>(0);
 	let avatar = React.useRef<string>("");
 	let who = React.useRef<string>("");
 	let topicTab = React.useRef<string>("");
 	let colTab = React.useRef<string>("");
 	let maxtotal = React.useRef<number>(0);
 	const [curTab, setCurTab] = React.useState<string>("home");
+	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	const [introcontent, setIntroContent] = React.useState<string>(""); // 简介数据
 	// 数据
 	let favTopics = React.useRef<any[]>([]);
@@ -60,6 +60,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let isShowFavcol = React.useRef<boolean>(false);
 	let isShowUserTopic = React.useRef<boolean>(false);
 	let isShowFavTopic = React.useRef<boolean>(false);
+	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
@@ -236,6 +237,10 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			navigation.navigate("Page", { screen: "UserFav", params: { id: 0, uid: uid.current } });
 		} else if (page == "item-detail") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id } });
+		} else if (page == "social-shequ-detail") {
+			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.ctdlgid } });
+		} else if (page == "user-shequ") {
+			navigation.navigate("Page", { screen: "UserShequ", params: { uid: uid.current, cnt: info.current.topic, name: info.current.uname } });
 		} else {
 			let screen = toCamelCase(page);
 			navigation.navigate("Page", { screen: screen, params: { uid: uid.current } });
@@ -268,24 +273,51 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 动态修改顶部导航栏透明度
+	const showHeaderView = (e: any) => {
+		if (e.nativeEvent.contentOffset.y > 300) {
+			if (isShowHeader.current) return;
+			isShowHeader.current = true;
+			Animated.timing(headerOpt, {
+				toValue: 1,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			if (!isShowHeader.current) return;
+			isShowHeader.current = false;
+			Animated.timing(headerOpt, {
+				toValue: 0,
+				duration: 200,
+				useNativeDriver: true,
+			}).start();
+		}
+	}
+
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
-				title: "",
+				title: info.current.uname,
 				isShowSearch: false,
 				style: Globalstyles.absolute,
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
+					headertitle: { opacity: headerOpt },
 				}
 			}} method={{
 				back: () => { navigation.goBack() },
-			}} />
-			<ScrollView showsVerticalScrollIndicator={false}>
+			}}>
+				<Animated.View style={{ ...StyleSheet.absoluteFillObject, zIndex: 0, opacity: headerOpt }}>
+					{avatar.current && <Image style={{ width: "100%", height: "100%", zIndex: 0, }} blurRadius={40} source={{ uri: avatar.current }} />}
+				</Animated.View>
+				<Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />
+			</HeaderView>
+			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView} contentContainerStyle={{ paddingBottom: 20 }}>
 				{avatar.current && <Image style={styles.header_bg} blurRadius={40} source={{ uri: avatar.current }} />}
-				<View style={styles.user_info}>
+				<View style={{ alignItems: "center", }}>
 					{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
 					<Text style={styles.user_name}>{info.current.uname}</Text>
-					{info.current.udesc && <View style={styles.intro_con} onLayout={setIntrodata}>
+					{info.current.udesc && <Pressable style={styles.intro_con} onLayout={setIntrodata} onPress={() => { gotodetail("user-intro") }} >
 						{introcontent && <>
 							<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
 							{info.current.udesc.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
@@ -293,7 +325,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 								<Icon name="btmarrow" style={styles.intro_icon} size={10} color={theme.toolbarbg} />
 							</View>}
 						</>}
-					</View>}
+					</Pressable>}
 					{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
@@ -428,22 +460,27 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									{(isShowUserTopic.current && isShowFavTopic.current) && <Text style={styles.tit_text}>|</Text>}
 									{isShowFavTopic.current && <Text style={[styles.tit_text, topicTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleTopic("fav") }}>{"收藏话题"}</Text>}
 								</View>
-								<Icon name="advance" size={14} color={theme.color} />
+								<Pressable hitSlop={10} style={styles.item_flex_row} onPress={() => { gotodetail("user-shequ") }}>
+									<Text style={styles.col_btn}>{"全部"}</Text>
+									<Icon name="advance" size={14} color={theme.color} />
+								</Pressable>
 							</View>
 							{topicTab.current == who.current && info.current.topics.map((item: any) => {
 								return (
-									<View key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}>
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+										onPress={() => { gotodetail("social-shequ-detail", item) }}>
 										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: avatar.current }} />}
 										<Text style={styles.topic_tit}>{item.cttitle}</Text>
-									</View>
+									</Pressable>
 								)
 							})}
 							{topicTab.current == "fav" && favTopics.current.map((item: any) => {
 								return (
-									<View key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}>
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+										onPress={() => { gotodetail("social-shequ-detail", item) }}>
 										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} />}
 										<Text style={styles.topic_tit}>{item.cttitle}</Text>
-									</View>
+									</Pressable>
 								)
 							})}
 						</View>}
@@ -525,15 +562,18 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 })
 
 const styles = StyleSheet.create({
+	title_icon: {
+		width: 44,
+		height: 44,
+		textAlign: "center",
+		lineHeight: 44,
+	},
 	header_bg: {
 		position: "absolute",
 		top: 0,
 		left: 0,
 		right: 0,
 		height: 400,
-	},
-	user_info: {
-		alignItems: "center",
 	},
 	user_avatar: {
 		width: 60,

@@ -137,9 +137,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 	}
 	// 是否喜好
 	const islike = () => {
-		if (!us.user.uid) {
-			return;
-		}
+		if (!us.user.uid) return;
 		http.post(ENV.pic, { method: "islike", uid: us.user.uid, mid: mid.current }).then((resp_data: any) => {
 			if (resp_data == "1") {
 				like_.current[mid.current] = 1;
@@ -176,7 +174,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 			setIsRender(val => !val);
 			return;
 		}
-		let favsid = []
+		let favsid = [];
 		for (let i in resp.items) {
 			favsid.push(resp.items[i].id)
 			if (resp.items[i].sub) {
@@ -350,9 +348,9 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<View style={Globalstyles.container}>
-			{loading.current && <View style={Globalstyles.loading_con}>
+			{/* {loading.current && <View style={Globalstyles.loading_con}>
 				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
-			</View>}
+			</View>} */}
 			<HeaderView data={{
 				title: itemdata.current.title,
 				isShowSearch: false,

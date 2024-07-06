@@ -155,10 +155,12 @@ const VodPage = React.memo(({ uid, navigation }: any) => {
 				keyExtractor={(item: any) => item.mid}
 				renderItem={({ item, index }: any) => {
 					return (
-						<View style={{
+						<Pressable style={{
 							marginBottom: 20,
 							marginLeft: (index + 1) % 2 == 0 ? 8 : 0,
 							marginRight: (index + 1) % 2 == 1 ? 8 : 0
+						}} onPress={() => {
+							navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.url.substring(0, 6) } });
 						}}>
 							<View style={styles.list_img_con}>
 								<FastImage style={{ width: "100%", height: "100%" }}
@@ -171,7 +173,7 @@ const VodPage = React.memo(({ uid, navigation }: any) => {
 							</View>
 							{item.mainname && <Text numberOfLines={1} style={[styles.list_mainname, styles.list_width]}>{item.mainname}</Text>}
 							{item.subname && <Text numberOfLines={1} style={[styles.list_subname, styles.list_width]}>{item.subname}</Text>}
-						</View>
+						</Pressable>
 					)
 				}}
 				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={vodlist.current.length > 0} />}
@@ -311,7 +313,9 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 							<Text style={styles.wiki_title}>{wikidata.current[item].text + "（" + wikidata.current[item].cnt + "）"}</Text>
 							{wikidata.current[item].items.map((item2: any, index: number) => {
 								return (
-									<View key={item2.id} style={styles.wiki_list_item}>
+									<Pressable key={item2.id} style={styles.wiki_list_item} onPress={() => {
+										navigation.navigate("Page", { screen: "WikiDetail", params: { id: item2.id } });
+									}}>
 										<View style={styles.wiki_list_image}>
 											{item == "fragrances" && <FastImage style={{ width: "100%", height: "100%" }}
 												source={{ uri: ENV.image + "/fragrance/" + item2.id + ".jpg" }}
@@ -332,15 +336,11 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 										<View style={styles.wiki_list_info}>
 											<View style={styles.info_name_con}>
 												<Text style={styles.info_name}>{item2.wname + " " + item2.woriname}</Text>
-												<Pressable onPress={() => {
-													deletewiki(item2, item)
-												}}>
-													<Icon name="del2" size={16} color={"#CCCCCC"} />
-												</Pressable>
+												<Icon name="del2" size={16} color={"#CCCCCC"} onPress={() => { deletewiki(item2, item) }} />
 											</View>
 											<Text numberOfLines={2} style={styles.info_desc}>{item2.desc}</Text>
 										</View>
-									</View>
+									</Pressable>
 								)
 							})}
 							{noMore.current[item] && <Pressable onPress={() => {
