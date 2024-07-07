@@ -463,12 +463,10 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 								</View>
 								<Text numberOfLines={1} style={styles.item_enname} onPress={() => { gotodetail("item-detail", itemdata.current) }}>{itemdata.current.enname}</Text>
 								<View style={styles.star_con}>
-									<StarImage
-										item={{
-											istotal: itemdata.current.istotal, isscore: itemdata.current.isscore,
-											s0: itemdata.current.s0, s1: itemdata.current.s1,
-										}}
-									/>
+									<StarImage item={{
+										istotal: itemdata.current.istotal, isscore: itemdata.current.isscore,
+										s0: itemdata.current.s0, s1: itemdata.current.s1,
+									}} />
 									<Text style={styles.item_score}>{itemdata.current.isscore + "分"}</Text>
 								</View>
 							</View>

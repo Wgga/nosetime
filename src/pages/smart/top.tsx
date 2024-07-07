@@ -112,7 +112,7 @@ function Top({ navigation, route }: any): React.JSX.Element {
 
 	const gotodetail = (page: string, item: any) => {
 		if (page == "user-detail") {
-			navigation.navigate("Page", { screen: "UserDetail", params: { id: item.discussid, src: "App排行榜页" } });
+			navigation.navigate("Page", { screen: "UserDetail", params: { uid: item.discussid, src: "App排行榜页" } });
 		} else if (page == "item-detail") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "App排行榜页" } });
 		}
@@ -183,13 +183,10 @@ function Top({ navigation, route }: any): React.JSX.Element {
 								<Pressable style={styles.text_marginbtm} onPress={() => { gotodetail("item-detail", item) }}>
 									<Text style={styles.item_name}>{item.enname}</Text>
 								</Pressable>
-								<StarImage style={{ fontSize: 14, color: theme.comment }}
-									isShowScore={true}
-									item={{
-										istotal: item.istotal, isscore: item.isscore,
-										s0: item.s0, s1: item.s1,
-									}}
-								/>
+								<StarImage item={{
+									istotal: item.istotal, isscore: item.isscore,
+									s0: item.s0, s1: item.s1,
+								}} isShowScore={true} style={{ fontSize: 14, color: theme.comment }} />
 								<View style={styles.item_odor}>
 									{item.odors.map((odor: any, index: number) => {
 										return (

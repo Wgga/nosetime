@@ -802,13 +802,13 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 							{!(item.uid > 0) && <Image source={{ uri: "https:" + item.wxavatar }} style={styles.replyitem_img} resizeMode="cover" />}
 							{item.uid > 0 && <View style={styles.replyitem_uname_con}>
 								<Text style={styles.replyitem_uname}>{item.uname}</Text>
-								<View style={Globalstyles.level}>
+								{item.ulevel > 0 && <View style={Globalstyles.level}>
 									<Image
 										style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 										defaultSource={require("../../assets/images/nopic.png")}
 										source={require("../../assets/images/level.png")}
 									/>
-								</View>
+								</View>}
 							</View>}
 							{!(item.uid > 0) && <View style={styles.replyitem_uname_con}>
 								<Text style={styles.replyitem_uname}>{item.wxnick}</Text>
@@ -857,13 +857,13 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 												<View style={[styles.replysub_text_con, subindex == 0 ? styles.first_replysub_text_con : null]}>
 													<View style={styles.replysub_uname_con}>
 														<Text style={styles.replysub_uname}>{sub.uname}</Text>
-														<View style={Globalstyles.level}>
+														{sub.ulevel > 0 && <View style={Globalstyles.level}>
 															<Image
 																style={[Globalstyles.level_icon, handlelevelLeft(sub.ulevel), handlelevelTop(sub.ulevel)]}
 																defaultSource={require("../../assets/images/nopic.png")}
 																source={require("../../assets/images/level.png")}
 															/>
-														</View>
+														</View>}
 													</View>
 													{(sub.refuid || sub.refuname) && <View style={styles.replysub_refuname}>
 														<Text style={styles.replyitem_text}>{"回复"}</Text>

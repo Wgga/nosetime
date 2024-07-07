@@ -34,12 +34,12 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 				<View style={styles.item_flex_row}>
 					<View style={[styles.info_name_con, { marginLeft: 0 }]}>
 						<Text style={[styles.info_name, { fontSize: 13 }]}>{item.uname}</Text>
-						<View style={Globalstyles.level}>
+						{item.ulevel > 0 && <View style={Globalstyles.level}>
 							<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 								defaultSource={require("../assets/images/nopic.png")}
 								source={require("../assets/images/level.png")}
 							/>
-						</View>
+						</View>}
 					</View>
 					<Pressable hitSlop={10} onPress={() => { reply_menu(item) }}>
 						<Icon name="shequsandian" size={16} color={theme.placeholder} />

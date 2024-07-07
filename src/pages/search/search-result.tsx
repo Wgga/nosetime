@@ -207,18 +207,18 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 		}
 	}
 
-	const gotodetail = (type: string, item: any) => {
-		if (type == "article") {
+	const gotodetail = (page: string, item: any) => {
+		if (page == "article") {
 			navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.id, src: "APP搜索" } });
-		} else if (type == "topic") {
+		} else if (page == "topic") {
 			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.id, src: "APP搜索" } });
-		} else if (type == "item") {
+		} else if (page == "item") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "APP搜索" } });
-		} else if (type == "brand" || type == "odor" || type == "perfumer") {
+		} else if (page == "brand" || page == "odor" || page == "perfumer") {
 			navigation.navigate("Page", { screen: "WikiDetail", params: { id: item.id, src: "APP搜索" } });
-		} else if (type == "user-detail") {
-			navigation.navigate("Page", { screen: "UserDetail", params: { id: item.uid, src: "APP搜索" } });
-		} else if (type == "vod") {
+		} else if (page == "user-detail") {
+			navigation.navigate("Page", { screen: "UserDetail", params: { uid: item.uid, src: "APP搜索" } });
+		} else if (page == "vod") {
 			if (item.mid != null) {
 				navigation.navigate("Page", { screen: "MediaListDetail", params: { id: item.viid, src: "APP搜索" } });
 			} else {
@@ -257,12 +257,10 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 											</Pressable>}
 										</View>
 										<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
-										<StarImage isShowScore={true}
-											item={{
-												istotal: item.istotal, isscore: item.isscore,
-												s0: item.s0, s1: item.s1
-											}}
-										/>
+										<StarImage item={{
+											istotal: item.istotal, isscore: item.isscore,
+											s0: item.s0, s1: item.s1
+										}} isShowScore={true} />
 									</View>
 								</Pressable>
 							)
@@ -470,13 +468,13 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 									<View style={styles.wiki_list_info}>
 										<View style={styles.item_flex}>
 											<Text numberOfLines={1}>{item.uname}</Text>
-											<View style={Globalstyles.level}>
+											{item.ulevel > 0 && <View style={Globalstyles.level}>
 												<Image
 													style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 													defaultSource={require("../../assets/images/nopic.png")}
 													source={require("../../assets/images/level.png")}
 												/>
-											</View>
+											</View>}
 										</View>
 										<Text numberOfLines={2} style={styles.user_desc}>{item.desc}</Text>
 									</View>

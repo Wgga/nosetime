@@ -405,13 +405,13 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 								/>
 								<View style={styles.info_name_con}>
 									<Text style={styles.info_name}>{item0.current.uname}</Text>
-									<View style={Globalstyles.level}>
+									{item0.current.ulevel > 0 && <View style={Globalstyles.level}>
 										<Image
 											style={[Globalstyles.level_icon, handlelevelLeft(item0.current.ulevel), handlelevelTop(item0.current.ulevel)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/level.png")}
 										/>
-									</View>
+									</View>}
 								</View>
 							</View>
 							<View style={styles.main_desc}>

@@ -22,9 +22,10 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import StarImage from "../../components/starimage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -403,8 +404,101 @@ const ListPage = React.memo(({ uid, navigation }: any) => {
 	)
 })
 const DiscussPage = React.memo(({ uid, navigation }: any) => {
+	// 控件
+	// 变量
+	// 数据
+	let list = React.useRef<any[]>([]);
+	// 状态
+	const [isrender, setIsRender] = React.useState(false);
+
+	React.useEffect(() => {
+		http.post(ENV.user + "?uid=" + uid, { method: "getfav", token: us.user.token, type: "香评" }).then((resp_data: any) => {
+			resp_data.forEach((item: any) => {
+				if (item.color != "") {
+					let color = item.color.match(/\((.+?)\)/)[1].split(",");
+					item["color1"] = `hsla(${color[0]},${color[1]},${color[2]},0.1)`;
+				} else {
+					item["color1"] = "rgba(184,191,255,0.1)";
+				}
+			})
+			list.current = resp_data;
+			setIsRender(val => !val);
+		})
+	}, [])
+
+	const handledesc = (desc: string) => {
+		let desc2 = desc.substring(0, 220);
+		let sz: any[] = [], descs = desc2.replace(/\r/g, "").replace(/\n\n/g, "\n").split(/\n/g);
+		sz = descs.map((item: string, index: number) => {
+			if (index == descs.length - 1 && desc.length > 220) {
+				return (<Text key={index} style={styles.info_perfume_desc}>{item}<Text key={"end"} style={styles.desc_morebtn}>{" ... 全部"}</Text></Text>)
+			} else {
+				return (<Text key={index} style={styles.info_perfume_desc}>{item}</Text>);
+			}
+		})
+		return sz;
+	}
+
+	const gotodetail = (page: string, item: any) => {
+		if (page == "user-detail") {
+			navigation.push("Page", { screen: "UserDetail", params: { uid: item.uid } });
+		} else if (page == "item-detail") {
+			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id } });
+		}
+	}
+
 	return (
-		<></>
+		<>
+			{(list.current && list.current.length > 0) && <FlatList data={list.current}
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={styles.list_container}
+				keyExtractor={(item: any) => item.udid}
+				renderItem={({ item, index }: any) => {
+					return (
+						<View style={[styles.list_item, { flexDirection: "column" }]}>
+							<Pressable style={styles.item_user_con} onPress={() => { gotodetail("user-detail", item) }}>
+								<Image style={styles.item_user_image}
+									source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
+								/>
+								<View style={{ marginLeft: 11 }}>
+									<View style={styles.item_user_info}>
+										<Text style={styles.info_name}>{item.uname}</Text>
+										{item.ulevel > 0 && <View style={Globalstyles.level}>
+											<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+												defaultSource={require("../../assets/images/nopic.png")}
+												source={require("../../assets/images/level.png")}
+											/>
+										</View>}
+									</View>
+									{item.score > 0 && <View style={Globalstyles.star}>
+										<Image
+											style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+											defaultSource={require("../../assets/images/nopic.png")}
+											source={require("../../assets/images/star/star.png")}
+										/>
+									</View>}
+								</View>
+							</Pressable>
+							<Pressable style={[styles.item_perfume_con, { backgroundColor: item.color1 }]} onPress={() => { gotodetail("item-detail", item) }}>
+								<Image style={styles.item_perfume_image}
+									source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
+									resizeMode="contain"
+								/>
+								<View style={styles.item_perfume_info}>
+									<View style={styles.info_name_con}>
+										<Text style={styles.info_name}>{item.cnname}</Text>
+										<Text style={styles.info_score}>{item.isscore}<Text style={{ fontSize: 12 }}>{" 分"}</Text></Text>
+									</View>
+									<Text style={[styles.info_name, { color: theme.comment, marginTop: 6 }]}>{item.enname}</Text>
+								</View>
+							</Pressable>
+							<View style={{ marginTop: 14 }}>{handledesc(item.desc)}</View>
+						</View>
+					)
+				}}
+				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={list.current.length > 0} />}
+			/>}
+		</>
 	)
 })
 
@@ -652,6 +746,49 @@ const styles = StyleSheet.create({
 	more_text: {
 		fontSize: 12,
 		color: theme.text1,
+	},
+	item_user_con: {
+		flexDirection: "row",
+	},
+	item_user_image: {
+		width: 40,
+		height: 40,
+		borderRadius: 50,
+	},
+	item_user_info: {
+		flexDirection: "row",
+		marginBottom: 6
+	},
+	item_perfume_con: {
+		padding: 8,
+		marginTop: 15,
+		borderRadius: 10,
+		overflow: "hidden",
+		flexDirection: "row",
+	},
+	item_perfume_image: {
+		width: 50,
+		height: 50,
+		borderRadius: 8,
+		overflow: "hidden",
+		paddingVertical: 5
+	},
+	item_perfume_info: {
+		flex: 1,
+		marginLeft: 12
+	},
+	info_score: {
+		fontSize: 17,
+		color: "#EFAC1F"
+	},
+	desc_morebtn: {
+		fontSize: 14,
+		color: theme.placeholder
+	},
+	info_perfume_desc: {
+		fontSize: 14,
+		color: theme.text1,
+		marginBottom: 14
 	}
 });
 

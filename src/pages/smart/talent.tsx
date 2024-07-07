@@ -171,13 +171,13 @@ function Talent({ navigation }: any): React.JSX.Element {
 								<View style={styles.item_info}>
 									<View style={styles.item_flex}>
 										<Text numberOfLines={1} style={styles.item_uname}>{item.uname}</Text>
-										<View style={Globalstyles.level}>
+										{item.ulevel > 0 && <View style={Globalstyles.level}>
 											<Image
 												style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 												defaultSource={require("../../assets/images/nopic.png")}
 												source={require("../../assets/images/level.png")}
 											/>
-										</View>
+										</View>}
 									</View>
 									<View style={styles.item_message}>
 										{tab == "talent" && <>
