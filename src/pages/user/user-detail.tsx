@@ -154,26 +154,17 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	}
 
 	// 处理【香水统计】数据
-	const handleBase = (arr: any) => {
-		var noseTypeGene = [];
+	const handleBase = (data: any) => {
+		let noseTypeGene = [];
 		for (var i in noseTypeList) {
 			var name = noseTypeList[i];
-			noseTypeGene.push({ text: name, value: arr[i], color: colorlist[i] })
+			noseTypeGene.push({ text: name, value: data[i], color: colorlist[i] })
 		}
 		gene_code.current["circle_graph"] = [
 			{ name: "gene_type_graph", data: noseTypeGene.slice(0, 2) },
 			{ name: "gene_popular_graph", data: noseTypeGene.slice(2, 5) },
 			{ name: "gene_sex_graph", data: noseTypeGene.slice(5, 8) }
 		]
-	}
-
-	const handleRadar = (arr: any) => {
-		var indicator = [];
-		for (var i in arr) {
-			indicator.push({ label: note_lists[i], value: arr[i] });
-		}
-		gene_code.current["notes"] = indicator;
-		console.log("%c Line:204 🥃 gene_code.current", "color:#ffdd4d", gene_code.current["notes"]);
 	}
 
 	// 获取嗅觉DNA数据
@@ -204,7 +195,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			// 处理香调偏好数据
 			var fragrance_cnt = resp_data.fragrance.reduce((total: number, i: number) => { return i + total });
 			if (resp_data.fragrance && fragrance_cnt != 0) {
-				handleRadar(resp_data.fragrance);
+				for (var i in resp_data.fragrance) {
+					gene_code.current["notes"].push({ label: note_lists[i], value: resp_data.fragrance[i] });
+				}
 			} else {
 				dna_cnt2.current = 1;
 			}
@@ -478,8 +471,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							isShowUsercol.current && isShowFavcol.current && isShowFavTopic.current && isShowUserTopic.current
 						) && <Image style={Globalstyles.emptyimg}
 							source={require("../../assets/images/empty/ohomepage_blank.png")}
-							resizeMode="contain" />
-						}
+							resizeMode="contain" />}
 						{(us.user.uid != uid.current && commoncnt.current > 0) && <View style={styles.item_padding}>
 							<ShadowedView style={styles.commonfav_con}>
 								<View style={styles.commonfav_avatar_con}>
@@ -674,9 +666,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</>}
 					</View>}
 					{(info.current.name != "[已注销] " && curTab == "gene") && <View>
-						<View style={styles.item_list}>
+						{dna_cnt.current != 1 && <View style={styles.item_list}>
 							<Text style={[styles.gene_title, { paddingTop: 0 }]}>{"香水统计"}</Text>
-							<View style={styles.base_con}>
+							<View style={{ flexDirection: "row" }}>
 								{gene_code.current.circle_graph.length > 0 && gene_code.current.circle_graph.map((item: any) => {
 									return (
 										<View key={item.name} style={styles.base_item}>
@@ -700,27 +692,71 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									)
 								})}
 							</View>
-						</View>
-						<View style={styles.item_list}>
+						</View>}
+						{dna_cnt2.current != 1 && <View style={styles.item_list}>
 							<Text style={styles.gene_title}>{"香调偏好"}</Text>
-							{gene_code.current.notes.length > 0 &&
-								<RadarChart data={gene_code.current.notes} isCircle
-									size={width}
-									fillColor={"transparent"}
-									gradientColor={{
-										startColor: "#FFF",
-										endColor: "#FFF",
-										count: 3,
-									}}
-									stroke={["#EEE", "#EEE", "#CCC"]}
-									dataFillColor={"#EEE"}
-								/>
-							}
-						</View>
+							<View style={{ alignItems: "center" }}>
+								{gene_code.current.notes.length > 0 &&
+									<RadarChart data={gene_code.current.notes}
+										size={width * 0.65}
+										isCircle
+										gradientColor={{
+											startColor: "#FFF",
+											endColor: "#FFF",
+											count: 3,
+										}}
+										labelSize={12}
+										divisionStroke={"#EEE"}
+										labelColor={"#4D4D4D"}
+										stroke={["#EEE", "#EEE", "#CCC"]}
+										dataFillColor={"#999"}
+										dataFillOpacity={0.3}
+									/>
+								}
+							</View>
+						</View>}
+						{(dna_cnt2.current == 1 && dna_cnt.current != 1) && <View>
+							<Text style={styles.gene_title}>{"嗅觉偏好"}</Text>
+							<Image style={Globalstyles.emptyimg}
+								source={require("../../assets/images/empty/somedna_blank.png")}
+								resizeMode="contain" />
+						</View>}
+						{(dna_cnt.current != 2 && gene_code.current.style.length > 0) && <View style={styles.item_list}>
+							<Text style={styles.gene_title}>{"风格偏好"}</Text>
+						</View>}
+						{(dna_cnt.current != 2 && gene_code.current.odor.length > 0) && <View style={styles.item_list}>
+							<Text style={styles.gene_title}>{"气味偏好"}</Text>
+							<View style={{ paddingHorizontal: 20 }}>
+								{gene_code.current.odor.map((item: any) => {
+									return (
+										<View key={item.id} style={styles.odor_item}>
+											<Text style={styles.item_tag}>{item.tag}</Text>
+											<View style={styles.odor_outbar}>
+												<View style={[styles.odor_inbar, { width: `${item.val}%` }]}></View>
+											</View>
+											<Text style={styles.item_val}>{item.val + "%"}</Text>
+										</View>
+									)
+								})}
+							</View>
+						</View>}
+						{(dna_cnt.current != 2 && gene_code.current.brand.length > 0) && <View style={styles.item_list}>
+							<Text style={styles.gene_title}>{"品牌偏好"}</Text>
+							<View style={{ paddingHorizontal: 20, paddingBottom: 17 }}>
+								{gene_code.current.brand.map((item: any) => {
+									return (
+										<View key={item.id} style={styles.brand_item}>
+											{us.user.uid == uid.current && <Image style={styles.brand_img} source={{ uri: item.image }} />}
+											{us.user.uid != uid.current && <Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} />}
+										</View>
+									)
+								})}
+							</View>
+						</View>}
 					</View>}
 				</View>
-			</ScrollView>
-		</View>
+			</ScrollView >
+		</View >
 	);
 })
 
@@ -991,9 +1027,6 @@ const styles = StyleSheet.create({
 		marginVertical: 15,
 		backgroundColor: theme.bg,
 	},
-	base_con: {
-		flexDirection: "row",
-	},
 	gene_title: {
 		paddingVertical: 20,
 		paddingHorizontal: 13,
@@ -1026,6 +1059,39 @@ const styles = StyleSheet.create({
 		color: theme.text2,
 		textAlign: "center",
 	},
+	odor_item: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginVertical: 15
+	},
+	item_tag: {
+		width: 55,
+		height: 17,
+		lineHeight: 17,
+	},
+	odor_outbar: {
+		backgroundColor: theme.bg,
+		borderRadius: 5,
+		overflow: "hidden",
+		flex: 1,
+		height: 10,
+	},
+	odor_inbar: {
+		backgroundColor: theme.border,
+		height: "100%",
+		borderRadius: 5,
+		overflow: "hidden",
+	},
+	item_val: {
+		width: 50,
+		textAlign: "right",
+	},
+	brand_item: {
+		paddingVertical: 15
+	},
+	brand_img: {
+
+	}
 });
 
 export default UserDetail;

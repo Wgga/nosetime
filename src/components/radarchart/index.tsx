@@ -84,8 +84,8 @@ export default ({
 			const degreeInRadians = degToRadians(degree);
 			const degreeInRadiansY = degToRadians(svgY(degree));
 			return [
-				viewBoxCenter + Math.cos(degreeInRadians) * radius * scale,
 				viewBoxCenter + Math.sin(degreeInRadiansY) * radius * scale,
+				viewBoxCenter + Math.cos(degreeInRadiansY) * radius * scale,
 			];
 		};
 	}, [viewBoxCenter, radius, degreesBetweenAxes]);
