@@ -149,7 +149,10 @@ function UserIntro({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={Globalstyles.container}>
-			<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + info.current.uid + ".jpg?" + info.current.uface }} />
+			<View style={Globalstyles.header_bg_con}>
+				<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: ENV.avatar + info.current.uid + ".jpg?" + info.current.uface }} />
+				<View style={Globalstyles.header_bg_msk}></View>
+			</View>
 			<HeaderView data={{
 				title: "",
 				backicon: "close",
@@ -214,10 +217,6 @@ function UserIntro({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-	header_bg: {
-		...StyleSheet.absoluteFillObject,
-		zIndex: 0,
-	},
 	intro_con: {
 		paddingHorizontal: 25,
 	},

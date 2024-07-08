@@ -102,7 +102,10 @@ function UserLevelIntro({ navigation, route }: any): React.JSX.Element {
 
 	return (
 		<View style={Globalstyles.container}>
-			<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + uid.current + ".jpg?" + uface.current }} />
+			<View style={Globalstyles.header_bg_con}>
+				<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: ENV.avatar + uid.current + ".jpg?" + uface.current }} />
+				<View style={Globalstyles.header_bg_msk}></View>
+			</View>
 			<HeaderView data={{
 				title: "等级介绍",
 				isShowSearch: false,

@@ -79,7 +79,7 @@ const display = (items: any) => {
 
 // 设置内容折叠
 const setContentFold = (params: any) => {
-	let srclist = ["smart", "article"]
+	let srclist = ["smart", "article", "user"];
 	if (srclist.includes(params.src)) {
 		handleContent(params.item, params);
 	} else {
@@ -274,6 +274,23 @@ const Globalstyles: any = StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: "transparent",
+	},
+	// 头部头像背景
+	header_bg_con: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 0,
+	},
+	header_bg_msk: {
+		position: "absolute",
+		width: "100%",
+		height: "100%",
+		backgroundColor: "rgba(0,0,0,0.3)",
+		zIndex: 1,
+	},
+	header_bg_img: {
+		width: "100%",
+		height: "100%",
+		zIndex: 0,
 	},
 	// 帖子首页类型筛选遮罩
 	social_mask: {

@@ -1,10 +1,15 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList, Animated } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList, Animated, useWindowDimensions } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PieChart } from "react-native-gifted-charts";
+import { ShadowedView } from "react-native-fast-shadow";
 
 import HeaderView from "../../components/headerview";
+import { ModalPortal } from "../../components/modals";
+import PhotoPopover from "../../components/popover/photo-popover";
+import RadarChart from "../../components/radarchart";
 
 import us from "../../services/user-service/user-service";
 
@@ -15,14 +20,9 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft, toCamelCase } from "../../configs/globalmethod";
+import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import { ShadowedView } from "react-native-fast-shadow";
-import reactNativeTextSize from "react-native-text-size";
-import { ModalPortal } from "../../components/modals";
-import PhotoPopover from "../../components/popover/photo-popover";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,16 +31,17 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	// 控件
 	const classname = "UserDetailPage";
 	const insets = useSafeAreaInsets();
+	const windowD = useWindowDimensions();
 	// 变量
 	let uid = React.useRef<number>(0);
 	let avatar = React.useRef<string>("");
 	let who = React.useRef<string>("");
 	let topicTab = React.useRef<string>("");
 	let colTab = React.useRef<string>("");
-	let maxtotal = React.useRef<number>(0);
 	const [curTab, setCurTab] = React.useState<string>("home");
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
-	const [introcontent, setIntroContent] = React.useState<string>(""); // 简介数据
+	let dna_cnt = React.useRef<number>(0);
+	let dna_cnt2 = React.useRef<number>(0);
 	// 数据
 	let favTopics = React.useRef<any[]>([]);
 	let usercol = React.useRef<any[]>([]);
@@ -54,7 +55,21 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let favcnt = React.useRef<number>(0);
 	let commoncnt = React.useRef<number>(0);
 	let aImages = React.useRef<any[]>([]);
+	let gene_code = React.useRef<any>({
+		circle_graph: [],
+		notes: [],
+		style: [],
+		odor: [],
+		brand: [],
+		perfumer: [],
+		gene_type_graph: "",
+		gene_popular_graph: "",
+		gene_sex_graph: ""
+	});
 	// 参数
+	const noseTypeList: any = ["商业", "沙龙", "热门", "中等", "冷门", "男士", "中性", "女士"];
+	const colorlist: any = ["#e0e0e0", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7"];
+	const note_lists: any = ["柑橘调", "果香调", "花香调", "美食调", "西普调", "皮革调", "东方调", "木质调", "馥奇调", "水生调", "绿叶调", "芳香调"];
 	// 状态
 	let isShowUsercol = React.useRef<boolean>(false);
 	let isShowFavcol = React.useRef<boolean>(false);
@@ -102,9 +117,128 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		for (let i = 0; i < data.photos.length; i++) {
 			aImages.current.push(ENV.image + "/uploads/" + data.photos[i] + ".jpg");
 		}
+		data["udesc2"] = "";
+		if (data.udesc.length > 0) {
+			setContentFold({
+				item: data, // 列表数据
+				key: "udesc", // 需要展开收起的字段
+				src: "user", // 来源
+				width: windowD.width - 40, // 列表项的宽度
+				fontSize: 12, // 列表项的字体大小
+				lineInfoForLine: 5, // 收起时显示的行数
+				moreTextLen: 4, // 展开收起按钮长度
+			})
+		}
 		info.current = data;
 		avatar.current = ENV.avatar + info.current.uid + ".jpg?" + info.current.uface;
 		// this.getaddtiondata();
+		getGeneData();
+	}
+
+
+	const initGeneData = () => {
+		//标记香水，清空缓存，实时更新
+		dna_cnt.current = 0;
+		dna_cnt2.current = 0;
+		gene_code.current = {
+			circle_graph: [],
+			notes: [],
+			style: [],
+			odor: [],
+			brand: [],
+			perfumer: [],
+			gene_type_graph: "",
+			gene_popular_graph: "",
+			gene_sex_graph: ""
+		};
+	}
+
+	// 处理【香水统计】数据
+	const handleBase = (arr: any) => {
+		var noseTypeGene = [];
+		for (var i in noseTypeList) {
+			var name = noseTypeList[i];
+			noseTypeGene.push({ text: name, value: arr[i], color: colorlist[i] })
+		}
+		gene_code.current["circle_graph"] = [
+			{ name: "gene_type_graph", data: noseTypeGene.slice(0, 2) },
+			{ name: "gene_popular_graph", data: noseTypeGene.slice(2, 5) },
+			{ name: "gene_sex_graph", data: noseTypeGene.slice(5, 8) }
+		]
+	}
+
+	const handleRadar = (arr: any) => {
+		var indicator = [];
+		for (var i in arr) {
+			indicator.push({ label: note_lists[i], value: arr[i] });
+		}
+		gene_code.current["notes"] = indicator;
+		console.log("%c Line:204 🥃 gene_code.current", "color:#ffdd4d", gene_code.current["notes"]);
+	}
+
+	// 获取嗅觉DNA数据
+	const getGeneData = () => {
+		initGeneData();
+		http.post(ENV.user, { method: "getdnainfo", id: uid.current }).then((resp_data: any) => {
+
+			// 处理香水统计数据
+			var base_cnt = resp_data.base.reduce((total: number, i: number) => { return i + total });
+			if (resp_data.base && base_cnt != 0) {
+				handleBase(resp_data.base);
+			} else {
+				dna_cnt.current = 1;
+			}
+
+			// 处理品牌偏好图片
+			if (us.user.uid == uid.current) {
+				resp_data.brand.forEach((ele: any) => {
+					Promise.all([encode_base64("brand", (ele.id % 100000))]).then((values: any) => {
+						ele["image"] = values[0];
+					})
+				});
+			}
+
+			// 气味偏好数据过滤掉无id的
+			resp_data.odor = resp_data.odor.filter((item: any) => { return item.id });
+
+			// 处理香调偏好数据
+			var fragrance_cnt = resp_data.fragrance.reduce((total: number, i: number) => { return i + total });
+			if (resp_data.fragrance && fragrance_cnt != 0) {
+				handleRadar(resp_data.fragrance);
+			} else {
+				dna_cnt2.current = 1;
+			}
+
+			//如果没有下边四个数据显示灰色的图　
+			if (resp_data.style && resp_data.style.length != 0) gene_code.current["style"] = resp_data.style;
+			if (resp_data.odor && resp_data.odor.length != 0) gene_code.current["odor"] = resp_data.odor.slice(0, 8);
+			if (resp_data.brand && resp_data.brand.length != 0) gene_code.current["brand"] = resp_data.brand;
+			if (resp_data.perfumer && resp_data.perfumer.length != 0) gene_code.current["perfumer"] = resp_data.perfumer;
+			if ((resp_data.style.length != 0
+				|| resp_data.odor.length != 0
+				|| resp_data.brand.length != 0
+				|| resp_data.perfumer.length != 0
+			) && dna_cnt.current != 0) {
+				dna_cnt2.current = 1;
+			}
+			if (uid.current != us.user.uid) cache.saveItem("herDna", resp_data)
+			else if (uid.current == us.user.uid) cache.saveItem("userDna", resp_data)
+		})
+	}
+
+	// 转换base64图片
+	const encode_base64 = (type: string, id: number) => {
+		return new Promise((resolve, reject) => {
+			let url = "";
+			if (type == "avatar") {
+				url = "&uid=" + id;
+			} else {
+				url = "&id=" + id;
+			}
+			http.get(ENV.api + "/base64.php?method=encode_base64&type=" + type + url).then((resp: any) => {
+				if (resp.msg == "OK") resolve(resp.base64url);
+			})
+		})
 	}
 
 	// 获取用户收藏话题数据
@@ -199,24 +333,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
-	// 设置用户简介
-	const setIntrodata = (e: any) => {
-		reactNativeTextSize.measure({
-			width: e.nativeEvent.layout.width,
-			fontSize: 12,
-			fontFamily: "monospace",
-			fontWeight: "normal",
-			text: info.current.udesc,
-			lineInfoForLine: 5
-		}).then((data: any) => {
-			maxtotal.current = data.lineInfo.start - 4;
-			setIntroContent(info.current.udesc.slice(0, maxtotal.current));
-		}).catch(() => {
-			maxtotal.current = info.current.udesc.length;
-			setIntroContent(info.current.udesc.slice(0, maxtotal.current));
-		});
-	}
-
 	// 切换香单类型
 	const toggleCol = (type: string) => {
 		if (colTab.current == type) return;
@@ -275,7 +391,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 
 	// 动态修改顶部导航栏透明度
 	const showHeaderView = (e: any) => {
-		if (e.nativeEvent.contentOffset.y > 300) {
+		if (e.nativeEvent.contentOffset.y > 150) {
 			if (isShowHeader.current) return;
 			isShowHeader.current = true;
 			Animated.timing(headerOpt, {
@@ -307,23 +423,28 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			}} method={{
 				back: () => { navigation.goBack() },
 			}}>
-				<Animated.View style={{ ...StyleSheet.absoluteFillObject, zIndex: 0, opacity: headerOpt }}>
-					{avatar.current && <Image style={{ width: "100%", height: "100%", zIndex: 0, }} blurRadius={40} source={{ uri: avatar.current }} />}
+				<Animated.View style={[Globalstyles.header_bg_con, { opacity: headerOpt }]}>
+					<View style={Globalstyles.header_bg_msk}></View>
+					{avatar.current && <Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />}
 				</Animated.View>
 				<Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />
 			</HeaderView>
-			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView} contentContainerStyle={{ paddingBottom: 20 }}>
-				{avatar.current && <Image style={styles.header_bg} blurRadius={40} source={{ uri: avatar.current }} />}
-				<View style={{ alignItems: "center", }}>
+			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView} contentContainerStyle={{}}>
+				{avatar.current && <View style={styles.header_bg}>
+					<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />
+					<View style={[Globalstyles.header_bg_msk]}></View>
+				</View>}
+				<View style={{ alignItems: "center", zIndex: 1 }}>
 					{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
 					<Text style={styles.user_name}>{info.current.uname}</Text>
-					{info.current.udesc && <Pressable style={styles.intro_con} onLayout={setIntrodata} onPress={() => { gotodetail("user-intro") }} >
-						{introcontent && <>
-							<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{introcontent}</Text>
-							{info.current.udesc.length > maxtotal.current && <View style={styles.intro_morebtn_con}>
+					{info.current.udesc && <Pressable style={styles.intro_con} onPress={() => { gotodetail("user-intro") }}>
+						{!info.current.udesc2 && <Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace", textAlign: "center" }]}>{info.current.udesc}</Text>}
+						{info.current.udesc2 && <>
+							<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{info.current.udesc2}</Text>
+							<View style={styles.intro_morebtn_con}>
 								<Text style={styles.intro_text}>{"..."}</Text>
 								<Icon name="btmarrow" style={styles.intro_icon} size={10} color={theme.toolbarbg} />
-							</View>}
+							</View>
 						</>}
 					</Pressable>}
 					{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
@@ -552,12 +673,54 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							</View>
 						</>}
 					</View>}
-					{(info.current.name != "[已注销] " && curTab == "gene") && <View style={styles.page_gene_con}>
-
+					{(info.current.name != "[已注销] " && curTab == "gene") && <View>
+						<View style={styles.item_list}>
+							<Text style={[styles.gene_title, { paddingTop: 0 }]}>{"香水统计"}</Text>
+							<View style={styles.base_con}>
+								{gene_code.current.circle_graph.length > 0 && gene_code.current.circle_graph.map((item: any) => {
+									return (
+										<View key={item.name} style={styles.base_item}>
+											{item.data.length > 0 && <>
+												<View style={{ height: width / 3, justifyContent: "center" }}>
+													<PieChart data={item.data} radius={(width / 3 * 0.65) / 2} />
+												</View>
+												<View style={styles.base_info_con}>
+													{item.data.map((item2: any) => {
+														return (
+															<View key={item2.text} style={styles.base_info}>
+																<Text style={styles.base_text}>{item2.text}</Text>
+																<View style={[styles.base_bg, { backgroundColor: item2.color }]}></View>
+																<Text style={[styles.base_text, { width: 34 }]}>{item2.value + "%"}</Text>
+															</View>
+														)
+													})}
+												</View>
+											</>}
+										</View>
+									)
+								})}
+							</View>
+						</View>
+						<View style={styles.item_list}>
+							<Text style={styles.gene_title}>{"香调偏好"}</Text>
+							{gene_code.current.notes.length > 0 &&
+								<RadarChart data={gene_code.current.notes} isCircle
+									size={width}
+									fillColor={"transparent"}
+									gradientColor={{
+										startColor: "#FFF",
+										endColor: "#FFF",
+										count: 3,
+									}}
+									stroke={["#EEE", "#EEE", "#CCC"]}
+									dataFillColor={"#EEE"}
+								/>
+							}
+						</View>
 					</View>}
 				</View>
-			</ScrollView >
-		</View >
+			</ScrollView>
+		</View>
 	);
 })
 
@@ -574,6 +737,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 400,
+		zIndex: 0,
 	},
 	user_avatar: {
 		width: 60,
@@ -635,6 +799,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
+		zIndex: 1,
 	},
 	page_tabbar: {
 		height: 60,
@@ -657,7 +822,8 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.tit
 	},
 	page_container: {
-		backgroundColor: theme.toolbarbg
+		backgroundColor: theme.toolbarbg,
+		zIndex: 1,
 	},
 	item_padding: {
 		paddingVertical: 15,
@@ -825,8 +991,40 @@ const styles = StyleSheet.create({
 		marginVertical: 15,
 		backgroundColor: theme.bg,
 	},
-	page_gene_con: {
-
+	base_con: {
+		flexDirection: "row",
+	},
+	gene_title: {
+		paddingVertical: 20,
+		paddingHorizontal: 13,
+		fontFamily: "PingFang SC",
+		fontSize: 14,
+		color: theme.tit2,
+		fontWeight: "500",
+	},
+	base_item: {
+		width: width / 3,
+		height: "100%",
+		alignItems: "center",
+	},
+	base_info_con: {
+		paddingTop: 5,
+		paddingBottom: 20,
+	},
+	base_info: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 8,
+	},
+	base_bg: {
+		width: 13,
+		height: 13,
+		marginHorizontal: 5,
+	},
+	base_text: {
+		fontSize: 12,
+		color: theme.text2,
+		textAlign: "center",
 	},
 });
 

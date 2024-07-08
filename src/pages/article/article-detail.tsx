@@ -694,9 +694,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			// 	)
 			// }}
 			>
-				{!articledata.current.mp4URL && <Animated.View style={[{ ...StyleSheet.absoluteFillObject, zIndex: 0, opacity: headerOpt }]}>
-					<View style={styles.coverimg_msk}></View>
-					<Image source={{ uri: ENV.image + articledata.current.coverimg }} style={{ width: "100%", height: "100%", zIndex: 0, }} />
+				{!articledata.current.mp4URL && <Animated.View style={[Globalstyles.header_bg_con, { opacity: headerOpt }]}>
+					<View style={Globalstyles.header_bg_msk}></View>
+					<Image source={{ uri: ENV.image + articledata.current.coverimg }} style={Globalstyles.header_bg_img} />
 				</Animated.View>}
 				<Icon style={styles.title_icon} name={likelist.current[id] ? "heart-checked" : "heart"} size={20} onPress={favarticle}
 					color={likelist.current[id] ? theme.redchecked : !articledata.current.mp4URL ? theme.toolbarbg : theme.text2} />
@@ -1170,13 +1170,6 @@ const styles = StyleSheet.create({
 	replysub_uname: {
 		fontSize: 14,
 		color: theme.tit2,
-	},
-	coverimg_msk: {
-		position: "absolute",
-		width: "100%",
-		height: "100%",
-		backgroundColor: "rgba(0,0,0,0.3)",
-		zIndex: 1,
 	},
 	title_icon: {
 		width: 44,
