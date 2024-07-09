@@ -407,8 +407,17 @@ const Globalstyles: any = StyleSheet.create({
 		borderColor: theme.toolbarbg,
 		borderWidth: 1,
 	},
+	item_flex: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	item_flex_between: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+	},
 	// flex居中
-	confirm_btn: {
+	flex_center: {
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -416,7 +425,7 @@ const Globalstyles: any = StyleSheet.create({
 		fontSize: 14,
 		color: theme.toolbarbg,
 	},
-	// 列表Tab(个人页面 话题/香单 列表)
+	// 列表Tab公共样式(个人页面 话题/香单 列表)
 	tab_tit_con: {
 		flexDirection: "row",
 		alignItems: "center",

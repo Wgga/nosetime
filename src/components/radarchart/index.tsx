@@ -160,7 +160,7 @@ export default ({
 					})}`}
 				/>
 				{data.map((r, i) => {
-					const edgePoint = calculateEdgePoint(i, 1.15);
+					const edgePoint = calculateEdgePoint(i, 1.2);
 					const fontSize = labelSize ?? 16;
 					const color = labelColor ?? "black";
 					const fontFamily = labelFontFamily ?? "Inter";

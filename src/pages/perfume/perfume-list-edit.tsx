@@ -210,7 +210,7 @@ function PerfumeListEdit({ navigation, route }: any): React.JSX.Element {
 				<LinearGradient colors={["#81B4EC", "#9BA6F5"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
-					locations={[0, 1]} style={[Globalstyles.confirm_btn, { height: 50 + insets.bottom, paddingBottom: insets.bottom }]}>
+					locations={[0, 1]} style={[Globalstyles.flex_center, { height: 50 + insets.bottom, paddingBottom: insets.bottom }]}>
 					<Text style={Globalstyles.btn_text}>{"确定"}</Text>
 				</LinearGradient>
 			</Pressable>

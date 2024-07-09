@@ -31,7 +31,7 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 				resizeMode="contain"
 			/>
 			<View style={{ flex: 1, marginLeft: 11 }}>
-				<View style={styles.item_flex_row}>
+				<View style={Globalstyles.item_flex_between}>
 					<View style={[styles.info_name_con, { marginLeft: 0 }]}>
 						<Text style={[styles.info_name, { fontSize: 13 }]}>{item.uname}</Text>
 						{item.ulevel > 0 && <View style={Globalstyles.level}>
@@ -46,7 +46,7 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 					</Pressable>
 				</View>
 				<Pressable style={styles.main_desc} onPress={() => { reply(item.id, item.uname) }}>{handledesc(item[contentkey])}</Pressable>
-				<View style={[styles.item_flex_row, { marginBottom: 8 }]}>
+				<View style={[Globalstyles.item_flex_between, { marginBottom: 8 }]}>
 					<Text style={styles.main_time}>{item[timekey]}</Text>
 					<Pressable hitSlop={10} style={styles.reply_up} onPress={() => { like_reply(item) }}>
 						<Icon name={islike ? "up-checked" : "up"} size={15} color={theme.placeholder2} />
@@ -110,11 +110,6 @@ const styles = StyleSheet.create({
 		height: 30,
 		borderRadius: 50,
 		overflow: "hidden",
-	},
-	item_flex_row: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "space-between",
 	},
 	info_name_con: {
 		flexDirection: "row",

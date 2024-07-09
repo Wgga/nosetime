@@ -23,6 +23,8 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import LinearButton from "../../components/linearbutton";
+import Svg, { Ellipse, G } from "react-native-svg";
 
 const { width, height } = Dimensions.get("window");
 
@@ -132,7 +134,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		info.current = data;
 		avatar.current = ENV.avatar + info.current.uid + ".jpg?" + info.current.uface;
 		// this.getaddtiondata();
-		getGeneData();
 	}
 
 
@@ -169,53 +170,48 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 
 	// 获取嗅觉DNA数据
 	const getGeneData = () => {
-		initGeneData();
-		http.post(ENV.user, { method: "getdnainfo", id: uid.current }).then((resp_data: any) => {
+		return new Promise((resolve, reject) => {
+			initGeneData();
+			http.post(ENV.user, { method: "getdnainfo", id: uid.current }).then((resp_data: any) => {
 
-			// 处理香水统计数据
-			var base_cnt = resp_data.base.reduce((total: number, i: number) => { return i + total });
-			if (resp_data.base && base_cnt != 0) {
-				handleBase(resp_data.base);
-			} else {
-				dna_cnt.current = 1;
-			}
-
-			// 处理品牌偏好图片
-			if (us.user.uid == uid.current) {
-				resp_data.brand.forEach((ele: any) => {
-					Promise.all([encode_base64("brand", (ele.id % 100000))]).then((values: any) => {
-						ele["image"] = values[0];
-					})
-				});
-			}
-
-			// 气味偏好数据过滤掉无id的
-			resp_data.odor = resp_data.odor.filter((item: any) => { return item.id });
-
-			// 处理香调偏好数据
-			var fragrance_cnt = resp_data.fragrance.reduce((total: number, i: number) => { return i + total });
-			if (resp_data.fragrance && fragrance_cnt != 0) {
-				for (var i in resp_data.fragrance) {
-					gene_code.current["notes"].push({ label: note_lists[i], value: resp_data.fragrance[i] });
+				// 处理香水统计数据
+				var base_cnt = resp_data.base.reduce((total: number, i: number) => { return i + total });
+				if (resp_data.base && base_cnt != 0) {
+					handleBase(resp_data.base);
+				} else {
+					dna_cnt.current = 1;
 				}
-			} else {
-				dna_cnt2.current = 1;
-			}
 
-			//如果没有下边四个数据显示灰色的图　
-			if (resp_data.style && resp_data.style.length != 0) gene_code.current["style"] = resp_data.style;
-			if (resp_data.odor && resp_data.odor.length != 0) gene_code.current["odor"] = resp_data.odor.slice(0, 8);
-			if (resp_data.brand && resp_data.brand.length != 0) gene_code.current["brand"] = resp_data.brand;
-			if (resp_data.perfumer && resp_data.perfumer.length != 0) gene_code.current["perfumer"] = resp_data.perfumer;
-			if ((resp_data.style.length != 0
-				|| resp_data.odor.length != 0
-				|| resp_data.brand.length != 0
-				|| resp_data.perfumer.length != 0
-			) && dna_cnt.current != 0) {
-				dna_cnt2.current = 1;
-			}
-			if (uid.current != us.user.uid) cache.saveItem("herDna", resp_data)
-			else if (uid.current == us.user.uid) cache.saveItem("userDna", resp_data)
+				// 气味偏好数据过滤掉无id的
+				resp_data.odor = resp_data.odor.filter((item: any) => { return item.id });
+
+				// 处理香调偏好数据
+				var fragrance_cnt = resp_data.fragrance.reduce((total: number, i: number) => { return i + total });
+				if (resp_data.fragrance && fragrance_cnt != 0) {
+					for (var i in resp_data.fragrance) {
+						gene_code.current["notes"].push({ label: note_lists[i], value: resp_data.fragrance[i] });
+					}
+				} else {
+					dna_cnt2.current = 1;
+				}
+
+				//如果没有下边四个数据显示灰色的图　
+				if (resp_data.style && resp_data.style.length != 0) gene_code.current["style"] = resp_data.style;
+				if (resp_data.odor && resp_data.odor.length != 0) gene_code.current["odor"] = resp_data.odor.slice(0, 8);
+				if (resp_data.brand && resp_data.brand.length != 0) gene_code.current["brand"] = resp_data.brand;
+				if (resp_data.perfumer && resp_data.perfumer.length != 0) gene_code.current["perfumer"] = resp_data.perfumer;
+				if ((resp_data.style.length != 0
+					|| resp_data.odor.length != 0
+					|| resp_data.brand.length != 0
+					|| resp_data.perfumer.length != 0
+				) && dna_cnt.current != 0) {
+					dna_cnt2.current = 1;
+				}
+				if (uid.current != us.user.uid) cache.saveItem("herDna", resp_data)
+				else if (uid.current == us.user.uid) cache.saveItem("userDna", resp_data)
+
+				resolve(1);
+			})
 		})
 	}
 
@@ -319,10 +315,23 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			getFavCnt(),
 			getUserCol(),
 			getFavCol(),
-			getCompare()
+			getCompare(),
+			getGeneData()
 		]).then(() => {
 			colTab.current = usercol.current.length == 0 && favcol.current.length > 0 ? "fav" : "user";
-			setIsRender(val => !val);
+			// 处理品牌偏好图片
+			if (us.user.uid == uid.current) {
+				let cnt = 0;
+				gene_code.current.brand.forEach((item: any, index: number) => {
+					Promise.all([encode_base64("brand", (item.id % 100000))]).then((values: any) => {
+						cnt += 1;
+						item["image"] = values[0];
+						if (cnt == gene_code.current.brand.length) setIsRender(val => !val);
+					})
+				});
+			} else {
+				setIsRender(val => !val);
+			}
 		})
 	}
 
@@ -350,6 +359,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			navigation.navigate("Page", { screen: "SocialShequDetail", params: { ctdlgid: item.ctdlgid } });
 		} else if (page == "user-shequ") {
 			navigation.navigate("Page", { screen: "UserShequ", params: { uid: uid.current, cnt: info.current.topic, name: info.current.uname } });
+		} else if (page == "user-friend") {
+			navigation.navigate("Page", { screen: "UserFriend", params: { uid: uid.current, carecnt: info.current.care, name: info.current.uname, fanscnt: info.current.fans, } });
 		} else {
 			let screen = toCamelCase(page);
 			navigation.navigate("Page", { screen: screen, params: { uid: uid.current } });
@@ -441,7 +452,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</>}
 					</Pressable>}
 					{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
-						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-friend") }}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
 						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
@@ -479,11 +490,11 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									<Image style={[styles.commonfav_avatar, styles.commonfav_avatar2]} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 								</View>
 								<View style={styles.commonfav_list}>
-									<View style={styles.commonfav_tit_con}>
+									<View style={Globalstyles.item_flex}>
 										<Text style={styles.commonfav_tit}>{"我们共同的喜好 " + commoncnt.current + "个"}</Text>
 										<Icon name="advance" size={14} color={theme.tit2} style={{ marginLeft: 10 }} />
 									</View>
-									<Text style={styles.commonfav_text}>{
+									<Text style={[styles.textstyle, { marginTop: 5 }]}>{
 										"香水 " + commonfavs.current["item"].length + "  " +
 										"气味 " + commonfavs.current["odor"].length + "  " +
 										"品牌 " + commonfavs.current["brand"].length + "  " +
@@ -507,12 +518,12 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</View>}
 						{(isShowUsercol.current || isShowFavcol.current || us.user.uid == uid.current) && <View style={styles.item_list}>
 							<View style={styles.item_title}>
-								<View style={styles.item_flex_row}>
+								<View style={Globalstyles.item_flex}>
 									{isShowUsercol.current && <Text style={[styles.tit_text, colTab.current == "user" && { color: theme.tit2 }]} onPress={() => { toggleCol("user") }}>{"自建香单"}</Text>}
 									{(isShowUsercol.current && isShowFavcol.current) && <Text style={styles.tit_text}>|</Text>}
 									{isShowFavcol.current && <Text style={[styles.tit_text, colTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleCol("fav") }}>{"收藏香单"}</Text>}
 								</View>
-								<Pressable hitSlop={10} style={styles.item_flex_row} onPress={() => { gotodetail("perfume-list") }}>
+								<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("perfume-list") }}>
 									<Text style={styles.col_btn}>{"全部"}</Text>
 									<Icon name="advance" size={14} color={theme.color} />
 								</Pressable>
@@ -568,19 +579,19 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</View>}
 						{(isShowUserTopic.current || isShowFavTopic.current) && <View style={styles.item_list}>
 							<View style={styles.item_title}>
-								<View style={styles.item_flex_row}>
+								<View style={Globalstyles.item_flex}>
 									{isShowUserTopic.current && <Text style={[styles.tit_text, topicTab.current == who.current && { color: theme.tit2 }]} onPress={() => { toggleTopic(who.current) }}>{who.current + "的话题"}</Text>}
 									{(isShowUserTopic.current && isShowFavTopic.current) && <Text style={styles.tit_text}>|</Text>}
 									{isShowFavTopic.current && <Text style={[styles.tit_text, topicTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleTopic("fav") }}>{"收藏话题"}</Text>}
 								</View>
-								<Pressable hitSlop={10} style={styles.item_flex_row} onPress={() => { gotodetail("user-shequ") }}>
+								<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("user-shequ") }}>
 									<Text style={styles.col_btn}>{"全部"}</Text>
 									<Icon name="advance" size={14} color={theme.color} />
 								</Pressable>
 							</View>
 							{topicTab.current == who.current && info.current.topics.map((item: any) => {
 								return (
-									<Pressable key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
 										onPress={() => { gotodetail("social-shequ-detail", item) }}>
 										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: avatar.current }} />}
 										<Text style={styles.topic_tit}>{item.cttitle}</Text>
@@ -589,7 +600,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							})}
 							{topicTab.current == "fav" && favTopics.current.map((item: any) => {
 								return (
-									<Pressable key={item.ctdlgid} style={[styles.item_padding, styles.item_flex_row, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
 										onPress={() => { gotodetail("social-shequ-detail", item) }}>
 										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} />}
 										<Text style={styles.topic_tit}>{item.cttitle}</Text>
@@ -698,7 +709,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							<View style={{ alignItems: "center" }}>
 								{gene_code.current.notes.length > 0 &&
 									<RadarChart data={gene_code.current.notes}
-										size={width * 0.65}
+										size={width * 0.85}
 										isCircle
 										gradientColor={{
 											startColor: "#FFF",
@@ -721,38 +732,95 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 								source={require("../../assets/images/empty/somedna_blank.png")}
 								resizeMode="contain" />
 						</View>}
-						{(dna_cnt.current != 2 && gene_code.current.style.length > 0) && <View style={styles.item_list}>
+						{(dna_cnt2.current != 1 && gene_code.current.style.length > 0) && <View style={styles.item_list}>
 							<Text style={styles.gene_title}>{"风格偏好"}</Text>
+							<View style={styles.style_con}>
+								{gene_code.current.style.map((item: any) => {
+									return (
+										<View key={item.tag} style={styles.style_item}>
+											<Text>{item.val + "%"}</Text>
+											<View style={styles.style_outbar}>
+												{item.val != 100 && <Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
+													<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill="none" />
+												</Svg>}
+												<View style={[styles.style_inbar, { height: `${item.val}%` }]}>
+													<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
+														<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill={theme.border} />
+													</Svg>
+												</View>
+												<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { bottom: -2.5, zIndex: -1 }]}>
+													<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill={theme.border} />
+												</Svg>
+											</View>
+											<Text>{item.tag}</Text>
+										</View>
+									)
+								})}
+							</View>
 						</View>}
-						{(dna_cnt.current != 2 && gene_code.current.odor.length > 0) && <View style={styles.item_list}>
+						{(dna_cnt2.current != 1 && gene_code.current.odor.length > 0) && <View style={styles.item_list}>
 							<Text style={styles.gene_title}>{"气味偏好"}</Text>
 							<View style={{ paddingHorizontal: 20 }}>
 								{gene_code.current.odor.map((item: any) => {
 									return (
 										<View key={item.id} style={styles.odor_item}>
-											<Text style={styles.item_tag}>{item.tag}</Text>
-											<View style={styles.odor_outbar}>
-												<View style={[styles.odor_inbar, { width: `${item.val}%` }]}></View>
+											<Text style={[styles.textstyle, styles.item_tag]}>{item.tag}</Text>
+											<View style={[styles.progress_outbar, { flex: 1 }]}>
+												<View style={[styles.progress_inbar, { width: `${item.val}%` }]}></View>
 											</View>
-											<Text style={styles.item_val}>{item.val + "%"}</Text>
+											<Text style={[styles.textstyle, styles.item_val]}>{item.val + "%"}</Text>
 										</View>
 									)
 								})}
 							</View>
 						</View>}
-						{(dna_cnt.current != 2 && gene_code.current.brand.length > 0) && <View style={styles.item_list}>
+						{(dna_cnt2.current != 1 && gene_code.current.brand.length > 0) && <View style={styles.item_list}>
 							<Text style={styles.gene_title}>{"品牌偏好"}</Text>
 							<View style={{ paddingHorizontal: 20, paddingBottom: 17 }}>
 								{gene_code.current.brand.map((item: any) => {
 									return (
 										<View key={item.id} style={styles.brand_item}>
-											{us.user.uid == uid.current && <Image style={styles.brand_img} source={{ uri: item.image }} />}
-											{us.user.uid != uid.current && <Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} />}
+											{(us.user.uid == uid.current && item.image) && <Image style={styles.brand_img} source={{ uri: item.image }} resizeMode="contain" />}
+											{us.user.uid != uid.current && <Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} resizeMode="contain" />}
+											<View style={styles.brand_info}>
+												<View style={styles.info_name}>
+													<Text numberOfLines={1} style={[styles.textstyle, { flex: 1 }]}>{item.cnname + " " + item.enname}</Text>
+													<Text style={[styles.textstyle, { marginLeft: 10 }]}>{item.val + "%"}</Text>
+												</View>
+												<View style={[styles.progress_outbar, { marginTop: 15 }]}>
+													<View style={[styles.progress_inbar, { width: `${item.val}%` }]}></View>
+												</View>
+											</View>
 										</View>
 									)
 								})}
 							</View>
 						</View>}
+						{(dna_cnt2.current != 1 && gene_code.current.perfumer.length > 0) && <View style={{ paddingBottom: 30 }}>
+							<Text style={styles.gene_title}>{"调香师偏好"}</Text>
+							<View>
+								{gene_code.current.perfumer.map((item: any) => {
+									return (
+										<View key={item.id} style={{ padding: 20 }}>
+											<View style={[styles.info_name, styles.perfume_outbar]}>
+												<View style={[styles.perfume_inbar, { width: `${item.val}%` }]}></View>
+												<Text style={[styles.textstyle, { marginLeft: 17, zIndex: 1 }]}>{item.tag}</Text>
+												<Text style={[styles.textstyle, { marginRight: 17, zIndex: 1 }]}>{item.val + "%"}</Text>
+											</View>
+										</View>
+									)
+								})}
+							</View>
+						</View>}
+						{(dna_cnt2.current != 1 && uid.current == us.user.uid) && <LinearButton containerStyle={styles.dna_photo_btn}
+							text={"生成嗅觉DNA报告"}
+							textStyle={styles.dna_photo_btn_text}
+							colors2={["#81B4EC", "#9BA6F5"]}
+							isShowColor={false}
+							onPress={() => {
+
+							}}
+						/>}
 					</View>}
 				</View>
 			</ScrollView >
@@ -895,18 +963,13 @@ const styles = StyleSheet.create({
 	commonfav_list: {
 		marginLeft: 10,
 	},
-	commonfav_tit_con: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
 	commonfav_tit: {
 		fontSize: 14,
 		color: theme.tit2
 	},
-	commonfav_text: {
+	textstyle: {
 		fontSize: 12,
 		color: theme.text2,
-		marginTop: 5,
 	},
 	item_list: {
 		borderBottomWidth: 8,
@@ -934,10 +997,6 @@ const styles = StyleSheet.create({
 		color: theme.text1,
 		marginBottom: 10,
 		marginLeft: 6,
-	},
-	item_flex_row: {
-		flexDirection: "row",
-		alignItems: "center",
 	},
 	tit_text: {
 		fontSize: 15,
@@ -1059,6 +1118,34 @@ const styles = StyleSheet.create({
 		color: theme.text2,
 		textAlign: "center",
 	},
+	style_con: {
+		paddingBottom: 20,
+		flexDirection: "row",
+	},
+	style_item: {
+		flexGrow: 1,
+		alignItems: "center",
+	},
+	style_outbar: {
+		width: 14,
+		marginVertical: 15,
+		height: 90,
+		borderColor: "#AFAFAF",
+		borderWidth: 1,
+		borderTopWidth: 0,
+		borderBottomWidth: 0,
+	},
+	style_svg: {
+		position: "absolute",
+		left: -1,
+		zIndex: 1
+	},
+	style_inbar: {
+		backgroundColor: theme.border,
+		width: 12,
+		position: "absolute",
+		bottom: 0,
+	},
 	odor_item: {
 		flexDirection: "row",
 		alignItems: "center",
@@ -1069,16 +1156,15 @@ const styles = StyleSheet.create({
 		height: 17,
 		lineHeight: 17,
 	},
-	odor_outbar: {
+	progress_outbar: {
 		backgroundColor: theme.bg,
 		borderRadius: 5,
 		overflow: "hidden",
-		flex: 1,
 		height: 10,
 	},
-	odor_inbar: {
+	progress_inbar: {
 		backgroundColor: theme.border,
-		height: "100%",
+		height: 10,
 		borderRadius: 5,
 		overflow: "hidden",
 	},
@@ -1087,10 +1173,48 @@ const styles = StyleSheet.create({
 		textAlign: "right",
 	},
 	brand_item: {
-		paddingVertical: 15
+		paddingVertical: 15,
+		flexDirection: "row"
 	},
 	brand_img: {
-
+		width: 60,
+		height: 60,
+		borderColor: theme.bg,
+		borderWidth: 1,
+	},
+	brand_info: {
+		flex: 1,
+		marginLeft: 15,
+	},
+	info_name: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+	},
+	perfume_outbar: {
+		height: 20,
+		backgroundColor: theme.bg,
+		borderRadius: 10,
+		overflow: "hidden",
+		// paddingHorizontal: 17,
+	},
+	perfume_inbar: {
+		position: "absolute",
+		top: 0,
+		bottom: 0,
+		zIndex: 0,
+		borderRadius: 10,
+		overflow: "hidden",
+		backgroundColor: theme.border,
+	},
+	dna_photo_btn: {
+		marginBottom: 30,
+		padding: 0,
+		paddingHorizontal: 100,
+	},
+	dna_photo_btn_text: {
+		color: theme.toolbarbg,
+		fontSize: 15,
 	}
 });
 

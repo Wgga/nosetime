@@ -19,6 +19,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -154,13 +155,13 @@ const SocialShequ = React.memo(({ navigation, type, showHeaderView }: any) => {
 					}}>
 						<Text numberOfLines={1} style={styles.item_title}>{item.title}</Text>
 						<View style={styles.item_info}>
-							<View style={styles.item_flex}>
+							<View style={Globalstyles.item_flex}>
 								<FastImage style={styles.item_avatar}
 									source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }}
 								/>
 								<Text style={styles.item_uname}>{item.uname}</Text>
 							</View>
-							<View style={styles.item_flex}>
+							<View style={Globalstyles.item_flex}>
 								{item.cnt != "" && item.cnt != "0" && <Text style={styles.reply_cnt}>{item.cnt}</Text>}
 								<Icon name="reply2" size={18} color={theme.comment} />
 							</View>
@@ -227,10 +228,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "space-between",
-	},
-	item_flex: {
-		flexDirection: "row",
-		alignItems: "center",
 	},
 	item_avatar: {
 		width: 22,

@@ -53,6 +53,8 @@ import UserFav from "../pages/user/user-fav";
 import UserShequ from "../pages/user/user-shequ";
 import UserIntro from "../pages/user/user-intro";
 import UserLevelIntro from "../pages/user/user-level-intro";
+import UserDiscuss from "../pages/user/user-discuss";
+import UserFriend from "../pages/user/user-friend";
 
 const Stack = createNativeStackNavigator();
 
@@ -111,6 +113,8 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="UserShequ" component={UserShequ} />
 			<Stack.Screen name="UserIntro" component={UserIntro} />
 			<Stack.Screen name="UserLevelIntro" component={UserLevelIntro} />
+			<Stack.Screen name="UserDiscuss" component={UserDiscuss} />
+			<Stack.Screen name="UserFriend" component={UserFriend} />
 		</Stack.Navigator>
 	);
 }

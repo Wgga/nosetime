@@ -15,6 +15,7 @@ import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/glo
 import us from "../../services/user-service/user-service";
 import ToastCtrl from "../../components/toastctrl";
 import LinearGradient from "react-native-linear-gradient";
+import CareView from "../../components/careView";
 
 function Talent({ navigation }: any): React.JSX.Element {
 	// 控件
@@ -120,14 +121,6 @@ function Talent({ navigation }: any): React.JSX.Element {
 		})
 	}
 
-	const getid = (type: string, item: any) => {
-		if (type == "care") {
-			return item.id;
-		} else {
-			return item.uid;
-		}
-	}
-
 	return (
 		<View style={styles.talent_container}>
 			<HeaderView data={{
@@ -151,73 +144,16 @@ function Talent({ navigation }: any): React.JSX.Element {
 				<View style={Globalstyles.title_text_con}></View>
 			</HeaderView>
 			<View style={Globalstyles.container}>
-				{(tab == "care" && carelist.current.length == 0) && <View style={styles.borderbg}>
-					<Image style={Globalstyles.emptyimg}
-						resizeMode="contain"
-						source={require("../../assets/images/empty/userfriend_blank.png")} />
-				</View>}
-				{((tab == "care" && carelist.current.length > 0) || (tab == "talent" && talentlist.current.length > 0)) && <FlatList data={tab == "care" ? carelist.current : talentlist.current}
-					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={[styles.talent_con, styles.borderbg]}
-					keyExtractor={(item: any) => getid(tab, item)}
-					renderItem={({ item }: any) => {
-						return (
-							<View style={styles.talent_or_care_item}>
-								<View style={styles.item_img_con}>
-									<FastImage style={styles.item_img}
-										source={{ uri: ENV.avatar + (tab == "talent" ? item.uid : item.id) + ".jpg?" + item.uface }}
-									/>
-								</View>
-								<View style={styles.item_info}>
-									<View style={styles.item_flex}>
-										<Text numberOfLines={1} style={styles.item_uname}>{item.uname}</Text>
-										{item.ulevel > 0 && <View style={Globalstyles.level}>
-											<Image
-												style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-												defaultSource={require("../../assets/images/nopic.png")}
-												source={require("../../assets/images/level.png")}
-											/>
-										</View>}
-									</View>
-									<View style={styles.item_message}>
-										{tab == "talent" && <>
-											<Text style={{ marginRight: 15 }}>{"商业香  " + item.stradexp}</Text>
-											<Text>{"沙龙香  " + item.ssalonxp}</Text>
-										</>}
-										{tab == "care" && <>
-											<Text style={{ marginRight: 15 }}>{"商业香  " + item.utradexp}</Text>
-											<Text>{"沙龙香  " + item.usalonxp}</Text>
-										</>}
-									</View>
-								</View>
-								{(!like_.current[getid(tab, item)] && getid(tab, item) != us.user.uid) && <Pressable onPress={() => { care("add", item) }} style={styles.item_btn_con}>
-									<LinearGradient style={styles.item_btn}
-										colors={["#81B4EC", "#9BA6F5"]}
-										start={{ x: 0, y: 0 }}
-										end={{ x: 1, y: 0 }}
-										locations={[0, 1]}
-									>
-										<Text style={styles.btn_text}>{"关注"}</Text>
-									</LinearGradient>
-								</Pressable>}
-								{like_.current[getid(tab, item)] && <Pressable onPress={() => { care("del", item) }} style={styles.item_btn_con}>
-									<View style={[styles.item_btn, { borderWidth: 1, borderColor: "#EEEEEE" }]}>
-										<Text style={styles.btn_text2}>{"取消关注"}</Text>
-									</View>
-								</Pressable>}
-							</View>
-						)
-					}}
-				/>}
+				<CareView data={{
+					items: tab == "care" ? carelist.current : talentlist.current,
+					likedata: like_.current,
+					type: tab
+				}} />
 			</View>
 		</View>
 	);
 }
 const styles = StyleSheet.create({
-	item_flex: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
 	talent_container: {
 		flex: 1,
 		backgroundColor: theme.bg,
@@ -234,66 +170,5 @@ const styles = StyleSheet.create({
 		color: theme.placeholder,
 		fontWeight: "500",
 	},
-	borderbg: {
-		borderTopColor: theme.bg,
-		borderTopWidth: 6,
-	},
-	talent_con: {
-		paddingVertical: 8,
-	},
-	talent_or_care_item: {
-		paddingHorizontal: 14,
-		paddingVertical: 20,
-		flexDirection: "row",
-	},
-	item_img_con: {
-		width: 55,
-		height: 55,
-		borderRadius: 50,
-		overflow: "hidden",
-	},
-	item_img: {
-		width: "100%",
-		height: "100%",
-	},
-	item_info: {
-		flex: 1,
-		marginLeft: 13,
-		justifyContent: "space-around",
-	},
-	item_uname: {
-		fontSize: 14,
-		fontWeight: "500",
-		color: theme.tit2,
-		fontFamily: "PingFang SC",
-	},
-	item_message: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	item_btn_con: {
-		justifyContent: "center",
-		marginLeft: 40,
-	},
-	item_btn: {
-		minWidth: 68,
-		height: 30,
-		alignItems: "center",
-		justifyContent: "center",
-		borderRadius: 20,
-		paddingHorizontal: 6,
-	},
-	btn_text: {
-		color: theme.toolbarbg,
-		fontWeight: "500",
-		fontSize: 14,
-		fontFamily: "PingFang SC",
-	},
-	btn_text2: {
-		color: "#808080",
-		fontWeight: "500",
-		fontSize: 14,
-		fontFamily: "PingFang SC",
-	}
 });
 export default Talent;

@@ -5,7 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 
 import theme from "../configs/theme";
 
-function LinearButton({ text, onPress, containerStyle, textStyle, btntransform, colors, colors2 }: any): React.JSX.Element {
+function LinearButton({ text, onPress, containerStyle, textStyle, btntransform, colors, colors2, isShowColor = true }: any): React.JSX.Element {
 	// 控件
 	// 变量
 	// 数据
@@ -14,12 +14,12 @@ function LinearButton({ text, onPress, containerStyle, textStyle, btntransform, 
 	return (
 		<View style={containerStyle}>
 			<Pressable onPress={onPress} style={styles.btn}>
-				<LinearGradient colors={colors ? colors : ["#81B4EC", "#9BA6F5"]}
+				{isShowColor && <LinearGradient colors={colors ? colors : ["#81B4EC", "#9BA6F5"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
 					locations={[0, 1]}
 					style={[styles.btn_bg, { zIndex: 1, transform: btntransform ? btntransform : [{ translateY: -2 }, { translateX: -2 }] }]}
-				/>
+				/>}
 				<LinearGradient colors={colors2 ? colors2 : ["#61A2E9", "#95A0EB"]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}

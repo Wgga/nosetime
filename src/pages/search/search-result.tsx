@@ -247,7 +247,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										/>
 									</View>
 									<View style={styles.item_con}>
-										<View style={[styles.item_cnname, styles.item_flex]}>
+										<View style={[styles.item_cnname, Globalstyles.item_flex]}>
 											<Text numberOfLines={1} style={styles.cnname}>{item.cnname}</Text>
 											{isbuy[item.id] && <Pressable onPress={(ev) => { gotomall("mall-item", item.id, ev) }}>
 												<Yimai width={18} height={18} />
@@ -282,7 +282,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.articles.map((item: any, index: number) => {
 							return (
-								<Pressable key={item.id} onPress={() => { gotodetail("article", item) }} style={[styles.wiki_list_con, styles.item_flex]}>
+								<Pressable key={item.id} onPress={() => { gotodetail("article", item) }} style={[styles.wiki_list_con, Globalstyles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -306,7 +306,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.brands.map((item: any, index: number) => {
 							return (
-								<Pressable onPress={() => { gotodetail("brand", item) }} key={item.id} style={[styles.wiki_list_con, styles.item_flex]}>
+								<Pressable onPress={() => { gotodetail("brand", item) }} key={item.id} style={[styles.wiki_list_con, Globalstyles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -330,7 +330,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.odors.map((item: any, index: number) => {
 							return (
-								<Pressable onPress={() => { gotodetail("odor", item) }} key={item.id} style={[styles.wiki_list_con, styles.item_flex]}>
+								<Pressable onPress={() => { gotodetail("odor", item) }} key={item.id} style={[styles.wiki_list_con, Globalstyles.item_flex]}>
 									<Image
 										style={styles.wiki_list_image}
 										defaultSource={require("../../assets/images/nopic.png")}
@@ -354,7 +354,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={[styles.wiki_list, { paddingHorizontal: 13 }]}>
 						{searchdata.perfumers.map((item: any, index: number) => {
 							return (
-								<Pressable key={item.id} onPress={() => { gotodetail("perfumer", item) }} style={[styles.wiki_list_con, styles.item_flex]}>
+								<Pressable key={item.id} onPress={() => { gotodetail("perfumer", item) }} style={[styles.wiki_list_con, Globalstyles.item_flex]}>
 									<RnImage style={styles.wiki_list_image}
 										source={{ uri: ENV.image + "/nosevi/" + item.id + ".jpg" }}
 										errsrc={require("../../assets/images/perfumer.png")}
@@ -398,8 +398,8 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<View style={styles.mall_list_info}>
 											{(item.name == "购物清单" || item.name == "合辑") && <Text numberOfLines={1} style={styles.mall_list_info_title}>{item2.title}</Text>}
 											{item.name == "购物清单" && <Text style={styles.mall_list_info_desc}>{item2.desc}</Text>}
-											{item.name == "单品" && <View style={[styles.mall_list_info_cnname_con, styles.item_flex]}>
-												<View style={[styles.item_flex, { maxWidth: item2.marketing ? width - 175 : width - 135 }]}>
+											{item.name == "单品" && <View style={[styles.mall_list_info_cnname_con, Globalstyles.item_flex]}>
+												<View style={[Globalstyles.item_flex, { maxWidth: item2.marketing ? width - 175 : width - 135 }]}>
 													<Text numberOfLines={1} style={[styles.mall_list_info_cnname]}>{item2.cnname}</Text>
 													{item2.marketing != 0 && <Text style={styles.mall_list_info_marketing}>{"活动"}</Text>}
 												</View>
@@ -458,7 +458,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 					<View style={styles.wiki_list}>
 						{searchdata.users.map((item: any, index: number) => {
 							return (
-								<View style={[styles.user_list_item, styles.item_flex]} key={item.uid}>
+								<View style={[styles.user_list_item, Globalstyles.item_flex]} key={item.uid}>
 									<Image
 										style={[styles.wiki_list_image, styles.user_avatar]}
 										defaultSource={require("../../assets/images/default_avatar.png")}
@@ -466,7 +466,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										resizeMode="contain"
 									/>
 									<View style={styles.wiki_list_info}>
-										<View style={styles.item_flex}>
+										<View style={Globalstyles.item_flex}>
 											<Text numberOfLines={1}>{item.uname}</Text>
 											{item.ulevel > 0 && <View style={Globalstyles.level}>
 												<Image
@@ -605,10 +605,6 @@ function SearchResult({ navigation, route }: any): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-	item_flex: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
 	tabs_con: {
 		width: "100%",
 		flexDirection: "row",
