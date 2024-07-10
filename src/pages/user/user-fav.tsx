@@ -29,23 +29,31 @@ import StarImage from "../../components/starimage";
 
 const { width, height } = Dimensions.get("window");
 
-const ArticlePage = React.memo(({ uid, navigation }: any) => {
+const ArticlePage = React.memo(({ navigation }: any) => {
 
 	// 控件
 
 	// 变量
+	let curuid = React.useRef<number>(0);
 	// 数据
 	let articlelist = React.useRef<any[]>([]);
 	// 状态
 	const [isrender, setIsRender] = React.useState(false);
 
 	React.useEffect(() => {
-		http.post(ENV.user + "?uid=" + us.user.uid, { method: "getfav", token: us.user.token, type: "文章" }).then((resp_data: any) => {
-			articlelist.current = resp_data;
-			setIsRender(val => !val);
-		})
+		articlelist.current = [];
+		events.subscribe("current_uid", (uid: number) => {
+			if (uid > 0) getfavdata(uid);
+		});
 	}, [])
 
+	const getfavdata = (uid: number) => {
+		http.post(ENV.user + "?uid=" + uid, { method: "getfav", token: us.user.token, type: "文章" }).then((resp_data: any) => {
+			articlelist.current = resp_data;
+			curuid.current = uid;
+			setIsRender(val => !val);
+		})
+	}
 	const unitNumber = (number: number) => {
 		return articleService.unitNumber(number, 1);
 	}
@@ -72,8 +80,8 @@ const ArticlePage = React.memo(({ uid, navigation }: any) => {
 							return navigation.navigate("Page", { screen: "Login", params: { src: "App我的喜好页面" } });
 						}
 						articlelist.current = articlelist.current.filter(item2 => { return item2.id != item.id });
-						setIsRender(val => !val);
 						ToastCtrl.show({ message: "删除成功", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
+						setIsRender(val => !val);
 					});
 				}
 			}],
@@ -81,49 +89,55 @@ const ArticlePage = React.memo(({ uid, navigation }: any) => {
 	}
 
 	return (
-		<>
-			{(articlelist.current && articlelist.current.length > 0) && <FlatList data={articlelist.current}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={styles.list_container}
-				keyExtractor={(item: any) => item.id}
-				renderItem={({ item, index }: any) => {
-					return (
-						<Pressable onPress={() => {
-							navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.id } });
-						}} style={styles.list_item}>
-							<FastImage style={styles.item_image}
-								source={{ uri: ENV.image + item.apicurl + "!m" }}
-							/>
-							<View style={styles.item_info}>
-								<Text style={styles.item_title}>{item.atitle}</Text>
-								<View style={styles.flex_row}>
-									<View style={[styles.icon_item_con, styles.flex_row]}>
-										<View style={styles.icon_item}>
-											<Icon name="heart" size={14} color={"#808080"} />
-											<Text style={styles.icon_text}>{unitNumber(item.favcnt)}</Text>
-										</View>
-										<View style={styles.icon_item}>
-											<Icon name="message" size={13.5} color={"#808080"} />
-											<Text style={styles.icon_text}>{unitNumber(item.replycnt)}</Text>
-										</View>
-										<View style={styles.icon_item}>
-											<Icon name="look" size={16} color={"#808080"} />
-											<Text style={styles.icon_text}>{unitNumber(item.click)}</Text>
-										</View>
+		<FlatList data={articlelist.current}
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={styles.list_container}
+			keyExtractor={(item: any) => item.id}
+			ListEmptyComponent={<View>
+				{curuid.current == us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/userlike_blank.png")} />}
+				{curuid.current != us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/olike_blank.png")} />}
+			</View>}
+			renderItem={({ item, index }: any) => {
+				return (
+					<Pressable onPress={() => {
+						navigation.navigate("Page", { screen: "ArticleDetail", params: { id: item.id } });
+					}} style={styles.list_item}>
+						<FastImage style={styles.item_image}
+							source={{ uri: ENV.image + item.apicurl + "!m" }}
+						/>
+						<View style={styles.item_info}>
+							<Text style={styles.item_title}>{item.atitle}</Text>
+							<View style={styles.flex_row}>
+								<View style={[styles.icon_item_con, styles.flex_row]}>
+									<View style={styles.icon_item}>
+										<Icon name="heart" size={14} color={"#808080"} />
+										<Text style={styles.icon_text}>{unitNumber(item.favcnt)}</Text>
 									</View>
-									<Pressable onPress={() => {
-										deletefav(item)
-									}}>
-										<Icon name="del2" size={16} color={"#CCCCCC"} />
-									</Pressable>
+									<View style={styles.icon_item}>
+										<Icon name="message" size={13.5} color={"#808080"} />
+										<Text style={styles.icon_text}>{unitNumber(item.replycnt)}</Text>
+									</View>
+									<View style={styles.icon_item}>
+										<Icon name="look" size={16} color={"#808080"} />
+										<Text style={styles.icon_text}>{unitNumber(item.click)}</Text>
+									</View>
 								</View>
+								<Pressable onPress={() => {
+									deletefav(item)
+								}}>
+									<Icon name="del2" size={16} color={"#CCCCCC"} />
+								</Pressable>
 							</View>
-						</Pressable>
-					)
-				}}
-				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={articlelist.current.length > 0} />}
-			/>}
-		</>
+						</View>
+					</Pressable>
+				)
+			}}
+			ListFooterComponent={<ListBottomTip noMore={true} isShowTip={articlelist.current.length > 0} />}
+		/>
 	)
 })
 const VodPage = React.memo(({ uid, navigation }: any) => {
@@ -136,6 +150,11 @@ const VodPage = React.memo(({ uid, navigation }: any) => {
 	const [isrender, setIsRender] = React.useState(false);
 
 	React.useEffect(() => {
+		vodlist.current = [];
+		getfavdata();
+	}, [])
+
+	const getfavdata = () => {
 		http.post(ENV.user + "?uid=" + uid, { method: "getfav", token: us.user.token, type: "视频" }).then((resp_data: any) => {
 			resp_data.map((item: any) => {
 				item["mainname"] = item["name"] ? item["name"].split("：")[0] : "";
@@ -144,43 +163,48 @@ const VodPage = React.memo(({ uid, navigation }: any) => {
 			vodlist.current = resp_data;
 			setIsRender(val => !val);
 		})
-	}, [])
+	}
 
 	return (
-		<>
-			{(vodlist.current && vodlist.current.length > 0) && <FlatList data={vodlist.current}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={[styles.list_container, { paddingTop: 20 }]}
-				horizontal={false}
-				numColumns={2}
-				keyExtractor={(item: any) => item.mid}
-				renderItem={({ item, index }: any) => {
-					return (
-						<Pressable style={{
-							marginBottom: 20,
-							marginLeft: (index + 1) % 2 == 0 ? 8 : 0,
-							marginRight: (index + 1) % 2 == 1 ? 8 : 0
-						}} onPress={() => {
-							navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.url.substring(0, 6) } });
-						}}>
-							<View style={styles.list_img_con}>
-								<FastImage style={{ width: "100%", height: "100%" }}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: item.picurl }}
-								/>
-								<Image style={styles.triangle}
-									source={require("../../assets/images/player/play.png")}
-								/>
-							</View>
-							{item.mainname && <Text numberOfLines={1} style={[styles.list_mainname, styles.list_width]}>{item.mainname}</Text>}
-							{item.subname && <Text numberOfLines={1} style={[styles.list_subname, styles.list_width]}>{item.subname}</Text>}
-						</Pressable>
-					)
-				}}
-				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={vodlist.current.length > 0} />}
-			/>
-			}
-		</>
+		<FlatList data={vodlist.current}
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={[styles.list_container, { paddingTop: 20 }]}
+			horizontal={false}
+			numColumns={2}
+			keyExtractor={(item: any) => item.mid}
+			ListEmptyComponent={<View>
+				{uid == us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/userlike_blank.png")} />}
+				{uid != us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/olike_blank.png")} />}
+			</View>}
+			renderItem={({ item, index }: any) => {
+				return (
+					<Pressable style={{
+						marginBottom: 20,
+						marginLeft: (index + 1) % 2 == 0 ? 8 : 0,
+						marginRight: (index + 1) % 2 == 1 ? 8 : 0
+					}} onPress={() => {
+						navigation.navigate("Page", { screen: "MediaListDetail", params: { mid: item.mid, id: item.url.substring(0, 6) } });
+					}}>
+						<View style={styles.list_img_con}>
+							<FastImage style={{ width: "100%", height: "100%" }}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={{ uri: item.picurl }}
+							/>
+							<Image style={styles.triangle}
+								source={require("../../assets/images/player/play.png")}
+							/>
+						</View>
+						{item.mainname && <Text numberOfLines={1} style={[styles.list_mainname, styles.list_width]}>{item.mainname}</Text>}
+						{item.subname && <Text numberOfLines={1} style={[styles.list_subname, styles.list_width]}>{item.subname}</Text>}
+					</Pressable>
+				)
+			}}
+			ListFooterComponent={<ListBottomTip noMore={true} isShowTip={vodlist.current.length > 0} />}
+		/>
 	)
 })
 const WikiPage = React.memo(({ uid, navigation }: any) => {
@@ -190,42 +214,13 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 	// 数据
 	const wikilist: any = ["fragrances", "odors", "brands", "perfumers"];
 	let wikidata = React.useRef<any>({
-		fragrances: {
-			items: [],
-			moreitems: [],
-			cnt: 0,
-			text: "香调",
-			index: 0
-		},
-		odors: {
-			items: [],
-			moreitems: [],
-			cnt: 0,
-			text: "气味",
-			index: 0
-		},
-		brands: {
-			items: [],
-			moreitems: [],
-			cnt: 0,
-			text: "品牌",
-			index: 0
-		},
-		perfumers: {
-			items: [],
-			moreitems: [],
-			cnt: 0,
-			text: "调香师",
-			index: 0
-		}
+		fragrances: { items: [], moreitems: [], cnt: 0, text: "香调", index: 0 },
+		odors: { items: [], moreitems: [], cnt: 0, text: "气味", index: 0 },
+		brands: { items: [], moreitems: [], cnt: 0, text: "品牌", index: 0 },
+		perfumers: { items: [], moreitems: [], cnt: 0, text: "调香师", index: 0 }
 	});
 	let wikilength = React.useRef<number>(0);
-	let noMore = React.useRef<any>({
-		fragrances: true,
-		odors: true,
-		brands: true,
-		perfumers: true
-	})
+	let noMore = React.useRef<any>({ fragrances: true, odors: true, brands: true, perfumers: true })
 
 	// 状态
 	const [isrender, setIsRender] = React.useState(false);
@@ -236,7 +231,7 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 
 	const getlist = (type: string) => {
 		return new Promise((resolve, reject) => {
-			http.post(ENV.user + "?uid=" + us.user.uid, {
+			http.post(ENV.user + "?uid=" + uid, {
 				method: "getfav", token: us.user.token, type: type
 			}).then((resp_data: any) => {
 				resolve(resp_data);
@@ -245,6 +240,14 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 	}
 
 	const init = () => {
+		wikidata.current = {
+			fragrances: { items: [], moreitems: [], cnt: 0, text: "香调", index: 0 },
+			odors: { items: [], moreitems: [], cnt: 0, text: "气味", index: 0 },
+			brands: { items: [], moreitems: [], cnt: 0, text: "品牌", index: 0 },
+			perfumers: { items: [], moreitems: [], cnt: 0, text: "调香师", index: 0 }
+		}
+		wikilength.current = 0;
+		noMore.current = { fragrances: true, odors: true, brands: true, perfumers: true }
 		Promise.all([getlist("香调"), getlist("气味"), getlist("品牌"), getlist("调香师")]).then((resp_data: any) => {
 			Object.keys(wikidata.current).forEach((item, index) => {
 				wikidata.current[item]["cnt"] = resp_data[index].length;
@@ -307,6 +310,19 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 	return (
 		<ScrollView contentContainerStyle={[styles.list_container, { paddingTop: 20 }]}
 			showsVerticalScrollIndicator={false}>
+			{(
+				wikidata.current["fragrances"].items.length == 0 &&
+				wikidata.current["odors"].items.length == 0 &&
+				wikidata.current["brands"].items.length == 0 &&
+				wikidata.current["perfumers"].items.length == 0
+			) && <View>
+					{uid == us.user.uid && <Image style={Globalstyles.emptyimg}
+						resizeMode="contain"
+						source={require("../../assets/images/empty/userlike_blank.png")} />}
+					{uid != us.user.uid && <Image style={Globalstyles.emptyimg}
+						resizeMode="contain"
+						source={require("../../assets/images/empty/olike_blank.png")} />}
+				</View>}
 			{wikilist.map((item: any, index: number) => {
 				return (
 					<View key={item}>
@@ -366,6 +382,7 @@ const ListPage = React.memo(({ uid, navigation }: any) => {
 	const [isrender, setIsRender] = React.useState(false);
 
 	React.useEffect(() => {
+		list.current = [];
 		http.post(ENV.user + "?uid=" + uid, { method: "getfav", token: us.user.token, type: "清单" }).then((resp_data: any) => {
 			list.current = resp_data;
 			setIsRender(val => !val);
@@ -373,34 +390,40 @@ const ListPage = React.memo(({ uid, navigation }: any) => {
 	}, [])
 
 	return (
-		<>
-			{(list.current && list.current.length > 0) && <FlatList data={list.current}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={[styles.list_container, { paddingTop: 20 }]}
-				horizontal={false}
-				numColumns={2}
-				keyExtractor={(item: any) => item.id}
-				renderItem={({ item, index }: any) => {
-					return (
-						<View style={{
-							marginBottom: 20,
-							marginLeft: (index + 1) % 2 == 0 ? 8 : 0,
-							marginRight: (index + 1) % 2 == 1 ? 8 : 0
-						}}>
-							<View style={styles.list_img_con}>
-								<FastImage style={{ width: "100%", height: "100%" }}
-									defaultSource={require("../../assets/images/nopic.png")}
-									source={{ uri: ENV.image + item.img + "!l" }}
-								/>
-							</View>
-							{item.name && <Text numberOfLines={1} style={[styles.list_mainname, styles.list_width]}>{item.name}</Text>}
-							{item.desc && <Text numberOfLines={1} style={[styles.list_subname, styles.list_width]}>{item.desc}</Text>}
+		<FlatList data={list.current}
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={[styles.list_container, { paddingTop: 20 }]}
+			horizontal={false}
+			numColumns={2}
+			keyExtractor={(item: any) => item.id}
+			ListEmptyComponent={<View>
+				{uid == us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/userlike_blank.png")} />}
+				{uid != us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/olike_blank.png")} />}
+			</View>}
+			renderItem={({ item, index }: any) => {
+				return (
+					<View style={{
+						marginBottom: 20,
+						marginLeft: (index + 1) % 2 == 0 ? 8 : 0,
+						marginRight: (index + 1) % 2 == 1 ? 8 : 0
+					}}>
+						<View style={styles.list_img_con}>
+							<FastImage style={{ width: "100%", height: "100%" }}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={{ uri: ENV.image + item.img + "!l" }}
+							/>
 						</View>
-					)
-				}}
-				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={list.current.length > 0} />}
-			/>}
-		</>
+						{item.name && <Text numberOfLines={1} style={[styles.list_mainname, styles.list_width]}>{item.name}</Text>}
+						{item.desc && <Text numberOfLines={1} style={[styles.list_subname, styles.list_width]}>{item.desc}</Text>}
+					</View>
+				)
+			}}
+			ListFooterComponent={<ListBottomTip noMore={true} isShowTip={list.current.length > 0} />}
+		/>
 	)
 })
 const DiscussPage = React.memo(({ uid, navigation }: any) => {
@@ -412,6 +435,7 @@ const DiscussPage = React.memo(({ uid, navigation }: any) => {
 	const [isrender, setIsRender] = React.useState(false);
 
 	React.useEffect(() => {
+		list.current = [];
 		http.post(ENV.user + "?uid=" + uid, { method: "getfav", token: us.user.token, type: "香评" }).then((resp_data: any) => {
 			resp_data.forEach((item: any) => {
 				if (item.color != "") {
@@ -448,57 +472,63 @@ const DiscussPage = React.memo(({ uid, navigation }: any) => {
 	}
 
 	return (
-		<>
-			{(list.current && list.current.length > 0) && <FlatList data={list.current}
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={styles.list_container}
-				keyExtractor={(item: any) => item.udid}
-				renderItem={({ item, index }: any) => {
-					return (
-						<View style={[styles.list_item, { flexDirection: "column" }]}>
-							<Pressable style={styles.item_user_con} onPress={() => { gotodetail("user-detail", item) }}>
-								<Image style={styles.item_user_image}
-									source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
-								/>
-								<View style={{ marginLeft: 11 }}>
-									<View style={styles.item_user_info}>
-										<Text style={styles.info_name}>{item.uname}</Text>
-										{item.ulevel > 0 && <View style={Globalstyles.level}>
-											<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-												defaultSource={require("../../assets/images/nopic.png")}
-												source={require("../../assets/images/level.png")}
-											/>
-										</View>}
-									</View>
-									{item.score > 0 && <View style={Globalstyles.star}>
-										<Image
-											style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+		<FlatList data={list.current}
+			showsVerticalScrollIndicator={false}
+			contentContainerStyle={styles.list_container}
+			keyExtractor={(item: any) => item.udid}
+			ListEmptyComponent={<View>
+				{uid == us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/userlike_blank.png")} />}
+				{uid != us.user.uid && <Image style={Globalstyles.emptyimg}
+					resizeMode="contain"
+					source={require("../../assets/images/empty/olike_blank.png")} />}
+			</View>}
+			renderItem={({ item, index }: any) => {
+				return (
+					<View style={[styles.list_item, { flexDirection: "column" }]}>
+						<Pressable style={styles.item_user_con} onPress={() => { gotodetail("user-detail", item) }}>
+							<Image style={styles.item_user_image}
+								source={{ uri: ENV.avatar + item.uid + ".jpg?" + item.uface }}
+							/>
+							<View style={{ marginLeft: 11 }}>
+								<View style={styles.item_user_info}>
+									<Text style={styles.info_name}>{item.uname}</Text>
+									{item.ulevel > 0 && <View style={Globalstyles.level}>
+										<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 											defaultSource={require("../../assets/images/nopic.png")}
-											source={require("../../assets/images/star/star.png")}
+											source={require("../../assets/images/level.png")}
 										/>
 									</View>}
 								</View>
-							</Pressable>
-							<Pressable style={[styles.item_perfume_con, { backgroundColor: item.color1 }]} onPress={() => { gotodetail("item-detail", item) }}>
-								<Image style={styles.item_perfume_image}
-									source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
-									resizeMode="contain"
-								/>
-								<View style={styles.item_perfume_info}>
-									<View style={styles.info_name_con}>
-										<Text style={styles.info_name}>{item.cnname}</Text>
-										<Text style={styles.info_score}>{item.isscore}<Text style={{ fontSize: 12 }}>{" 分"}</Text></Text>
-									</View>
-									<Text style={[styles.info_name, { color: theme.comment, marginTop: 6 }]}>{item.enname}</Text>
+								{item.score > 0 && <View style={Globalstyles.star}>
+									<Image
+										style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+										defaultSource={require("../../assets/images/nopic.png")}
+										source={require("../../assets/images/star/star.png")}
+									/>
+								</View>}
+							</View>
+						</Pressable>
+						<Pressable style={[styles.item_perfume_con, { backgroundColor: item.color1 }]} onPress={() => { gotodetail("item-detail", item) }}>
+							<Image style={styles.item_perfume_image}
+								source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
+								resizeMode="contain"
+							/>
+							<View style={styles.item_perfume_info}>
+								<View style={styles.info_name_con}>
+									<Text style={styles.info_name}>{item.cnname}</Text>
+									<Text style={styles.info_score}>{item.isscore}<Text style={{ fontSize: 12 }}>{" 分"}</Text></Text>
 								</View>
-							</Pressable>
-							<View style={{ marginTop: 14 }}>{handledesc(item.desc)}</View>
-						</View>
-					)
-				}}
-				ListFooterComponent={<ListBottomTip noMore={true} isShowTip={list.current.length > 0} />}
-			/>}
-		</>
+								<Text style={[styles.info_name, { color: theme.comment, marginTop: 6 }]}>{item.enname}</Text>
+							</View>
+						</Pressable>
+						<View style={{ marginTop: 14 }}>{handledesc(item.desc)}</View>
+					</View>
+				)
+			}}
+			ListFooterComponent={<ListBottomTip noMore={true} isShowTip={list.current.length > 0} />}
+		/>
 	)
 })
 
@@ -524,14 +554,18 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 	const [isrender, setIsRender] = React.useState(false);
 
 	React.useEffect(() => {
-		if (route.params && route.params.uid) {
-			uid.current = route.params.uid;
+		if (route.params) {
+			uid.current = route.params.uid ? route.params.uid : 0;
 			events.publish("current_uid", uid.current);
 		}
 		init();
+		return () => {
+			events.unsubscribe("current_uid");
+		}
 	}, [])
 
 	const init = () => {
+		favcntlist.current = {};
 		http.post(ENV.user + "?uid=" + uid.current, { method: "getfavcnt", token: us.user.token }).then((resp_data: any) => {
 			favcntlist.current = resp_data;
 			setIsRender(val => !val);
@@ -560,7 +594,7 @@ const UserFav = React.memo(({ navigation, route }: any) => {
 				renderScene={({ route }) => {
 					switch (route.key) {
 						case "article":
-							return <ArticlePage uid={uid.current} navigation={navigation} />;
+							return <ArticlePage navigation={navigation} />;
 						case "vod":
 							return <VodPage uid={uid.current} navigation={navigation} />;
 						case "wiki":

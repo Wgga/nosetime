@@ -425,7 +425,7 @@ const Globalstyles: any = StyleSheet.create({
 		fontSize: 14,
 		color: theme.toolbarbg,
 	},
-	// 列表Tab公共样式(个人页面 话题/香单 列表)
+	// 列表Tab公共样式(个人页面【话题/香单】列表)
 	tab_tit_con: {
 		flexDirection: "row",
 		alignItems: "center",

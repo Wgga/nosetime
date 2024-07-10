@@ -21,12 +21,14 @@ function Talent({ navigation }: any): React.JSX.Element {
 	// 控件
 	// 变量
 	const [tab, setTab] = React.useState<string>("talent"); // 当前tab
+	let curpage = React.useRef<number>(1);
 	// 数据
 	let talentlist = React.useRef<any[]>([]);
 	let carelist = React.useRef<any[]>([]);
 	let like_ = React.useRef<any>({});
 	// 参数
 	// 状态
+	let noMore = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	React.useEffect(() => {
@@ -67,14 +69,26 @@ function Talent({ navigation }: any): React.JSX.Element {
 		if (us.user.uid == 0) {
 			navigation.navigate("Page", { screen: "Login", params: { src: "App资深评论家页" } });
 		} else {
-			getCare()
+			getCare("init");
 		}
 	}
 
 	// 获取我的关注数据
-	const getCare = () => {
-		http.post(ENV.user, { method: "getcare", id: us.user.uid }).then((resp_data: any) => {
-			carelist.current = resp_data;
+	const getCare = (type: string) => {
+		if (type == "loadMore") {
+			if (noMore.current) return;
+			curpage.current++;
+		}
+		http.post(ENV.user, { method: "getcare", id: us.user.uid, page: curpage.current }).then((resp_data: any) => {
+			if (type == "init") {
+				carelist.current = resp_data;
+			} else {
+				carelist.current = carelist.current.concat(resp_data);
+			}
+
+			if (resp_data.length < 20) {
+				noMore.current = true;
+			}
 
 			var ids = [];
 			for (let i in carelist.current) {
@@ -95,30 +109,6 @@ function Talent({ navigation }: any): React.JSX.Element {
 			}
 			setIsRender(val => !val);
 		});
-	}
-
-	const care = (type: string, item: any) => {
-		if (!us.user.uid) {
-			return navigation.navigate("Page", { screen: "Login", params: { src: "App资深评论家页" } });
-		}
-		let id = tab == "care" ? item.id : item.uid;
-		http.post(ENV.user, { token: us.user.token, method: "care" + type, ida: us.user.uid, idb: id }).then((resp_data: any) => {
-			if (resp_data.msg == "ADD") {
-				ToastCtrl.show({ message: "关注成功", duration: 1000, viewstyle: "short_toast", key: "care_add_toast" });
-				like_.current[id] = 1;
-			} else if (resp_data.msg == "DEL") {
-				ToastCtrl.show({ message: "取消成功", duration: 1000, viewstyle: "short_toast", key: "care_add_toast" });
-				delete like_.current[id];
-			} else if (resp_data.msg == "NOEFFECT") {
-				console.log("发布失败：" + resp_data.msg);
-			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
-				us.delUser();
-				return navigation.navigate("Page", { screen: "Login", params: { src: "App资深评论家页" } });
-			} else {
-				console.log("发布失败：" + resp_data.msg);
-			}
-			setIsRender(val => !val);
-		})
 	}
 
 	return (
@@ -147,8 +137,11 @@ function Talent({ navigation }: any): React.JSX.Element {
 				<CareView data={{
 					items: tab == "care" ? carelist.current : talentlist.current,
 					likedata: like_.current,
-					type: tab
-				}} />
+					type: tab,
+					noMore: tab == "talent" ? true : noMore.current,
+					isempty: tab == "care" && carelist.current.length == 0,
+					navigation,
+				}} method={{ loadMore: getCare }} />
 			</View>
 		</View>
 	);

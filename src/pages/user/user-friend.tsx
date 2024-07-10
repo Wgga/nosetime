@@ -34,17 +34,24 @@ function UserFriend({ navigation, route }: any): React.JSX.Element {
 	let uid = React.useRef<number>(0);
 	let carecnt = React.useRef<number>(0);
 	let fanscnt = React.useRef<number>(0);
-	let curpage = React.useRef<number>(1);
-	const [curTab, setCurTab] = React.useState<string>("care");
+	let curpage = React.useRef<any>({
+		care: 1,
+		fans: 1
+	});
+	let noMore = React.useRef<any>({
+		care: false,
+		fans: false
+	})
+	let curtab = React.useRef<string>("care");
 	// 数据
-	let carelist = React.useRef<any[]>([]);
-	let fanslist = React.useRef<any[]>([]);
+	let list = React.useRef<any>({
+		care: [],
+		fans: []
+	});
 	let like_ = React.useRef<any>({});
 	// 状态
 	let isempty = React.useRef<boolean>(false);
 	let isemptyo = React.useRef<boolean>(false);
-	let carenoMore = React.useRef<boolean>(false);
-	let fansnoMore = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
@@ -59,31 +66,30 @@ function UserFriend({ navigation, route }: any): React.JSX.Element {
 
 	const init = () => {
 		if (uid.current == us.user.uid) name.current = "我";
-		getdata("care");
+		getdata("init");
 	}
 
 	const getdata = (type: string) => {
-		http.post(ENV.user, { method: "get" + type, id: uid.current }).then((resp_data: any) => {
-			cache.saveItem(classname + type + uid.current, resp_data, 10);
-			if (type == "care") {
-				carelist.current = resp_data;
+		if (type == "loadMore") {
+			if (noMore.current[curtab.current]) return;
+			curpage.current[curtab.current]++;
+		}
+		http.post(ENV.user, { method: "get" + curtab.current, id: uid.current, page: curpage.current[curtab.current] }).then((resp_data: any) => {
+			if (type == "init") {
+				list.current[curtab.current] = resp_data;
 			} else {
-				fanslist.current = resp_data;
+				list.current[curtab.current] = list.current[curtab.current].concat(resp_data);
 			}
-			if (resp_data.length == 0) {
-				if (uid.current == us.user.uid) {
-					isempty.current = true;
-				} else {
-					isemptyo.current = true;
-				}
+
+			if (type == "init" && resp_data.length == 0) {
+				if (uid.current == us.user.uid) isempty.current = true;
+				else isemptyo.current = true;
 			}
+
 			if (resp_data.length < 20) {
-				if (type == "care") {
-					carenoMore.current = true;
-				} else {
-					fansnoMore.current = true;
-				}
+				noMore.current[curtab.current] = true;
 			}
+
 			let ids = [];
 			for (let i in resp_data) ids.push(resp_data[i].id);
 			islike(ids);
@@ -91,14 +97,32 @@ function UserFriend({ navigation, route }: any): React.JSX.Element {
 	}
 
 	const islike = (ids: any) => {
-		if (curTab == "care") {
-			// for (var i in ids) {
-			// 	like_.current[ids[i]] = 1;
-			// }
+		if (curtab.current == "care") {
+			for (var i in ids) {
+				like_.current[ids[i]] = 1;
+			}
 			setIsRender(val => !val);
 			return;
 		}
+		if (!us.user.uid) {
+			setIsRender(val => !val);
+			return;
+		}
+		http.post(ENV.user, { method: "islike", uid: us.user.uid, ids: ids }).then((resp_data: any) => {
+			for (var i in resp_data) {
+				like_.current[resp_data[i]] = 1;
+			}
+			setIsRender(val => !val);
+		});
 	};
+
+	const toogle = (type: string) => {
+		if (curtab.current == type) return;
+		curtab.current = type;
+		setIsRender(val => !val);
+		if (type != "fans") return;
+		getdata("init");
+	}
 
 	return (
 		<View style={Globalstyles.container}>
@@ -120,20 +144,25 @@ function UserFriend({ navigation, route }: any): React.JSX.Element {
 			</HeaderView>
 			<View style={[Globalstyles.container, Globalstyles.list_content]}>
 				<View style={styles.friend_tab}>
-					<Pressable style={styles.tabbar} onPress={() => { setCurTab("care") }}>
-						<Text style={[styles.tabbar_text, curTab == "care" && styles.activetab]}>{"关注 " + carecnt.current}</Text>
-						{curTab == "care" && <Text style={styles.tabline}></Text>}
+					<Pressable style={styles.tabbar} onPress={() => { toogle("care") }}>
+						<Text style={[styles.tabbar_text, curtab.current == "care" && styles.activetab]}>{"关注 " + carecnt.current}</Text>
+						{curtab.current == "care" && <Text style={styles.tabline}></Text>}
 					</Pressable>
-					<Pressable style={styles.tabbar} onPress={() => { setCurTab("fans") }}>
-						<Text style={[styles.tabbar_text, curTab == "fans" && styles.activetab]}>{"粉丝 " + fanscnt.current}</Text>
-						{curTab == "fans" && <Text style={styles.tabline}></Text>}
+					<Pressable style={styles.tabbar} onPress={() => { toogle("fans"); }}>
+						<Text style={[styles.tabbar_text, curtab.current == "fans" && styles.activetab]}>{"粉丝 " + fanscnt.current}</Text>
+						{curtab.current == "fans" && <Text style={styles.tabline}></Text>}
 					</Pressable>
 				</View>
 				<CareView data={{
-					items: curTab == "care" ? carelist.current : fanslist.current,
+					items: list.current[curtab.current],
 					likedata: like_.current,
-					type: curTab,
-				}} />
+					type: curtab.current,
+					isShowCS: false,
+					noMore: noMore.current[curtab.current],
+					isempty: isempty.current,
+					isemptyo: isemptyo.current,
+					navigation,
+				}} method={{ loadMore: getdata }} />
 			</View>
 		</View>
 	);

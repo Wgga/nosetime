@@ -940,8 +940,20 @@ useExoplayerHls-启用HLS支持
 这些功能中的每一个都会增加APK的大小，所以只启用您需要的功能。默认情况下，启用的功能包括：`useExoplayerSmoothStreaming`、`useExopplayerDash`、`useExoplayerHls`
 
 
+### 30. [react-native-view-shot](https://github.com/gre/react-native-view-shot)
 
-### 30. [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera)
+react-native-view-shot 是一个用于 React Native 的截图组件。
+
+```bash
+# using npm
+npm install react-native-view-shot
+
+# OR using Yarn
+yarn add react-native-view-shot
+
+```
+
+### 31. [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera)
 
 react-native-vision-camera 是一个用于 React Native 的相机组件。
 
@@ -976,7 +988,7 @@ if (enableCodeScanner) {
 ```
 
 
-### 31. [React Native WebView](https://github.com/react-native-webview/react-native-webview)
+### 32. [React Native WebView](https://github.com/react-native-webview/react-native-webview)
 
 React Native WebView 是 React Native 的社区维护的 WebView 组件。它旨在替代内置的 WebView
 
@@ -989,7 +1001,7 @@ yarn add react-native-webview
 ```
 
 
-### 32. [rxjs](https://github.com/ReactiveX/rxjs)
+### 33. [rxjs](https://github.com/ReactiveX/rxjs)
 
 RxJS 是一个用于处理异步操作的库。
 
@@ -1002,7 +1014,7 @@ yarn add rxjs
 ```
 
 
-### 33. [TS MD5](https://github.com/cotag/ts-md5)
+### 34. [TS MD5](https://github.com/cotag/ts-md5)
 
 TypeScript 的 MD5 实现。
 

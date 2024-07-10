@@ -312,12 +312,12 @@ function User({ navigation }: any): React.JSX.Element {
 						<Image style={styles.page_bg} source={require("../../assets/images/user/jifen.png")} resizeMode="contain" />
 					</Pressable>
 					{/* <View style={[styles.page_btn_item, { marginLeft: 7.5 }]}>
-						<Text style={styles.item_main_tit}>{"香水学院"}</Text>
-						<View style={styles.item_sub_tit_con}>
-							<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
-							<Icon name="r-return" size={12} color={theme.comment} />
-						</View>
-					</View> */}
+							<Text style={styles.item_main_tit}>{"香水学院"}</Text>
+							<View style={styles.item_sub_tit_con}>
+								<Text style={styles.item_sub_tit}>{"香水研习"}</Text>
+								<Icon name="r-return" size={12} color={theme.comment} />
+							</View>
+						</View> */}
 				</View>
 				<View>
 					<View style={styles.btns_item_con}>

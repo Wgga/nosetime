@@ -10,7 +10,7 @@ import StickyHeader from "../../components/StickyHeader";
 import HeaderView from "../../components/headerview";
 import ToastCtrl from "../../components/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
-import { ModalPortal, SlideAnimation } from "../../components/modals";
+import { ModalPortal } from "../../components/modals";
 
 import us from "../../services/user-service/user-service";
 import itemService from "../../services/item-service/item-service";
