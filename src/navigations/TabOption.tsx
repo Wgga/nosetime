@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	iconsocialcon: {
-		width: 56,
-		height: 56,
+		width: 63,
+		height: 63,
 		backgroundColor: theme.toolbarbg,
 		justifyContent: "center",
 		alignItems: "center",
@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
 		top: -3
 	},
 	iconsocial: {
-		width: 45,
-		height: 45,
+		width: 50,
+		height: 50,
 	},
 	btn_badge: {
 		width: 12,

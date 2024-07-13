@@ -43,10 +43,12 @@ function Tabs({ navigation, route }: any): React.JSX.Element {
 				tabBarStyle: {
 					shadowColor: "transparent",
 					borderColor: "transparent",
+					height: 56,
 				},
 				tabBarItemStyle: {
 					borderColor: "transparent",
 					flexDirection: "column",
+					marginBottom: 5,
 				},
 			})}>
 				<Tab.Screen name="Home" options={{ title: "首页" }} component={Home} />
@@ -92,6 +94,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		top: 0,
 		left: -2,
+		
 	}
 })
 
