@@ -27,6 +27,7 @@ import Icon from "../../assets/iconfont";
 import LinearButton from "../../components/linearbutton";
 import Svg, { Ellipse, G } from "react-native-svg";
 import AutoSizeImage from "../../components/autosizeimage";
+import SharePopover from "../../components/popover/share-popover";
 
 const { width, height } = Dimensions.get("window");
 
@@ -218,21 +219,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
-	// 转换base64图片
-	const encode_base64 = (type: string, id: number) => {
-		return new Promise((resolve, reject) => {
-			let url = "";
-			if (type == "avatar") {
-				url = "&uid=" + id;
-			} else {
-				url = "&id=" + id;
-			}
-			http.get(ENV.api + "/base64.php?method=encode_base64&type=" + type + url).then((resp: any) => {
-				if (resp.msg == "OK") resolve(resp.base64url);
-			})
-		})
-	}
-
 	// 获取用户收藏话题数据
 	const getFavTopic = () => {
 		return new Promise((resolve, reject) => {
@@ -322,19 +308,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			getGeneData()
 		]).then(() => {
 			colTab.current = usercol.current.length == 0 && favcol.current.length > 0 ? "fav" : "user";
-			// 处理品牌偏好图片
-			if (us.user.uid == uid.current) {
-				let cnt = 0;
-				gene_code.current.brand.forEach((item: any, index: number) => {
-					Promise.all([encode_base64("brand", (item.id % 100000))]).then((values: any) => {
-						cnt += 1;
-						item["image"] = values[0];
-						if (cnt == gene_code.current.brand.length) setIsRender(val => !val);
-					})
-				});
-			} else {
-				setIsRender(val => !val);
-			}
+			setTimeout(() => { setIsRender(val => !val); }, 100)
 		})
 	}
 
@@ -417,17 +391,35 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
-	const CreateDNAPhoto = () => {
+	const createDNAPhoto = () => {
 		if (dnaref.current) {
 			dnaref.current.capture().then((uri: string) => {
+				console.log("%c Line:423 🌰 uri", "color:#fca650", uri);
 				ModalPortal.show((
-					<ScrollView showsVerticalScrollIndicator={false}>
-						<AutoSizeImage style={{ width }} uri={uri} />
-					</ScrollView>
+					<View style={styles.dna_photo_con}>
+						<View style={styles.dna_photo_info}>
+							<Image style={styles.dna_photo_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+							<Icon name="close" size={30} color={theme.toolbarbg} style={styles.dna_photo_closebtn} onPress={() => {
+								ModalPortal.dismiss("dnaphoto_popover");
+							}} />
+							<View style={styles.dna_photo_msgcon}>
+								<Text style={styles.dna_photo_uname}>{info.current.uname}</Text>
+								<Text style={styles.dna_photo_msg}>{"已入住香水时代" + info.current.days + "，记录了" + info.current.records + "款香水"}</Text>
+								<Text style={styles.dna_photo_desc} numberOfLines={2}>{info.current.udesc}</Text>
+								<Text style={styles.dna_photo_title}>{info.current.uname + "的嗅觉DNA报告"}</Text>
+							</View>
+						</View>
+						<ScrollView showsVerticalScrollIndicator={false}>
+							<AutoSizeImage style={{ width }} uri={uri} />
+						</ScrollView>
+						<ShadowedView style={styles.dna_photo_share}>
+							<SharePopover data={{ containerStyle: { paddingBottom: 16 } }} />
+						</ShadowedView>
+					</View>
 				), {
 					key: "dnaphoto_popover",
 					width,
-					height: height * 0.7,
+					height,
 					rounded: false,
 					useNativeDriver: true,
 					onTouchOutside: () => {
@@ -439,7 +431,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 					},
 					animationDuration: 300,
 					type: "bottomModal",
-					modalStyle: { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+					modalStyle: { backgroundColor: "transparent", paddingTop: 75 + insets.top },
 				});
 			})
 		}
@@ -464,255 +456,253 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				</Animated.View>
 				<Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />
 			</HeaderView>
-			<ViewShot ref={dnaref} options={{
-				fileName: "DNA" + new Date().valueOf(),
-				format: "jpg",
-				result: "data-uri",
-			}} style={{ backgroundColor: theme.toolbarbg }}>
-				<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView}>
-					{avatar.current && <View style={styles.header_bg}>
-						<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />
-						<View style={[Globalstyles.header_bg_msk]}></View>
+			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView}>
+				{avatar.current && <View style={styles.header_bg}>
+					<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />
+					<View style={[Globalstyles.header_bg_msk]}></View>
+				</View>}
+				<View style={{ alignItems: "center", zIndex: 1 }}>
+					{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
+					<Text style={styles.user_name}>{info.current.uname}</Text>
+					{info.current.udesc && <Pressable style={styles.intro_con} onPress={() => { gotodetail("user-intro") }}>
+						{!info.current.udesc2 && <Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace", textAlign: "center" }]}>{info.current.udesc}</Text>}
+						{info.current.udesc2 && <>
+							<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{info.current.udesc2}</Text>
+							<View style={styles.intro_morebtn_con}>
+								<Text style={styles.intro_text}>{"..."}</Text>
+								<Icon name="btmarrow" style={styles.intro_icon} size={10} color={theme.toolbarbg} />
+							</View>
+						</>}
+					</Pressable>}
+					{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
+						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-friend") }}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
+						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
+						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
+						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-fav") }}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
 					</View>}
-					<View style={{ alignItems: "center", zIndex: 1 }}>
-						{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
-						<Text style={styles.user_name}>{info.current.uname}</Text>
-						{info.current.udesc && <Pressable style={styles.intro_con} onPress={() => { gotodetail("user-intro") }}>
-							{!info.current.udesc2 && <Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace", textAlign: "center" }]}>{info.current.udesc}</Text>}
-							{info.current.udesc2 && <>
-								<Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace" }]}>{info.current.udesc2}</Text>
-								<View style={styles.intro_morebtn_con}>
-									<Text style={styles.intro_text}>{"..."}</Text>
-									<Icon name="btmarrow" style={styles.intro_icon} size={10} color={theme.toolbarbg} />
-								</View>
-							</>}
-						</Pressable>}
-						{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
-							<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-friend") }}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
-							<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
-							<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
-							<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
-							<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-fav") }}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
-						</View>}
-					</View>
-					{info.current.name != "[已注销] " && <View style={styles.page_tabbar_con}>
-						<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("home") }}>
-							<Text style={[styles.tabtext, curTab == "home" && styles.activetab]}>{"个人主页"}</Text>
-							{curTab == "home" && <Text style={styles.tabline}></Text>}
-						</Pressable>
-						<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("gene") }}>
-							<Text style={[styles.tabtext, curTab == "gene" && styles.activetab]}>{"嗅觉DNA"}</Text>
-							{curTab == "gene" && <Text style={styles.tabline}></Text>}
-						</Pressable>
-					</View>}
-					<View style={styles.page_container}>
-						{info.current.name == "[已注销] " && <Image style={Globalstyles.emptyimg}
+				</View>
+				{info.current.name != "[已注销] " && <View style={styles.page_tabbar_con}>
+					<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("home") }}>
+						<Text style={[styles.tabtext, curTab == "home" && styles.activetab]}>{"个人主页"}</Text>
+						{curTab == "home" && <Text style={styles.tabline}></Text>}
+					</Pressable>
+					<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("gene") }}>
+						<Text style={[styles.tabtext, curTab == "gene" && styles.activetab]}>{"嗅觉DNA"}</Text>
+						{curTab == "gene" && <Text style={styles.tabline}></Text>}
+					</Pressable>
+				</View>}
+				<View style={styles.page_container}>
+					{info.current.name == "[已注销] " && <Image style={Globalstyles.emptyimg}
+						source={require("../../assets/images/empty/ohomepage_blank.png")}
+						resizeMode="contain"
+					/>}
+					{(info.current.name != "[已注销] " && curTab == "home") && <View>
+						{(
+							us.user.uid != uid &&
+							info.current.uiid == 0 && info.current.photo == 0 && commoncnt.current == 0 &&
+							info.current.short == 0 && info.current.discuss == 0 &&
+							isShowUsercol.current && isShowFavcol.current && isShowFavTopic.current && isShowUserTopic.current
+						) && <Image style={Globalstyles.emptyimg}
 							source={require("../../assets/images/empty/ohomepage_blank.png")}
-							resizeMode="contain"
-						/>}
-						{(info.current.name != "[已注销] " && curTab == "home") && <View>
-							{(
-								us.user.uid != uid &&
-								info.current.uiid == 0 && info.current.photo == 0 && commoncnt.current == 0 &&
-								info.current.short == 0 && info.current.discuss == 0 &&
-								isShowUsercol.current && isShowFavcol.current && isShowFavTopic.current && isShowUserTopic.current
-							) && <Image style={Globalstyles.emptyimg}
-								source={require("../../assets/images/empty/ohomepage_blank.png")}
-								resizeMode="contain" />}
-							{(us.user.uid != uid.current && commoncnt.current > 0) && <View style={styles.item_padding}>
-								<ShadowedView style={styles.commonfav_con}>
-									<View style={styles.commonfav_avatar_con}>
-										{avatar.current && <Image style={styles.commonfav_avatar} source={{ uri: avatar.current }} />}
-										<Image style={[styles.commonfav_avatar, styles.commonfav_avatar2]} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
-									</View>
-									<View style={styles.commonfav_list}>
-										<View style={Globalstyles.item_flex}>
-											<Text style={styles.commonfav_tit}>{"我们共同的喜好 " + commoncnt.current + "个"}</Text>
-											<Icon name="advance" size={14} color={theme.tit2} style={{ marginLeft: 10 }} />
-										</View>
-										<Text style={[styles.textstyle, { marginTop: 5 }]}>{
-											"香水 " + commonfavs.current["item"].length + "  " +
-											"气味 " + commonfavs.current["odor"].length + "  " +
-											"品牌 " + commonfavs.current["brand"].length + "  " +
-											"调香师 " + commonfavs.current["perfumer"].length + "  " +
-											"文章 " + commonfavs.current["article"].length + "  "
-										}</Text>
-									</View>
-								</ShadowedView>
-							</View>}
-							{info.current.uiid > 0 && <View style={styles.item_list}>
-								<View style={styles.item_title}>
-									<Text style={[styles.tit_text, { color: theme.tit2 }]}>{"签名香"}</Text>
+							resizeMode="contain" />}
+						{(us.user.uid != uid.current && commoncnt.current > 0) && <View style={styles.item_padding}>
+							<ShadowedView style={styles.commonfav_con}>
+								<View style={styles.commonfav_avatar_con}>
+									{avatar.current && <Image style={styles.commonfav_avatar} source={{ uri: avatar.current }} />}
+									<Image style={[styles.commonfav_avatar, styles.commonfav_avatar2]} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 								</View>
-								<Pressable style={styles.mine_perfume} onPress={() => { gotodetail("item-detail", { id: info.current.uiid }) }}>
-									<Image style={styles.mine_perfume_img} source={{ uri: ENV.image + "/perfume/" + info.current.uiid + ".jpg!m" }} resizeMode="contain" />
-									<View>
-										<Text style={styles.mine_perfume_name}>{info.current.uitem.cnname}</Text>
-										<Text style={[styles.mine_perfume_name, { color: theme.text2 }]}>{info.current.uitem.enname}</Text>
-									</View>
-								</Pressable>
-							</View>}
-							{(isShowUsercol.current || isShowFavcol.current || us.user.uid == uid.current) && <View style={styles.item_list}>
-								<View style={styles.item_title}>
+								<View style={styles.commonfav_list}>
 									<View style={Globalstyles.item_flex}>
-										{isShowUsercol.current && <Text style={[styles.tit_text, colTab.current == "user" && { color: theme.tit2 }]} onPress={() => { toggleCol("user") }}>{"自建香单"}</Text>}
-										{(isShowUsercol.current && isShowFavcol.current) && <Text style={styles.tit_text}>|</Text>}
-										{isShowFavcol.current && <Text style={[styles.tit_text, colTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleCol("fav") }}>{"收藏香单"}</Text>}
+										<Text style={styles.commonfav_tit}>{"我们共同的喜好 " + commoncnt.current + "个"}</Text>
+										<Icon name="advance" size={14} color={theme.tit2} style={{ marginLeft: 10 }} />
 									</View>
-									<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("perfume-list") }}>
-										<Text style={styles.col_btn}>{"全部"}</Text>
-										<Icon name="advance" size={14} color={theme.color} />
-									</Pressable>
+									<Text style={[styles.textstyle, { marginTop: 5 }]}>{
+										"香水 " + commonfavs.current["item"].length + "  " +
+										"气味 " + commonfavs.current["odor"].length + "  " +
+										"品牌 " + commonfavs.current["brand"].length + "  " +
+										"调香师 " + commonfavs.current["perfumer"].length + "  " +
+										"文章 " + commonfavs.current["article"].length + "  "
+									}</Text>
 								</View>
-								<FlatList data={colTab.current == "user" ? usercol.current : favcol.current}
-									horizontal={true}
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.item_padding}
-									keyExtractor={(item: any) => item.cid}
-									ListFooterComponent={
-										<>
-											{(uid.current == us.user.uid && usercol.current.length < 4 && colTab.current == "user") &&
-												<Pressable style={styles.perfume_item} onPress={() => { gotodetail("perfume-list-edit") }}>
-													<Image style={styles.item_image}
-														source={require("../../assets/images/edit.png")}
-													/>
-													<Text numberOfLines={2} style={styles.item_cname}>{"新建香单"}</Text>
-												</Pressable>
-											}
-										</>
-									}
-									renderItem={({ item }: any) => {
-										return (
-											<View style={styles.perfume_item}>
-												<Image style={styles.item_image}
-													source={{ uri: ENV.image + item.cpic + "!l" }}
-												/>
-												<Text numberOfLines={2} style={styles.item_cname}>{item.cname}</Text>
-											</View>
-										)
-									}}
-								/>
-							</View>}
-							{info.current.photo > 0 && <View style={styles.item_list}>
-								<View style={styles.item_title}>
-									<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的相册 (" + info.current.photo + ")"}</Text>
-								</View>
-								{(info.current.photos && info.current.photos.length > 0) && <FlatList data={info.current.photos}
-									horizontal={true}
-									showsHorizontalScrollIndicator={false}
-									contentContainerStyle={styles.item_padding}
-									keyExtractor={(item: any) => item}
-									renderItem={({ item, index }: any) => {
-										return (
-											<Pressable onPress={() => { open_PhotoPopover(index) }}>
-												<Image style={[styles.item_image, { marginRight: 13 }]}
-													source={{ uri: ENV.image + "/uploads/" + item + ".jpg!l" }}
-												/>
-											</Pressable>
-										)
-									}}
-								/>}
-							</View>}
-							{(isShowUserTopic.current || isShowFavTopic.current) && <View style={styles.item_list}>
-								<View style={styles.item_title}>
-									<View style={Globalstyles.item_flex}>
-										{isShowUserTopic.current && <Text style={[styles.tit_text, topicTab.current == who.current && { color: theme.tit2 }]} onPress={() => { toggleTopic(who.current) }}>{who.current + "的话题"}</Text>}
-										{(isShowUserTopic.current && isShowFavTopic.current) && <Text style={styles.tit_text}>|</Text>}
-										{isShowFavTopic.current && <Text style={[styles.tit_text, topicTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleTopic("fav") }}>{"收藏话题"}</Text>}
-									</View>
-									<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("user-shequ") }}>
-										<Text style={styles.col_btn}>{"全部"}</Text>
-										<Icon name="advance" size={14} color={theme.color} />
-									</Pressable>
-								</View>
-								{topicTab.current == who.current && info.current.topics.map((item: any) => {
-									return (
-										<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
-											onPress={() => { gotodetail("social-shequ-detail", item) }}>
-											{avatar.current && <Image style={styles.topic_avatar} source={{ uri: avatar.current }} />}
-											<Text style={styles.topic_tit}>{item.cttitle}</Text>
-										</Pressable>
-									)
-								})}
-								{topicTab.current == "fav" && favTopics.current.map((item: any) => {
-									return (
-										<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
-											onPress={() => { gotodetail("social-shequ-detail", item) }}>
-											{avatar.current && <Image style={styles.topic_avatar} source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} />}
-											<Text style={styles.topic_tit}>{item.cttitle}</Text>
-										</Pressable>
-									)
-								})}
-							</View>}
-							{info.current.short > 0 && <View style={styles.item_list}>
-								<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
-									<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的一句话香评 (" + info.current.short + ")"}</Text>
-									<Icon name="advance" size={14} color={theme.color} />
-								</Pressable>
-								{(info.current.shorts && info.current.shorts.length > 0) && info.current.shorts.map((item: any) => {
-									return (
-										<View key={item.id} style={styles.item_padding}>
-											<View style={{ flexDirection: "row" }}>
-												<View style={styles.discuss_image_info}>
-													<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
-													<View style={styles.img_traiangle}></View>
-												</View>
-												<View style={{ marginLeft: 10 }}>
-													<Text style={styles.discuss_name}>{item.cnname}</Text>
-													<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
-												</View>
-											</View>
-											<View style={styles.discuss_info}>
-												{item.score > 0 && <View style={Globalstyles.star}>
-													<Image
-														style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
-														defaultSource={require("../../assets/images/nopic.png")}
-														source={require("../../assets/images/star/star.png")}
-													/>
-												</View>}
-												<Text numberOfLines={1} style={styles.discuss_desc}>{item.desc}</Text>
-											</View>
-										</View>
-									)
-								})}
-							</View>}
-							{info.current.discuss > 0 && <>
-								<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
-									<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的香水评论 (" + info.current.discuss + ")"}</Text>
-									<Icon name="advance" size={14} color={theme.color} />
-								</Pressable>
-								{(info.current.discusss && info.current.discusss.length > 0) && info.current.discusss.map((item: any) => {
-									return (
-										<View key={item.id} style={styles.item_padding}>
-											<View style={{ flexDirection: "row" }}>
-												<View style={styles.discuss_image_info}>
-													<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
-													<View style={styles.img_traiangle}></View>
-												</View>
-												<View style={{ marginLeft: 10 }}>
-													<Text style={styles.discuss_name}>{item.cnname}</Text>
-													<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
-												</View>
-											</View>
-											<View style={styles.discuss_info}>
-												{item.score > 0 && <View style={Globalstyles.star}>
-													<Image
-														style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
-														defaultSource={require("../../assets/images/nopic.png")}
-														source={require("../../assets/images/star/star.png")}
-													/>
-												</View>}
-												<Text numberOfLines={4} style={styles.discuss_desc}>{item.desc}</Text>
-											</View>
-										</View>
-									)
-								})}
-								<View style={{ alignItems: "center" }}>
-									<Text style={styles.discuss_morebtn}>{"查看全部"}</Text>
-								</View>
-							</>}
+							</ShadowedView>
 						</View>}
-						{(info.current.name != "[已注销] " && curTab == "gene") && <View>
+						{info.current.uiid > 0 && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{"签名香"}</Text>
+							</View>
+							<Pressable style={styles.mine_perfume} onPress={() => { gotodetail("item-detail", { id: info.current.uiid }) }}>
+								<Image style={styles.mine_perfume_img} source={{ uri: ENV.image + "/perfume/" + info.current.uiid + ".jpg!m" }} resizeMode="contain" />
+								<View>
+									<Text style={styles.mine_perfume_name}>{info.current.uitem.cnname}</Text>
+									<Text style={[styles.mine_perfume_name, { color: theme.text2 }]}>{info.current.uitem.enname}</Text>
+								</View>
+							</Pressable>
+						</View>}
+						{(isShowUsercol.current || isShowFavcol.current || us.user.uid == uid.current) && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<View style={Globalstyles.item_flex}>
+									{isShowUsercol.current && <Text style={[styles.tit_text, colTab.current == "user" && { color: theme.tit2 }]} onPress={() => { toggleCol("user") }}>{"自建香单"}</Text>}
+									{(isShowUsercol.current && isShowFavcol.current) && <Text style={styles.tit_text}>|</Text>}
+									{isShowFavcol.current && <Text style={[styles.tit_text, colTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleCol("fav") }}>{"收藏香单"}</Text>}
+								</View>
+								<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("perfume-list") }}>
+									<Text style={styles.col_btn}>{"全部"}</Text>
+									<Icon name="advance" size={14} color={theme.color} />
+								</Pressable>
+							</View>
+							<FlatList data={colTab.current == "user" ? usercol.current : favcol.current}
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.item_padding}
+								keyExtractor={(item: any) => item.cid}
+								ListFooterComponent={
+									<>
+										{(uid.current == us.user.uid && usercol.current.length < 4 && colTab.current == "user") &&
+											<Pressable style={styles.perfume_item} onPress={() => { gotodetail("perfume-list-edit") }}>
+												<Image style={styles.item_image}
+													source={require("../../assets/images/edit.png")}
+												/>
+												<Text numberOfLines={2} style={styles.item_cname}>{"新建香单"}</Text>
+											</Pressable>
+										}
+									</>
+								}
+								renderItem={({ item }: any) => {
+									return (
+										<View style={styles.perfume_item}>
+											<Image style={styles.item_image}
+												source={{ uri: ENV.image + item.cpic + "!l" }}
+											/>
+											<Text numberOfLines={2} style={styles.item_cname}>{item.cname}</Text>
+										</View>
+									)
+								}}
+							/>
+						</View>}
+						{info.current.photo > 0 && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的相册 (" + info.current.photo + ")"}</Text>
+							</View>
+							{(info.current.photos && info.current.photos.length > 0) && <FlatList data={info.current.photos}
+								horizontal={true}
+								showsHorizontalScrollIndicator={false}
+								contentContainerStyle={styles.item_padding}
+								keyExtractor={(item: any) => item}
+								renderItem={({ item, index }: any) => {
+									return (
+										<Pressable onPress={() => { open_PhotoPopover(index) }}>
+											<Image style={[styles.item_image, { marginRight: 13 }]}
+												source={{ uri: ENV.image + "/uploads/" + item + ".jpg!l" }}
+											/>
+										</Pressable>
+									)
+								}}
+							/>}
+						</View>}
+						{(isShowUserTopic.current || isShowFavTopic.current) && <View style={styles.item_list}>
+							<View style={styles.item_title}>
+								<View style={Globalstyles.item_flex}>
+									{isShowUserTopic.current && <Text style={[styles.tit_text, topicTab.current == who.current && { color: theme.tit2 }]} onPress={() => { toggleTopic(who.current) }}>{who.current + "的话题"}</Text>}
+									{(isShowUserTopic.current && isShowFavTopic.current) && <Text style={styles.tit_text}>|</Text>}
+									{isShowFavTopic.current && <Text style={[styles.tit_text, topicTab.current == "fav" && { color: theme.tit2 }]} onPress={() => { toggleTopic("fav") }}>{"收藏话题"}</Text>}
+								</View>
+								<Pressable hitSlop={10} style={Globalstyles.item_flex} onPress={() => { gotodetail("user-shequ") }}>
+									<Text style={styles.col_btn}>{"全部"}</Text>
+									<Icon name="advance" size={14} color={theme.color} />
+								</Pressable>
+							</View>
+							{topicTab.current == who.current && info.current.topics.map((item: any) => {
+								return (
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+										onPress={() => { gotodetail("social-shequ-detail", item) }}>
+										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: avatar.current }} />}
+										<Text style={styles.topic_tit}>{item.cttitle}</Text>
+									</Pressable>
+								)
+							})}
+							{topicTab.current == "fav" && favTopics.current.map((item: any) => {
+								return (
+									<Pressable key={item.ctdlgid} style={[styles.item_padding, Globalstyles.item_flex, { borderBottomColor: theme.bg, borderBottomWidth: 1 }]}
+										onPress={() => { gotodetail("social-shequ-detail", item) }}>
+										{avatar.current && <Image style={styles.topic_avatar} source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }} />}
+										<Text style={styles.topic_tit}>{item.cttitle}</Text>
+									</Pressable>
+								)
+							})}
+						</View>}
+						{info.current.short > 0 && <View style={styles.item_list}>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的一句话香评 (" + info.current.short + ")"}</Text>
+								<Icon name="advance" size={14} color={theme.color} />
+							</Pressable>
+							{(info.current.shorts && info.current.shorts.length > 0) && info.current.shorts.map((item: any) => {
+								return (
+									<View key={item.id} style={styles.item_padding}>
+										<View style={{ flexDirection: "row" }}>
+											<View style={styles.discuss_image_info}>
+												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<View style={styles.img_traiangle}></View>
+											</View>
+											<View style={{ marginLeft: 10 }}>
+												<Text style={styles.discuss_name}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+											</View>
+										</View>
+										<View style={styles.discuss_info}>
+											{item.score > 0 && <View style={Globalstyles.star}>
+												<Image
+													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={require("../../assets/images/star/star.png")}
+												/>
+											</View>}
+											<Text numberOfLines={1} style={styles.discuss_desc}>{item.desc}</Text>
+										</View>
+									</View>
+								)
+							})}
+						</View>}
+						{info.current.discuss > 0 && <>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的香水评论 (" + info.current.discuss + ")"}</Text>
+								<Icon name="advance" size={14} color={theme.color} />
+							</Pressable>
+							{(info.current.discusss && info.current.discusss.length > 0) && info.current.discusss.map((item: any) => {
+								return (
+									<View key={item.id} style={styles.item_padding}>
+										<View style={{ flexDirection: "row" }}>
+											<View style={styles.discuss_image_info}>
+												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<View style={styles.img_traiangle}></View>
+											</View>
+											<View style={{ marginLeft: 10 }}>
+												<Text style={styles.discuss_name}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+											</View>
+										</View>
+										<View style={styles.discuss_info}>
+											{item.score > 0 && <View style={Globalstyles.star}>
+												<Image
+													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+													defaultSource={require("../../assets/images/nopic.png")}
+													source={require("../../assets/images/star/star.png")}
+												/>
+											</View>}
+											<Text numberOfLines={4} style={styles.discuss_desc}>{item.desc}</Text>
+										</View>
+									</View>
+								)
+							})}
+							<View style={{ alignItems: "center" }}>
+								<Text style={styles.discuss_morebtn}>{"查看全部"}</Text>
+							</View>
+						</>}
+					</View>}
+
+					{(info.current.name != "[已注销] " && curTab == "gene") && <>
+						<ViewShot ref={dnaref} options={{ fileName: "DNA" + new Date().valueOf(), format: "png", quality: 1 }}
+							style={{ backgroundColor: theme.toolbarbg }}>
 							{dna_cnt.current != 1 && <View style={styles.item_list}>
 								<Text style={[styles.gene_title, { paddingTop: 0 }]}>{"香水统计"}</Text>
 								<View style={{ flexDirection: "row" }}>
@@ -816,8 +806,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									{gene_code.current.brand.map((item: any) => {
 										return (
 											<View key={item.id} style={styles.brand_item}>
-												{(us.user.uid == uid.current && item.image) && <Image style={styles.brand_img} source={{ uri: item.image }} resizeMode="contain" />}
-												{us.user.uid != uid.current && <Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} resizeMode="contain" />}
+												<Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} resizeMode="contain" />
 												<View style={styles.brand_info}>
 													<View style={styles.info_name}>
 														<Text numberOfLines={1} style={[styles.textstyle, { flex: 1 }]}>{item.cnname + " " + item.enname}</Text>
@@ -848,17 +837,17 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									})}
 								</View>
 							</View>}
-						</View>}
+						</ViewShot>
 						{(dna_cnt2.current != 1 && uid.current == us.user.uid) && <LinearButton containerStyle={styles.dna_photo_btn}
 							text={"生成嗅觉DNA报告"}
 							textStyle={styles.dna_photo_btn_text}
 							colors2={["#81B4EC", "#9BA6F5"]}
 							isShowColor={false}
-							onPress={CreateDNAPhoto}
+							onPress={createDNAPhoto}
 						/>}
-					</View>
-				</ScrollView>
-			</ViewShot>
+					</>}
+				</View>
+			</ScrollView>
 		</View>
 	);
 })
@@ -1251,8 +1240,71 @@ const styles = StyleSheet.create({
 		color: theme.toolbarbg,
 		fontSize: 15,
 	},
-	dnaphoto_con: {
-
+	dna_photo_con: {
+		flex: 1,
+		backgroundColor: theme.toolbarbg,
+		borderTopLeftRadius: 16.7,
+		borderTopRightRadius: 16.7,
+	},
+	dna_photo_info: {
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	dna_photo_avatar: {
+		position: "absolute",
+		top: -18,
+		width: 52.5,
+		height: 52.5,
+		borderRadius: 50,
+		overflow: "hidden",
+		borderColor: theme.toolbarbg,
+		borderWidth: 2.5,
+	},
+	dna_photo_closebtn: {
+		position: "absolute",
+		top: -38,
+		right: 10,
+	},
+	dna_photo_msgcon: {
+		paddingTop: 43,
+		alignItems: "center",
+	},
+	dna_photo_uname: {
+		fontSize: 15,
+		color: theme.tit2,
+		fontFamily: "PingFang SC",
+		fontWeight: "bold",
+		marginBottom: 16,
+	},
+	dna_photo_msg: {
+		fontSize: 12,
+		color: theme.text2,
+		marginBottom: 16,
+	},
+	dna_photo_desc: {
+		marginHorizontal: 25,
+		fontSize: 12,
+		color: theme.comment,
+	},
+	dna_photo_title: {
+		marginVertical: 15,
+		fontSize: 15,
+		color: "#505AB3",
+	},
+	dna_photo_share: {
+		position: "absolute",
+		bottom: 0,
+		left: 0,
+		right: 0,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		overflow: "hidden",
+		shadowOpacity: 0.3,
+		shadowRadius: 30,
+		shadowOffset: {
+			width: 0,
+			height: 0,
+		},
 	}
 });
 

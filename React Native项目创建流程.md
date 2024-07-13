@@ -29,7 +29,20 @@ yarn add @react-native-async-storage/async-storage
 ```
 
 
-### 2. [@react-native-community/slider](https://github.com/callstack/react-native-slider)
+### 2. [react Native Camera Roll](https://github.com/react-native-cameraroll/react-native-cameraroll)
+
+react-native-cameraroll 是一个用于访问用户相册的库。项目内用于保存图片到相册
+
+```bash
+# using npm
+npm install @react-native-camera-roll/camera-roll
+
+# OR using Yarn
+yarn add @react-native-camera-roll/camera-roll
+```
+
+
+### 3. [@react-native-community/slider](https://github.com/callstack/react-native-slider)
 
 @react-native-community/slider 是一个 React Native 进度条滑动组件。
 
@@ -42,7 +55,7 @@ yarn add @react-native-community/slider
 ```
 
 
-#### 3. [Bottom Tabs Navigator](https://github.com/react-navigation/react-navigation)
+#### 4. [Bottom Tabs Navigator](https://github.com/react-navigation/react-navigation)
 
 屏幕底部的一个简单的标签栏，可让您在不同的路线之间切换。
 
@@ -55,7 +68,7 @@ yarn add @react-navigation/bottom-tabs
 ```
 
 
-### 4. [React Navigation](https://github.com/react-navigation/react-navigation)
+### 5. [React Navigation](https://github.com/react-navigation/react-navigation)
 
 React Navigation是一个为App提供一种在屏幕之间转换和管理导航历史记录的库。
 
@@ -99,7 +112,7 @@ public class MainActivity extends ReactActivity {
 并确保在包语句下面的文件顶部添加导入语句 `import android.os.Bundle;`
 
 
-### 5. [@shopify/flash-list](https://github.com/Shopify/flash-list)
+### 6. [@shopify/flash-list](https://github.com/Shopify/flash-list)
 
 @shopify/flash-list 是一个 快速和高性能的 React Native 列表组件。
 
@@ -112,7 +125,7 @@ yarn add @shopify/flash-list
 ```
 
 
-### 6. [Axios](https://github.com/axios/axios)
+### 7. [Axios](https://github.com/axios/axios)
 
 基于 Promise 的浏览器和 node.js HTTP 客户端
 
@@ -125,7 +138,7 @@ yarn add axios
 ```
 
 
-### 7. deprecated-react-native-prop-types
+### 8. deprecated-react-native-prop-types
 
 deprecated-react-native-prop-types 是一个用于检查和警告过时的 React Native 组件属性的库。
 
@@ -138,7 +151,7 @@ yarn add deprecated-react-native-prop-types
 ```
 
 
-### 8. [native-wechat](https://github.com/Hector-Chong/native-wechat)
+### 9. [native-wechat](https://github.com/Hector-Chong/native-wechat)
 
 native-wechat 是一个用于在React Native中调用微信SDK的库。
 
@@ -151,7 +164,20 @@ yarn add native-wechat
 ```
 
 
-### 9. [react-native-awesome-gallery](https://github.com/Flair-Dev/react-native-awesome-gallery)
+### 10. [react-native-avoid-softinput](https://github.com/mateusz1913/react-native-avoid-softinput)
+
+react-native-avoid-softinput 是一个用于在 React Native 应用中避免软键盘弹出和隐藏的库。
+
+```bash
+# using npm
+npm install react-native-avoid-softinput
+
+# OR using Yarn
+yarn add react-native-avoid-softinput
+```
+
+
+### 11. [react-native-awesome-gallery](https://github.com/Flair-Dev/react-native-awesome-gallery)
 
 react-native-awesome-gallery 是一个用于在React Native中展示图片的库。
 
@@ -164,7 +190,7 @@ yarn add react-native-awesome-gallery
 ```
 
 
-### 10. [react-native-color-matrix-image-filters](https://github.com/iyegoroff/react-native-color-matrix-image-filters)
+### 12. [react-native-color-matrix-image-filters](https://github.com/iyegoroff/react-native-color-matrix-image-filters)
 
 react-native-color-matrix-image-filters 是一个用于在 React Native 应用中使用颜色矩阵进行图像处理的库。如滤镜。
 
@@ -177,7 +203,7 @@ yarn add react-native-color-matrix-image-filters
 ```
 
 
-### 11. [React Native Device Info](https://github.com/react-native-device-info/react-native-device-info)
+### 13. [React Native Device Info](https://github.com/react-native-device-info/react-native-device-info)
 
 React Native Device Info 是一个用于获取有关设备的信息的 React Native 库
 
@@ -206,7 +232,7 @@ yarn add react-native-device-info
 ```
 
 
-### 12. [React Native FastImage](https://github.com/DylanVann/react-native-fast-image)
+### 14. [React Native FastImage](https://github.com/DylanVann/react-native-fast-image)
 
 FastImage 是一个用于 React Native 的快速图像组件。在很大程度上像浏览器一样处理图像缓存。
 
@@ -219,7 +245,7 @@ yarn add react-native-fast-image
 ```
 
 
-### 13. [react-native-fast-shadow](https://github.com/alan-eu/react-native-fast-shadow)
+### 15. [react-native-fast-shadow](https://github.com/alan-eu/react-native-fast-shadow)
 
 react-native-fast-shadow 是一个用于 React Native 的快速高质量Android阴影组件。
 
@@ -232,7 +258,19 @@ yarn add react-native-fast-shadow
 ```
 
 
-### 14. [React Native Gesture Handler](https://github.com/software-mansion/react-native-gesture-handler)
+### 16. [react-native-fs](https://github.com/itinance/react-native-fs)
+
+react-native-fs 是一个用于在 React Native 中访问文件系统的库。
+```bash
+# using npm
+npm install react-native-fs
+
+# OR using Yarn
+yarn add react-native-fs
+```
+
+
+### 17. [React Native Gesture Handler](https://github.com/software-mansion/react-native-gesture-handler)
 
 Gesture Handler 旨在取代 React Native 的内置触摸系统
 
@@ -245,7 +283,7 @@ yarn add react-native-gesture-handler
 ```
 
 
-### 15. [react-native-gif-player](https://github.com/ysfzrn/react-native-gif-player)
+### 18. [react-native-gif-player](https://github.com/ysfzrn/react-native-gif-player)
 
 react-native-gif-player 是一个用于在React Native中播放GIF的库。
 
@@ -258,7 +296,7 @@ yarn add react-native-gif-player
 ```
 
 
-### 16. [react-native-gifted-charts](https://github.com/Abhinandan-Kushwaha/react-native-gifted-charts)
+### 19. [react-native-gifted-charts](https://github.com/Abhinandan-Kushwaha/react-native-gifted-charts)
 
 react-native-gifted-charts 是一个用于在React Native中创建图表的库。
 
@@ -271,7 +309,7 @@ yarn add react-native-gifted-charts
 ```
 
 
-### 17. [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker)
+### 20. [react-native-image-crop-picker](https://github.com/ivpusic/react-native-image-crop-picker)
 
 react-native-image-crop-picker 是一个用于在 React Native 应用中裁剪和选择图片的库。
 
@@ -284,7 +322,7 @@ yarn add react-native-image-crop-picker
 ```
 
 
-### 18. [React Native Linear Gradient](https://github.com/react-native-linear-gradient/react-native-linear-gradient)
+### 21. [React Native Linear Gradient](https://github.com/react-native-linear-gradient/react-native-linear-gradient)
 
 Linear Gradient 是一个为React Native项目提供渐变色的库
 
@@ -297,7 +335,7 @@ yarn add react-native-linear-gradient
 ```
 
 
-### 19. [React Native Orientation Locker](https://github.com/wonday/react-native-orientation-locker)
+### 22. [React Native Orientation Locker](https://github.com/wonday/react-native-orientation-locker)
 
 一个 react-native 模块，可以监听设备的方向变化，获取当前方向，锁定到首选方向。
 
@@ -375,22 +413,7 @@ public class MainActivity extends ReactActivity {
 ```
 
 
-### 20. [React Native Tab View](https://github.com/react-navigation/react-navigation)
-
-React Native Tab View 是 React Native 的跨平台 Tab View 组件。
-
-```bash
-# using npm
-npm install react-native-tab-view
-npm install react-native-pager-view
-
-# OR using Yarn
-yarn add react-native-tab-view
-yarn add react-native-pager-view
-```
-
-
-### 21. [react-native-permissions](https://github.com/zoontek/react-native-permissions)
+### 23. [react-native-permissions](https://github.com/zoontek/react-native-permissions)
 
 react-native-permissions 是一个适用于 iOS、Android 和 Windows 上的 React Native 的统一权限 API 组件。
 
@@ -401,7 +424,6 @@ npm install react-native-permissions
 # OR using Yarn
 yarn add react-native-permissions
 ```
-
 
 #### IOS
 
@@ -593,7 +615,7 @@ setup_permissions([
 ```
 
 
-### 22. [React Native Reanimated](https://github.com/software-mansion/react-native-reanimated)
+### 24. [React Native Reanimated](https://github.com/software-mansion/react-native-reanimated)
 
 React Native Reanimated 是由 Software Mansion 构建的强大动画库。
 
@@ -608,7 +630,7 @@ yarn add react-native-reanimated
 ```
 
 
-### 23. [react-native-reanimated-carousel](https://github.com/dohooo/react-native-reanimated-carousel)
+### 25. [react-native-reanimated-carousel](https://github.com/dohooo/react-native-reanimated-carousel)
 
 react-native-reanimated-carousel 是一个用于 React Native 的可定制的轮播组件。
 
@@ -621,7 +643,7 @@ yarn add react-native-reanimated-carousel
 ```
 
 
-### 24. [React Native Splash Screen](https://github.com/crazycodeboy/react-native-splash-screen)
+### 26. [React Native Splash Screen](https://github.com/crazycodeboy/react-native-splash-screen)
 
 用于 react-native 的启动屏幕 API，它可以通过编程方式隐藏和显示启动屏幕。适用于 iOS 和 Android。
 
@@ -805,7 +827,7 @@ IOS
 
 
 
-### 25. [React Native Stars](https://github.com/4umo/react-native-stars)
+### 27. [React Native Stars](https://github.com/4umo/react-native-stars)
 
 react-native-stars 是一个多功能的 React Native Star Review 组件，具有半星兼容性和自定义图像、星形大小、星数、星间距和值显示。
 
@@ -818,7 +840,7 @@ yarn add react-native-stars
 ```
 
 
-### 26. [React Native SVG](https://github.com/software-mansion/react-native-svg)
+### 28. [React Native SVG](https://github.com/software-mansion/react-native-svg)
 
 React Native自带的`Image`组件无法渲染SVG，因此需要使用React Native SVG 在React Native项目中渲染SVG。
 
@@ -833,7 +855,35 @@ yarn add react-native-svg-transformer
 ```
 
 
-### 27. [react-native-text-size](https://github.com/aMarCruz/react-native-text-size)
+### 29. [react-native-system-bars](https://github.com/hudl/react-native-system-bars)
+
+react-native-system-bars 是一个用于 React Native 自定义系统导航/状态栏的React Native库。
+
+```bash
+# using npm
+npm install react-native-system-bars
+
+# OR using Yarn
+yarn add react-native-system-bars
+```
+
+
+### 30. [React Native Tab View](https://github.com/react-navigation/react-navigation)
+
+React Native Tab View 是 React Native 的跨平台 Tab View 组件。
+
+```bash
+# using npm
+npm install react-native-tab-view
+npm install react-native-pager-view
+
+# OR using Yarn
+yarn add react-native-tab-view
+yarn add react-native-pager-view
+```
+
+
+### 31. [react-native-text-size](https://github.com/aMarCruz/react-native-text-size)
 
 react-native-text-size 是一个用于 React Native 在布局之前准确测量文本，并从应用程序（Android和iOS）中获取字体信息组件。
 
@@ -846,7 +896,7 @@ yarn add react-native-text-size
 ```
 
 
-### 28. [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)
+### 32. [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons)
 
 React Native Vector Icons是一个为React Native项目提供图标的库。可以使用`Icon`组件来渲染自定义图标。
 
@@ -894,7 +944,7 @@ dependencies {
 ```
 
 
-### 29. [React Native Video](https://github.com/TheWidlarzGroup/react-native-video)
+### 33. [React Native Video](https://github.com/TheWidlarzGroup/react-native-video)
 
 React Native Video 是 React Native 的播放视频组件。
 
@@ -940,7 +990,7 @@ useExoplayerHls-启用HLS支持
 这些功能中的每一个都会增加APK的大小，所以只启用您需要的功能。默认情况下，启用的功能包括：`useExoplayerSmoothStreaming`、`useExopplayerDash`、`useExoplayerHls`
 
 
-### 30. [react-native-view-shot](https://github.com/gre/react-native-view-shot)
+### 34. [react-native-view-shot](https://github.com/gre/react-native-view-shot)
 
 react-native-view-shot 是一个用于 React Native 的截图组件。
 
@@ -950,12 +1000,12 @@ npm install react-native-view-shot
 
 # OR using Yarn
 yarn add react-native-view-shot
-
 ```
 
-### 31. [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera)
 
-react-native-vision-camera 是一个用于 React Native 的相机组件。
+### 35. [react-native-vision-camera](https://github.com/mrousavy/react-native-vision-camera)
+
+react-native-vision-camera 是一个用于 React Native 的相机组件。项目中用于扫描二维码/条码
 
 ```bash
 # using npm
@@ -988,7 +1038,7 @@ if (enableCodeScanner) {
 ```
 
 
-### 32. [React Native WebView](https://github.com/react-native-webview/react-native-webview)
+### 36. [React Native WebView](https://github.com/react-native-webview/react-native-webview)
 
 React Native WebView 是 React Native 的社区维护的 WebView 组件。它旨在替代内置的 WebView
 
@@ -1001,7 +1051,7 @@ yarn add react-native-webview
 ```
 
 
-### 33. [rxjs](https://github.com/ReactiveX/rxjs)
+### 37. [rxjs](https://github.com/ReactiveX/rxjs)
 
 RxJS 是一个用于处理异步操作的库。
 
@@ -1014,7 +1064,7 @@ yarn add rxjs
 ```
 
 
-### 34. [TS MD5](https://github.com/cotag/ts-md5)
+### 38. [TS MD5](https://github.com/cotag/ts-md5)
 
 TypeScript 的 MD5 实现。
 

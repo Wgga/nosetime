@@ -15,6 +15,7 @@ const AutoSizeImage = React.memo(({ style, uri }: any) => {
 	return (
 		<Image source={{ uri }}
 			onLoad={({ nativeEvent: { source: { width, height } } }: any) => {
+				console.log("%c Line:18 🎂 width, height", "color:#b03734", width, height);
 				setImageData({ width, height })
 			}}
 			style={[style, (imagedata.height && imagedata.width) && { aspectRatio: imagedata.width / imagedata.height }]}
