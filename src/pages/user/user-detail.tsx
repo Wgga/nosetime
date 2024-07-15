@@ -1,16 +1,21 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList, Animated, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, FlatList, Animated, useWindowDimensions, PixelRatio, ActivityIndicator } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import RNFS from "react-native-fs";
 import { PieChart } from "react-native-gifted-charts";
-import ViewShot from "react-native-view-shot";
+import ViewShot, { captureRef } from "react-native-view-shot";
 import { ShadowedView } from "react-native-fast-shadow";
+import Svg, { Ellipse } from "react-native-svg";
+import WebView from "react-native-webview";
 
 import HeaderView from "../../components/headerview";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
 import RadarChart from "../../components/radarchart";
+import LinearButton from "../../components/linearbutton";
+import SharePopover from "../../components/popover/share-popover";
 
 import us from "../../services/user-service/user-service";
 
@@ -24,10 +29,6 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import LinearButton from "../../components/linearbutton";
-import Svg, { Ellipse, G } from "react-native-svg";
-import AutoSizeImage from "../../components/autosizeimage";
-import SharePopover from "../../components/popover/share-popover";
 
 const { width, height } = Dimensions.get("window");
 
@@ -48,6 +49,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
 	let dna_cnt = React.useRef<number>(0);
 	let dna_cnt2 = React.useRef<number>(0);
+	let dnaloadText = React.useRef<string>("正在生成，请稍后...");
+	let dnaHeight = React.useRef<number>(0);
+	let dnaHeaderH = React.useRef<number>(0);
 	// 数据
 	let favTopics = React.useRef<any[]>([]);
 	let usercol = React.useRef<any[]>([]);
@@ -72,6 +76,10 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		gene_popular_graph: "",
 		gene_sex_graph: ""
 	});
+	let dna_info = React.useRef<any>({
+		uri: "",
+		dataurl: ""
+	})
 	// 参数
 	const noseTypeList: any = ["商业", "沙龙", "热门", "中等", "冷门", "男士", "中性", "女士"];
 	const colorlist: any = ["#e0e0e0", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7"];
@@ -83,6 +91,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let isShowFavTopic = React.useRef<boolean>(false);
 	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
 	const [isrender, setIsRender] = React.useState<boolean>(false);
+	const [dnaloading, setDnaLoading] = React.useState<boolean>(false);
+
 
 	React.useEffect(() => {
 		if (route.params) {
@@ -391,49 +401,84 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
-	const createDNAPhoto = () => {
-		if (dnaref.current) {
-			dnaref.current.capture().then((uri: string) => {
-				console.log("%c Line:423 🌰 uri", "color:#fca650", uri);
-				ModalPortal.show((
-					<View style={styles.dna_photo_con}>
-						<View style={styles.dna_photo_info}>
-							<Image style={styles.dna_photo_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
-							<Icon name="close" size={30} color={theme.toolbarbg} style={styles.dna_photo_closebtn} onPress={() => {
-								ModalPortal.dismiss("dnaphoto_popover");
-							}} />
-							<View style={styles.dna_photo_msgcon}>
-								<Text style={styles.dna_photo_uname}>{info.current.uname}</Text>
-								<Text style={styles.dna_photo_msg}>{"已入住香水时代" + info.current.days + "，记录了" + info.current.records + "款香水"}</Text>
-								<Text style={styles.dna_photo_desc} numberOfLines={2}>{info.current.udesc}</Text>
-								<Text style={styles.dna_photo_title}>{info.current.uname + "的嗅觉DNA报告"}</Text>
-							</View>
-						</View>
-						<ScrollView showsVerticalScrollIndicator={false}>
-							<AutoSizeImage style={{ width }} uri={uri} />
-						</ScrollView>
-						<ShadowedView style={styles.dna_photo_share}>
-							<SharePopover data={{ containerStyle: { paddingBottom: 16 } }} />
-						</ShadowedView>
+	// 打开DNA报告弹窗
+	const open_dnaPopover = () => {
+		ModalPortal.show((
+			<View style={styles.dna_photo_con}>
+				<View style={styles.dna_photo_info}>
+					<Image style={styles.dna_photo_avatar} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+					<Icon name="close" size={30} color={theme.toolbarbg} style={styles.dna_photo_closebtn} onPress={() => {
+						ModalPortal.dismiss("dnaphoto_popover");
+					}} />
+					<View style={styles.dna_photo_msgcon}>
+						<Text style={styles.dna_photo_uname}>{info.current.uname}</Text>
+						<Text style={styles.dna_photo_msg}>{"已入住香水时代" + info.current.days + "，记录了" + info.current.records + "款香水"}</Text>
+						<Text style={styles.dna_photo_desc} numberOfLines={2}>{info.current.udesc}</Text>
+						<Text style={styles.dna_photo_title}>{info.current.uname + "的嗅觉DNA报告"}</Text>
 					</View>
-				), {
-					key: "dnaphoto_popover",
-					width,
-					height,
-					rounded: false,
-					useNativeDriver: true,
-					onTouchOutside: () => {
-						ModalPortal.dismiss("dnaphoto_popover");
-					},
-					onHardwareBackPress: () => {
-						ModalPortal.dismiss("dnaphoto_popover");
-						return true;
-					},
-					animationDuration: 300,
-					type: "bottomModal",
-					modalStyle: { backgroundColor: "transparent", paddingTop: 75 + insets.top },
-				});
-			})
+				</View>
+				<View style={{ overflow: "hidden", flex: 1 }}>
+					<WebView originWhitelist={["*"]}
+						scalesPageToFit={false}
+						setBuiltInZoomControls={false}
+						showsVerticalScrollIndicator={false}
+						scrollEnabled={false}
+						containerStyle={{ paddingBottom: 180, marginTop: -dnaHeaderH.current }}
+						source={{
+							html: `<html><head><style>*{padding:0;margin:0;}img{width:${width}px}</style></head>
+					<body><img src="${dna_info.current.dataurl}" /></body></html>`
+						}}
+					/>
+				</View>
+				<ShadowedView style={styles.dna_photo_share}>
+					<SharePopover data={{ containerStyle: { paddingBottom: 16 }, uri: dna_info.current.uri }} />
+				</ShadowedView>
+			</View>
+		), {
+			key: "dnaphoto_popover",
+			width,
+			height,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => {
+				ModalPortal.dismiss("dnaphoto_popover");
+			},
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("dnaphoto_popover");
+				return true;
+			},
+			animationDuration: 300,
+			type: "bottomModal",
+			modalStyle: { backgroundColor: "transparent", paddingTop: 75 + insets.top },
+		});
+	}
+
+	// 生成嗅觉DNA报告
+	const createDNAPhoto = () => {
+		if (dna_info.current.uri && dna_info.current.dataurl) {
+			open_dnaPopover();
+			return;
+		}
+		if (dnaref.current) {
+			setDnaLoading(true);
+			// captureRef(dnaref.current, { format: "png", fileName: "DNA" + new Date().valueOf(), snapshotContentContainer: true }).then((uri: string) => {
+			// 	RNFS.readFile(uri, "base64").then((res: any) => {
+			// 		let dataurl = "data:image/png;base64," + res;
+			// 		dna_info.current = { uri, dataurl };
+			// 		setDnaLoading(false);
+			// 		open_dnaPopover();
+			// 	}).catch(err => { });
+			// }).catch((err) => {
+			// 	console.log("%c Line:463 🥒 err", "color:#b03734", err);
+			// });
+			dnaref.current.capture().then((uri: string) => {
+				RNFS.readFile(uri, "base64").then((res: any) => {
+					let dataurl = "data:image/png;base64," + res;
+					dna_info.current = { uri, dataurl };
+					setDnaLoading(false);
+					open_dnaPopover();
+				}).catch(err => { });
+			}).catch(() => { })
 		}
 	}
 
@@ -456,6 +501,12 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				</Animated.View>
 				<Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />
 			</HeaderView>
+			{dnaloading && <View style={styles.dnaload_con}>
+				<View style={styles.dnaload_info}>
+					<ActivityIndicator size="large" color="#9BA6F5" />
+					<Text style={styles.dnaload_text}>{dnaloadText.current}</Text>
+				</View>
+			</View>}
 			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView}>
 				{avatar.current && <View style={styles.header_bg}>
 					<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />
@@ -700,155 +751,172 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</>}
 					</View>}
 
-					{(info.current.name != "[已注销] " && curTab == "gene") && <>
-						<ViewShot ref={dnaref} options={{ fileName: "DNA" + new Date().valueOf(), format: "png", quality: 1 }}
-							style={{ backgroundColor: theme.toolbarbg }}>
-							{dna_cnt.current != 1 && <View style={styles.item_list}>
-								<Text style={[styles.gene_title, { paddingTop: 0 }]}>{"香水统计"}</Text>
-								<View style={{ flexDirection: "row" }}>
-									{gene_code.current.circle_graph.length > 0 && gene_code.current.circle_graph.map((item: any) => {
-										return (
-											<View key={item.name} style={styles.base_item}>
-												{item.data.length > 0 && <>
-													<View style={{ height: width / 3, justifyContent: "center" }}>
-														<PieChart data={item.data} radius={(width / 3 * 0.65) / 2} />
-													</View>
-													<View style={styles.base_info_con}>
-														{item.data.map((item2: any) => {
-															return (
-																<View key={item2.text} style={styles.base_info}>
-																	<Text style={styles.base_text}>{item2.text}</Text>
-																	<View style={[styles.base_bg, { backgroundColor: item2.color }]}></View>
-																	<Text style={[styles.base_text, { width: 34 }]}>{item2.value + "%"}</Text>
-																</View>
-															)
-														})}
-													</View>
-												</>}
-											</View>
-										)
-									})}
+					{(info.current.name != "[已注销] " && curTab == "gene") && <View style={{ height: (dnaHeight.current + 71) - dnaHeaderH.current, overflow: "hidden" }}>
+						<ViewShot ref={dnaref} options={{ fileName: "DNA" + new Date().valueOf(), format: "png" }} style={{
+							position: "absolute", top: -dnaHeaderH.current
+						}} onLayout={(e: any) => {
+							dnaHeight.current = e.nativeEvent.layout.height;
+						}}>
+							<View style={{ backgroundColor: theme.toolbarbg }}>
+								<View style={styles.dna_photo_info} onLayout={(e: any) => {
+									dnaHeaderH.current = e.nativeEvent.layout.height;
+									setIsRender(val => !val);
+								}}>
+									<Image style={[styles.dna_photo_avatar, { position: "relative", top: 0, marginTop: 30 }]} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+									<View style={[styles.dna_photo_msgcon, { paddingTop: 10 }]}>
+										<Text style={styles.dna_photo_uname}>{info.current.uname}</Text>
+										<Text style={styles.dna_photo_msg}>{"已入住香水时代" + info.current.days + "，记录了" + info.current.records + "款香水"}</Text>
+										<Text style={styles.dna_photo_desc} numberOfLines={2}>{info.current.udesc}</Text>
+										<Text style={styles.dna_photo_title}>{info.current.uname + "的嗅觉DNA报告"}</Text>
+									</View>
 								</View>
-							</View>}
-							{dna_cnt2.current != 1 && <View style={styles.item_list}>
-								<Text style={styles.gene_title}>{"香调偏好"}</Text>
-								<View style={{ alignItems: "center" }}>
-									{gene_code.current.notes.length > 0 &&
-										<RadarChart data={gene_code.current.notes}
-											size={width * 0.85}
-											isCircle
-											gradientColor={{
-												startColor: "#FFF",
-												endColor: "#FFF",
-												count: 3,
-											}}
-											labelSize={12}
-											divisionStroke={"#EEE"}
-											labelColor={"#4D4D4D"}
-											stroke={["#EEE", "#EEE", "#CCC"]}
-											dataFillColor={"#999"}
-											dataFillOpacity={0.3}
-										/>
-									}
-								</View>
-							</View>}
-							{(dna_cnt2.current == 1 && dna_cnt.current != 1) && <View>
-								<Text style={styles.gene_title}>{"嗅觉偏好"}</Text>
-								<Image style={Globalstyles.emptyimg}
-									source={require("../../assets/images/empty/somedna_blank.png")}
-									resizeMode="contain" />
-							</View>}
-							{(dna_cnt2.current != 1 && gene_code.current.style.length > 0) && <View style={styles.item_list}>
-								<Text style={styles.gene_title}>{"风格偏好"}</Text>
-								<View style={styles.style_con}>
-									{gene_code.current.style.map((item: any) => {
-										return (
-											<View key={item.tag} style={styles.style_item}>
-												<Text>{item.val + "%"}</Text>
-												<View style={styles.style_outbar}>
-													{item.val != 100 && <Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
-														<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill="none" />
-													</Svg>}
-													<View style={[styles.style_inbar, { height: `${item.val}%` }]}>
-														<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
+								{dna_cnt.current != 1 && <View style={styles.item_list}>
+									<Text style={[styles.gene_title, { paddingTop: 0 }]}>{"香水统计"}</Text>
+									<View style={{ flexDirection: "row" }}>
+										{gene_code.current.circle_graph.length > 0 && gene_code.current.circle_graph.map((item: any) => {
+											return (
+												<View key={item.name} style={styles.base_item}>
+													{item.data.length > 0 && <>
+														<View style={{ height: width / 3, justifyContent: "center" }}>
+															<PieChart data={item.data} radius={(width / 3 * 0.65) / 2} />
+														</View>
+														<View style={styles.base_info_con}>
+															{item.data.map((item2: any) => {
+																return (
+																	<View key={item2.text} style={styles.base_info}>
+																		<Text style={styles.base_text}>{item2.text}</Text>
+																		<View style={[styles.base_bg, { backgroundColor: item2.color }]}></View>
+																		<Text style={[styles.base_text, { width: 34 }]}>{item2.value + "%"}</Text>
+																	</View>
+																)
+															})}
+														</View>
+													</>}
+												</View>
+											)
+										})}
+									</View>
+								</View>}
+								{dna_cnt2.current != 1 && <View style={styles.item_list}>
+									<Text style={styles.gene_title}>{"香调偏好"}</Text>
+									<View style={{ alignItems: "center" }}>
+										{gene_code.current.notes.length > 0 &&
+											<RadarChart data={gene_code.current.notes}
+												size={width * 0.85}
+												isCircle
+												gradientColor={{
+													startColor: "#FFF",
+													endColor: "#FFF",
+													count: 3,
+												}}
+												labelSize={12}
+												divisionStroke={"#EEE"}
+												labelColor={"#4D4D4D"}
+												stroke={["#EEE", "#EEE", "#CCC"]}
+												dataFillColor={"#999"}
+												dataFillOpacity={0.3}
+											/>
+										}
+									</View>
+								</View>}
+								{(dna_cnt2.current == 1 && dna_cnt.current != 1) && <View>
+									<Text style={styles.gene_title}>{"嗅觉偏好"}</Text>
+									<Image style={Globalstyles.emptyimg}
+										source={require("../../assets/images/empty/somedna_blank.png")}
+										resizeMode="contain" />
+								</View>}
+								{(dna_cnt2.current != 1 && gene_code.current.style.length > 0) && <View style={styles.item_list}>
+									<Text style={styles.gene_title}>{"风格偏好"}</Text>
+									<View style={styles.style_con}>
+										{gene_code.current.style.map((item: any) => {
+											return (
+												<View key={item.tag} style={styles.style_item}>
+													<Text>{item.val + "%"}</Text>
+													<View style={styles.style_outbar}>
+														{item.val != 100 && <Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
+															<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill="none" />
+														</Svg>}
+														<View style={[styles.style_inbar, { height: `${item.val}%` }]}>
+															<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { top: -2 }]}>
+																<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill={theme.border} />
+															</Svg>
+														</View>
+														<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { bottom: -2.5, zIndex: -1 }]}>
 															<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill={theme.border} />
 														</Svg>
 													</View>
-													<Svg width="14" height="5" viewBox="0 0 14 5" style={[styles.style_svg, { bottom: -2.5, zIndex: -1 }]}>
-														<Ellipse strokeWidth={1} stroke="#AFAFAF" cx="50%" cy="50%" rx="49%" ry="40%" fill={theme.border} />
-													</Svg>
+													<Text>{item.tag}</Text>
 												</View>
-												<Text>{item.tag}</Text>
-											</View>
-										)
-									})}
-								</View>
-							</View>}
-							{(dna_cnt2.current != 1 && gene_code.current.odor.length > 0) && <View style={styles.item_list}>
-								<Text style={styles.gene_title}>{"气味偏好"}</Text>
-								<View style={{ paddingHorizontal: 20 }}>
-									{gene_code.current.odor.map((item: any) => {
-										return (
-											<View key={item.id} style={styles.odor_item}>
-												<Text style={[styles.textstyle, styles.item_tag]}>{item.tag}</Text>
-												<View style={[styles.progress_outbar, { flex: 1 }]}>
-													<View style={[styles.progress_inbar, { width: `${item.val}%` }]}></View>
-												</View>
-												<Text style={[styles.textstyle, styles.item_val]}>{item.val + "%"}</Text>
-											</View>
-										)
-									})}
-								</View>
-							</View>}
-							{(dna_cnt2.current != 1 && gene_code.current.brand.length > 0) && <View style={styles.item_list}>
-								<Text style={styles.gene_title}>{"品牌偏好"}</Text>
-								<View style={{ paddingHorizontal: 20, paddingBottom: 17 }}>
-									{gene_code.current.brand.map((item: any) => {
-										return (
-											<View key={item.id} style={styles.brand_item}>
-												<Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} resizeMode="contain" />
-												<View style={styles.brand_info}>
-													<View style={styles.info_name}>
-														<Text numberOfLines={1} style={[styles.textstyle, { flex: 1 }]}>{item.cnname + " " + item.enname}</Text>
-														<Text style={[styles.textstyle, { marginLeft: 10 }]}>{item.val + "%"}</Text>
-													</View>
-													<View style={[styles.progress_outbar, { marginTop: 15 }]}>
+											)
+										})}
+									</View>
+								</View>}
+								{(dna_cnt2.current != 1 && gene_code.current.odor.length > 0) && <View style={styles.item_list}>
+									<Text style={styles.gene_title}>{"气味偏好"}</Text>
+									<View style={{ paddingHorizontal: 20 }}>
+										{gene_code.current.odor.map((item: any) => {
+											return (
+												<View key={item.id} style={styles.odor_item}>
+													<Text style={[styles.textstyle, styles.item_tag]}>{item.tag}</Text>
+													<View style={[styles.progress_outbar, { flex: 1 }]}>
 														<View style={[styles.progress_inbar, { width: `${item.val}%` }]}></View>
 													</View>
+													<Text style={[styles.textstyle, styles.item_val]}>{item.val + "%"}</Text>
 												</View>
-											</View>
-										)
-									})}
-								</View>
-							</View>}
-							{(dna_cnt2.current != 1 && gene_code.current.perfumer.length > 0) && <View style={{ paddingBottom: 30 }}>
-								<Text style={styles.gene_title}>{"调香师偏好"}</Text>
-								<View>
-									{gene_code.current.perfumer.map((item: any) => {
-										return (
-											<View key={item.id} style={{ padding: 20 }}>
-												<View style={[styles.info_name, styles.perfume_outbar]}>
-													<View style={[styles.perfume_inbar, { width: `${item.val}%` }]}></View>
-													<Text style={[styles.textstyle, { marginLeft: 17, zIndex: 1 }]}>{item.tag}</Text>
-													<Text style={[styles.textstyle, { marginRight: 17, zIndex: 1 }]}>{item.val + "%"}</Text>
+											)
+										})}
+									</View>
+								</View>}
+								{(dna_cnt2.current != 1 && gene_code.current.brand.length > 0) && <View style={styles.item_list}>
+									<Text style={styles.gene_title}>{"品牌偏好"}</Text>
+									<View style={{ paddingHorizontal: 20, paddingBottom: 17 }}>
+										{gene_code.current.brand.map((item: any) => {
+											return (
+												<View key={item.id} style={styles.brand_item}>
+													<Image style={styles.brand_img} source={{ uri: ENV.image + "/brand/" + (item.id % 100000) + ".jpg" }} resizeMode="contain" />
+													<View style={styles.brand_info}>
+														<View style={styles.info_name}>
+															<Text numberOfLines={1} style={[styles.textstyle, { flex: 1 }]}>{item.cnname + " " + item.enname}</Text>
+															<Text style={[styles.textstyle, { marginLeft: 10 }]}>{item.val + "%"}</Text>
+														</View>
+														<View style={[styles.progress_outbar, { marginTop: 15 }]}>
+															<View style={[styles.progress_inbar, { width: `${item.val}%` }]}></View>
+														</View>
+													</View>
 												</View>
-											</View>
-										)
-									})}
-								</View>
-							</View>}
+											)
+										})}
+									</View>
+								</View>}
+								{(dna_cnt2.current != 1 && gene_code.current.perfumer.length > 0) && <View style={{ paddingBottom: 30 }}>
+									<Text style={styles.gene_title}>{"调香师偏好"}</Text>
+									<View>
+										{gene_code.current.perfumer.map((item: any) => {
+											return (
+												<View key={item.id} style={{ padding: 20 }}>
+													<View style={[styles.info_name, styles.perfume_outbar]}>
+														<View style={[styles.perfume_inbar, { width: `${item.val}%` }]}></View>
+														<Text style={[styles.textstyle, { marginLeft: 17, zIndex: 1 }]}>{item.tag}</Text>
+														<Text style={[styles.textstyle, { marginRight: 17, zIndex: 1 }]}>{item.val + "%"}</Text>
+													</View>
+												</View>
+											)
+										})}
+									</View>
+								</View>}
+							</View>
 						</ViewShot>
-						{(dna_cnt2.current != 1 && uid.current == us.user.uid) && <LinearButton containerStyle={styles.dna_photo_btn}
+						{(dna_cnt2.current != 1 && uid.current == us.user.uid) && <LinearButton containerStyle={[styles.dna_photo_btn, { top: dnaHeight.current - dnaHeaderH.current }]}
 							text={"生成嗅觉DNA报告"}
 							textStyle={styles.dna_photo_btn_text}
 							colors2={["#81B4EC", "#9BA6F5"]}
 							isShowColor={false}
 							onPress={createDNAPhoto}
 						/>}
-					</>}
+					</View>}
 				</View>
-			</ScrollView>
-		</View>
+			</ScrollView >
+		</View >
 	);
 })
 
@@ -1230,6 +1298,25 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		overflow: "hidden",
 		backgroundColor: theme.border,
+	},
+	dnaload_con: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 99,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "rgba(0,0,0,0.5)",
+	},
+	dnaload_info: {
+		paddingVertical: 10,
+		paddingHorizontal: 20,
+		backgroundColor: theme.toolbarbg,
+		borderRadius: 8,
+		overflow: "hidden",
+	},
+	dnaload_text: {
+		fontSize: 16,
+		color: theme.tit2,
+		marginTop: 7
 	},
 	dna_photo_btn: {
 		marginBottom: 30,
