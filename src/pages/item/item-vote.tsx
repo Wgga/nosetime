@@ -406,6 +406,7 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 				</>}
 				<View style={styles.vote_textarea}>
 					<TextInput style={styles.textarea}
+						multiline={true}
 						value={info.current.replytext}
 						onChangeText={(value: string) => {
 							info.current.replytext = value;

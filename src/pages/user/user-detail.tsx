@@ -354,6 +354,10 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
+	const gotodiscuss = (type: string, cnt: number,) => {
+		navigation.push("Page", { screen: "UserDiscuss", params: { type, uid: uid.current, cnt, name: info.current.uname } });
+	}
+
 	// 查看相册大图
 	const open_PhotoPopover = (slideimgindex: number) => {
 		ModalPortal.show((
@@ -461,16 +465,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		}
 		if (dnaref.current) {
 			setDnaLoading(true);
-			// captureRef(dnaref.current, { format: "png", fileName: "DNA" + new Date().valueOf(), snapshotContentContainer: true }).then((uri: string) => {
-			// 	RNFS.readFile(uri, "base64").then((res: any) => {
-			// 		let dataurl = "data:image/png;base64," + res;
-			// 		dna_info.current = { uri, dataurl };
-			// 		setDnaLoading(false);
-			// 		open_dnaPopover();
-			// 	}).catch(err => { });
-			// }).catch((err) => {
-			// 	console.log("%c Line:463 🥒 err", "color:#b03734", err);
-			// });
 			dnaref.current.capture().then((uri: string) => {
 				RNFS.readFile(uri, "base64").then((res: any) => {
 					let dataurl = "data:image/png;base64," + res;
@@ -527,9 +521,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 					</Pressable>}
 					{info.current.name != "[已注销] " && <View style={styles.user_tabbar_con}>
 						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-friend") }}><Text style={styles.tabbar_num}>{info.current.friend}</Text>{"\n友邻"}</Text>
-						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
-						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
-						<Text style={styles.tabbar_text}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodiscuss("wanted", info.current.wanted) }}><Text style={styles.tabbar_num}>{info.current.wanted}</Text>{"\n想要"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodiscuss("smelt", info.current.smelt) }}><Text style={styles.tabbar_num}>{info.current.smelt}</Text>{"\n闻过"}</Text>
+						<Text style={styles.tabbar_text} onPress={() => { gotodiscuss("have", info.current.have) }}><Text style={styles.tabbar_num}>{info.current.have}</Text>{"\n拥有"}</Text>
 						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-fav") }}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
 					</View>}
 				</View>
@@ -683,7 +677,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							})}
 						</View>}
 						{info.current.short > 0 && <View style={styles.item_list}>
-							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]} onPress={() => { gotodiscuss("short", info.current.short) }}>
 								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的一句话香评 (" + info.current.short + ")"}</Text>
 								<Icon name="advance" size={14} color={theme.color} />
 							</Pressable>
@@ -692,30 +686,31 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									<View key={item.id} style={styles.item_padding}>
 										<View style={{ flexDirection: "row" }}>
 											<View style={styles.discuss_image_info}>
-												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<Pressable style={styles.discuss_img} onPress={() => { gotodetail("item-detail", item) }}>
+													<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												</Pressable>
 												<View style={styles.img_traiangle}></View>
 											</View>
 											<View style={{ marginLeft: 10 }}>
-												<Text style={styles.discuss_name}>{item.cnname}</Text>
-												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+												<Text style={styles.discuss_name} onPress={() => { gotodetail("item-detail", item) }}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]} onPress={() => { gotodetail("item-detail", item) }}>{item.enname}</Text>
 											</View>
 										</View>
 										<View style={styles.discuss_info}>
 											{item.score > 0 && <View style={Globalstyles.star}>
-												<Image
-													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+												<Image style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
 													defaultSource={require("../../assets/images/nopic.png")}
 													source={require("../../assets/images/star/star.png")}
 												/>
 											</View>}
-											<Text numberOfLines={1} style={styles.discuss_desc}>{item.desc}</Text>
+											<Text numberOfLines={1} style={styles.discuss_desc} onPress={() => { gotodiscuss("short", info.current.short) }}>{item.desc}</Text>
 										</View>
 									</View>
 								)
 							})}
 						</View>}
 						{info.current.discuss > 0 && <>
-							<Pressable style={[styles.item_title, { paddingBottom: 15 }]}>
+							<Pressable style={[styles.item_title, { paddingBottom: 15 }]} onPress={() => { gotodiscuss("discuss", info.current.discuss) }}>
 								<Text style={[styles.tit_text, { color: theme.tit2 }]}>{who.current + "的香水评论 (" + info.current.discuss + ")"}</Text>
 								<Icon name="advance" size={14} color={theme.color} />
 							</Pressable>
@@ -724,30 +719,31 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 									<View key={item.id} style={styles.item_padding}>
 										<View style={{ flexDirection: "row" }}>
 											<View style={styles.discuss_image_info}>
-												<Image style={styles.discuss_img} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												<Pressable style={styles.discuss_img} onPress={() => { gotodetail("item-detail", item) }}>
+													<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }} resizeMode="contain" />
+												</Pressable>
 												<View style={styles.img_traiangle}></View>
 											</View>
 											<View style={{ marginLeft: 10 }}>
-												<Text style={styles.discuss_name}>{item.cnname}</Text>
-												<Text style={[styles.discuss_name, { color: theme.text2 }]}>{item.enname}</Text>
+												<Text style={styles.discuss_name} onPress={() => { gotodetail("item-detail", item) }}>{item.cnname}</Text>
+												<Text style={[styles.discuss_name, { color: theme.text2 }]} onPress={() => { gotodetail("item-detail", item) }}>{item.enname}</Text>
 											</View>
 										</View>
 										<View style={styles.discuss_info}>
 											{item.score > 0 && <View style={Globalstyles.star}>
-												<Image
-													style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+												<Image style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
 													defaultSource={require("../../assets/images/nopic.png")}
 													source={require("../../assets/images/star/star.png")}
 												/>
 											</View>}
-											<Text numberOfLines={4} style={styles.discuss_desc}>{item.desc}</Text>
+											<Text numberOfLines={4} style={styles.discuss_desc} onPress={() => { gotodiscuss("discuss", info.current.discuss) }}>{item.desc}</Text>
 										</View>
 									</View>
 								)
 							})}
-							<View style={{ alignItems: "center" }}>
+							<Pressable style={{ alignItems: "center" }} onPress={() => { gotodiscuss("discuss", info.current.discuss) }}>
 								<Text style={styles.discuss_morebtn}>{"查看全部"}</Text>
-							</View>
+							</Pressable>
 						</>}
 					</View>}
 

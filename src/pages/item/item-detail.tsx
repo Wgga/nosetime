@@ -1111,9 +1111,7 @@ const ItemDetail = React.memo(({ route, navigation }: any) => {
 					</>
 				)
 			}}>
-				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
-					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
-				</Pressable>
+				<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} onPress={() => { setShowMenu(val => !val) }} />
 			</HeaderView>
 			<ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
 				<ItemHeader itemid={id} navigation={navigation} method={{ gotovote }} />
@@ -1128,6 +1126,7 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
+		zIndex: 1,
 	},
 	menu_icon_con: {
 		paddingLeft: 10,

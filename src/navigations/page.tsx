@@ -9,6 +9,7 @@ import Scanner from "../pages/scanner";
 
 import ItemDetail from "../pages/item/item-detail";
 import ItemVote from "../pages/item/item-vote";
+import DiscussReply from "../pages/item/disscuss-reply";
 
 import MediaListDetail from "../pages/media/media-list-detail";
 import PicList from "../pages/media/pic-list";
@@ -69,6 +70,7 @@ function Page(): React.JSX.Element {
 
 			<Stack.Screen name="ItemDetail" component={ItemDetail} />
 			<Stack.Screen name="ItemVote" component={ItemVote} />
+			<Stack.Screen name="DiscussReply" component={DiscussReply} />
 
 			<Stack.Screen name="MediaListDetail" component={MediaListDetail} />
 			<Stack.Screen name="PicList" component={PicList} />
