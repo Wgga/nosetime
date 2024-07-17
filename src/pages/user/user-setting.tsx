@@ -18,7 +18,6 @@ import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";
 
 import us from "../../services/user-service/user-service";
-import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
 
@@ -29,11 +28,12 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import UserAvatar from "../../components/useravatar";
 
 const { width, height } = Dimensions.get("window");
 const AppVersion = ENV.AppMainVersion + "." + ENV.AppMiniVersion + "." + ENV.AppBuildVersion;
 
-const Person = React.memo(({ navigation, changeAvatar }: any) => {
+const Person = React.memo(({ navigation }: any) => {
 
 	// 控件
 	// 变量
@@ -229,7 +229,7 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 			<ScrollView contentContainerStyle={styles.setting_list_con}
 				showsVerticalScrollIndicator={false}>
 				<ShadowedView style={styles.list_item_con}>
-					<Pressable onPress={changeAvatar} style={styles.list_item}>
+					<View style={styles.list_item}>
 						<Text style={styles.item_title}>{"头像"}</Text>
 						<View style={styles.item_msg}>
 							<Image style={styles.item_user_avatar}
@@ -237,7 +237,7 @@ const Person = React.memo(({ navigation, changeAvatar }: any) => {
 							/>
 							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 						</View>
-					</Pressable>
+					</View>
 					<Pressable onPress={() => {
 						opendlg({
 							header: "修改昵称",
@@ -698,6 +698,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 		require("../../assets/images/setting/system.png"),
 	];
 	// 状态
+	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		events.subscribe("userupdatedata", (result: any) => {
@@ -720,48 +721,14 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 			}
 		}).catch(() => { });
 
+		events.subscribe(classname + "change_avatar", () => {
+			setIsRender(val => !val);
+		})
 		return () => {
 			events.unsubscribe("userupdatedata");
+			events.unsubscribe(classname + "change_avatar");
 		}
 	}, [])
-
-	const changeAvatar = () => {
-		let params = {
-			index: 0,
-			quality: 0.9,
-			includeBase64: true,
-			maxWidth: 400,
-			maxHeight: 400,
-			src: "useravatar",
-			classname,
-			isCrop: true,
-		}
-		ActionSheetCtrl.show({
-			key: "avatar_action_sheet",
-			buttons: [{
-				text: "拍照",
-				style: { color: theme.redchecked },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
-				}
-			}, {
-				text: "从相册选择",
-				style: { color: theme.tit2 },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-					params["index"] = 1;
-					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
-				}
-			}, {
-				text: "取消",
-				style: { color: theme.tit },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-				}
-			}],
-		})
-	}
 
 	return (
 		<View style={styles.setting_con}>
@@ -779,17 +746,13 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
 			<View style={[styles.setting_header, { paddingTop: insets.top ? insets.top + 30 : 55 }]}>
-				<Pressable onPress={changeAvatar}>
-					<Image style={styles.user_avatar}
-						source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
-					/>
-				</Pressable>
+				<UserAvatar classname={classname} />
 				<Text style={styles.setting_text}>{"个人设置"}</Text>
 			</View>
 			<TabView navigationState={{ index, routes }}
 				style={{ backgroundColor: "transparent", marginTop: 20 }}
 				renderScene={SceneMap({
-					person: () => <Person navigation={navigation} changeAvatar={changeAvatar} />,
+					person: () => <Person navigation={navigation} />,
 					account: () => <Account navigation={navigation} showgiftcode={showgiftcode.current} />,
 					system: () => <System navigation={navigation} copyrightyear={copyrightyear.current} />,
 				})}

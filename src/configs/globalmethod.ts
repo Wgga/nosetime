@@ -452,6 +452,14 @@ const Globalstyles: any = StyleSheet.create({
 	activetab: {
 		color: theme.tit
 	},
+	user_avatar: {
+		width: 60,
+		height: 60,
+		borderWidth: 1,
+		borderColor: theme.toolbarbg,
+		borderRadius: 30,
+		overflow: "hidden",
+	}
 });
 
 

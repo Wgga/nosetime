@@ -8,13 +8,12 @@ import { useFocusEffect } from "@react-navigation/native";
 import { ShadowedView } from "react-native-fast-shadow";
 
 import ToastCtrl from "../../components/toastctrl";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
 import { ModalPortal } from "../../components/modals";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";
+import UserAvatar from "../../components/useravatar";
 
 import us from "../../services/user-service/user-service";
-import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
 
@@ -23,6 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Waitpay from "../../assets/svg/user/waitpay.svg";
@@ -34,18 +34,16 @@ import Wishlist from "../../assets/svg/user/wishlist.svg";
 import Usercart from "../../assets/svg/user/usercart.svg";
 import Giftcode from "../../assets/svg/user/giftcode.svg";
 import Setting from "../../assets/svg/user/setting.svg";
-import { Globalstyles } from "../../configs/globalmethod";
 
 const { width, height } = Dimensions.get("window");
-const classname = "UserPage";
 
 function User({ navigation }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
+	const classname = "UserPage";
 	// 参数
 	// 变量
 	let pointval = React.useRef<number>(0); // 积分
-	let avatar = React.useRef<string>(""); // 头像
 	let giftcode = React.useRef<string>("");
 	// 数据
 	let userinfo = React.useRef<any>({
@@ -66,18 +64,15 @@ function User({ navigation }: any): React.JSX.Element {
 	);
 
 	React.useEffect(() => {
-		events.subscribe("change_avatar", (data: any) => {
-			if (data) {
-				avatar.current = data.avatar;
-				setIsRender(val => !val);
-			}
-		})
-		events.subscribe("userupdatedata", (result) => {
+		events.subscribe("userupdatedata", (result: any) => {
 			showgiftcode.current = result && result.showgiftcode == 1 ? true : false;
 		})
+		events.subscribe(classname + "change_avatar", () => {
+			setIsRender(val => !val);
+		})
 		return () => {
-			events.unsubscribe("change_avatar");
 			events.unsubscribe("userupdatedata");
+			events.unsubscribe(classname + "change_avatar");
 		}
 	}, []);
 
@@ -134,44 +129,6 @@ function User({ navigation }: any): React.JSX.Element {
 		} else {
 			navigation.navigate("Page", { screen: page })
 		}
-	}
-
-	const changeAvatar = () => {
-		let params = {
-			index: 0,
-			quality: 0.9,
-			includeBase64: true,
-			maxWidth: 400,
-			maxHeight: 400,
-			src: "useravatar",
-			classname,
-			isCrop: true,
-		}
-		ActionSheetCtrl.show({
-			key: "avatar_action_sheet",
-			buttons: [{
-				text: "拍照",
-				style: { color: theme.redchecked },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
-				}
-			}, {
-				text: "从相册选择",
-				style: { color: theme.tit2 },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-					params["index"] = 1;
-					setTimeout(() => { upService.buttonClicked(params, { marginTop: insets.top }) }, 300);
-				}
-			}, {
-				text: "取消",
-				style: { color: theme.tit },
-				handler: () => {
-					ActionSheetCtrl.close("avatar_action_sheet");
-				}
-			}],
-		})
 	}
 
 	// 打开礼品码兑换输入框
@@ -274,13 +231,13 @@ function User({ navigation }: any): React.JSX.Element {
 			</Brightness>
 			<View style={styles.user_info_con}>
 				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
-					<Pressable onPress={changeAvatar}>
-						<Image style={styles.user_avatar}
-							defaultSource={require("../../assets/images/default_avatar.png")}
-							source={{ uri: avatar.current ? avatar.current : ENV.avatar + userinfo.current.uid + ".jpg?" + userinfo.current.uface }}
+					<Pressable onPress={() => { }}>
+						<Image style={Globalstyles.user_avatar}
+							defaultSource={require("../assets/images/default_avatar.png")}
+							source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
 						/>
 					</Pressable>
-					<View>
+					<View style={{ marginLeft: 20 }}>
 						<Text style={styles.user_name}>{userinfo.current.uname ? userinfo.current.uname : "未设置"}</Text>
 						<Text style={styles.user_days}>{"已入住 " + (userinfo.current.days ? userinfo.current.days : "0 天") + "，记录了 " + (userinfo.current.all ? userinfo.current.all : "0") + " 款香水"}</Text>
 					</View>
@@ -399,14 +356,6 @@ const styles = StyleSheet.create({
 	user_avatar_con: {
 		flexDirection: "row",
 		marginBottom: 30,
-	},
-	user_avatar: {
-		width: 60,
-		height: 60,
-		borderWidth: 1,
-		borderColor: theme.toolbarbg,
-		borderRadius: 30,
-		marginRight: 20,
 	},
 	user_info_con: {
 		marginHorizontal: 20,

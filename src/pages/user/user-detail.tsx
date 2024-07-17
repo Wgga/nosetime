@@ -29,6 +29,8 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import ToastCtrl from "../../components/toastctrl";
+import AlertCtrl from "../../components/alertctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -80,6 +82,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		uri: "",
 		dataurl: ""
 	})
+	let like_ = React.useRef<any>({});
 	// 参数
 	const noseTypeList: any = ["商业", "沙龙", "热门", "中等", "冷门", "男士", "中性", "女士"];
 	const colorlist: any = ["#e0e0e0", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7", "#e0e0e0", "#ebebeb", "#f7f7f7"];
@@ -90,16 +93,23 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let isShowUserTopic = React.useRef<boolean>(false);
 	let isShowFavTopic = React.useRef<boolean>(false);
 	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
+	let isblist = React.useRef<boolean>(false);
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 	const [dnaloading, setDnaLoading] = React.useState<boolean>(false);
-
+	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 
 	React.useEffect(() => {
 		if (route.params) {
 			uid.current = route.params.uid;
 			who.current = route.params.uid == us.user.uid ? "我" : "Ta";
+			if (us.user && us.user.ublock && us.user.ublock.split(",").includes(uid.current)) {
+				isblist.current = true;
+			} else {
+				isblist.current = false;
+			}
 		}
-		init()
+		init();
+		isShowbtn();
 	}, []);
 
 	// 获取用户数据
@@ -118,6 +128,24 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				})
 			});
 		})
+	}
+
+	// 获取是否关注该用户
+	const islike = () => {
+		return new Promise((resolve, reject) => {
+			if (!us.user.uid) {
+				resolve(0)
+			} else {
+				http.post(ENV.user, { method: "islike", uid: us.user.uid, ids: [uid.current] }).then((resp_data: any) => {
+					like_.current[resp_data[0]] = 1;
+					resolve(1);
+				});
+			}
+		})
+	}
+
+	const isShowbtn = () => {
+
 	}
 
 	// 设置个人页面数据
@@ -150,9 +178,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		// this.getaddtiondata();
 	}
 
-
+	// 初始化DNA数据
 	const initGeneData = () => {
-		//标记香水，清空缓存，实时更新
 		dna_cnt.current = 0;
 		dna_cnt2.current = 0;
 		gene_code.current = {
@@ -315,7 +342,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			getUserCol(),
 			getFavCol(),
 			getCompare(),
-			getGeneData()
+			getGeneData(),
+			islike()
 		]).then(() => {
 			colTab.current = usercol.current.length == 0 && favcol.current.length > 0 ? "fav" : "user";
 			setTimeout(() => { setIsRender(val => !val); }, 100)
@@ -348,13 +376,16 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			navigation.navigate("Page", { screen: "UserShequ", params: { uid: uid.current, cnt: info.current.topic, name: info.current.uname } });
 		} else if (page == "user-friend") {
 			navigation.push("Page", { screen: "UserFriend", params: { uid: uid.current, carecnt: info.current.care, name: info.current.uname, fanscnt: info.current.fans, } });
+		} else if (page == "social-sixin-detail") {
+			navigation.navigate("Page", { screen: "SocialSixinDetail", params: { fromuser: { uid: uid.current, uname: info.current.uname, uface: info.current.uface } } });
 		} else {
 			let screen = toCamelCase(page);
 			navigation.navigate("Page", { screen: screen, params: { uid: uid.current } });
 		}
 	}
 
-	const gotodiscuss = (type: string, cnt: number,) => {
+	// 跳转香评列表
+	const gotodiscuss = (type: string, cnt: number) => {
 		navigation.push("Page", { screen: "UserDiscuss", params: { type, uid: uid.current, cnt, name: info.current.uname } });
 	}
 
@@ -476,11 +507,73 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
+	// 关注/取消关注用户
+	const careuser = () => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App个人主页" } });
+		}
+		let method = like_.current[uid.current] ? "caredel" : "careadd";
+		http.post(ENV.user, { method, token: us.user.token, ida: us.user.uid, idb: uid.current }).then((resp_data: any) => {
+			if (resp_data.msg == "ADD") {
+				like_.current[uid.current] = 1;
+				ToastCtrl.show({ message: "已关注", duration: 1000, viewstyle: "short_toast", key: "care_add_toast" });
+			} else if (resp_data.msg == "DEL") {
+				like_.current[uid.current] = 0;
+				ToastCtrl.show({ message: "取消关注", duration: 1000, viewstyle: "short_toast", key: "care_del_toast" });
+			} else if (resp_data.msg == "NOEFFECT") {
+				console.log("发布失败：" + resp_data.msg);
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App个人主页" } });
+			} else {
+				AlertCtrl.show({
+					header: "关注失败",
+					key: "careadd_err_alert",
+					message: resp_data.msg,
+					buttons: [{
+						text: "确定",
+						handler: () => {
+							AlertCtrl.close("careadd_err_alert")
+						}
+					}]
+				});
+			}
+			setIsRender(val => !val);
+		})
+	}
+
+	// 拉黑/取消拉黑用户
+	const drag_blists = () => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App个人主页" } });
+		}
+		let method = isblist.current ? "blockdel" : "blockadd";
+
+		http.post(ENV.user, { method, token: us.user.token, ida: us.user.uid, idb: uid.current }).then((resp_data: any) => {
+			if (resp_data.msg == "ADD") {
+				ToastCtrl.show({ message: "已添加至黑名单", duration: 1000, viewstyle: "medium_toast", key: "block_add_toast" });
+				us.user.blocking = true;
+				us.user.ublock = us.user.ublock + uid.current;
+				isblist.current = true;
+			} else if (resp_data.msg == "DEL") {
+				ToastCtrl.show({ message: "已移出至黑名单", duration: 1000, viewstyle: "medium_toast", key: "block_del_toast" });
+				us.user.blocking = false;
+				us.user.ublock = us.user.ublock.replace(uid.current, "");
+				isblist.current = false;
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App个人主页" } });
+			}
+			setIsRender(val => !val);
+		})
+	}
+
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title: info.current.uname,
 				isShowSearch: false,
+				showmenu: uid.current != us.user.uid ? showmenu : false,
 				style: Globalstyles.absolute,
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
@@ -488,12 +581,38 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				}
 			}} method={{
 				back: () => { navigation.goBack() },
+			}} MenuChildren={() => {
+				return (
+					uid.current != us.user.uid ? <>
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => { gotodetail("social-sixin-detail") }}>
+							<Icon style={Globalstyles.menu_icon} name="sixin1" size={17} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"写信"}</Text>
+						</Pressable>
+						<Pressable style={Globalstyles.menu_icon_con} onPress={careuser}>
+							<Icon style={Globalstyles.menu_icon} name={like_.current[uid.current] ? "cancelfav" : "fav-outline"} size={17} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{like_.current[uid.current] ? "取消关注" : "关注"}</Text>
+						</Pressable>
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => { gotodetail("user-intro") }}>
+							<Icon style={Globalstyles.menu_icon} name="data" size={17} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"资料卡"}</Text>
+						</Pressable>
+						<Pressable style={Globalstyles.menu_icon_con} onPress={drag_blists}>
+							<Icon style={Globalstyles.menu_icon} name={!isblist.current ? "blacklist" : "rmblacklist"} size={17} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{!isblist.current ? "加入黑名单" : "移出黑名单"}</Text>
+						</Pressable>
+						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={() => { }}>
+							<Icon style={Globalstyles.menu_icon} name="report1" size={17} color={theme.tit2} />
+							<Text style={Globalstyles.menu_text}>{"举报"}</Text>
+						</Pressable>
+					</> : <></>
+				)
 			}}>
 				<Animated.View style={[Globalstyles.header_bg_con, { opacity: headerOpt }]}>
 					<View style={Globalstyles.header_bg_msk}></View>
 					{avatar.current && <Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />}
 				</Animated.View>
-				<Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />
+				{uid.current != us.user.uid && <Icon style={styles.title_icon} name="sandian" size={20} color={theme.toolbarbg} onPress={() => { setShowMenu(val => !val) }} />}
+				{uid.current == us.user.uid && <Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />}
 			</HeaderView>
 			{dnaloading && <View style={styles.dnaload_con}>
 				<View style={styles.dnaload_info}>
@@ -509,6 +628,19 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 				<View style={{ alignItems: "center", zIndex: 1 }}>
 					{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
 					<Text style={styles.user_name}>{info.current.uname}</Text>
+					{(us.user.uid != uid.current && us.user.uid > 0) && <View style={styles.user_btn_con}>
+						{isblist.current && <View style={styles.user_btn}><Text style={styles.user_btn_text}>{"已拉黑"}</Text></View>}
+						{!isblist.current && <>
+							<Pressable style={[styles.user_btn, { marginRight: 15 }]} onPress={() => { gotodetail("social-sixin-detail") }}>
+								<Icon name="sixin1" size={16} color={theme.toolbarbg} />
+								<Text style={styles.user_btn_text}>{"写信"}</Text>
+							</Pressable>
+							<Pressable style={styles.user_btn} onPress={careuser}>
+								<Icon name={like_.current[uid.current] ? "fav" : "fav-outline"} size={16} color={theme.toolbarbg} />
+								<Text style={styles.user_btn_text}>{like_.current[uid.current] ? "已关注" : "关注"}</Text>
+							</Pressable>
+						</>}
+					</View>}
 					{info.current.udesc && <Pressable style={styles.intro_con} onPress={() => { gotodetail("user-intro") }}>
 						{!info.current.udesc2 && <Text numberOfLines={5} style={[styles.intro_text, { fontFamily: "monospace", textAlign: "center" }]}>{info.current.udesc}</Text>}
 						{info.current.udesc2 && <>
@@ -527,16 +659,18 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						<Text style={styles.tabbar_text} onPress={() => { gotodetail("user-fav") }}><Text style={styles.tabbar_num}>{favcnt.current}</Text>{"\n喜好"}</Text>
 					</View>}
 				</View>
-				{info.current.name != "[已注销] " && <View style={styles.page_tabbar_con}>
-					<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("home") }}>
-						<Text style={[styles.tabtext, curTab == "home" && styles.activetab]}>{"个人主页"}</Text>
-						{curTab == "home" && <Text style={styles.tabline}></Text>}
-					</Pressable>
-					<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("gene") }}>
-						<Text style={[styles.tabtext, curTab == "gene" && styles.activetab]}>{"嗅觉DNA"}</Text>
-						{curTab == "gene" && <Text style={styles.tabline}></Text>}
-					</Pressable>
-				</View>}
+				{
+					info.current.name != "[已注销] " && <View style={styles.page_tabbar_con}>
+						<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("home") }}>
+							<Text style={[styles.tabtext, curTab == "home" && styles.activetab]}>{"个人主页"}</Text>
+							{curTab == "home" && <Text style={styles.tabline}></Text>}
+						</Pressable>
+						<Pressable style={styles.page_tabbar} onPress={() => { setCurTab("gene") }}>
+							<Text style={[styles.tabtext, curTab == "gene" && styles.activetab]}>{"嗅觉DNA"}</Text>
+							{curTab == "gene" && <Text style={styles.tabline}></Text>}
+						</Pressable>
+					</View>
+				}
 				<View style={styles.page_container}>
 					{info.current.name == "[已注销] " && <Image style={Globalstyles.emptyimg}
 						source={require("../../assets/images/empty/ohomepage_blank.png")}
@@ -747,6 +881,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						</>}
 					</View>}
 
+
 					{(info.current.name != "[已注销] " && curTab == "gene") && <View style={{ height: (dnaHeight.current + 71) - dnaHeaderH.current, overflow: "hidden" }}>
 						<ViewShot ref={dnaref} options={{ fileName: "DNA" + new Date().valueOf(), format: "png" }} style={{
 							position: "absolute", top: -dnaHeaderH.current
@@ -942,6 +1077,27 @@ const styles = StyleSheet.create({
 		marginTop: 6,
 		fontSize: 18,
 		color: theme.toolbarbg,
+	},
+	user_btn_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		marginTop: 10,
+	},
+	user_btn: {
+		minWidth: 67,
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+		borderColor: "rgba(255,255,255,0.5)",
+		borderWidth: 1,
+		paddingVertical: 3,
+		paddingHorizontal: 5,
+	},
+	user_btn_text: {
+		fontSize: 12,
+		color: theme.toolbarbg,
+		marginLeft: 2,
 	},
 	intro_con: {
 		width: width - 40,

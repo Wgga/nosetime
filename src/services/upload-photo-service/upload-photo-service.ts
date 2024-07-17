@@ -11,6 +11,8 @@ import http from "../../utils/api/http";
 import events from "../../hooks/events";
 
 import { ENV } from "../../configs/ENV";
+import ActionSheetCtrl from "../../components/actionsheetctrl";
+import theme from "../../configs/theme";
 
 class UploadPhotoService {
 	public myImage: string = "";
@@ -21,6 +23,44 @@ class UploadPhotoService {
 		maxWidth: 1024,
 		maxHeight: 1024,
 		src: ""
+	}
+
+	changeAvatar(data: any) {
+		let params = {
+			index: 0,
+			quality: 0.9,
+			includeBase64: true,
+			maxWidth: 400,
+			maxHeight: 400,
+			src: "useravatar",
+			classname: data.classname,
+			isCrop: true,
+		}
+		ActionSheetCtrl.show({
+			key: "avatar_action_sheet",
+			buttons: [{
+				text: "拍照",
+				style: { color: theme.redchecked },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					setTimeout(() => { upService.buttonClicked(params, data.style) }, 300);
+				}
+			}, {
+				text: "从相册选择",
+				style: { color: theme.tit2 },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+					params["index"] = 1;
+					setTimeout(() => { upService.buttonClicked(params, data.style) }, 300);
+				}
+			}, {
+				text: "取消",
+				style: { color: theme.tit },
+				handler: () => {
+					ActionSheetCtrl.close("avatar_action_sheet");
+				}
+			}],
+		})
 	}
 
 	async buttonClicked(params: any, style?: any) {
@@ -56,16 +96,16 @@ class UploadPhotoService {
 		if (this.params.src == "photoupload") {
 			events.publish("photo_upload" + this.params.classname + us.user.uid, this.myImage);
 		} else if (this.params.src == "useravatar") {
-			this.changeAvatar();
+			this._changeAvatar();
 		}
 	}
 
 	async emitavatar() {
 		let params = { avatar: this.myImage };
-		events.publish("change_avatar", params);
+		events.publish(this.params.classname + "change_avatar", params);
 	}
 
-	changeAvatar() {
+	_changeAvatar() {
 		http.post(ENV.user, { method: "changepic", id: us.user.uid, token: us.user.token, Filedata: this.myImage }).then((resp_data: any) => {
 			if (parseFloat(resp_data.msg) > 0) {
 				ToastCtrl.show({ message: "头像已修改", duration: 2000, viewstyle: "short_toast", key: "changeAvatar_success_alert" });

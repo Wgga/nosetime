@@ -109,9 +109,11 @@ const SocialSixinDetail = React.memo(({ navigation, route }: any) => {
 
 	const checkin = () => {
 		http.post(ENV.sixin + "?uid=" + us.user.uid, { method: "checkin", token: us.user.token, fromid: fromuser.current.uid }).then((resp_data: any) => {
-			if (resp_data.firstmsg == undefined || resp_data.items == undefined) return;
+			if (!resp_data.firstmsg || !resp_data.items || resp_data.items.length == 0) {
+				setIsRender(val => !val);
+				return;
+			}
 			firstmsg.current = resp_data.firstmsg;
-			if (!resp_data.items || resp_data.items.length == 0) return;
 
 			setmsg(resp_data.items, "new");
 		});
