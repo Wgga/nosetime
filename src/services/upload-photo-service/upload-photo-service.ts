@@ -43,7 +43,7 @@ class UploadPhotoService {
 				style: { color: theme.redchecked },
 				handler: () => {
 					ActionSheetCtrl.close("avatar_action_sheet");
-					setTimeout(() => { upService.buttonClicked(params, data.style) }, 300);
+					setTimeout(() => { this.buttonClicked(params, { marginTop: data.marginTop }) }, 400);
 				}
 			}, {
 				text: "从相册选择",
@@ -51,7 +51,7 @@ class UploadPhotoService {
 				handler: () => {
 					ActionSheetCtrl.close("avatar_action_sheet");
 					params["index"] = 1;
-					setTimeout(() => { upService.buttonClicked(params, data.style) }, 300);
+					setTimeout(() => { this.buttonClicked(params, { marginTop: data.marginTop }) }, 400);
 				}
 			}, {
 				text: "取消",

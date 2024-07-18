@@ -11,9 +11,9 @@ import ToastCtrl from "../../components/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";
-import UserAvatar from "../../components/useravatar";
 
 import us from "../../services/user-service/user-service";
+import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
 
@@ -231,9 +231,9 @@ function User({ navigation }: any): React.JSX.Element {
 			</Brightness>
 			<View style={styles.user_info_con}>
 				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
-					<Pressable onPress={() => { }}>
+					<Pressable onPress={() => { upService.changeAvatar({ classname, marginTop: insets.top }) }}>
 						<Image style={Globalstyles.user_avatar}
-							defaultSource={require("../assets/images/default_avatar.png")}
+							defaultSource={require("../../assets/images/default_avatar.png")}
 							source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
 						/>
 					</Pressable>

@@ -18,6 +18,7 @@ import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";
 
 import us from "../../services/user-service/user-service";
+import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
 
@@ -26,14 +27,14 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import UserAvatar from "../../components/useravatar";
 
 const { width, height } = Dimensions.get("window");
 const AppVersion = ENV.AppMainVersion + "." + ENV.AppMiniVersion + "." + ENV.AppBuildVersion;
 
-const Person = React.memo(({ navigation }: any) => {
+const Person = React.memo(({ navigation, marginTop }: any) => {
 
 	// 控件
 	// 变量
@@ -229,7 +230,7 @@ const Person = React.memo(({ navigation }: any) => {
 			<ScrollView contentContainerStyle={styles.setting_list_con}
 				showsVerticalScrollIndicator={false}>
 				<ShadowedView style={styles.list_item_con}>
-					<View style={styles.list_item}>
+					<Pressable style={styles.list_item} onPress={() => { upService.changeAvatar({ classname: "UserSettingPage", marginTop }) }}>
 						<Text style={styles.item_title}>{"头像"}</Text>
 						<View style={styles.item_msg}>
 							<Image style={styles.item_user_avatar}
@@ -237,7 +238,7 @@ const Person = React.memo(({ navigation }: any) => {
 							/>
 							<Icon name="back1" style={styles.item_icon} size={16} color={theme.placeholder} />
 						</View>
-					</View>
+					</Pressable>
 					<Pressable onPress={() => {
 						opendlg({
 							header: "修改昵称",
@@ -746,13 +747,18 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
 			<View style={[styles.setting_header, { paddingTop: insets.top ? insets.top + 30 : 55 }]}>
-				<UserAvatar classname={classname} />
+				<Pressable onPress={() => { upService.changeAvatar({ classname, marginTop: insets.top }) }}>
+					<Image style={Globalstyles.user_avatar}
+						defaultSource={require("../../assets/images/default_avatar.png")}
+						source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }}
+					/>
+				</Pressable>
 				<Text style={styles.setting_text}>{"个人设置"}</Text>
 			</View>
 			<TabView navigationState={{ index, routes }}
 				style={{ backgroundColor: "transparent", marginTop: 20 }}
 				renderScene={SceneMap({
-					person: () => <Person navigation={navigation} />,
+					person: () => <Person navigation={navigation} marginTop={insets.top} />,
 					account: () => <Account navigation={navigation} showgiftcode={showgiftcode.current} />,
 					system: () => <System navigation={navigation} copyrightyear={copyrightyear.current} />,
 				})}
