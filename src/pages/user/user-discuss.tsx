@@ -158,7 +158,7 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 				params: { type, optionaltype: type, id: item.id, name: item.cnname, enname: item.enname, }
 			});
 		} else if (page == "discuss-reply") {
-			navigation.navigate("Page", { screen: "DiscussReply", params: { id: item.id, udid: item.udid, title: name.current + title["discuss"] } });
+			navigation.navigate("Page", { screen: "DiscussReply", params: { id: item.id, udid: item.udid, title: name.current + title["discuss"], src: "user" } });
 		}
 	}
 
@@ -244,7 +244,7 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 		let regex = /<img[^>]+src="([^"]+)">/g;
 		let match, sz: any = [];
 		while (match = regex.exec(desc)) {
-			sz.push(<Image key={match[1]} style={styles.desc_img} source={{ uri: match[1] }} />);
+			sz.push(<Image key={match[1]} style={Globalstyles.desc_img} source={{ uri: match[1] }} />);
 		}
 		return sz;
 	}
@@ -323,7 +323,7 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 							</View>
 							<View style={type.current != "discuss" && { marginLeft: 60 }}>
 								{item.content && <View style={{ marginTop: 23 }}>{handledesc(item.content)}</View>}
-								{(type.current == "discuss" && item.udpichtml) && <View style={styles.item_img_desc}>{handledescimg(item.udpichtml)}</View>}
+								{(type.current == "discuss" && item.udpichtml) && <View style={Globalstyles.desc_img_con}>{handledescimg(item.udpichtml)}</View>}
 								<View style={styles.item_btn}>
 									<Text style={styles.item_time}>{item.time}</Text>
 									{us.user.uid == uid.current && <>
@@ -412,19 +412,6 @@ const styles = StyleSheet.create({
 		marginBottom: 14,
 		fontSize: 14,
 		color: theme.comment
-	},
-	item_img_desc: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginTop: 9,
-		marginLeft: 8,
-		marginBottom: 14,
-	},
-	desc_img: {
-		width: 110,
-		height: 110,
-		borderRadius: 8,
-		marginRight: 5,
 	},
 	item_btn: {
 		flexDirection: "row",

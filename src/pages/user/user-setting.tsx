@@ -828,13 +828,6 @@ const styles = StyleSheet.create({
 	setting_header: {
 		alignItems: "center",
 	},
-	user_avatar: {
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		borderWidth: 1,
-		borderColor: theme.toolbarbg,
-	},
 	setting_text: {
 		fontSize: 18,
 		color: theme.tit2,

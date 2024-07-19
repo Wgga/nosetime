@@ -1,5 +1,5 @@
 import React from "react";
-import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable, FlatList, StatusBar } from "react-native";
+import { Animated, ScrollView, StyleSheet, View, Text, Dimensions, Pressable, FlatList, } from "react-native";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import { Tabs, MaterialTabBar, MaterialTabItem } from "react-native-collapsible-tab-view"
@@ -267,11 +267,6 @@ const Home = React.memo(({ navigation }: any) => {
 							{
 								useNativeDriver: true, listener: (e: any) => {
 									scrollY.setValue(e.nativeEvent.contentOffset.y - sliderHeight);
-									if ((e.nativeEvent.contentOffset.y - sliderHeight) >= sliderHeight) {
-										StatusBar.setBarStyle("dark-content", true);
-									} else {
-										StatusBar.setBarStyle("default", true);
-									}
 								}
 							}
 						)

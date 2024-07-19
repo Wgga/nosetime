@@ -94,6 +94,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 	let isShowFavTopic = React.useRef<boolean>(false);
 	let isShowHeader = React.useRef<boolean>(false); // 是否显示头部
 	let isblist = React.useRef<boolean>(false);
+	let loading = React.useRef<boolean>(true);
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 	const [dnaloading, setDnaLoading] = React.useState<boolean>(false);
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
@@ -346,7 +347,10 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			islike()
 		]).then(() => {
 			colTab.current = usercol.current.length == 0 && favcol.current.length > 0 ? "fav" : "user";
-			setTimeout(() => { setIsRender(val => !val); }, 100)
+			setTimeout(() => {
+				loading.current = false;
+				setIsRender(val => !val);
+			}, 100)
 		})
 	}
 
@@ -466,7 +470,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 					/>
 				</View>
 				<ShadowedView style={styles.dna_photo_share}>
-					<SharePopover data={{ containerStyle: { paddingBottom: 16 }, uri: dna_info.current.uri }} />
+					<SharePopover data={{ containerStyle: { paddingBottom: 16 }, uri: dna_info.current.uri, hidebtn: [4, 5] }} />
 				</ShadowedView>
 			</View>
 		), {
@@ -570,6 +574,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<View style={Globalstyles.container}>
+			{loading.current && <View style={Globalstyles.loading_con}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
+			</View>}
 			<HeaderView data={{
 				title: info.current.uname,
 				isShowSearch: false,
@@ -626,7 +633,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 					<View style={[Globalstyles.header_bg_msk]}></View>
 				</View>}
 				<View style={{ alignItems: "center", zIndex: 1 }}>
-					{avatar.current && <Image style={[styles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
+					{avatar.current && <Image style={[Globalstyles.user_avatar, { marginTop: 41 + insets.top }]} source={{ uri: avatar.current }} />}
 					<Text style={styles.user_name}>{info.current.uname}</Text>
 					{(us.user.uid != uid.current && us.user.uid > 0) && <View style={styles.user_btn_con}>
 						{isblist.current && <View style={styles.user_btn}><Text style={styles.user_btn_text}>{"已拉黑"}</Text></View>}
@@ -880,8 +887,6 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 							</Pressable>
 						</>}
 					</View>}
-
-
 					{(info.current.name != "[已注销] " && curTab == "gene") && <View style={{ height: (dnaHeight.current + 71) - dnaHeaderH.current, overflow: "hidden" }}>
 						<ViewShot ref={dnaref} options={{ fileName: "DNA" + new Date().valueOf(), format: "png" }} style={{
 							position: "absolute", top: -dnaHeaderH.current
@@ -1046,8 +1051,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 						/>}
 					</View>}
 				</View>
-			</ScrollView >
-		</View >
+			</ScrollView>
+		</View>
 	);
 })
 
@@ -1065,13 +1070,6 @@ const styles = StyleSheet.create({
 		right: 0,
 		height: 400,
 		zIndex: 0,
-	},
-	user_avatar: {
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		borderColor: theme.toolbarbg,
-		borderWidth: 1,
 	},
 	user_name: {
 		marginTop: 6,

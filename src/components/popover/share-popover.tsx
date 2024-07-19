@@ -24,24 +24,31 @@ const { width, height } = Dimensions.get("window");
 function SharePopover({ data = {} }: any): React.JSX.Element {
 	// 控件
 	const insets = useSafeAreaInsets();
+	// 参数
+	const { uri, containerStyle, hidebtn } = data;
 	// 变量
-	// 数据
-	let sharelist = React.useRef<any[]>([
+	const sharedata = [
 		{ id: 1, icon: <WX width={56 * 0.65} height={56 * 0.65} />, text: "微信好友" },
 		{ id: 2, icon: <PYQ width={56 * 0.65} height={56 * 0.65} />, text: "朋友圈" },
 		{ id: 3, icon: <WEIBO width={56 * 0.65} height={56 * 0.65} />, text: "微博" },
-		// { id: 4, icon: <Link width={56 * 0.65} height={56 * 0.65} />, text: "复制链接" },
-		// { id: 5, icon: <QQ width={56 * 0.65} height={56 * 0.65} />, text: "QQ" },
+		{ id: 4, icon: <Link width={56 * 0.65} height={56 * 0.65} />, text: "复制链接" },
+		{ id: 5, icon: <QQ width={56 * 0.65} height={56 * 0.65} />, text: "QQ" },
 		{ id: 6, icon: <Download width={56 * 0.65} height={56 * 0.65} />, text: "保存到相册" },
-	])
-	// 参数
-	const { uri, containerStyle } = data;
+	]
+	// 数据
+	let sharelist = React.useRef<any[]>([]);
 	// 状态
+	const [isrender, setIsRender] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		sharelist.current = sharedata.filter((item: any) => !hidebtn.includes(item.id));
+		setIsRender(val => !val);
+	}, []);
 
 	const clickbtn = async (item: any) => {
 		if (item.id == 6) {
 			if (!(await permissionService.checkPermission("write", { marginTop: insets.top }))) return;
-			CameraRoll.saveAsset(uri, { type: "photo" }).then((data: any) => {
+			CameraRoll.saveAsset(uri, { type: "photo", album: "nosetime" }).then((data: any) => {
 				ToastCtrl.show({ message: "保存成功", duration: 1000, viewstyle: "short_toast", key: "save_success_toast" });
 			}).catch((err: any) => {
 				ToastCtrl.show({ message: "保存失败", duration: 1000, viewstyle: "short_toast", key: "save_error_toast" });

@@ -452,6 +452,7 @@ const Globalstyles: any = StyleSheet.create({
 	activetab: {
 		color: theme.tit
 	},
+	// 头像公共样式
 	user_avatar: {
 		width: 60,
 		height: 60,
@@ -459,7 +460,21 @@ const Globalstyles: any = StyleSheet.create({
 		borderColor: theme.toolbarbg,
 		borderRadius: 30,
 		overflow: "hidden",
-	}
+	},
+	// 香评图片公共样式
+	desc_img_con: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginTop: 9,
+		marginLeft: 8,
+		marginBottom: 14,
+	},
+	desc_img: {
+		width: 110,
+		height: 110,
+		borderRadius: 8,
+		marginRight: 5,
+	},
 });
 
 

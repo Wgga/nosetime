@@ -1,15 +1,13 @@
 import React from "react";
-import { BackHandler, StatusBar, View } from "react-native";
+import { BackHandler, StatusBar } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import ToastCtrl from "../components/toastctrl";
-import { ModalPortal } from "../components/modals";
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";
-import { Globalstyles } from "../configs/globalmethod";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,7 +22,7 @@ function Route(): React.JSX.Element {
 		React.useCallback(() => {
 			// 监听路由变化改变状态栏颜色
 			const urlRegex = [
-				"Home", "Lottery",
+				"Lottery",
 				"ItemDetail",
 				"MallHeji", "MallBrand", "MallGroup", "MallOrderDetail", "MallCoupon", "MallWishList",
 				"SocialShequDetail", "SocialXiaoxi",
