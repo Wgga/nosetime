@@ -22,7 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -159,7 +159,7 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子发布页" } });
 			} else {
-				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "publish_error_toast" });
+				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 2000, viewstyle: "medium_toast", key: "publish_err_toast" });
 			}
 		});
 	}
@@ -168,16 +168,15 @@ function SocialShequPost({ navigation, route }: any): React.JSX.Element {
 	const openfiledlg = () => {
 		ActionSheetCtrl.show({
 			key: "filedlg_action_sheet",
+			textStyle: { color: theme.tit2 },
 			buttons: [{
 				text: "拍照",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(0) }, 300);
 				}
 			}, {
 				text: "从相册选择",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(1) }, 300);

@@ -21,7 +21,7 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 

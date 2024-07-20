@@ -8,7 +8,7 @@ import WebView from "react-native-webview";
 import { ModalPortal } from "../modals";
 
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 
@@ -57,9 +57,9 @@ function RulesPopover({ modalparams }: any): React.JSX.Element {
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
 					locations={[0, 1]}
-					style={styles.vote_btn}
+					style={Globalstyles.confirm_btn}
 				>
-					<Text style={styles.vote_btn_text}>{"完成"}</Text>
+					<Text style={Globalstyles.confirm_btn_text}>{"完成"}</Text>
 				</LinearGradient>
 			</Pressable>
 		</View>
@@ -78,16 +78,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		color: "#000",
 	},
-	vote_btn: {
-		width: "100%",
-		height: 46,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	vote_btn_text: {
-		fontSize: 16,
-		color: theme.toolbarbg,
-	}
 });
 
 export default RulesPopover;

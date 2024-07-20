@@ -67,12 +67,12 @@ const PhotoPopover = React.memo(({ modalparams }: any) => {
 				text: "取消",
 				handler: () => {
 					AlertCtrl.close("del_photo_alert");
-					_remove(index, item);
 				}
 			}, {
 				text: "确定",
 				handler: () => {
 					AlertCtrl.close("del_photo_alert");
+					_remove(index, item);
 				}
 			}],
 		})

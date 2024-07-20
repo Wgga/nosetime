@@ -22,7 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Waitpay from "../../assets/svg/user/waitpay.svg";

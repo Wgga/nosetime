@@ -16,7 +16,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -43,7 +43,7 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 
 		events.subscribe("EnterSocialSixinDetailPage", (data: any) => {
 			let index = items.current.findIndex((item: any) => item.uid == data.uid);
-			if (index > -1 && items.current[index].new){
+			if (index > -1 && items.current[index].new) {
 				delete items.current[index].new;
 				getSixincnt();
 				setIsRender(val => !val);
@@ -123,16 +123,15 @@ const SocialSixin = React.memo(({ navigation, setSixin }: any) => {
 	const openmenudlg = (item: any) => {
 		ActionSheetCtrl.show({
 			key: "menudlg_action_sheet",
+			textStyle: { color: theme.tit2 },
 			buttons: [{
 				text: item.top ? "取消置顶" : "置顶",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("menudlg_action_sheet");
 					setmsgtop(item);
 				}
 			}, {
 				text: "删除",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("menudlg_action_sheet");
 					delmsg(item)

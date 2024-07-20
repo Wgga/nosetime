@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 import reactNativeTextSize from "react-native-text-size";
 
-import theme from "./theme";
+import theme from "../configs/theme";
 
 // 设置等级的左偏移量
 const handlelevelLeft = (level: number) => {
@@ -123,6 +123,11 @@ const toCamelCase = (page: string) => {
 			return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 		}
 	}).join("");
+}
+
+const unitNumber = (number: number, decimal: number) => {
+	let ponit = Math.pow(10, decimal);
+	return number >= 1e3 && number < 1e4 ? (Math.floor(number / 1e3 * ponit) / ponit) + 'k' : number >= 1e4 ? (Math.floor(number / 1e4 * ponit) / ponit) + 'w' : number
 }
 
 const Globalstyles: any = StyleSheet.create({
@@ -475,6 +480,30 @@ const Globalstyles: any = StyleSheet.create({
 		borderRadius: 8,
 		marginRight: 5,
 	},
+	// 弹窗内确定按钮
+	confirm_btn: {
+		width: "100%",
+		height: 46,
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	confirm_btn_text: {
+		fontSize: 16,
+		color: theme.toolbarbg,
+	},
+	// 底部输入框图标
+	footer_icon_con: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+	footer_icon: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginRight: 20,
+	},
+	footer_text: {
+		marginLeft: 5,
+	},
 });
 
 
@@ -485,5 +514,6 @@ export {
 	handlestarLeft, handlereplystarLeft,
 	show_items, display,
 	setContentFold,
-	toCamelCase
+	toCamelCase,
+	unitNumber
 };

@@ -27,7 +27,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -185,16 +185,15 @@ const Person = React.memo(({ navigation, marginTop }: any) => {
 	const changeGender = () => {
 		ActionSheetCtrl.show({
 			key: "changeGender_action_sheet",
+			textStyle: { color: theme.tit2 },
 			buttons: [{
 				text: "我是男士",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("changeGender_action_sheet");
 					setgender("m");
 				}
 			}, {
 				text: "我是女士",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("changeGender_action_sheet");
 					setgender("f");

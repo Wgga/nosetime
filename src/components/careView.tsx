@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View, Image, Text, Pressable } from "react-native
 
 import theme from "../configs/theme";
 import { ENV } from "../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop } from "../utils/globalmethod";
 import LinearGradient from "react-native-linear-gradient";
 import ListBottomTip from "./listbottomtip";
 import AlertCtrl from "./controller/alertctrl";

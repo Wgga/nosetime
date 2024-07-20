@@ -222,16 +222,15 @@ function MallIdcardEdit({ navigation }: any): React.JSX.Element {
 		pictype.current = type;
 		ActionSheetCtrl.show({
 			key: "filedlg_action_sheet",
+			textStyle: { color: theme.tit2 },
 			buttons: [{
 				text: "拍照",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(0) }, 300);
 				}
 			}, {
 				text: "从相册选择",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(1) }, 300);

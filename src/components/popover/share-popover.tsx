@@ -51,7 +51,7 @@ function SharePopover({ data = {} }: any): React.JSX.Element {
 			CameraRoll.saveAsset(uri, { type: "photo", album: "nosetime" }).then((data: any) => {
 				ToastCtrl.show({ message: "保存成功", duration: 1000, viewstyle: "short_toast", key: "save_success_toast" });
 			}).catch((err: any) => {
-				ToastCtrl.show({ message: "保存失败", duration: 1000, viewstyle: "short_toast", key: "save_error_toast" });
+				ToastCtrl.show({ message: "保存失败", duration: 1000, viewstyle: "short_toast", key: "save_fail_toast" });
 			})
 		}
 	}

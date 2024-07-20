@@ -407,11 +407,6 @@ class ArticleService {
 		})
 		return "ok";
 	}
-
-	unitNumber(number: number, decimal: number) {
-		let ponit = Math.pow(10, decimal);
-		return number >= 1e3 && number < 1e4 ? (Math.floor(number / 1e3 * ponit) / ponit) + 'k' : number >= 1e4 ? (Math.floor(number / 1e4 * ponit) / ponit) + 'w' : number
-	}
 }
 const articleService = new ArticleService();
 export default articleService;

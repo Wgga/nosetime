@@ -8,7 +8,7 @@ import http from "../../utils/api/http";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

@@ -27,7 +27,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -289,10 +289,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 
 	}
 
-	const unitNumber = (number: number) => {
-		return articleService.unitNumber(number, 1);
-	}
-
 	const goPage = (page: number) => {
 		currentpage.current = page;
 		setShowPage(false);
@@ -449,13 +445,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 								idkey: "id",
 								item,
 								likedata: like_.current
-							}} method={{
-								display: () => {
-									display(item.sub);
-									setIsRender(val => !val);
-								},
-								show_items,
-							}} />
+							}} method={{}} />
 						)
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={pages.current.items.length > 0} />}
@@ -471,13 +461,13 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 				{!isfocus && <View style={styles.footer_flex}>
 					<View style={[styles.footer_flex, { marginRight: 20 }]}>
 						<Icon name="reply" size={16} color={theme.fav} />
-						{item0.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(item0.current.replycnt)}</Text>}
+						{item0.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(item0.current.replycnt, 1)}</Text>}
 					</View>
 					<View style={styles.footer_flex}>
 						<Icon name={like_.current[item0.current.id] ? "heart-checked" : "heart"}
 							size={16} color={like_.current[item0.current.id] ? theme.redchecked : theme.fav}
 						/>
-						{item0.current.up > 0 && <Text style={styles.footer_text}>{unitNumber(item0.current.up)}</Text>}
+						{item0.current.up > 0 && <Text style={styles.footer_text}>{unitNumber(item0.current.up, 1)}</Text>}
 					</View>
 				</View>}
 			</FooterView>

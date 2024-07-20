@@ -53,7 +53,7 @@ const LoginScreen = React.memo(({ data, method }: any) => {
 			ToastCtrl.show({ message: "正在验证，请稍等...", duration: 0, viewstyle: "short_toast", key: "loading_toast" });
 			login({ method: "loginweixinmobile", code: response.code });
 		}, (reason: any) => {
-			ToastCtrl.show({ message: "登录失败: " + reason, duration: 1000, viewstyle: "short_toast", key: "wxlogin_error_toast" });
+			ToastCtrl.show({ message: "登录失败: " + reason, duration: 1000, viewstyle: "short_toast", key: "wxlogin_fail_toast" });
 		})
 	}
 

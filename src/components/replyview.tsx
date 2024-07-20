@@ -1,25 +1,28 @@
 import React from "react";
-import { Text, StyleSheet, View, Image, Pressable, Dimensions } from "react-native";
+import { Text, StyleSheet, View, Image, Pressable } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
 import theme from "../configs/theme";
 import { ENV } from "../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../utils/globalmethod";
 
 import Icon from "../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
 
 const ReplyItem = React.memo(({ data, method = {} }: any) => {
 
 	const { contentkey, timekey, parentitem, item, islike } = data;
 	const { reply_menu, like_reply, reply } = method;
 
-	const handledesc = (desc: string) => {
+	const handledesc = (item1: any, desc: string) => {
 		let sz: any[] = [];
 		sz = desc.replace(/\r/g, "").replace(/\n\n/g, "\n").split(/\n/g).map((item: string, index: number) => {
-			return (<Text key={index} style={styles.reply_text}>{item}</Text>)
+			return (
+				<View key={index} style={Globalstyles.item_flex}>
+					{(item1.refuid || item1.refuname) && <Text style={styles.reply_text}>{"回复 "}<Text style={styles.refuname}>{item1.refuname + "："}</Text></Text>}
+					<Text style={styles.reply_text}>{item}</Text>
+				</View>
+			)
 		})
 		return sz;
 	};
@@ -51,7 +54,7 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 						<Icon name="shequsandian" size={16} color={theme.placeholder} />
 					</Pressable>
 				</View>
-				<Pressable style={styles.main_desc} onPress={() => { reply(item.id, item.uname) }}>{handledesc(item[contentkey])}</Pressable>
+				<Pressable style={styles.main_desc} onPress={() => { reply(item) }}>{handledesc(item, item[contentkey])}</Pressable>
 				<View style={[Globalstyles.item_flex_between, { marginBottom: 8 }]}>
 					<Text style={styles.main_time}>{item[timekey]}</Text>
 					<Pressable hitSlop={10} style={styles.reply_up} onPress={() => { like_reply(item) }}>
@@ -77,7 +80,7 @@ const ReplyView = React.memo(({ data, method = {} }: any) => {
 			{(isShowSub || (item.sub && item.sub.length > 0)) && <View style={styles.list_sub_item}>
 				{item.sub.map((sub: any, index: number) => {
 					return (
-						<View key={sub.id}>
+						<View key={sub[idkey]}>
 							{show_items(item.sub, index) && <ReplyItem data={{
 								contentkey,
 								timekey,
@@ -130,14 +133,17 @@ const styles = StyleSheet.create({
 		fontWeight: "500",
 	},
 	main_desc: {
-		width: "100%",
-		marginTop: 13,
+		marginVertical: 13,
 	},
 	reply_text: {
 		fontSize: 13,
 		color: theme.text2,
 		lineHeight: 20,
-		marginBottom: 13
+	},
+	refuname: {
+		fontFamily: "PingFang SC",
+		fontWeight: "500",
+		fontSize: 14,
 	},
 	main_time: {
 		color: theme.placeholder2,

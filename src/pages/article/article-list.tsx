@@ -12,7 +12,7 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 import { FlashList } from "@shopify/flash-list";
 import ListBottomTip from "../../components/listbottomtip";
 

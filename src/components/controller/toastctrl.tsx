@@ -51,6 +51,9 @@ class Toast {
 			onDismiss: () => { data.onDismiss() },
 			onTouchOutside: data.onTouchOutside ? data.onTouchOutside : () => { this.close(data.key) },
 			onHardwareBackPress: () => {
+				if (data.key == "exit_toast") {
+					return false;
+				}
 				this.close(data.key);
 				return true;
 			},

@@ -10,7 +10,7 @@ import cache from "../../hooks/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globalmethod";
 
 import us from "../../services/user-service/user-service";
 import ToastCtrl from "../../components/controller/toastctrl";

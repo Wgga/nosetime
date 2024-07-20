@@ -22,7 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import StarImage from "../../components/starimage";
@@ -53,9 +53,6 @@ const ArticlePage = React.memo(({ navigation }: any) => {
 			curuid.current = uid;
 			setIsRender(val => !val);
 		})
-	}
-	const unitNumber = (number: number) => {
-		return articleService.unitNumber(number, 1);
 	}
 
 	const deletefav = (item: any) => {
@@ -115,15 +112,15 @@ const ArticlePage = React.memo(({ navigation }: any) => {
 								<View style={[styles.icon_item_con, styles.flex_row]}>
 									<View style={styles.icon_item}>
 										<Icon name="heart" size={14} color={"#808080"} />
-										<Text style={styles.icon_text}>{unitNumber(item.favcnt)}</Text>
+										<Text style={styles.icon_text}>{unitNumber(item.favcnt, 1)}</Text>
 									</View>
 									<View style={styles.icon_item}>
 										<Icon name="message" size={13.5} color={"#808080"} />
-										<Text style={styles.icon_text}>{unitNumber(item.replycnt)}</Text>
+										<Text style={styles.icon_text}>{unitNumber(item.replycnt, 1)}</Text>
 									</View>
 									<View style={styles.icon_item}>
 										<Icon name="look" size={16} color={"#808080"} />
-										<Text style={styles.icon_text}>{unitNumber(item.click)}</Text>
+										<Text style={styles.icon_text}>{unitNumber(item.click, 1)}</Text>
 									</View>
 								</View>
 								<Pressable onPress={() => {

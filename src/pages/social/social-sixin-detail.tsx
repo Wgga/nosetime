@@ -17,7 +17,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../configs/globalmethod";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import ToastCtrl from "../../components/controller/toastctrl";
@@ -175,7 +175,7 @@ const SocialSixinDetail = React.memo(({ navigation, route }: any) => {
 				setTimeout(() => {
 					items.current[0].loading = 0;
 					items.current[0].error = 1;
-					ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_error_toast" });
+					ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_fail_toast" });
 				}, 2000);
 			}
 		});

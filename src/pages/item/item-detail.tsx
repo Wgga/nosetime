@@ -22,7 +22,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft, handlereplystarLeft } from "../../configs/globalmethod";
+import { Globalstyles, handlestarLeft, handlereplystarLeft } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import HaveChecked from "../../assets/svg/itemdetail/have-checked.svg";

@@ -27,7 +27,7 @@ import http from "../../utils/api/http";
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 import { articlestyle } from "../../configs/articlestyle";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display, setContentFold, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -355,11 +355,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
-	// 处理评论数
-	const unitNumber = (number: number) => {
-		return articleService.unitNumber(number, 1);
-	}
-
 	// 处理webview中的链接与RN通信
 	const INJECTED_JAVASCRIPT = `(function () {
 		let allLinks = document.querySelectorAll("a");
@@ -454,7 +449,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						if (supported) {
 							Linking.openURL(href);
 						} else {
-							ToastCtrl.show({ message: "未安装淘宝", duration: 1000, viewstyle: "short_toast", key: "goto_error_toast" });
+							ToastCtrl.show({ message: "未安装淘宝", duration: 1000, viewstyle: "short_toast", key: "goto_fail_toast" });
 						}
 					});
 				} else if (scheme.includes("https://weidian.com/item.html")) {
@@ -521,7 +516,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			} else {
-				return ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "vote_error_toast" });
+				return ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "vote_err_toast" });
 			}
 		});
 	}
@@ -646,7 +641,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App文章页" } });
 			} else {
-				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_error_toast" });
+				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_err_toast" });
 			}
 		});
 	};
@@ -939,8 +934,8 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				},
 				publish,
 			}}>
-				{!isfocus && <View style={styles.footer_icon_con}>
-					<Pressable style={styles.footer_icon} onPress={() => {
+				{!isfocus && <View style={Globalstyles.footer_icon_con}>
+					<Pressable style={Globalstyles.footer_icon} onPress={() => {
 						if (listref.current) {
 							listref.current.scrollToIndex({
 								index: 0,
@@ -951,13 +946,13 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 						}
 					}}>
 						<Icon name="reply" size={16} color={theme.fav} />
-						{articledata.current.replycnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.replycnt)}</Text>}
+						{articledata.current.replycnt > 0 && <Text style={Globalstyles.footer_text}>{unitNumber(articledata.current.replycnt, 1)}</Text>}
 					</Pressable>
-					<Pressable style={[styles.footer_icon, { marginRight: 0 }]} onPress={favarticle}>
+					<Pressable style={[Globalstyles.footer_icon, { marginRight: 0 }]} onPress={favarticle}>
 						<Icon name={likelist.current[id] ? "heart-checked" : "heart"}
 							size={16} color={likelist.current[id] ? theme.redchecked : theme.fav}
 						/>
-						{articledata.current.favcnt > 0 && <Text style={styles.footer_text}>{unitNumber(articledata.current.favcnt)}</Text>}
+						{articledata.current.favcnt > 0 && <Text style={Globalstyles.footer_text}>{unitNumber(articledata.current.favcnt, 1)}</Text>}
 					</Pressable>
 					{/* <Pressable onPress={showSharePopover} hitSlop={20}>
 						<Icon name="share2" size={14} color={theme.fav} />
@@ -1176,18 +1171,6 @@ const styles = StyleSheet.create({
 		height: 44,
 		textAlign: "center",
 		lineHeight: 44,
-	},
-	footer_icon_con: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	footer_icon: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginRight: 20,
-	},
-	footer_text: {
-		marginLeft: 5,
 	},
 })
 

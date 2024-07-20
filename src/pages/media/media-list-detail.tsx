@@ -20,7 +20,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, toCamelCase, display } from "../../configs/globalmethod";
+import { Globalstyles, toCamelCase, display } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import ReplyView from "../../components/replyview";
@@ -242,7 +242,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 				us.delUser();
 				return navigation.navigate("Page", { screen: "Login", params: { src: "App单品视频页" } });
 			} else {
-				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_error_toast" });
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "short_toast", key: "publish_err_toast" });
 			}
 		});
 	}
@@ -332,15 +332,15 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 	}
 
 	// 点击评论回复
-	const reply = (refid: number, refuname: string) => {
-		if (refid == replyinfo.current.refid) {
+	const reply = (item: any) => {
+		if (item.id == replyinfo.current.refid) {
 			replyinfo.current.refid = 0;
 			replyinfo.current.refuname = "";
 			replyinfo.current.holder = "写跟帖";
 		} else {
-			replyinfo.current.refid = refid;
-			replyinfo.current.refuname = refuname;
-			replyinfo.current.holder = "回复 " + refuname;
+			replyinfo.current.refid = item.id;
+			replyinfo.current.refuname = item.uname;
+			replyinfo.current.holder = "回复 " + item.uname;
 		}
 		if (inputref.current) inputref.current.focus();
 		setIsRender(val => !val);

@@ -26,7 +26,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
+import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import ToastCtrl from "../../components/controller/toastctrl";

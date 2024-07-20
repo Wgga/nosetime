@@ -12,6 +12,8 @@ import ListBottomTip from "../../components/listbottomtip";
 import ReplyView from "../../components/replyview";
 import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import FooterView from "../../components/footerview";
+import ReportPopover from "../../components/popover/report-popover";
+import { ModalPortal } from "../../components/modals";
 
 import us from "../../services/user-service/user-service";
 
@@ -22,9 +24,11 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, show_items, display } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import AlertCtrl from "../../components/controller/alertctrl";
+import HandleDesc from "../../components/handledesc";
 
 const { width, height } = Dimensions.get("window");
 
@@ -183,23 +187,6 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 	const gotodetail = (item: any) => {
 	}
 
-	const handledesc = (desc: string) => {
-		let sz: any[] = [];
-		sz = desc.replace(/\r/g, "").replace(/\n\n/g, "\n").split(/\n/g).map((item: string, index: number) => {
-			return (<Text key={index} style={styles.discuss_desc_text}>{item}</Text>)
-		})
-		return sz;
-	};
-
-	const handledescimg = (desc: string) => {
-		let regex = /<img[^>]+src="([^"]+)">/g;
-		let match, sz: any = [];
-		while (match = regex.exec(desc)) {
-			sz.push(<Image key={match[1]} style={Globalstyles.desc_img} source={{ uri: match[1] }} />);
-		}
-		return sz;
-	}
-
 	const postdiscussup = (type: number) => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
@@ -250,41 +237,90 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 显示回复弹窗
+	const showReplyCtrl = (item: any, parentitem?: any, type?: string) => {
+		let who = type == "hidereport" ? "my" : "follow";
+		let buttons = [{
+			text: "举报",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				report(item, parentitem);
+			}
+		}, {
+			text: "回复",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				reply(item);
+			}
+		}, {
+			text: "删除",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				delReply(item, who);
+			}
+		}, {
+			text: "取消",
+			style: { color: theme.tit },
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+			}
+		}];
+		if (type == "hidereport") {
+			buttons = buttons.filter(item => item.text != "举报");
+		} else if (type == "hidedel") {
+			buttons = buttons.filter(item => item.text != "删除");
+		}
+		ActionSheetCtrl.show({
+			key: "reply_action_sheet",
+			textStyle: { color: theme.tit2 },
+			buttons,
+		})
+	}
+
+	// 点击评论回复右上角三点进行回复
 	const reply_menu = (item: any, parentitem?: any) => {
 		if (discuss.current.replyuid == us.user.uid && item.uid != us.user.uid) {
-			ActionSheetCtrl.show({
-				key: "reply_action_sheet",
-				buttons: [{
-					text: "举报",
-					style: { color: theme.tit2 },
-					handler: () => {
-						ActionSheetCtrl.close("reply_action_sheet");
-						report(item, parentitem);
-					}
-				}, {
-					text: "回复",
-					style: { color: theme.tit2 },
-					handler: () => {
-						ActionSheetCtrl.close("reply_action_sheet");
-						replyinfo.current.refuid = item.uid;
-						replyinfo.current.refuname = item.uname;
-						replyinfo.current.refurid = item.urid;
-						replyinfo.current.holder = "回复 " + item.uname;
-						if (inputref.current) inputref.current.focus();
-						setIsRender(val => !val);
-					}
-				}, {
-					text: "取消",
-					style: { color: theme.tit },
-					handler: () => {
-						ActionSheetCtrl.close("reply_action_sheet");
-					}
-				}],
-			})
+			showReplyCtrl(item, parentitem);
+		} else if (item.uid == us.user.uid) {
+			showReplyCtrl(item, parentitem, "hidereport");
+		} else {
+			showReplyCtrl(item, parentitem, "hidedel");
 		}
 	}
 
-	const report = (item: any, parentitem: any) => {
+	// 删除评论
+	const delReply = (item: any, who: string) => {
+		AlertCtrl.show({
+			header: "确认删除这条评论吗？",
+			key: "del_reply_alert",
+			message: "",
+			buttons: [{
+				text: "取消",
+				handler: () => {
+					AlertCtrl.close("del_reply_alert");
+				}
+			}, {
+				text: "确定",
+				handler: () => {
+					AlertCtrl.close("del_reply_alert");
+					http.post(ENV.item + "?method=removediscussreply&id=" + id.current + "&uid=" + us.user.uid, {
+						token: us.user.token, urid: item.urid, udid: item.urudid, who
+					}).then((resp_data: any) => {
+						//20240229 shibo:处理token失效
+						if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+							us.delUser();
+							return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
+						}
+						ToastCtrl.show({ message: "删除成功", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
+						loadMore("init");
+					})
+				}
+			}],
+		})
+	}
+
+	// 举报评论
+	const report = (item?: any, parentitem?: any) => {
 		let reportshequ: any = {};
 		let reportuser: any = {};
 		let reportpage: any = {};
@@ -307,6 +343,31 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 				reportpage = parentitem;
 			}
 		}
+		let params: any = {
+			modalkey: "discussreport_popover",
+			id: id.current,
+			reportshequ,
+			reportuser,
+			reportpage,
+			classname,
+		}
+		ModalPortal.show((
+			<ReportPopover modalparams={params} />
+		), {
+			key: "discussreport_popover",
+			width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => { ModalPortal.dismiss("discussreport_popover") },
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("discussreport_popover");
+				return true;
+			},
+			swipeDirection: "down",
+			animationDuration: 300,
+			type: "bottomModal",
+			modalStyle: { backgroundColor: "transparent" },
+		})
 	}
 
 	// 动态修改底部输入框遮罩透明度和层级
@@ -337,6 +398,24 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		setIsFocus(bol);
 	}
 
+	// 点击评论回复
+	const reply = (item: any, type?: string) => {
+		if (type == "first") {
+			replyinfo.current.refuid = 0;
+			replyinfo.current.refurid = 0;
+			replyinfo.current.refuname = "";
+			replyinfo.current.holder = '写跟帖';
+		} else {
+			replyinfo.current.refuid = item.uid;
+			replyinfo.current.refurid = item.urid;
+			replyinfo.current.refuname = item.uname;
+			replyinfo.current.holder = "回复 " + item.uname;
+			replyinfo.current.refuid = item.uid;
+		}
+		if (inputref.current) inputref.current.focus();
+		setIsRender(val => !val);
+	}
+
 	const publish = () => {
 
 	}
@@ -365,6 +444,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 							<Text style={Globalstyles.menu_text}>{"点赞"}</Text>
 						</Pressable>
 						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={() => {
+							report();
 							setShowMenu(false);
 						}}>
 							<Icon style={Globalstyles.menu_icon} name="report2" size={16} color={theme.comment} />
@@ -385,7 +465,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 					size={20} onPress={() => { postdiscussup(1) }}
 					color={like_.current[discuss.current.udid] ? theme.redchecked : theme.toolbarbg}
 					style={Globalstyles.title_icon} />}
-				{(discuss.current.replyuid != us.user.uid && !isemptydata) && <Icon name="sandian"
+				{(discuss.current.replyuid != us.user.uid && !isemptydata.current) && <Icon name="sandian"
 					size={20} onPress={() => { setShowMenu(val => !val) }}
 					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
 			</HeaderView>
@@ -424,8 +504,22 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 								</View>}
 							</View>
 						</View>
-						{discuss.current.content && <View style={{ marginTop: 10 }}>{handledesc(discuss.current.content)}</View>}
-						{discuss.current.udpichtml && <View style={Globalstyles.desc_img_con}>{handledescimg(discuss.current.udpichtml)}</View>}
+						{discuss.current.content && <Pressable onPress={() => { reply(discuss.current, "first") }}>
+							<HandleDesc
+								containerStyle={{ marginTop: 10 }}
+								itemStyle={styles.discuss_desc_text}
+								type="text"
+								item={discuss.current}
+								itemKey="content"
+							/>
+						</Pressable>}
+						{discuss.current.udpichtml && <HandleDesc
+							containerStyle={Globalstyles.desc_img_con}
+							itemStyle={Globalstyles.desc_img}
+							type="image"
+							item={discuss.current}
+							itemKey="udpichtml"
+						/>}
 						<View style={Globalstyles.item_flex_between}>
 							<Text>{discuss.current.udtime}</Text>
 							<View style={Globalstyles.item_flex}>
@@ -449,6 +543,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 							}} method={{
 								reply_menu,
 								like_reply,
+								reply
 							}} />
 						)
 					}}
@@ -461,14 +556,27 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 			{id.current > 0 && <FooterView data={{
 				placeholder: replyinfo.current.holder, replytext: replyinfo.current.replytext,
 				inputref, classname: classname + id.current,
-				showBtn: true
 			}} method={{
 				onChangeText: (val: string) => {
 					replyinfo.current.replytext = val;
 					setIsRender(val => !val);
 				},
 				publish,
-			}} />}
+			}}>
+				{!isfocus && <View style={Globalstyles.footer_icon_con}>
+					<View style={Globalstyles.footer_icon}>
+						<Icon name="reply" size={16} color={theme.fav} />
+						{discuss.current.udreplycnt > 0 && <Text style={Globalstyles.footer_text}>{unitNumber(discuss.current.udreplycnt, 1)}</Text>}
+					</View>
+					<Pressable style={[Globalstyles.footer_icon, { marginRight: 0 }]} onPress={() => { postdiscussup(1) }}>
+						<Icon name={like_.current[discuss.current.udid] ? "up-checked" : "up"} size={16} color={theme.fav} />
+						{discuss.current.udup > 0 && <Text style={Globalstyles.footer_text}>{unitNumber(discuss.current.udup, 1)}</Text>}
+					</Pressable>
+					{/* <Pressable onPress={showSharePopover} hitSlop={20}>
+						<Icon name="share2" size={14} color={theme.fav} />
+					</Pressable> */}
+				</View>}
+			</FooterView>}
 		</View>
 	);
 })
@@ -490,7 +598,6 @@ const styles = StyleSheet.create({
 		fontFamily: "PingFang SC",
 		fontWeight: "500",
 		color: theme.color,
-
 	},
 	discuss_desc_text: {
 		fontSize: 14,

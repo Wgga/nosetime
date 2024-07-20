@@ -15,7 +15,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import LinearGradient from "react-native-linear-gradient";

@@ -1,12 +1,12 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
+import { Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
 import theme from "../configs/theme";
 
 import Icon from "../assets/iconfont";
 import RulesPopover from "./popover/rules-popover";
-import { ModalPortal, SlideAnimation } from "./modals";
+import { ModalPortal } from "./modals";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,17 +26,11 @@ function RulesView({ rules, tip }: any): React.JSX.Element {
 			width,
 			rounded: false,
 			useNativeDriver: true,
-			modalAnimation: new SlideAnimation({
-				initialValue: 0,
-				slideFrom: "bottom",
-				useNativeDriver: true,
-			}),
 			onTouchOutside: () => { ModalPortal.dismiss(params.modalkey) },
 			onHardwareBackPress: () => {
 				ModalPortal.dismiss(params.modalkey);
 				return true;
 			},
-			swipeDirection: "down",
 			animationDuration: 300,
 			type: "bottomModal",
 			modalStyle: { backgroundColor: "transparent" },

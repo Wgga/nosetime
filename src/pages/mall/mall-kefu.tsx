@@ -25,7 +25,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, toCamelCase } from "../../configs/globalmethod";
+import { Globalstyles, toCamelCase } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Photo from "../../assets/svg/photo.svg";
@@ -366,16 +366,15 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 	const openfiledlg = () => {
 		ActionSheetCtrl.show({
 			key: "filedlg_action_sheet",
+			textStyle: { color: theme.tit2 },
 			buttons: [{
 				text: "拍照",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(0) }, 300);
 				}
 			}, {
 				text: "从相册选择",
-				style: { color: theme.tit2 },
 				handler: () => {
 					ActionSheetCtrl.close("filedlg_action_sheet");
 					setTimeout(() => { buttonClicked(1) }, 300);
@@ -507,7 +506,7 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 					items.current[i].loading = 0;
 					items.current[i].error = 1;
 					backupupload(item);
-					ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_error_toast" });
+					ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_fail_toast" });
 				}
 				return;
 			}
@@ -528,7 +527,7 @@ const MallKefu = React.memo(({ navigation, route }: any) => {
 				setTimeout(() => {
 					item.loading = 0;
 					item.error = 1;
-					if (src) ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_error_toast" });
+					if (src) ToastCtrl.show({ message: "信息发送超时", duration: 1000, viewstyle: "short_toast", key: "msg_fail_toast" });
 				}, 2000);
 			}
 		});

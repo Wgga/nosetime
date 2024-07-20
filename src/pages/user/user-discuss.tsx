@@ -16,11 +16,12 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft } from "../../configs/globalmethod";
+import { Globalstyles, handlestarLeft } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
 import AlertCtrl from "../../components/controller/alertctrl";
+import HandleDesc from "../../components/handledesc";
 
 const { width, height } = Dimensions.get("window");
 
@@ -233,14 +234,6 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
-	const handledesc = (desc: string) => {
-		let sz: any[] = [];
-		sz = desc.replace(/\r/g, "").replace(/\n\n/g, "\n").split(/\n/g).map((item: string, index: number) => {
-			return (<Text key={index} style={styles.item_desc}>{item}</Text>)
-		})
-		return sz;
-	};
-
 	const handledescimg = (desc: string) => {
 		let regex = /<img[^>]+src="([^"]+)">/g;
 		let match, sz: any = [];
@@ -248,6 +241,31 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 			sz.push(<Image key={match[1]} style={Globalstyles.desc_img} source={{ uri: match[1] }} />);
 		}
 		return sz;
+	}
+
+	const open_PhotoPopover = (slideimgindex: number) => {
+		// ModalPortal.show((
+		// 	<PhotoPopover modalparams={{
+		// 		key: "user_photo_popover",
+		// 		slideimgindex,
+		// 		slideimglist: aImages.current,
+		// 	}} />
+		// ), {
+		// 	key: "user_photo_popover",
+		// 	width,
+		// 	height,
+		// 	rounded: false,
+		// 	useNativeDriver: true,
+		// 	onTouchOutside: () => {
+		// 		ModalPortal.dismiss("user_photo_popover");
+		// 	},
+		// 	onHardwareBackPress: () => {
+		// 		ModalPortal.dismiss("user_photo_popover");
+		// 		return true;
+		// 	},
+		// 	animationDuration: 300,
+		// 	modalStyle: { backgroundColor: "transparent" },
+		// })
 	}
 
 	return (
@@ -323,8 +341,20 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 								</View>
 							</View>
 							<View style={type.current != "discuss" && { marginLeft: 60 }}>
-								{item.content && <View style={{ marginTop: 23 }}>{handledesc(item.content)}</View>}
-								{(type.current == "discuss" && item.udpichtml) && <View style={Globalstyles.desc_img_con}>{handledescimg(item.udpichtml)}</View>}
+								{item.content && <HandleDesc
+									containerStyle={{ marginTop: 23 }}
+									itemStyle={styles.item_desc}
+									type="text"
+									item={item}
+									itemKey="content"
+								/>}
+								{(type.current == "discuss" && item.udpichtml) && <HandleDesc
+									containerStyle={Globalstyles.desc_img_con}
+									itemStyle={Globalstyles.desc_img}
+									type="image"
+									item={item}
+									itemKey="udpichtml"
+								/>}
 								<View style={styles.item_btn}>
 									<Text style={styles.item_time}>{item.time}</Text>
 									{us.user.uid == uid.current && <>
