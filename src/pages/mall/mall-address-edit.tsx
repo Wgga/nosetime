@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import HeaderView from "../../components/headerview";
 import Switch from "../../components/switch";
 import LinearButton from "../../components/linearbutton";
-import AlertCtrl from "../../components/alertctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 import WheelPicker from "../../components/wheelpicker";
 import { ModalPortal, SlideAnimation } from "../../components/modals";
 

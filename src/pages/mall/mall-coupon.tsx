@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
 import us from "../../services/user-service/user-service";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import http from "../../utils/api/http";
 

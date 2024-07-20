@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 import { ShadowedView } from "react-native-fast-shadow";
 
-import { ModalPortal } from "./modals";
+import { ModalPortal } from "../modals";
 
-import theme from "../configs/theme";
+import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
 

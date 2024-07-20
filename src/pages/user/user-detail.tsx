@@ -29,8 +29,8 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlestarLeft, toCamelCase, setContentFold } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import ToastCtrl from "../../components/toastctrl";
-import AlertCtrl from "../../components/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 const { width, height } = Dimensions.get("window");
 

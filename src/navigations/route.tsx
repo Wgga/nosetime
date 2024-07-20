@@ -4,7 +4,7 @@ import { BackHandler, StatusBar } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
-import ToastCtrl from "../components/toastctrl";
+import ToastCtrl from "../components/controller/toastctrl";
 
 import Tabs from "../navigations/tabs";
 import Page from "../navigations/page";

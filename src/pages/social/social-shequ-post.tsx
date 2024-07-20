@@ -7,9 +7,9 @@ import { ShadowedView } from "react-native-fast-shadow";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import HeaderView from "../../components/headerview";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import RulesView from "../../components/rulesview";
 
 import upService from "../../services/upload-photo-service/upload-photo-service";

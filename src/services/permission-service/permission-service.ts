@@ -2,8 +2,8 @@ import { Platform, AppState } from "react-native";
 
 import { checkMultiple, requestMultiple, PERMISSIONS } from "react-native-permissions";
 
-import ToastCtrl from "../../components/toastctrl";
-import AlertCtrl from "../../components/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 class PermissionService {
 	private per_toast: any;

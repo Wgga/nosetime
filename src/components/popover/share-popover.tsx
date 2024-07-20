@@ -17,7 +17,7 @@ import WEIBO from "../../assets/svg/share/weibo.svg";
 import QQ from "../../assets/svg/share/qq.svg";
 import Link from "../../assets/svg/share/link.svg";
 import Download from "../../assets/svg/share/download.svg";
-import ToastCtrl from "../toastctrl";
+import ToastCtrl from "../controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 

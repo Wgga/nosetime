@@ -13,8 +13,8 @@ import {
 import { Md5 } from "ts-md5";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import AlertCtrl from "../../components/alertctrl";
-import ToastCtrl from "../../components/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import us from "../../services/user-service/user-service";
 import wechatService from "../../services/wechat-service/wechat-service";

@@ -8,8 +8,8 @@ import FastImage from "react-native-fast-image";
 
 import HeaderView from "../../components/headerview";
 import ListBottomTip from "../../components/listbottomtip";
-import AlertCtrl from "../../components/alertctrl";
-import ToastCtrl from "../../components/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import RnImage from "../../components/RnImage";
 
 import us from "../../services/user-service/user-service";

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
 import HeaderView from "../../components/headerview";
-import AlertCtrl from "../../components/alertctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";

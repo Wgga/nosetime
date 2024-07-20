@@ -10,11 +10,11 @@ import HeaderView from "../../components/headerview";
 import FooterView from "../../components/footerview";
 import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal } from "../../components/modals";
 import AutoHeightWebView from "../../components/autoHeightWebview";
-import AlertCtrl from "../../components/alertctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 import us from "../../services/user-service/user-service";
 import articleService from "../../services/article-service/article-service";

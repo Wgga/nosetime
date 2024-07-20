@@ -9,10 +9,10 @@ import { ShadowedView } from "react-native-fast-shadow";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import AlertCtrl from "../../components/alertctrl";
-import ToastCtrl from "../../components/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import LinearButton from "../../components/linearbutton";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import { ModalPortal } from "../../components/modals";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";

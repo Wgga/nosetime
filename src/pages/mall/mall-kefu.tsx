@@ -11,8 +11,8 @@ import HeaderView from "../../components/headerview";
 import AutoSizeImage from "../../components/autosizeimage";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
-import ToastCtrl from "../../components/toastctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import upService from "../../services/upload-photo-service/upload-photo-service";
 import us from "../../services/user-service/user-service";

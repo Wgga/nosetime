@@ -6,7 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TabBar, TabView } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import us from "../../services/user-service/user-service";
 

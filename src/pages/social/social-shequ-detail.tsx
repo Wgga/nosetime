@@ -9,7 +9,7 @@ import { ShadowedView } from "react-native-fast-shadow";
 import FastImage from "react-native-fast-image";
 
 import HeaderView from "../../components/headerview";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import ListBottomTip from "../../components/listbottomtip";
 import FooterView from "../../components/footerview";
 import { ModalPortal } from "../../components/modals";
@@ -316,14 +316,15 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 			}} MenuChildren={() => {
 				return (
 					<>
-						<Pressable style={Globalstyles.menu_icon_con} onPress={() => { }}>
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
+							setShowMenu(false);
+						}}>
 							<Icon style={Globalstyles.menu_icon} name={like_.current[item0.current.id] ? "heart-checked" : "heart"} size={17}
 								color={like_.current[item0.current.id] ? theme.redchecked : theme.comment} />
 							<Text style={Globalstyles.menu_text}>{"收藏"}</Text>
 						</Pressable>
 						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={() => {
-							navigation.navigate("Page", { screen: "MallCoupon" });
-							setShowMenu(val => !val);
+							setShowMenu(false);
 						}}>
 							<Icon style={Globalstyles.menu_icon} name="report2" size={16} color={theme.comment} />
 							<Text style={Globalstyles.menu_text}>{"举报"}</Text>
@@ -338,9 +339,8 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 						/>
 					</Brightness>
 				</View>
-				<Pressable style={{ zIndex: 1 }} onPress={() => { setShowMenu(val => !val) }}>
-					<Icon name="sandian" size={20} color={theme.toolbarbg} style={styles.title_icon} />
-				</Pressable>
+				<Icon name="sandian" size={20} onPress={() => { setShowMenu(val => !val) }} color={theme.toolbarbg}
+					style={[Globalstyles.title_icon, { zIndex: 1 }]} />
 			</HeaderView>
 			{pagecnt.current > 3 && <>
 				{showPage && <Pressable style={styles.pagemask} onPress={() => { setShowPage(false); }}></Pressable>}
@@ -428,6 +428,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 											<ReplyView data={{
 												contentkey: "desc",
 												timekey: "cttime",
+												idkey: "id",
 												item: hot,
 												likedata: like_.current,
 												isShowSub: false,
@@ -445,6 +446,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 							<ReplyView data={{
 								contentkey: "desc",
 								timekey: "cttime",
+								idkey: "id",
 								item,
 								likedata: like_.current
 							}} method={{
@@ -484,12 +486,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 })
 
 const styles = StyleSheet.create({
-	title_icon: {
-		width: 44,
-		height: 44,
-		textAlign: "center",
-		lineHeight: 44,
-	},
 	pagemask: {
 		...StyleSheet.absoluteFillObject,
 		zIndex: 99,

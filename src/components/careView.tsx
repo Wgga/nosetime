@@ -6,10 +6,10 @@ import { ENV } from "../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop } from "../configs/globalmethod";
 import LinearGradient from "react-native-linear-gradient";
 import ListBottomTip from "./listbottomtip";
-import AlertCtrl from "./alertctrl";
+import AlertCtrl from "./controller/alertctrl";
 import us from "../services/user-service/user-service";
 import http from "../utils/api/http";
-import ToastCtrl from "./toastctrl";
+import ToastCtrl from "./controller/toastctrl";
 
 const CareView = React.memo(({ data, method }: any) => {
 

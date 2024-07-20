@@ -5,9 +5,9 @@ import { Brightness } from "react-native-color-matrix-image-filters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import LinearButton from "../../components/linearbutton";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import upService from "../../services/upload-photo-service/upload-photo-service";
 import us from "../../services/user-service/user-service";

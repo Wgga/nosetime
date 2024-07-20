@@ -1,9 +1,9 @@
 import React from "react";
-import { StyleSheet, Text, TouchableHighlight, View, Pressable, Dimensions, TextInput } from "react-native";
+import { StyleSheet, Text, TouchableHighlight, View, Dimensions } from "react-native";
 
-import { ModalPortal } from "./modals";
+import { ModalPortal } from "../modals";
 
-import theme from "../configs/theme";
+import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
 

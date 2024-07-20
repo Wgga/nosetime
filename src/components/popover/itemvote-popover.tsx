@@ -16,7 +16,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import ToastCtrl from "../toastctrl";
+import ToastCtrl from "../controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 

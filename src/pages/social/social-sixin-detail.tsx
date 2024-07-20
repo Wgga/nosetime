@@ -20,7 +20,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 const SocialSixinDetail = React.memo(({ navigation, route }: any) => {
 

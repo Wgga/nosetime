@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LinearGradient from "react-native-linear-gradient";
 
 import HeaderView from "../../components/headerview";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import ExchangePopover from "../../components/popover/jifen-popover";
 

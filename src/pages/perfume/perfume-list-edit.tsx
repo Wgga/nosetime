@@ -20,7 +20,7 @@ import { Globalstyles } from "../../configs/globalmethod";
 import Icon from "../../assets/iconfont";
 import HeaderView from "../../components/headerview";
 import LinearGradient from "react-native-linear-gradient";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 

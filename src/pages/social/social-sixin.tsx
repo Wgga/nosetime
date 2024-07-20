@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
 
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import ListBottomTip from "../../components/listbottomtip";
 
 import us from "../../services/user-service/user-service";

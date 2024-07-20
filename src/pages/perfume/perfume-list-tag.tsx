@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from "react-native";
 
 import HeaderView from "../../components/headerview";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 import http from "../../utils/api/http";
 

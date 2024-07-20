@@ -6,8 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/headerview";
 import LinearButton from "../../components/linearbutton";
-import AlertCtrl from "../../components/alertctrl";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 
 import us from "../../services/user-service/user-service";
 import upService from "../../services/upload-photo-service/upload-photo-service";

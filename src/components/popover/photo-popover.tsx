@@ -11,10 +11,10 @@ import theme from "../../configs/theme";
 
 import Icon from "../../assets/iconfont";
 import AutoSizeImage from "../autosizeimage";
-import ActionSheetCtrl from "../actionsheetctrl";
-import AlertCtrl from "../alertctrl";
+import ActionSheetCtrl from "../controller/actionsheetctrl";
+import AlertCtrl from "../controller/alertctrl";
 import http from "../../utils/api/http";
-import ToastCtrl from "../toastctrl";
+import ToastCtrl from "../controller/toastctrl";
 import { ENV } from "../../configs/ENV";
 import us from "../../services/user-service/user-service";
 import events from "../../hooks/events";

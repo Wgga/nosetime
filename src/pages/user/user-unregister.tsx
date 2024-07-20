@@ -4,10 +4,10 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 import { Md5 } from "ts-md5";
 
 import HeaderView from "../../components/headerview";
-import AlertCtrl from "../../components/alertctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import { ModalPortal } from "../../components/modals";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";

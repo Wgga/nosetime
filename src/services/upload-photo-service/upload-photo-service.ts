@@ -1,7 +1,7 @@
 import ImagePicker from "react-native-image-crop-picker";
 
-import ToastCtrl from "../../components/toastctrl";
-import AlertCtrl from "../../components/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 import permissionService from "../permission-service/permission-service";
 import us from "../user-service/user-service";
@@ -11,7 +11,7 @@ import http from "../../utils/api/http";
 import events from "../../hooks/events";
 
 import { ENV } from "../../configs/ENV";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import theme from "../../configs/theme";
 
 class UploadPhotoService {

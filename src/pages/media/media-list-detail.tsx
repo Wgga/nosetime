@@ -24,8 +24,8 @@ import { Globalstyles, toCamelCase, display } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import ReplyView from "../../components/replyview";
-import ActionSheetCtrl from "../../components/actionsheetctrl";
-import ToastCtrl from "../../components/toastctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 
 const MediaListDetail = React.memo(({ navigation, route }: any) => {
@@ -506,6 +506,7 @@ const MediaListDetail = React.memo(({ navigation, route }: any) => {
 						<ReplyView data={{
 							contentkey: "content",
 							timekey: "mctime",
+							idkey: "id",
 							item,
 							likedata: like_.current
 						}} method={{

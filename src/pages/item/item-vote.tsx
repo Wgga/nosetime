@@ -7,9 +7,9 @@ import Slider from "@react-native-community/slider";
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ActionSheetCtrl from "../../components/actionsheetctrl";
-import AlertCtrl from "../../components/alertctrl";
-import ToastCtrl from "../../components/toastctrl";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import ItemVotePopover from "../../components/popover/itemvote-popover";
 import HeaderView from "../../components/headerview";

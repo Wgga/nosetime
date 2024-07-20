@@ -8,7 +8,7 @@ import reactNativeTextSize from "react-native-text-size";
 
 import StickyHeader from "../../components/StickyHeader";
 import HeaderView from "../../components/headerview";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal } from "../../components/modals";
 

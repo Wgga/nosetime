@@ -20,7 +20,7 @@ import { Globalstyles, handlestarLeft } from "../../configs/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
-import AlertCtrl from "../../components/alertctrl";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -158,7 +158,8 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 				params: { type, optionaltype: type, id: item.id, name: item.cnname, enname: item.enname, }
 			});
 		} else if (page == "discuss-reply") {
-			navigation.navigate("Page", { screen: "DiscussReply", params: { id: item.id, udid: item.udid, title: name.current + title["discuss"], src: "user" } });
+			item["udiid"] = item.id;
+			navigation.navigate("Page", { screen: "DiscussReply", params: { item, id: item.id, udid: item.udid, title: name.current + title["discuss"], src: "user" } });
 		}
 	}
 

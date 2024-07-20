@@ -13,7 +13,7 @@ const { width, height } = Dimensions.get("window");
 
 const ReplyItem = React.memo(({ data, method = {} }: any) => {
 
-	const { contentkey, timekey, item, islike } = data;
+	const { contentkey, timekey, parentitem, item, islike } = data;
 	const { reply_menu, like_reply, reply } = method;
 
 	const handledesc = (desc: string) => {
@@ -41,7 +41,13 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 							/>
 						</View>}
 					</View>
-					<Pressable hitSlop={10} onPress={() => { reply_menu(item) }}>
+					<Pressable hitSlop={10} onPress={() => {
+						if (parentitem) {
+							reply_menu(item, parentitem)
+						} else {
+							reply_menu(item)
+						}
+					}}>
 						<Icon name="shequsandian" size={16} color={theme.placeholder} />
 					</Pressable>
 				</View>
@@ -60,14 +66,14 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 
 const ReplyView = React.memo(({ data, method = {} }: any) => {
 
-	const { contentkey, timekey, item, likedata, isShowSub } = data;
+	const { contentkey, timekey, idkey, item, likedata, isShowSub } = data;
 	const { reply_menu, like_reply, reply } = method;
 
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	return (
 		<View style={styles.list_item}>
-			<ReplyItem data={{ contentkey, timekey, item, islike: likedata[item.id] }} method={{ reply_menu, like_reply, reply }} />
+			<ReplyItem data={{ contentkey, timekey, item, islike: likedata[item[idkey]] }} method={{ reply_menu, like_reply, reply }} />
 			{(isShowSub || (item.sub && item.sub.length > 0)) && <View style={styles.list_sub_item}>
 				{item.sub.map((sub: any, index: number) => {
 					return (
@@ -75,8 +81,9 @@ const ReplyView = React.memo(({ data, method = {} }: any) => {
 							{show_items(item.sub, index) && <ReplyItem data={{
 								contentkey,
 								timekey,
+								parentitem: item,
 								item: sub,
-								islike: likedata[sub.id]
+								islike: likedata[sub[idkey]]
 							}} method={{ reply_menu, like_reply, reply }} />}
 						</View>
 					)

@@ -7,7 +7,7 @@ import { Brightness } from "react-native-color-matrix-image-filters";
 import { useFocusEffect } from "@react-navigation/native";
 import { ShadowedView } from "react-native-fast-shadow";
 
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import GiftcodePopover from "../../components/popover/giftcode-popover";

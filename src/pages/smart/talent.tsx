@@ -13,7 +13,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../configs/globalmethod";
 
 import us from "../../services/user-service/user-service";
-import ToastCtrl from "../../components/toastctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 import LinearGradient from "react-native-linear-gradient";
 import CareView from "../../components/careView";
 
