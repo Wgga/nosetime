@@ -382,6 +382,8 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			navigation.push("Page", { screen: "UserFriend", params: { uid: uid.current, carecnt: info.current.care, name: info.current.uname, fanscnt: info.current.fans, } });
 		} else if (page == "social-sixin-detail") {
 			navigation.navigate("Page", { screen: "SocialSixinDetail", params: { fromuser: { uid: uid.current, uname: info.current.uname, uface: info.current.uface } } });
+		} else if (page == "perfume-list-detail") {
+			navigation.push("Page", { screen: "PerfumeListDetail", params: { id: item.cid } });
 		} else {
 			let screen = toCamelCase(page);
 			navigation.navigate("Page", { screen: screen, params: { uid: uid.current } });
@@ -756,12 +758,12 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 								}
 								renderItem={({ item }: any) => {
 									return (
-										<View style={styles.perfume_item}>
+										<Pressable style={styles.perfume_item} onPress={() => { gotodetail("perfume-list-detail", item) }}>
 											<Image style={styles.item_image}
 												source={{ uri: ENV.image + item.cpic + "!l" }}
 											/>
 											<Text numberOfLines={2} style={styles.item_cname}>{item.cname}</Text>
-										</View>
+										</Pressable>
 									)
 								}}
 							/>
@@ -1135,6 +1137,7 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		padding: 5,
 		flexGrow: 1,
+		flexBasis: 0,
 	},
 	tabbar_num: {
 		fontSize: 11,
@@ -1150,6 +1153,7 @@ const styles = StyleSheet.create({
 	page_tabbar: {
 		height: 60,
 		flexGrow: 1,
+		flexBasis: 0,
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -1366,6 +1370,7 @@ const styles = StyleSheet.create({
 	},
 	style_item: {
 		flexGrow: 1,
+		flexBasis: 0,
 		alignItems: "center",
 	},
 	style_outbar: {

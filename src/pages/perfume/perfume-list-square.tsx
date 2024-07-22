@@ -15,16 +15,17 @@ import { ENV } from "../../configs/ENV";
 const { width, height } = Dimensions.get("window");
 
 
-const Item = React.memo(({ item, imgstyle, textstyle }: any) => {
+const Item = React.memo(({ item, imgstyle, textstyle, gotodetail }: any) => {
+
 	return (
-		<View style={{ paddingHorizontal: 8 }}>
+		<Pressable style={{ paddingHorizontal: 8 }} onPress={() => { gotodetail("perfume-list-detail", item) }}>
 			<View style={imgstyle}>
 				<FastImage style={{ width: "100%", height: "100%" }}
 					source={{ uri: ENV.image + item.cpic + "!l" }}
 				/>
 			</View>
 			<Text numberOfLines={1} style={textstyle}>{item.cname}</Text>
-		</View>
+		</Pressable>
 	)
 })
 
@@ -120,9 +121,11 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 		})
 	}
 
-	const gotodetail = (page: string, item: any = null) => {
+	const gotodetail = (page: string, item?: any) => {
 		if (page == "perfume-list-tag") {
 			navigation.navigate("Page", { screen: "PerfumeListTag", params: { tags: tags.current, src: "square" } });
+		} else if (page == "perfume-list-detail") {
+			navigation.navigate("Page", { screen: "PerfumeListDetail", params: { id: item.cid } })
 		} else {
 			navigation.navigate("Page", { screen: page, params: { id: item.cid } });
 		}
@@ -164,7 +167,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 							keyExtractor={(item: any) => item.cid}
 							renderItem={({ item }: any) => {
 								return (
-									<Item item={item}
+									<Item item={item} gotodetail={gotodetail}
 										imgstyle={[styles.item_img, styles.list_img]}
 										textstyle={[styles.item_text, styles.list_text]}
 									/>
@@ -181,7 +184,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 							keyExtractor={(item: any) => item.cid}
 							renderItem={({ item }: any) => {
 								return (
-									<Item item={item}
+									<Item item={item} gotodetail={gotodetail}
 										imgstyle={[styles.item_img, styles.list_img]}
 										textstyle={[styles.item_text, styles.list_text]}
 									/>
@@ -196,7 +199,7 @@ function PerfumeListSquare({ navigation, route }: any): React.JSX.Element {
 				onEndReached={loadMore}
 				renderItem={({ item }: any) => {
 					return (
-						<Item item={item}
+						<Item item={item} gotodetail={gotodetail}
 							imgstyle={styles.item_img}
 							textstyle={styles.item_text}
 						/>

@@ -30,7 +30,7 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 	return (
 		<View style={styles.reply_item}>
 			<FastImage style={styles.reply_avatar}
-				source={{ uri: ENV.avatar + item.uid + ".jpg?!l" + item.uface }}
+				source={{ uri: ENV.avatar + item.uid + ".jpg!l?" + item.uface }}
 				resizeMode="contain"
 			/>
 			<View style={{ flex: 1, marginLeft: 11 }}>

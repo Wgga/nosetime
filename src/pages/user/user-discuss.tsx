@@ -411,6 +411,7 @@ const styles = StyleSheet.create({
 		lineHeight: 45,
 		textAlign: "center",
 		flexGrow: 1,
+		flexBasis: 0,
 	},
 	discuss_item: {
 		padding: 15,

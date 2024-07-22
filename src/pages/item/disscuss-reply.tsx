@@ -501,7 +501,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 				<View style={[Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Brightness amount={0.85}>
 						<Image style={{ width: "100%", height: "100%" }} blurRadius={40}
-							source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg?!l" + discuss.current.uface }}
+							source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg!l?" + discuss.current.uface }}
 						/>
 					</Brightness>
 				</View>
@@ -528,7 +528,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 					ListHeaderComponent={<View style={styles.discuss_head_con}>
 						<View style={{ flexDirection: "row" }}>
 							{discuss.current.replyuid && <Pressable style={styles.user_avatar} onPress={() => { gotodetail("user-detail", discuss.current.replyuid) }}>
-								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg?!l" + discuss.current.uface }} />
+								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg!l?" + discuss.current.uface }} />
 							</Pressable>}
 							{discuss.current.score >= 0 && !discuss.current.replyuid && <Pressable style={styles.user_avatar} onPress={() => { gotodetail("item-detail", discuss.current.id) }}>
 								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + "/perfume/" + discuss.current.id + ".jpg!l" }} />

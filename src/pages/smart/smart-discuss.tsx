@@ -15,7 +15,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlestarLeft } from "../../utils/globalmethod";
+import { Globalstyles, handlestarLeft, toCamelCase } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
@@ -85,11 +85,14 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 		})
 	}
 
-	const gotodetail = (page: string, item: any = null) => {
+	const gotodetail = (page: string, item?: any) => {
 		if (page == "item-detail") {
 			navigation.navigate("Page", { screen: "ItemDetail", params: { id: item.id, src: "APP新鲜事" } });
+		} else if (page == "perfume-list-detail") {
+			navigation.navigate("Page", { screen: "PerfumeListDetail", params: { id: item.cid } });
 		} else {
-			navigation.navigate("Page", { screen: page });
+			let screen = toCamelCase(page);
+			navigation.navigate("Page", { screen });
 		}
 	}
 
@@ -106,9 +109,7 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 				contentContainerStyle={{ backgroundColor: theme.toolbarbg }}
 				keyExtractor={(item: any) => item.id + "_" + item.uid}
 				ListHeaderComponent={<View style={Globalstyles.container}>
-					<Pressable onPress={() => {
-						gotodetail("Talent");
-					}} style={[styles.like_con, styles.flex_row]}>
+					<Pressable onPress={() => { gotodetail("talent") }} style={[styles.like_con, styles.flex_row]}>
 						<Text style={styles.flex_row_tit}>{"资深评论家"}</Text>
 						<View style={styles.flex_row}>
 							{(talentTop.current && talentTop.current.length > 0) && talentTop.current.map((item: any, index: number) => {
@@ -121,21 +122,20 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 							<Icon name="r-return" size={15} color={theme.tit2} />
 						</View>
 					</Pressable>
-					<Pressable onPress={() => {
-						gotodetail("PerfumeListSquare");
-					}} style={[styles.perfume_tit_con, styles.flex_row]}>
+					<Pressable onPress={() => { gotodetail("perfume-list-square") }} style={[styles.perfume_tit_con, styles.flex_row]}>
 						<Text style={styles.flex_row_tit}>{"香单广场"}</Text>
 						<Icon name="r-return" size={15} color={theme.tit2} />
 					</Pressable>
 					<View style={styles.perfume_list_con}>
 						{(perfumelist.current && perfumelist.current.length > 0) && perfumelist.current.map((item: any, index: number) => {
 							return (
-								<View key={item.cid} style={[styles.perfume_item, { marginRight: (index + 1) % 3 == 0 ? 0 : 10 }]}>
+								<Pressable key={item.cid} style={[styles.perfume_item, { marginRight: (index + 1) % 3 == 0 ? 0 : 10 }]}
+									onPress={() => { gotodetail("perfume-list-detail", item) }}>
 									<Image style={styles.perfume_item_img} defaultSource={require("../../assets/images/nopic.png")}
 										source={{ uri: ENV.image + item.cpic + "!l" }}
 									/>
 									<Text numberOfLines={2} style={styles.perfume_item_desc}>{item.cname}</Text>
-								</View>
+								</Pressable>
 							)
 						})}
 					</View>
@@ -143,25 +143,15 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 				renderItem={({ item, index }: any) => {
 					return (
 						<View style={styles.smartlist_item_con}>
-							<Pressable onPress={() => {
-								gotodetail("item-detail", item);
-							}}>
-								<Image style={styles.item_img} defaultSource={require("../../assets/images/noxx.png")}
+							<Pressable style={styles.item_img} onPress={() => { gotodetail("item-detail", item) }}>
+								<Image style={{ width: "100%", height: "100%" }} defaultSource={require("../../assets/images/noxx.png")}
 									source={{ uri: ENV.image + "/perfume/" + item.id + ".jpg!m" }}
 									resizeMode="contain"
 								/>
 							</Pressable>
-							<View style={styles.item_info}>
-								<Pressable onPress={() => {
-									gotodetail("item-detail", item);
-								}}>
-									<Text numberOfLines={1} style={styles.item_cnname}>{item.cnname}</Text>
-								</Pressable>
-								<Pressable onPress={() => {
-									gotodetail("item-detail", item);
-								}}>
-									<Text numberOfLines={1} style={styles.item_enname}>{item.enname}</Text>
-								</Pressable>
+							<View style={{ flex: 1 }}>
+								{item.cnname && <Text numberOfLines={1} style={styles.item_cnname} onPress={() => { gotodetail("item-detail", item) }}>{item.cnname}</Text>}
+								{item.enname && <Text numberOfLines={1} style={styles.item_enname} onPress={() => { gotodetail("item-detail", item) }}>{item.enname}</Text>}
 								<View style={styles.item_uname}>
 									<Text style={styles.item_uname_text}>{item.uname}</Text>
 									{item.score > 0 && <View style={Globalstyles.star}>
@@ -268,9 +258,6 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		marginRight: 9,
 		backgroundColor: theme.toolbarbg,
-	},
-	item_info: {
-		flex: 1,
 	},
 	item_cnname: {
 		fontSize: 14,

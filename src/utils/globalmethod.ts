@@ -439,6 +439,7 @@ const Globalstyles: any = StyleSheet.create({
 	},
 	tab_tit: {
 		flexGrow: 1,
+		flexBasis: 0,
 		height: 40,
 		alignItems: "center",
 		justifyContent: "center",

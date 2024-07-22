@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
 	},
 	tabbar: {
 		flexGrow: 1,
+		flexBasis: 0,
 		paddingVertical: 16,
 		alignItems: "center"
 	},
