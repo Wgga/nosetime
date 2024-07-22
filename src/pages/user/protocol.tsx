@@ -3,13 +3,13 @@ import { View } from "react-native";
 
 import { WebView } from "react-native-webview";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../utils/globalmethod";
 
 function Protocol({ navigation, route }: any): React.JSX.Element {
 

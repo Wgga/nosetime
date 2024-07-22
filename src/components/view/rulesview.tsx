@@ -2,11 +2,11 @@ import React from "react";
 
 import { Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
-import theme from "../configs/theme";
+import theme from "../../configs/theme";
 
-import Icon from "../assets/iconfont";
-import RulesPopover from "./popover/rules-popover";
-import { ModalPortal } from "./modals";
+import Icon from "../../assets/iconfont";
+import RulesPopover from "../popover/rules-popover";
+import { ModalPortal } from "../modals";
 
 const { width, height } = Dimensions.get("window");
 

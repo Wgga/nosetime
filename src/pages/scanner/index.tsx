@@ -1,20 +1,11 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Easing } from "react-native";
+import { View, StyleSheet, Dimensions, Animated, Easing } from "react-native";
 
 import { Camera, CodeScanner, useCameraDevice } from "react-native-vision-camera";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import us from "../../services/user-service/user-service";
-
-import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage";
-import events from "../../hooks/events";
-
 import theme from "../../configs/theme";
-import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import LinearGradient from "react-native-linear-gradient";

@@ -10,7 +10,7 @@ import { ShadowedView } from "react-native-fast-shadow";
 import Svg, { Ellipse } from "react-native-svg";
 import WebView from "react-native-webview";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
 import RadarChart from "../../components/radarchart";

@@ -4,9 +4,9 @@ import { View, Text, StyleSheet, Pressable, TextInput, Animated, Easing, Dimensi
 import { ShadowedView } from "react-native-fast-shadow";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import Icon from "../assets/iconfont";
+import Icon from "../../assets/iconfont";
 
-import theme from "../configs/theme";
+import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
 

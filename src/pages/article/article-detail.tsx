@@ -6,14 +6,14 @@ import Orientation from "react-native-orientation-locker";
 import FastImage from "react-native-fast-image";
 import { useFocusEffect } from "@react-navigation/native";
 
-import HeaderView from "../../components/headerview";
-import FooterView from "../../components/footerview";
+import HeaderView from "../../components/view/headerview";
+import FooterView from "../../components/view/footerview";
 import VideoPlayer from "../../components/videoplayer";
 import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/controller/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal } from "../../components/modals";
-import AutoHeightWebView from "../../components/autoHeightWebview";
+import AutoHeightWebView from "../../components/autoHeightWebView";
 import AlertCtrl from "../../components/controller/alertctrl";
 
 import us from "../../services/user-service/user-service";
@@ -648,9 +648,9 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 
 	return (
 		<>
-			{/* {loading && <View style={Globalstyles.loading_con}>
+			{loading && <View style={Globalstyles.loading_con}>
 				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
-			</View>} */}
+			</View>}
 			<HeaderView data={{
 				title: !articledata.current.mp4URL ? articledata.current.title2 : articledata.current.title,
 				isShowSearch: false,
@@ -798,8 +798,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 							{item.uid > 0 && <View style={styles.replyitem_uname_con}>
 								<Text style={styles.replyitem_uname}>{item.uname}</Text>
 								{item.ulevel > 0 && <View style={Globalstyles.level}>
-									<Image
-										style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+									<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 										defaultSource={require("../../assets/images/nopic.png")}
 										source={require("../../assets/images/level.png")}
 									/>
@@ -853,8 +852,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 													<View style={styles.replysub_uname_con}>
 														<Text style={styles.replysub_uname}>{sub.uname}</Text>
 														{sub.ulevel > 0 && <View style={Globalstyles.level}>
-															<Image
-																style={[Globalstyles.level_icon, handlelevelLeft(sub.ulevel), handlelevelTop(sub.ulevel)]}
+															<Image style={[Globalstyles.level_icon, handlelevelLeft(sub.ulevel), handlelevelTop(sub.ulevel)]}
 																defaultSource={require("../../assets/images/nopic.png")}
 																source={require("../../assets/images/level.png")}
 															/>

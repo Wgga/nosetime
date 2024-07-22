@@ -3,7 +3,7 @@ import { Image, View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from
 
 import { FlashList } from "@shopify/flash-list";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
 import RnImage from "../../components/RnImage";
 
@@ -469,8 +469,7 @@ const ItemView = React.memo(({ tab, currentword, navigation }: any) => {
 										<View style={Globalstyles.item_flex}>
 											<Text numberOfLines={1}>{item.uname}</Text>
 											{item.ulevel > 0 && <View style={Globalstyles.level}>
-												<Image
-													style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+												<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
 													defaultSource={require("../../assets/images/nopic.png")}
 													source={require("../../assets/images/level.png")}
 												/>

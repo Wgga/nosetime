@@ -2,17 +2,17 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image } from "react-native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ToastCtrl from "../../components/controller/toastctrl";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

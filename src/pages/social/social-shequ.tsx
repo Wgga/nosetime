@@ -13,13 +13,13 @@ import ListBottomTip from "../../components/listbottomtip";
 import shequService from "../../services/shequ-service/shequ-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

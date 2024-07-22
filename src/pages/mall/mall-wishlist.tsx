@@ -1,27 +1,22 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image, FlatList } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import Swipeable from "../../components/swipeable";
 
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import Sample from "../../assets/svg/sample.svg";
 import Bottle from "../../assets/svg/bottle.svg";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-const { width, height } = Dimensions.get("window");
 
 function MallWishList({ navigation }: any): React.JSX.Element {
 	// 控件

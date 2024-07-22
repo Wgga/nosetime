@@ -3,11 +3,11 @@ import { Text, StyleSheet, View, Image, Pressable } from "react-native";
 
 import FastImage from "react-native-fast-image";
 
-import theme from "../configs/theme";
-import { ENV } from "../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../utils/globalmethod";
+import theme from "../../configs/theme";
+import { ENV } from "../../configs/ENV";
+import { Globalstyles, handlelevelLeft, handlelevelTop, show_items, display } from "../../utils/globalmethod";
 
-import Icon from "../assets/iconfont";
+import Icon from "../../assets/iconfont";
 
 const ReplyItem = React.memo(({ data, method = {} }: any) => {
 
@@ -39,8 +39,8 @@ const ReplyItem = React.memo(({ data, method = {} }: any) => {
 						<Text style={[styles.info_name, { fontSize: 13 }]}>{item.uname}</Text>
 						{item.ulevel > 0 && <View style={Globalstyles.level}>
 							<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-								defaultSource={require("../assets/images/nopic.png")}
-								source={require("../assets/images/level.png")}
+								defaultSource={require("../../assets/images/nopic.png")}
+								source={require("../../assets/images/level.png")}
 							/>
 						</View>}
 					</View>

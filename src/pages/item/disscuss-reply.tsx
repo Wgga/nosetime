@@ -7,11 +7,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 
 import ToastCtrl from "../../components/controller/toastctrl";
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
-import ReplyView from "../../components/replyview";
+import ReplyView from "../../components/view/replyview";
 import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
-import FooterView from "../../components/footerview";
+import FooterView from "../../components/view/footerview";
 import ReportPopover from "../../components/popover/report-popover";
 import { ModalPortal } from "../../components/modals";
 
@@ -24,7 +24,7 @@ import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, unitNumber } from "../../utils/globalmethod";
+import { Globalstyles, handlelevelLeft, handlelevelTop, handlestarLeft, toCamelCase, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import AlertCtrl from "../../components/controller/alertctrl";
@@ -71,6 +71,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 	const [isfocus, setIsFocus] = React.useState(false); // 是否聚焦输入框
 
+	// 进入页面触发
 	React.useEffect(() => {
 		if (route.params) {
 			id.current = route.params.id ? route.params.id : 0;
@@ -97,11 +98,18 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 			showFooterMask(val);
 		})
 
+		cache.getItem(classname + "publish" + id.current).then((cacheobj) => {
+			if (cacheobj && cacheobj.replytext != "") {
+				replyinfo.current = cacheobj;
+			}
+		}).catch(() => { });
+
 		return () => {
 			events.unsubscribe(classname + id.current + "isShowKeyboard");
 		}
 	}, []);
 
+	// 初始化
 	const init = () => {
 		http.get(ENV.item + "?method=maindiscuss&id=" + id.current +
 			"&udid=" + udid.current +
@@ -114,6 +122,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
+	// 设置香评数据
 	const setdiscuss = (data: any) => {
 		if (!data || !data.udid) {
 			ToastCtrl.show({ message: "内容已被删除，无法查看", duration: 1000, viewstyle: "medium_toast", key: "content_empty_toast" });
@@ -130,6 +139,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		loadMore("init");
 	}
 
+	// 是否点赞香评
 	const islike_disucss = (ids: any) => {
 		if (!us.user.uid) return;
 		Promise.all([
@@ -145,6 +155,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 加载香评回复
 	const loadMore = (type: string) => {
 		if (type == "init") {
 			curpage.current = 1;
@@ -164,6 +175,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
+	// 是否点赞香评回复
 	const islike_replydiscuss = (resp: any) => {
 		if (!us.user.uid) {
 			setIsRender(val => !val);
@@ -184,9 +196,15 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		});
 	}
 
-	const gotodetail = (item: any) => {
+	const gotodetail = (page: any, id: number) => {
+		if (page == "user-detail") {
+			navigation.push("Page", { screen: "UserDetail", params: { uid: id } });
+		} else if (page == "item-detail") {
+			navigation.push("Page", { screen: "ItemDetail", params: { id } });
+		}
 	}
 
+	// 香评点赞
 	const postdiscussup = (type: number) => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
@@ -216,6 +234,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 香评回复点赞
 	const like_reply = (item: any) => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
@@ -363,7 +382,6 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 				ModalPortal.dismiss("discussreport_popover");
 				return true;
 			},
-			swipeDirection: "down",
 			animationDuration: 300,
 			type: "bottomModal",
 			modalStyle: { backgroundColor: "transparent" },
@@ -404,7 +422,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 			replyinfo.current.refuid = 0;
 			replyinfo.current.refurid = 0;
 			replyinfo.current.refuname = "";
-			replyinfo.current.holder = '写跟帖';
+			replyinfo.current.holder = "写跟帖";
 		} else {
 			replyinfo.current.refuid = item.uid;
 			replyinfo.current.refurid = item.urid;
@@ -416,8 +434,35 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 		setIsRender(val => !val);
 	}
 
+	// 发布香评回复
 	const publish = () => {
+		let replytext = replyinfo.current.replytext.trim();
+		if (replytext == "") return;
 
+		cache.saveItem(classname + "publish" + id.current, replyinfo.current, 30 * 24 * 3600);
+
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
+		}
+
+		http.post(ENV.item + "?method=postdiscussreplyv2&id=" + id.current + "&uid=" + us.user.uid, {
+			token: us.user.token, content: replytext, udid: discuss.current.udid,
+			uduid: discuss.current.replyuid, refuid: replyinfo.current.refuid, refurid: replyinfo.current.refurid
+		}).then((resp_data: any) => {
+			Keyboard.dismiss();
+			if (resp_data.msg == "OK") {
+				cache.removeItem("ItemDetailPage" + "publish" + id.current);
+				cache.removeItem(classname + "publish" + id.current);
+				ToastCtrl.show({ message: "发布成功", duration: 1000, viewstyle: "short_toast", key: "publish_success_toast" });
+				replyinfo.current.replytext = "";
+				loadMore("init");
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App香评详情页" } });
+			} else {
+				ToastCtrl.show({ message: "发布结果：" + resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "publish_err_toast" });
+			}
+		});
 	}
 
 	return (
@@ -482,22 +527,25 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 					keyExtractor={(item: any) => item.urid}
 					ListHeaderComponent={<View style={styles.discuss_head_con}>
 						<View style={{ flexDirection: "row" }}>
-							<Image style={styles.user_avatar} source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg?!l" + discuss.current.uface }} />
+							{discuss.current.replyuid && <Pressable style={styles.user_avatar} onPress={() => { gotodetail("user-detail", discuss.current.replyuid) }}>
+								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg?!l" + discuss.current.uface }} />
+							</Pressable>}
+							{discuss.current.score >= 0 && !discuss.current.replyuid && <Pressable style={styles.user_avatar} onPress={() => { gotodetail("item-detail", discuss.current.id) }}>
+								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + "/perfume/" + discuss.current.id + ".jpg!l" }} />
+							</Pressable>}
 							<View style={{ marginLeft: 10, flex: 1 }}>
 								{src.current != "user" && <View style={[Globalstyles.item_flex, { marginBottom: 5 }]}>
-									<Text numberOfLines={1} style={styles.user_uname} onPress={() => { }}>{discuss.current.uname}</Text>
+									<Text numberOfLines={1} style={styles.user_uname} onPress={() => { gotodetail("item-detail", discuss.current.replyuid) }}>{discuss.current.uname}</Text>
 									{discuss.current.ulevel > 0 && <View style={Globalstyles.level}>
-										<Image
-											style={[Globalstyles.level_icon, handlelevelLeft(discuss.current.ulevel), handlelevelTop(discuss.current.ulevel)]}
+										<Image style={[Globalstyles.level_icon, handlelevelLeft(discuss.current.ulevel), handlelevelTop(discuss.current.ulevel)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/level.png")}
 										/>
 									</View>}
 								</View>}
-								{src.current == "user" && <Text style={[styles.user_uname, { marginBottom: 5 }]} onPress={() => { }}>{discuss.current.name}</Text>}
+								{src.current == "user" && <Text style={[styles.user_uname, { marginBottom: 5 }]} onPress={() => { gotodetail("item-detail", discuss.current.id) }}>{discuss.current.name}</Text>}
 								{discuss.current.uwscore > 0 && <View style={Globalstyles.star}>
-									<Image
-										style={[Globalstyles.star_icon, handlestarLeft(discuss.current.uwscore * 2)]}
+									<Image style={[Globalstyles.star_icon, handlestarLeft(discuss.current.uwscore * 2)]}
 										defaultSource={require("../../assets/images/nopic.png")}
 										source={require("../../assets/images/star/star.png")}
 									/>
@@ -592,6 +640,7 @@ const styles = StyleSheet.create({
 		width: 40,
 		height: 40,
 		borderRadius: 50,
+		overflow: "hidden",
 	},
 	user_uname: {
 		fontSize: 14,

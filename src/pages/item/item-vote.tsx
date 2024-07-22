@@ -12,20 +12,20 @@ import AlertCtrl from "../../components/controller/alertctrl";
 import ToastCtrl from "../../components/controller/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import ItemVotePopover from "../../components/popover/itemvote-popover";
-import HeaderView from "../../components/headerview";
-import RulesView from "../../components/rulesview";
+import HeaderView from "../../components/view/headerview";
+import RulesView from "../../components/view/rulesview";
 
 import us from "../../services/user-service/user-service";
 import upService from "../../services/upload-photo-service/upload-photo-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 import StarUnCheck from "../../assets/svg/star/search/star_uncheck.svg";

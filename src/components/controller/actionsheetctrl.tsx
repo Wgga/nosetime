@@ -90,18 +90,19 @@ const styles = StyleSheet.create({
 	action_sheet_button: {
 		backgroundColor: theme.toolbarbg,
 		overflow: "hidden",
+		borderTopWidth: 1,
+		borderTopColor: theme.bg,
 	},
 	action_sheet_button1: {
 		borderTopLeftRadius: 12,
 		borderTopRightRadius: 12,
 		borderRadius: 0,
+		borderTopWidth: 0,
 	},
 	action_sheet_button2: {
 		borderBottomLeftRadius: 12,
 		borderBottomRightRadius: 12,
 		borderRadius: 0,
-		borderTopWidth: 1,
-		borderTopColor: theme.bg,
 	},
 	action_sheet_cancel_button: {
 		borderRadius: 12,

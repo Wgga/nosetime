@@ -7,7 +7,7 @@ import { ShadowedView } from "react-native-fast-shadow";
 import reactNativeTextSize from "react-native-text-size";
 
 import StickyHeader from "../../components/StickyHeader";
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ToastCtrl from "../../components/controller/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal } from "../../components/modals";
@@ -454,13 +454,11 @@ const ItemHeader = React.memo(({ itemid, navigation, method }: any) => {
 									{itemdata.current.isscore > 0 && <Text style={styles.card_scores_text}>{itemdata.current.isscore}</Text>}
 									{itemdata.current.isscore == 0 && <Text style={styles.card_noscores_text}>{"暂无评分"}</Text>}
 									<View style={Globalstyles.star}>
-										{itemdata.current.s0 == 1 && <Image
-											style={[Globalstyles.star_icon, handlestarLeft(itemdata.current.s1)]}
+										{itemdata.current.s0 == 1 && <Image style={[Globalstyles.star_icon, handlestarLeft(itemdata.current.s1)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/star/starcard.png")}
 										/>}
-										{itemdata.current.s0 == 0 && <Image
-											style={[Globalstyles.star_icon, handlestarLeft(itemdata.current.s1)]}
+										{itemdata.current.s0 == 0 && <Image style={[Globalstyles.star_icon, handlestarLeft(itemdata.current.s1)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/star/replystar.png")}
 										/>}

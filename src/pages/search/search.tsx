@@ -3,18 +3,18 @@ import { View, Text, StyleSheet, Pressable,  } from "react-native";
 
 import { useFocusEffect } from "@react-navigation/native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 import searchService from "../../services/search-service/search-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

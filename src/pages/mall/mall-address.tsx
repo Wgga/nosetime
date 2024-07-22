@@ -2,23 +2,21 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import AlertCtrl from "../../components/controller/alertctrl";
 import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import { useFocusEffect } from "@react-navigation/native";
 
 const MallAddress = React.memo(({ navigation }: any) => {
 	// 控件

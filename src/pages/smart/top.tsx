@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-nati
 import { FlashList } from "@shopify/flash-list";
 import FastImage from "react-native-fast-image";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import StarImage from "../../components/starimage";
 import ListBottomTip from "../../components/listbottomtip";
 
@@ -13,12 +13,12 @@ import us from "../../services/user-service/user-service";
 import searchService from "../../services/search-service/search-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

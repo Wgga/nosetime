@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-nati
 
 import { FlashList } from "@shopify/flash-list";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
 
 import us from "../../services/user-service/user-service";

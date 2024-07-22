@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, TextInput } 
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import Switch from "../../components/switch";
 import LinearButton from "../../components/linearbutton";
 import AlertCtrl from "../../components/controller/alertctrl";
@@ -13,6 +13,7 @@ import { ModalPortal, SlideAnimation } from "../../components/modals";
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
@@ -21,7 +22,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { Globalstyles } from "../../utils/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 

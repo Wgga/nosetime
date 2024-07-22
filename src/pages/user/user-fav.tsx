@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TabBar, TabView } from "react-native-tab-view";
 import FastImage from "react-native-fast-image";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
 import AlertCtrl from "../../components/controller/alertctrl";
 import ToastCtrl from "../../components/controller/toastctrl";
@@ -499,8 +499,7 @@ const DiscussPage = React.memo(({ uid, navigation }: any) => {
 									</View>}
 								</View>
 								{item.score > 0 && <View style={Globalstyles.star}>
-									<Image
-										style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+									<Image style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
 										defaultSource={require("../../assets/images/nopic.png")}
 										source={require("../../assets/images/star/star.png")}
 									/>

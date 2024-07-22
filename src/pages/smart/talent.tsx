@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, FlatList, Image } from "react-native";
 
 import FastImage from "react-native-fast-image";
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 import http from "../../utils/api/http";
 
@@ -15,7 +15,7 @@ import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globa
 import us from "../../services/user-service/user-service";
 import ToastCtrl from "../../components/controller/toastctrl";
 import LinearGradient from "react-native-linear-gradient";
-import CareView from "../../components/careView";
+import CareView from "../../components/view/careview";
 
 function Talent({ navigation }: any): React.JSX.Element {
 	// 控件

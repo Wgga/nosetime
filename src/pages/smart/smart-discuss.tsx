@@ -165,8 +165,7 @@ const SmartDiscuss = React.memo(({ navigation }: any) => {
 								<View style={styles.item_uname}>
 									<Text style={styles.item_uname_text}>{item.uname}</Text>
 									{item.score > 0 && <View style={Globalstyles.star}>
-										<Image
-											style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
+										<Image style={[Globalstyles.star_icon, handlestarLeft(item.score * 2)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/star/star.png")}
 										/>

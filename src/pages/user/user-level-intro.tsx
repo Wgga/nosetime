@@ -14,7 +14,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 const { width, height } = Dimensions.get("window");
 

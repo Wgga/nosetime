@@ -2,18 +2,20 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
+import { FlashList } from "@shopify/flash-list";
+
+import HeaderView from "../../components/view/headerview";
+import ListBottomTip from "../../components/listbottomtip";
+
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import HeaderView from "../../components/headerview";
-import { FlashList } from "@shopify/flash-list";
-import ListBottomTip from "../../components/listbottomtip";
 
 function UserShequ({ navigation, route }: any): React.JSX.Element {
 

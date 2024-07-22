@@ -2,21 +2,19 @@ import React from "react";
 
 import { View, ScrollView, Text, StyleSheet, Pressable, Dimensions, TextInput } from "react-native";
 
+import LinearGradient from "react-native-linear-gradient";
+
+import { ModalPortal } from "../modals";
+import ToastCtrl from "../controller/toastctrl";
+
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
-
-import cache from "../../hooks/storage";
-import events from "../../hooks/events";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
-import Icon from "../../assets/iconfont";
-import { ModalPortal } from "../modals";
-import LinearGradient from "react-native-linear-gradient";
-import ToastCtrl from "../controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 

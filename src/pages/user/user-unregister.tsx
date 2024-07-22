@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
 import { Md5 } from "ts-md5";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import AlertCtrl from "../../components/controller/alertctrl";
 import AlertInputPopover from "../../components/popover/alertinput-popover";
 import { ModalPortal } from "../../components/modals";
@@ -13,12 +13,12 @@ import LinearButton from "../../components/linearbutton";
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 const { width, height } = Dimensions.get("window");
 

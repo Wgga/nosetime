@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList } from "
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 import us from "../../services/user-service/user-service";
 
@@ -19,7 +19,7 @@ import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globa
 
 import Icon from "../../assets/iconfont";
 import LinearGradient from "react-native-linear-gradient";
-import CareView from "../../components/careView";
+import CareView from "../../components/view/careview";
 
 const { width, height } = Dimensions.get("window");
 

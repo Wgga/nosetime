@@ -1,24 +1,15 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 import LinearGradient from "react-native-linear-gradient";
 
 import { ModalPortal } from "../modals";
 
-import http from "../../utils/api/http";
-
 import cache from "../../hooks/storage";
-import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
-
-import Icon from "../../assets/iconfont";
-import ToastCtrl from "../controller/toastctrl";
-
-const { width, height } = Dimensions.get("window");
 
 function ItemVotePopover({ data }: any): React.JSX.Element {
 

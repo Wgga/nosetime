@@ -7,21 +7,20 @@ import { TabBar, TabView } from "react-native-tab-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ToastCtrl from "../../components/controller/toastctrl";
+import SocialSixin from "./social-sixin";
+import SocialTixing from "./social-tixing";
 
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
-import cache from "../../hooks/storage";
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import SocialSixin from "./social-sixin";
-import SocialTixing from "./social-tixing";
 
 const { width, height } = Dimensions.get("window");
 

@@ -2,8 +2,13 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, FlatList } from "react-native";
 
 import FastImage from "react-native-fast-image";
+import { FlashList } from "@shopify/flash-list";
+
+import ListBottomTip from "../../components/listbottomtip";
 
 import articleService from "../../services/article-service/article-service";
+
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
@@ -12,9 +17,6 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
-import { Globalstyles } from "../../utils/globalmethod";
-import { FlashList } from "@shopify/flash-list";
-import ListBottomTip from "../../components/listbottomtip";
 
 const { width, height } = Dimensions.get("window");
 

@@ -5,9 +5,9 @@ import LinearGradient from "react-native-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AvoidSoftInputView } from "react-native-avoid-softinput";
 
-import events from "../hooks/events";
+import events from "../../hooks/events";
 
-import theme from "../configs/theme";
+import theme from "../../configs/theme";
 
 function FooterView({ data, method, children }: any): React.JSX.Element {
 

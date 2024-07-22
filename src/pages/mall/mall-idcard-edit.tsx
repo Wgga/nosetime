@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView, Image, TextI
 import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import LinearButton from "../../components/linearbutton";
 import AlertCtrl from "../../components/controller/alertctrl";
 import ActionSheetCtrl from "../../components/controller/actionsheetctrl";

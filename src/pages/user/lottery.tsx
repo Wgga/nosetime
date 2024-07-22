@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image, ScrollView } from
 import { GifPlayerView } from "react-native-gif-player";
 import { ShadowedView } from "react-native-fast-shadow";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import LotteryPopover from "../../components/popover/lottery-popover";
 import { ModalPortal } from "../../components/modals";
 

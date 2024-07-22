@@ -1,29 +1,24 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 
 import { FlashList } from "@shopify/flash-list";
 import LinearGradient from "react-native-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
 
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
-import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
-
-import Icon from "../../assets/iconfont";
-
-const { width, height } = Dimensions.get("window");
 
 function PerfumeList({ navigation, route }: any): React.JSX.Element {
 

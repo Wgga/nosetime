@@ -4,12 +4,12 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image, ScrollView } from
 import FastImage from "react-native-fast-image";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

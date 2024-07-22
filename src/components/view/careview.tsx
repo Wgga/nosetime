@@ -1,15 +1,15 @@
 import React from "react";
 import { FlatList, StyleSheet, View, Image, Text, Pressable } from "react-native";
 
-import theme from "../configs/theme";
-import { ENV } from "../configs/ENV";
-import { Globalstyles, handlelevelLeft, handlelevelTop } from "../utils/globalmethod";
+import theme from "../../configs/theme";
+import { ENV } from "../../configs/ENV";
+import { Globalstyles, handlelevelLeft, handlelevelTop } from "../../utils/globalmethod";
 import LinearGradient from "react-native-linear-gradient";
-import ListBottomTip from "./listbottomtip";
-import AlertCtrl from "./controller/alertctrl";
-import us from "../services/user-service/user-service";
-import http from "../utils/api/http";
-import ToastCtrl from "./controller/toastctrl";
+import ListBottomTip from "../listbottomtip";
+import AlertCtrl from "../controller/alertctrl";
+import us from "../../services/user-service/user-service";
+import http from "../../utils/api/http";
+import ToastCtrl from "../controller/toastctrl";
 
 const CareView = React.memo(({ data, method }: any) => {
 
@@ -93,10 +93,10 @@ const CareView = React.memo(({ data, method }: any) => {
 			ListEmptyComponent={<View>
 				{isempty && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
-					source={require("../assets/images/empty/userfriend_blank.png")} />}
+					source={require("../../assets/images/empty/userfriend_blank.png")} />}
 				{isemptyo && <Image style={Globalstyles.emptyimg}
 					resizeMode="contain"
-					source={require("../assets/images/empty/ouserfriend_blank.png")} />}
+					source={require("../../assets/images/empty/ouserfriend_blank.png")} />}
 			</View>}
 			renderItem={({ item }: any) => {
 				return (
@@ -110,10 +110,9 @@ const CareView = React.memo(({ data, method }: any) => {
 							<View style={Globalstyles.item_flex}>
 								<Text numberOfLines={1} style={styles.item_uname} onPress={() => { gotodetail(item) }}>{item.uname}</Text>
 								{item.ulevel > 0 && <View style={Globalstyles.level}>
-									<Image
-										style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
-										defaultSource={require("../assets/images/nopic.png")}
-										source={require("../assets/images/level.png")}
+									<Image style={[Globalstyles.level_icon, handlelevelLeft(item.ulevel), handlelevelTop(item.ulevel)]}
+										defaultSource={require("../../assets/images/nopic.png")}
+										source={require("../../assets/images/level.png")}
 									/>
 								</View>}
 							</View>

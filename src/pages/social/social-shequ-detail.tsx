@@ -1,24 +1,24 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Image, Keyboard, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image, Keyboard, ScrollView, Animated } from "react-native";
 
 import { Brightness } from "react-native-color-matrix-image-filters";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FlashList } from "@shopify/flash-list";
 import { ShadowedView } from "react-native-fast-shadow";
-import FastImage from "react-native-fast-image";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ToastCtrl from "../../components/controller/toastctrl";
 import ListBottomTip from "../../components/listbottomtip";
-import FooterView from "../../components/footerview";
+import FooterView from "../../components/view/footerview";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
 import AutoSizeImage from "../../components/autosizeimage";
-import ReplyView from "../../components/replyview";
+import ReplyView from "../../components/view/replyview";
+import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
+import ReportPopover from "../../components/popover/report-popover";
 
 import us from "../../services/user-service/user-service";
-import articleService from "../../services/article-service/article-service";
 
 import http from "../../utils/api/http";
 
@@ -30,6 +30,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, handlelevelLeft, handlelevelTop, unitNumber } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
+import AlertCtrl from "../../components/controller/alertctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -51,7 +52,9 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	let oday = React.useRef<number>(0);
 	let cur_obj = React.useRef<number>(0);
 	let tdiff = React.useRef<number>(0);
-	const [replytext, setReplyText] = React.useState<string>(""); // 评论回复内容
+	let replyinfo = React.useRef<any>({ replytext: "", refid: 0, refuname: "", holder: "点击楼层文字，回复层主" });
+	let footerMaskOpt = React.useRef(new Animated.Value(0)).current; // 底部遮罩透明度动画
+	let footerMaskZ = React.useRef(new Animated.Value(-1)).current; // 底部遮罩层级动画
 	// 数据
 	let pages = React.useRef<any>({
 		page: 1, items: [], loaded: 0, full: 0,
@@ -61,7 +64,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	let items_top = React.useRef<any[]>([]);
 	let pagecnt = React.useRef<number>(0);
 	let pagenum = React.useRef<any>([]);
-	let currentpage = React.useRef<number>(1);
+	let curpage = React.useRef<number>(1);
 	let like_ = React.useRef<any>({}); // 用户喜欢的数据ID列表
 	// 状态
 	let noMore = React.useRef<boolean>(false);
@@ -80,7 +83,15 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 
 		init()
 		events.subscribe(classname + id.current + "isShowKeyboard", (val: boolean) => {
-			setIsFocus(val);
+			if (!val) {
+				replyinfo.current = {
+					refid: 0,
+					refuname: "",
+					replytext: "",
+					holder: "点击楼层文字，回复层主",
+				};
+			}
+			showFooterMask(val);
 		})
 		return () => {
 			events.unsubscribe(classname + id.current + "isShowKeyboard");
@@ -290,8 +301,203 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 	}
 
 	const goPage = (page: number) => {
-		currentpage.current = page;
+		curpage.current = page;
 		setShowPage(false);
+	}
+
+	// 显示回复弹窗
+	const showReplyCtrl = (item: any, parentitem?: any, type?: string) => {
+		let who = type == "hidereport" ? "my" : "follow";
+		let buttons = [{
+			text: "举报",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				report(item, parentitem);
+			}
+		}, {
+			text: "回复",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				reply(item);
+			}
+		}, {
+			text: "删除",
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+				delReply(item);
+			}
+		}, {
+			text: "取消",
+			style: { color: theme.tit },
+			handler: () => {
+				ActionSheetCtrl.close("reply_action_sheet");
+			}
+		}];
+		if (type == "hidereport") {
+			buttons = buttons.filter(item => item.text != "举报");
+		} else if (type == "hidedel") {
+			buttons = buttons.filter(item => item.text != "删除");
+		}
+		ActionSheetCtrl.show({
+			key: "reply_action_sheet",
+			textStyle: { color: theme.tit2 },
+			buttons,
+		})
+	}
+
+	// 点击评论回复右上角三点进行回复
+	const reply_menu = (item: any, parentitem?: any) => {
+		if (item0.current.uid == us.user.uid && item.uid != us.user.uid) {
+			showReplyCtrl(item, parentitem);
+		} else if (item.uid == us.user.uid) {
+			showReplyCtrl(item, parentitem, "hidereport");
+		} else {
+			showReplyCtrl(item, parentitem, "hidedel");
+		}
+	}
+
+	// 举报评论
+	const report = (item: any, parentitem?: any) => {
+		let reportshequ: any = {};
+		let reportuser: any = {};
+		let reportpage: any = {};
+		if (!item) {
+			reportuser = null;
+			reportpage = null;
+			reportshequ = item0.current;
+		} else {
+			reportshequ = null;
+			if (!parentitem) {
+				reportuser = item;
+				reportpage = null;
+			} else {
+				reportuser = item;
+				reportpage = parentitem;
+			}
+		}
+		let params: any = {
+			modalkey: "shequreport_popover",
+			id: id.current,
+			curpage: curpage.current,
+			reportshequ,
+			reportuser,
+			reportpage,
+			classname,
+		}
+		ModalPortal.show((
+			<ReportPopover modalparams={params} />
+		), {
+			key: "shequreport_popover",
+			width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => { ModalPortal.dismiss("shequreport_popover") },
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss("shequreport_popover");
+				return true;
+			},
+			animationDuration: 300,
+			type: "bottomModal",
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	const reply = (item: any, type?: any) => {
+		if (type == "first") {
+			replyinfo.current.refid = 0;
+			replyinfo.current.refuname = "";
+			replyinfo.current.holder = "写跟帖";
+		} else {
+			replyinfo.current.refid = item.id;
+			replyinfo.current.refuname = item.uname;
+			replyinfo.current.holder = "回复 " + item.uname;
+		}
+		if (inputref.current) inputref.current.focus();
+		setIsRender(val => !val);
+	}
+
+	const delReply = (item: any) => {
+		AlertCtrl.show({
+			header: "确认删除这条回复吗？",
+			key: "del_reply_alert",
+			message: "",
+			buttons: [{
+				text: "取消",
+				handler: () => {
+					AlertCtrl.close("del_reply_alert");
+				}
+			}, {
+				text: "确定",
+				handler: () => {
+					AlertCtrl.close("del_reply_alert");
+					http.post(ENV.shequ + "?method=removetopic&fid=1&id=" + id.current + "&uid=" + us.user.uid, { token: us.user.token, ctid: item.id }).then((resp_data: any) => {
+						if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+							us.delUser();
+							return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子详情页" } });
+						}
+						ToastCtrl.show({ message: "删除成功", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
+
+						load("init");
+					})
+				}
+			}],
+		})
+	}
+
+	const publish = () => {
+		let replytext = replyinfo.current.replytext.trim();
+		if (replytext == "") return;
+
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子详情页" } });
+		}
+
+		http.post(ENV.api + ENV.shequ + "?method=post&id=" + id.current + "&uid=" + us.user.uid, {
+			refid: replyinfo.current.refid, token: us.user.token, content: replytext
+		}).then((resp_data: any) => {
+			if (resp_data.msg == "OK") {
+				replyinfo.current.replytext = "";
+				ToastCtrl.show({ message: "发布成功", duration: 1000, viewstyle: "short_toast", key: "publish_success_toast" });
+				load("init");
+			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App帖子详情页" } });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "publish_err_toast" });
+			}
+		});
+	}
+
+	// 动态修改底部输入框遮罩透明度和层级
+	const showFooterMask = (bol: boolean) => {
+		if (bol) {
+			Animated.timing(footerMaskOpt, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: 1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		} else {
+			Animated.timing(footerMaskOpt, {
+				toValue: 0,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+			Animated.timing(footerMaskZ, {
+				toValue: -1,
+				duration: 100,
+				useNativeDriver: true,
+			}).start();
+		}
+		setIsFocus(bol);
+	}
+
+	const like_reply = () => {
+
 	}
 
 	return (
@@ -344,7 +550,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 					{!showPage && <Pressable style={styles.page_btn} onPress={() => {
 						setShowPage(true);
 					}}>
-						<Text style={styles.currentpage}>{currentpage.current}</Text>
+						<Text style={styles.currentpage}>{curpage.current}</Text>
 						<Text style={styles.allpage}>{"/" + pagecnt.current + "页"}</Text>
 					</Pressable>}
 					{showPage && <ShadowedView style={styles.gopage_btn_con}>
@@ -371,7 +577,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 									<Pressable key={item} style={styles.page_item} onPress={() => {
 										goPage(item);
 									}}>
-										<Text style={[styles.page_item_text, currentpage.current == item && styles.active_page]}>{item}</Text>
+										<Text style={[styles.page_item_text, curpage.current == item && styles.active_page]}>{item}</Text>
 									</Pressable>
 								)
 							})}
@@ -402,8 +608,7 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 								<View style={styles.info_name_con}>
 									<Text style={styles.info_name}>{item0.current.uname}</Text>
 									{item0.current.ulevel > 0 && <View style={Globalstyles.level}>
-										<Image
-											style={[Globalstyles.level_icon, handlelevelLeft(item0.current.ulevel), handlelevelTop(item0.current.ulevel)]}
+										<Image style={[Globalstyles.level_icon, handlelevelLeft(item0.current.ulevel), handlelevelTop(item0.current.ulevel)]}
 											defaultSource={require("../../assets/images/nopic.png")}
 											source={require("../../assets/images/level.png")}
 										/>
@@ -445,19 +650,30 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 								idkey: "id",
 								item,
 								likedata: like_.current
-							}} method={{}} />
+							}} method={{
+								reply_menu,
+								like_reply,
+								reply
+							}} />
 						)
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={pages.current.items.length > 0} />}
 				/>
 			</View>
 			{isfocus && <Pressable style={Globalstyles.keyboardmask} onPress={() => { Keyboard.dismiss(); }}></Pressable>}
+			<Animated.View style={[Globalstyles.keyboardmask, { opacity: footerMaskOpt, zIndex: footerMaskZ }]}>
+				<Pressable onPress={() => { Keyboard.dismiss(); }} style={{ flex: 1 }}></Pressable>
+			</Animated.View>
 			<FooterView data={{
-				placeholder: "点击楼层文字，回复层主",
-				replytext,
-				inputref,
-				classname: classname + id.current
-			}} method={{ setReplyText }}>
+				placeholder: replyinfo.current.holder, replytext: replyinfo.current.replytext,
+				inputref, classname: classname + id.current
+			}} method={{
+				onChangeText: (val: string) => {
+					replyinfo.current.replytext = val;
+					setIsRender(val => !val);
+				},
+				publish,
+			}}>
 				{!isfocus && <View style={styles.footer_flex}>
 					<View style={[styles.footer_flex, { marginRight: 20 }]}>
 						<Icon name="reply" size={16} color={theme.fav} />

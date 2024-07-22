@@ -2,7 +2,7 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions } from "react-native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 
 import us from "../../services/user-service/user-service";
 import searchService from "../../services/search-service/search-service";

@@ -1,18 +1,19 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Text, StatusBar } from "react-native";
+import { View, StyleSheet, Text, StatusBar } from "react-native";
 
 import { WebView } from "react-native-webview";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ModalPortal } from "../modals";
+
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import { ENV } from "../../configs/ENV";
 import theme from "../../configs/theme";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 
-import { ModalPortal } from "../../components/modals";
 
 
 function ProtocolPopover({ modalparams }: any): React.JSX.Element {

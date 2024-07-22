@@ -2,18 +2,19 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Image, ScrollView } from "react-native";
 
+import HeaderView from "../../components/view/headerview";
+
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import HeaderView from "../../components/headerview";
 
 function UserIntro({ navigation, route }: any): React.JSX.Element {
 

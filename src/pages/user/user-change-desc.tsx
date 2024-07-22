@@ -1,18 +1,18 @@
 import React from "react";
 import { View, StyleSheet, ScrollView, TextInput } from "react-native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import LinearButton from "../../components/linearbutton";
 
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import events from "../../hooks/events";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 function UserChangeDesc({ navigation }: any): React.JSX.Element {
 	// 控件

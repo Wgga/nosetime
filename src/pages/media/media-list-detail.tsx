@@ -5,11 +5,11 @@ import { View, Text, StyleSheet, Pressable, Image, FlatList, Keyboard, Animated 
 import { FlashList } from "@shopify/flash-list";
 import FastImage from "react-native-fast-image";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
 import VideoPlayer from "../../components/videoplayer";
 import StarImage from "../../components/starimage";
-import FooterView from "../../components/footerview";
+import FooterView from "../../components/view/footerview";
 
 import us from "../../services/user-service/user-service";
 
@@ -23,7 +23,7 @@ import { ENV } from "../../configs/ENV";
 import { Globalstyles, toCamelCase, display } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
-import ReplyView from "../../components/replyview";
+import ReplyView from "../../components/view/replyview";
 import ActionSheetCtrl from "../../components/controller/actionsheetctrl";
 import ToastCtrl from "../../components/controller/toastctrl";
 

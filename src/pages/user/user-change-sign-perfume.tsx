@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, Image, TextInput } from "react-native";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ToastCtrl from "../../components/controller/toastctrl";
 
 import searchService from "../../services/search-service/search-service";

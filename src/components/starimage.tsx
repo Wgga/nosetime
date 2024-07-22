@@ -9,13 +9,11 @@ function StarImage({ item, style, isShowScore }: any): React.JSX.Element {
 		<>
 			{item.istotal >= 10 && <View style={styles.item_star}>
 				<View style={Globalstyles.star}>
-					{item.s0 == 1 && <Image
-						style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
+					{item.s0 == 1 && <Image style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
 						defaultSource={require("../assets/images/nopic.png")}
 						source={require("../assets/images/star/star2.png")}
 					/>}
-					{item.s0 == 0 && <Image
-						style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
+					{item.s0 == 0 && <Image style={[Globalstyles.star_icon, handlestarLeft(item.s1)]}
 						defaultSource={require("../assets/images/nopic.png")}
 						source={require("../assets/images/star/star.png")}
 					/>}
@@ -24,8 +22,7 @@ function StarImage({ item, style, isShowScore }: any): React.JSX.Element {
 			</View>}
 			{item.istotal < 10 && <View style={styles.item_star}>
 				<View style={Globalstyles.star}>
-					<Image
-						style={[Globalstyles.star_icon, handlestarLeft(0)]}
+					<Image style={[Globalstyles.star_icon, handlestarLeft(0)]}
 						defaultSource={require("../assets/images/nopic.png")}
 						source={require("../assets/images/star/star.png")}
 					/>

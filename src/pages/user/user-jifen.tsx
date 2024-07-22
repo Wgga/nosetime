@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, Image, FlatList, Animate
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LinearGradient from "react-native-linear-gradient";
 
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import ToastCtrl from "../../components/controller/toastctrl";
 import { ModalPortal } from "../../components/modals";
 import ExchangePopover from "../../components/popover/jifen-popover";
@@ -12,10 +12,10 @@ import ExchangePopover from "../../components/popover/jifen-popover";
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
+import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
-import { Globalstyles } from "../../utils/globalmethod";
 
 import Icon from "../../assets/iconfont";
 

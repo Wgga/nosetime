@@ -583,7 +583,7 @@ export default class Swipeable extends PureComponent {
 				translateX: pan.x.interpolate({
 					inputRange,
 					outputRange,
-					extrapolate: 'clamp'
+					extrapolate: "clamp"
 				})
 			}];
 			const buttonStyle = [
@@ -623,7 +623,7 @@ export default class Swipeable extends PureComponent {
 					canSwipeLeft ? -width + StyleSheet.hairlineWidth : 0,
 					canSwipeRight ? width - StyleSheet.hairlineWidth : 0
 				],
-				extrapolate: 'clamp'
+				extrapolate: "clamp"
 			})
 		}];
 
@@ -647,7 +647,7 @@ export default class Swipeable extends PureComponent {
 
 const styles = StyleSheet.create({
 	container: {
-		flexDirection: 'row'
+		flexDirection: "row"
 	},
 	content: {
 		flex: 1

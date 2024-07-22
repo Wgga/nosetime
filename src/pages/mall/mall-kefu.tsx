@@ -7,7 +7,7 @@ import { AvoidSoftInputView } from "react-native-avoid-softinput";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import RnImage from "../../components/RnImage";
-import HeaderView from "../../components/headerview";
+import HeaderView from "../../components/view/headerview";
 import AutoSizeImage from "../../components/autosizeimage";
 import { ModalPortal } from "../../components/modals";
 import PhotoPopover from "../../components/popover/photo-popover";
