@@ -151,7 +151,7 @@ function UserIntro({ navigation, route }: any): React.JSX.Element {
 	return (
 		<View style={Globalstyles.container}>
 			<View style={Globalstyles.header_bg_con}>
-				<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: ENV.avatar + info.current.uid + ".jpg?" + info.current.uface }} />
+				<Image style={Globalstyles.header_bg_img} blurRadius={30} source={{ uri: ENV.avatar + info.current.uid + ".jpg?" + info.current.uface }} />
 				<View style={Globalstyles.header_bg_msk}></View>
 			</View>
 			<HeaderView data={{

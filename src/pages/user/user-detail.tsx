@@ -618,7 +618,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			}}>
 				<Animated.View style={[Globalstyles.header_bg_con, { opacity: headerOpt }]}>
 					<View style={Globalstyles.header_bg_msk}></View>
-					{avatar.current && <Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />}
+					{avatar.current && <Image style={Globalstyles.header_bg_img} blurRadius={30} source={{ uri: avatar.current }} />}
 				</Animated.View>
 				{uid.current != us.user.uid && <Icon style={styles.title_icon} name="sandian" size={20} color={theme.toolbarbg} onPress={() => { setShowMenu(val => !val) }} />}
 				{uid.current == us.user.uid && <Icon style={styles.title_icon} name="btmarrow" size={12} color={theme.toolbarbg} onPress={() => { gotodetail("user-intro") }} />}
@@ -631,7 +631,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 			</View>}
 			<ScrollView showsVerticalScrollIndicator={false} onScroll={showHeaderView}>
 				{avatar.current && <View style={styles.header_bg}>
-					<Image style={Globalstyles.header_bg_img} blurRadius={40} source={{ uri: avatar.current }} />
+					<Image style={Globalstyles.header_bg_img} blurRadius={30} source={{ uri: avatar.current }} />
 					<View style={[Globalstyles.header_bg_msk]}></View>
 				</View>}
 				<View style={{ alignItems: "center", zIndex: 1 }}>
@@ -756,9 +756,9 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 										}
 									</>
 								}
-								renderItem={({ item }: any) => {
+								renderItem={({ item, index }: any) => {
 									return (
-										<Pressable style={styles.perfume_item} onPress={() => { gotodetail("perfume-list-detail", item) }}>
+										<Pressable style={[styles.perfume_item, index != 0 && { marginLeft: 15 }]} onPress={() => { gotodetail("perfume-list-detail", item) }}>
 											<Image style={styles.item_image}
 												source={{ uri: ENV.image + item.cpic + "!l" }}
 											/>
@@ -780,7 +780,7 @@ const UserDetail = React.memo(({ navigation, route }: any) => {
 								renderItem={({ item, index }: any) => {
 									return (
 										<Pressable onPress={() => { open_PhotoPopover(index) }}>
-											<Image style={[styles.item_image, { marginRight: 13 }]}
+											<Image style={[styles.item_image, index != 0 && { marginLeft: 13 }]}
 												source={{ uri: ENV.image + "/uploads/" + item + ".jpg!l" }}
 											/>
 										</Pressable>
@@ -1256,7 +1256,6 @@ const styles = StyleSheet.create({
 	},
 	perfume_item: {
 		width: 80,
-		marginRight: 15,
 	},
 	item_image: {
 		width: 80,

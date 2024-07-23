@@ -44,7 +44,7 @@ const TagItem = React.memo(({ item, type, selectbtn }: any) => {
 	)
 })
 
-function PerfumeListTag({ navigation, route }: any): React.JSX.Element {
+const PerfumeListTag = React.memo(({ navigation, route }: any) => {
 
 	// 控件
 	const classname = "PerfumeListTagPage";
@@ -192,7 +192,7 @@ function PerfumeListTag({ navigation, route }: any): React.JSX.Element {
 			</ScrollView>
 		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	tags_con: {

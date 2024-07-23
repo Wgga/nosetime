@@ -500,7 +500,7 @@ const DiscussReply = React.memo(({ navigation, route }: any) => {
 			}}>
 				<View style={[Globalstyles.header_bg, { height: 90 + insets.top }]}>
 					<Brightness amount={0.85}>
-						<Image style={{ width: "100%", height: "100%" }} blurRadius={40}
+						<Image style={{ width: "100%", height: "100%" }} blurRadius={5}
 							source={{ uri: ENV.avatar + discuss.current.replyuid + ".jpg!l?" + discuss.current.uface }}
 						/>
 					</Brightness>

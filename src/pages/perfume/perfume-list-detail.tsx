@@ -2,7 +2,6 @@ import React from "react";
 
 import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Image, FlatList } from "react-native";
 
-import { FlashList } from "@shopify/flash-list";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HeaderView from "../../components/view/headerview";
@@ -11,7 +10,7 @@ import ListBottomTip from "../../components/listbottomtip";
 import us from "../../services/user-service/user-service";
 
 import http from "../../utils/api/http";
-import { Globalstyles } from "../../utils/globalmethod";
+import { Globalstyles, toCamelCase } from "../../utils/globalmethod";
 
 import cache from "../../hooks/storage";
 import events from "../../hooks/events";
@@ -20,6 +19,10 @@ import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
 
 import Icon from "../../assets/iconfont";
+import Yimai from "../../assets/svg/itemdetail/yimai.svg";
+import EmptyNose from "../../assets/svg/empty_nose.svg";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,7 +35,8 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let id = React.useRef<number>(0);
 	let allcnt = React.useRef<number>(0);
 	let pagesize = React.useRef<number>(0);
-	let headerOpt = React.useRef(new Animated.Value(0)).current; // 头部透明度动画
+	const [title, setTitle] = React.useState<string>("香单");
+	let scrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 顶部滚动动画
 	// 数据
 	let collection = React.useRef<any>({ cdata: [], cuid: "", cid: "" });
 	let items = React.useRef<any>([]);
@@ -45,6 +49,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let showaddbtn = React.useRef<boolean>(false);
 	let iscanbuy = React.useRef<boolean>(false);
 	let nocanbuy = React.useRef<boolean>(false);
+	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
 	React.useEffect(() => {
@@ -54,6 +59,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		init()
 	}, [])
 
+	// 初始化
 	const init = () => {
 		http.get(ENV.collection + "?method=getcollectiondetail&id=" + id.current + "&v=2").then((resp_data: any) => {
 			for (var i in resp_data["cdata"]) {
@@ -107,18 +113,25 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 跳转页面
 	const gotodetail = (page: string, item?: any) => {
+		const pages = ["perfume-list-edit", "perfume-list-intro", "perfume-list-discuss"];
 		if (page == "user-detail") {
 			navigation.push("Page", { screen: "UserDetail", params: { uid: item.cuid } });
+		} else if (pages.includes(page)) {
+			let screen = toCamelCase(page);
+			navigation.navigate("Page", { screen, params: { collection: collection.current } });
 		}
 	}
 
+	// 检测当前是否显示默认封面图
 	const is_default_img = () => {
 		if (us.user.uid != collection.current.cuid) return false;//不是自己的香单，不显示
 		if (!collection.current.cpic) return true;//没封面图片显示上传
 		return collection.current.cpic.includes("default");
 	}
 
+	// 收藏香单
 	const fav = () => {
 		if (!us.user.uid) {
 			return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
@@ -141,105 +154,219 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 切换在售商品
 	const togglecanbuy = () => {
 		iscanbuy.current = !iscanbuy.current;
 		if (iscanbuy.current) {
 			http.get(ENV.collection + "?method=getcollectioncanbuy&id=" + id.current).then((resp_data: any) => {
 				items.current = resp_data;
-				like_buys("nolike");
 				noMore.current = false;
+				nocanbuy.current = (items.current.length == 0);
+				like_buys("nolike");
 			})
 		} else {
 			items.current = collection.current.cdata;
 			noMore.current = true;
+			setIsRender(val => !val);
 		}
-		nocanbuy.current = (items.current.length == 0);
+	}
+
+	const delete_col = () => {
+		setShowMenu(false);
+		AlertCtrl.show({
+			header: "确认删除这个香单吗？",
+			key: "del_col_alert",
+			message: "",
+			buttons: [{
+				text: "取消",
+				handler: () => {
+					AlertCtrl.close("del_col_alert");
+				}
+			}, {
+				text: "确定",
+				handler: () => {
+					AlertCtrl.close("del_col_alert");
+					http.post(ENV.collection + "?uid=" + us.user.uid, {
+						method: "delcollection", token: us.user.token, id: id.current
+					}).then((resp_data: any) => {
+						if (resp_data.msg == "OK") {
+							ToastCtrl.show({ message: "已删除", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
+							//20200215直接通过事件传递删除的编号，避免刷新延迟，减少请求
+							events.publish("collectionDeleted", id.current);
+							cache.removeItem("usercollections" + us.user.uid);
+							navigation.goBack();
+						} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+							us.delUser();
+							return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
+						} else {
+							ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "del_err_toast" });
+						}
+					})
+				}
+			}],
+		})
 	}
 
 	return (
 		<View style={Globalstyles.container}>
-			<Animated.View style={[Globalstyles.header_bg_con, { height: 300 }]}>
-				<View style={Globalstyles.header_bg_msk}></View>
-				<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={40} style={Globalstyles.header_bg_img} />
-			</Animated.View>
 			<HeaderView data={{
-				title: "香单",
+				title,
 				isShowSearch: false,
-				style: [
-					Globalstyles.absolute
-				],
+				showmenu: collection.current.cuid == us.user.uid ? showmenu : false,
+				style: { zIndex: 0 },
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
 				}
-			}} method={{ back: () => { navigation.goBack() } }}></HeaderView>
-			<View style={[styles.perfume_info_con, { marginTop: 44 + insets.top }]}>
-				<View style={styles.info_con}>
-					<Pressable style={styles.info_image} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>
-						<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + collection.current.cpic + "!l" }} />
-						{is_default_img() && <View style={styles.info_image_msk}>
-							<Text style={styles.msk_text}>{"上传封面"}</Text>
-							<Text style={styles.msk_text}>{"入住香单广场"}</Text>
-						</View>}
-					</Pressable>
-					<View style={styles.info_msg}>
-						<Text numberOfLines={2} style={styles.info_name}>{collection.current.cname}</Text>
-						<View style={styles.info_flex}>
-							{collection.current.cdesc && <Text numberOfLines={1} style={styles.desc_text}>{collection.current.cdesc}</Text>}
-							{(!collection.current.cdesc && collection.current.cuid == us.user.uid) && <Text style={styles.desc_text}>{"编辑香单"}</Text>}
-							{(!collection.current.cdesc && collection.current.cuid != us.user.uid) && <Text style={styles.desc_text}>{"简介无"}</Text>}
-							<Icon name="advance" size={13} color={theme.toolbarbg} style={{ marginLeft: 5 }} />
-						</View>
-						<View style={styles.info_flex}>
-							<Pressable style={styles.user_image} onPress={() => { gotodetail("user-detail", collection.current) }}>
-								<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.avatar + collection.current.cuid + ".jpg!m?" + collection.current.uface }} />
-							</Pressable>
-							<Text numberOfLines={1} style={styles.user_name} onPress={() => { gotodetail("user-detail", collection.current) }}>{collection.current.uname}</Text>
-						</View>
-					</View>
-				</View>
-				<View style={[Globalstyles.item_flex, { marginTop: 5 }]}>
-					<Pressable style={styles.btn_con} onPress={() => { gotodetail("perfume-list-discuss", collection.current) }}>
-						<Icon name="message" size={15} color={theme.toolbarbg} />
-						<Text style={styles.btn_text}>{collection.current.discusscnt}</Text>
-					</Pressable>
-					<Pressable style={styles.btn_con} onPress={fav}>
-						<Icon name={like_.current[collection.current.cid] ? "heart1-checked" : "heart1"} size={15} color={theme.toolbarbg} />
-						<Text style={styles.btn_text}>{collection.current.favcnt}</Text>
-					</Pressable>
-					<Pressable style={styles.btn_con}>
-						<Icon name="checkbox" size={14} color={theme.toolbarbg} />
-						<Text style={styles.btn_text}>{"多选"}</Text>
-					</Pressable>
-					<Pressable style={styles.btn_con} onPress={togglecanbuy}>
-						<Icon name={iscanbuy.current ? "shopcart-checked" : "shopcart"} size={15} color={theme.toolbarbg} />
-						<Text style={styles.btn_text}>{"在售"}</Text>
-					</Pressable>
-				</View>
-			</View>
-			<FlatList data={items.current}
-				// estimatedItemSize={100}
-				onEndReachedThreshold={0.1}
-				onEndReached={() => { }}
-				keyExtractor={(item: any) => item.iid}
-				ListHeaderComponent={() => {
-					return (
-						<>
-
-						</>
-					)
-				}}
-				contentContainerStyle={{ backgroundColor: "red" }}
-				renderItem={({ item }: any) => {
-					return (
-						<View style={styles.col_item}>
-							<View style={styles.item_order}>
-
+			}} method={{ back: () => { navigation.goBack() } }} MenuChildren={() => {
+				return (
+					collection.current.cuid == us.user.uid ? <>
+						{/* <Pressable style={Globalstyles.menu_icon_con} onPress={() => { setShowMenu(false) }}>
+							<Icon style={Globalstyles.menu_icon} name="share2" size={13} color={theme.comment} />
+							<Text style={[Globalstyles.menu_text, { color: theme.text1 }]}>{"分享"}</Text>
+						</Pressable> */}
+						<Pressable style={Globalstyles.menu_icon_con} onPress={() => {
+							gotodetail("perfume-list-edit");
+							setShowMenu(false);
+						}}>
+							<Icon style={Globalstyles.menu_icon} name="edit" size={14} color={theme.text1} />
+							<Text style={[Globalstyles.menu_text, { color: theme.text1 }]}>{"编辑香单"}</Text>
+						</Pressable>
+						<Pressable style={[Globalstyles.menu_icon_con, Globalstyles.no_border_bottom]} onPress={delete_col}>
+							<Icon style={Globalstyles.menu_icon} name="del2" size={16} color={theme.text1} />
+							<Text style={[Globalstyles.menu_text, { color: theme.text1 }]}>{"删除香单"}</Text>
+						</Pressable>
+					</> : <></>
+				)
+			}}>
+				<Animated.View style={[Globalstyles.header_bg_con, {
+					height: 300, transform: [{
+						translateY: scrollY.interpolate({
+							inputRange: [0, 163],
+							outputRange: [0, -163],
+							extrapolate: "clamp",
+						})
+					}]
+				}]}>
+					<View style={Globalstyles.header_bg_msk}></View>
+					<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
+				</Animated.View>
+				{/* {(collection.current.cuid != us.user.uid) && <Icon name="share2" size={16}
+					onPress={() => { }} color={theme.toolbarbg} style={Globalstyles.title_icon} />} */}
+				{collection.current.cuid == us.user.uid && <Icon name="sandian"
+					size={18} onPress={() => { setShowMenu(val => !val) }}
+					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
+			</HeaderView>
+			<View style={{ flex: 1 }}>
+				<Animated.FlatList data={items.current}
+					// estimatedItemSize={100}
+					onEndReachedThreshold={0.1}
+					onEndReached={() => { }}
+					keyExtractor={(item: any) => item.iid}
+					onScroll={
+						Animated.event(
+							[{ nativeEvent: { contentOffset: { y: scrollY } } }],
+							{
+								useNativeDriver: true, listener: (e: any) => {
+									if (e.nativeEvent.contentOffset.y > 46) {
+										if (title == collection.current.cname) return;
+										setTitle(collection.current.cname);
+									} else {
+										if (title == "香单") return;
+										setTitle("香单");
+									}
+								}
+							}
+						)
+					}
+					ListEmptyComponent={() => {
+						return (
+							<View style={[styles.empty_con, styles.borderRadius]}>
+								<EmptyNose width={35} height={35} color={theme.fav} style={{ marginBottom: 10 }} />
+								<Text style={styles.empty_tip}>{"是我眼花了吗？\n这里没有香水啊！"}</Text>
 							</View>
-						</View>
-					)
-				}}
-				ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
-			/>
+						)
+					}}
+					ListHeaderComponent={() => {
+						return (
+							<View style={[styles.perfume_info_con]}>
+								<View style={styles.info_con}>
+									<Pressable style={styles.info_image} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>
+										<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + collection.current.cpic + "!l" }} />
+										{is_default_img() && <View style={Globalstyles.info_image_msk}>
+											<Text style={Globalstyles.msk_text}>{"上传封面"}</Text>
+											<Text style={Globalstyles.msk_text}>{"入住香单广场"}</Text>
+										</View>}
+									</Pressable>
+									<View style={styles.info_msg}>
+										<Text numberOfLines={2} style={styles.info_name}>{collection.current.cname}</Text>
+										<Pressable style={styles.info_flex} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>
+											{collection.current.cdesc && <Text numberOfLines={1} style={styles.desc_text}>{collection.current.cdesc}</Text>}
+											{(!collection.current.cdesc && collection.current.cuid == us.user.uid) && <Text style={styles.desc_text}>{"编辑香单"}</Text>}
+											{(!collection.current.cdesc && collection.current.cuid != us.user.uid) && <Text style={styles.desc_text}>{"简介无"}</Text>}
+											<Icon name="advance" size={13} color={theme.toolbarbg} style={{ marginLeft: 5 }} />
+										</Pressable>
+										<View style={styles.info_flex}>
+											<Pressable style={styles.user_image} onPress={() => { gotodetail("user-detail", collection.current) }}>
+												<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.avatar + collection.current.cuid + ".jpg!m?" + collection.current.uface }} />
+											</Pressable>
+											<Text numberOfLines={1} style={styles.user_name} onPress={() => { gotodetail("user-detail", collection.current) }}>{collection.current.uname}</Text>
+										</View>
+									</View>
+								</View>
+								<View style={[Globalstyles.item_flex, { marginTop: 5 }]}>
+									<Pressable style={styles.btn_con} onPress={() => { gotodetail("perfume-list-discuss", collection.current) }}>
+										<Icon name="message" size={15} color={theme.toolbarbg} />
+										<Text style={styles.btn_text}>{collection.current.discusscnt}</Text>
+									</Pressable>
+									<Pressable style={styles.btn_con} onPress={fav}>
+										<Icon name={like_.current[collection.current.cid] ? "heart1-checked" : "heart1"} size={15} color={theme.toolbarbg} />
+										<Text style={styles.btn_text}>{collection.current.favcnt}</Text>
+									</Pressable>
+									<Pressable style={styles.btn_con}>
+										<Icon name="checkbox" size={14} color={theme.toolbarbg} />
+										<Text style={styles.btn_text}>{"多选"}</Text>
+									</Pressable>
+									<Pressable style={styles.btn_con} onPress={togglecanbuy}>
+										<Icon name={iscanbuy.current ? "shopcart-checked" : "shopcart"} size={15} color={iscanbuy.current ? "#EFB946" : theme.toolbarbg} />
+										<Text style={[styles.btn_text, iscanbuy.current && { color: "#EFB946" }]}>{"在售"}</Text>
+									</Pressable>
+								</View>
+							</View>
+						)
+					}}
+					renderItem={({ item, index }: any) => {
+						return (
+							<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
+								<View style={styles.item_order}>
+									<Text style={styles.order_text}>{index + 1}</Text>
+								</View>
+								<Pressable style={styles.item_image}>
+									<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
+										defaultSource={require("../../assets/images/noxx.png")}
+										source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
+								</Pressable>
+								<View style={styles.item_info}>
+									{item.cnname && <Text numberOfLines={1} style={styles.name_text}>{item.cnname}</Text>}
+									{item.enname && <Text numberOfLines={1} style={[styles.name_text, { color: theme.text1 }]}>{item.enname}</Text>}
+									<View style={styles.item_info_score}>
+										<Pressable onPress={() => { }}>
+											{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
+											{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
+										</Pressable>
+										{isbuy_.current[item.iid] && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />}
+										{canbuy_.current[item.iid] && !isbuy_.current[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />}
+									</View>
+									{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
+								</View>
+								<Pressable style={styles.item_btn}>
+									<Icon name="sandian1" size={18} color={theme.fav} />
+								</Pressable>
+							</View>
+						)
+					}}
+					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
+				/>
+			</View>
 		</View>
 	);
 })
@@ -259,17 +386,6 @@ const styles = StyleSheet.create({
 		height: 100,
 		borderRadius: 5,
 		overflow: "hidden",
-	},
-	info_image_msk: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: "rgba(0,0,0,0.4)",
-		alignItems: "center",
-		justifyContent: "center",
-		zIndex: 1,
-	},
-	msk_text: {
-		fontSize: 12,
-		color: theme.toolbarbg,
 	},
 	info_msg: {
 		flex: 1,
@@ -313,13 +429,73 @@ const styles = StyleSheet.create({
 		color: theme.toolbarbg,
 		marginLeft: 7,
 	},
+	empty_con: {
+		height: 300,
+		backgroundColor: theme.toolbarbg,
+		alignItems: "center",
+		justifyContent: "center"
+	},
+	empty_tip: {
+		textAlign: "center",
+		fontSize: 14,
+		color: theme.fav,
+	},
 	col_item: {
-		paddingHorizontal: 9
+		minHeight: 120,
+		flexDirection: "row",
+		paddingHorizontal: 9,
+		backgroundColor: theme.toolbarbg
+	},
+	borderRadius: {
+		borderTopLeftRadius: 15,
+		borderTopRightRadius: 15,
+		overflow: "hidden",
 	},
 	item_order: {
 		width: 33,
 		height: 120,
+		alignItems: "center",
+		justifyContent: "center",
+		marginLeft: 5,
 	},
+	order_text: {
+		fontSize: 16,
+		color: theme.fav,
+	},
+	item_image: {
+		width: 60,
+		height: 60,
+		marginVertical: 30,
+	},
+	item_info: {
+		marginTop: 25,
+		marginLeft: 10,
+		flex: 1
+	},
+	name_text: {
+		fontSize: 13,
+		color: theme.tit2,
+		lineHeight: 22
+	},
+	item_info_score: {
+		...Globalstyles.item_flex,
+		marginTop: 6,
+	},
+	score_text: {
+		fontSize: 12,
+		color: theme.comment,
+	},
+	item_info_desc: {
+		marginTop: 10,
+		marginBottom: 20,
+		fontSize: 12,
+		color: theme.comment,
+	},
+	item_btn: {
+		width: 50,
+		alignItems: "center",
+		justifyContent: "center",
+	}
 });
 
 export default PerfumeListDetail;

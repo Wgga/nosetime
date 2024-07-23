@@ -23,6 +23,7 @@ import PerfumeListTag from "../pages/perfume/perfume-list-tag";
 import PerfumeListEdit from "../pages/perfume/perfume-list-edit";
 import PerfumeList from "../pages/perfume/perfume-list";
 import PerfumeListDetail from "../pages/perfume/perfume-list-detail";
+import PerfumeListIntro from "../pages/perfume/perfume-list-intro";
 
 import SocialShequDetail from "../pages/social/social-shequ-detail";
 import SocialShequPost from "../pages/social/social-shequ-post";
@@ -85,6 +86,7 @@ function Page(): React.JSX.Element {
 			<Stack.Screen name="PerfumeListEdit" component={PerfumeListEdit} />
 			<Stack.Screen name="PerfumeList" component={PerfumeList} />
 			<Stack.Screen name="PerfumeListDetail" component={PerfumeListDetail} />
+			<Stack.Screen name="PerfumeListIntro" component={PerfumeListIntro} />
 
 			<Stack.Screen name="SocialShequDetail" component={SocialShequDetail} />
 			<Stack.Screen name="SocialShequPost" component={SocialShequPost} />

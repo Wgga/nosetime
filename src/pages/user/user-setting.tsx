@@ -743,7 +743,7 @@ function UserSetting({ navigation }: any): React.JSX.Element {
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
 				/>
-				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+				<Image style={styles.header_bg} blurRadius={30} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
 			<View style={[styles.setting_header, { paddingTop: insets.top ? insets.top + 30 : 55 }]}>
 				<Pressable onPress={() => { upService.changeAvatar({ classname, marginTop: insets.top }) }}>

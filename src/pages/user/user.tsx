@@ -227,7 +227,7 @@ function User({ navigation }: any): React.JSX.Element {
 					locations={[0.5, 1]}
 					style={styles.linear_bg}
 				/>
-				<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+				<Image style={styles.header_bg} blurRadius={30} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 			</Brightness>
 			<View style={styles.user_info_con}>
 				<View style={[styles.user_avatar_con, { marginTop: insets.top ? insets.top + 60 : 84 }]}>
@@ -246,7 +246,7 @@ function User({ navigation }: any): React.JSX.Element {
 					<Pressable onPress={() => {
 						navigation.navigate("Page", { screen: "UserDetail", params: { uid: us.user.uid } })
 					}}>
-						<Image style={styles.header_bg} blurRadius={40} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
+						<Image style={styles.header_bg} blurRadius={30} source={{ uri: ENV.avatar + us.user.uid + ".jpg?" + us.user.uface }} />
 						<Image style={styles.user_page_msk}
 							source={require("../../assets/images/user/userpage.png")}
 						/>

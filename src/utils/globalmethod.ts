@@ -505,6 +505,18 @@ const Globalstyles: any = StyleSheet.create({
 	footer_text: {
 		marginLeft: 5,
 	},
+	// 香单无封面蒙版
+	info_image_msk: {
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: "rgba(0,0,0,0.4)",
+		alignItems: "center",
+		justifyContent: "center",
+		zIndex: 1,
+	},
+	msk_text: {
+		fontSize: 12,
+		color: theme.toolbarbg,
+	},
 });
 
 

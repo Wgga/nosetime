@@ -22,7 +22,7 @@ import HeaderView from "../../components/view/headerview";
 import LinearGradient from "react-native-linear-gradient";
 import ToastCtrl from "../../components/controller/toastctrl";
 
-function PerfumeListEdit({ navigation, route }: any): React.JSX.Element {
+const PerfumeListEdit = React.memo(({ navigation, route }: any) => {
 
 	// 控件
 	const classname = "PerfumeListEditPage";
@@ -45,7 +45,7 @@ function PerfumeListEdit({ navigation, route }: any): React.JSX.Element {
 		if (route.params) {
 			if (route.params.collection) oricoldata.current = route.params.collection;
 			coldata.current = Object.assign({}, oricoldata.current);
-			face_img.current = oricoldata.current.cpic.includes("default") ? ENV.image + oricoldata.current.cpic + "!m" : ""
+			face_img.current = !oricoldata.current.cpic.includes("default") ? ENV.image + oricoldata.current.cpic + "!m" : ""
 			setIsRender(val => !val);
 		}
 
@@ -90,6 +90,7 @@ function PerfumeListEdit({ navigation, route }: any): React.JSX.Element {
 
 				if (!coldata.current.cname) return;
 				http.post(ENV.collection + "?uid=" + us.user.uid, { method: "updatecollection", collection: coldata.current, token: us.user.token }).then((resp_data2: any) => {
+					coldata.current = resp_data2;
 					oricoldata.current = Object.assign({}, coldata.current);
 					setIsRender(val => !val);
 				})
@@ -214,7 +215,7 @@ function PerfumeListEdit({ navigation, route }: any): React.JSX.Element {
 			</Pressable>
 		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	flex_row: {
