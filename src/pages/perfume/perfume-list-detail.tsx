@@ -1,8 +1,9 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Animated, Image, FlatList } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Animated as RNAnimated, Image } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, { runOnJS, runOnUI, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
@@ -23,6 +24,8 @@ import Yimai from "../../assets/svg/itemdetail/yimai.svg";
 import EmptyNose from "../../assets/svg/empty_nose.svg";
 import AlertCtrl from "../../components/controller/alertctrl";
 import ToastCtrl from "../../components/controller/toastctrl";
+import LinearButton from "../../components/linearbutton";
+import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
@@ -34,9 +37,13 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	// 变量
 	let id = React.useRef<number>(0);
 	let allcnt = React.useRef<number>(0);
+	let selcnt = React.useRef<number>(0);
 	let pagesize = React.useRef<number>(0);
 	const [title, setTitle] = React.useState<string>("香单");
-	let scrollY = React.useRef<Animated.Value>(new Animated.Value(0)).current; // 顶部滚动动画
+	let colname = useSharedValue<string>("");
+	let scrollY = useSharedValue<number>(0); // 顶部滚动动画
+	let headerT = useSharedValue<number>(0);
+	let headerH = React.useRef<number>(0);
 	// 数据
 	let collection = React.useRef<any>({ cdata: [], cuid: "", cid: "" });
 	let items = React.useRef<any>([]);
@@ -49,6 +56,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let showaddbtn = React.useRef<boolean>(false);
 	let iscanbuy = React.useRef<boolean>(false);
 	let nocanbuy = React.useRef<boolean>(false);
+	let isSelAll = React.useRef<boolean>(false);
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
@@ -74,6 +82,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 			allcnt.current = resp_data.cnt;
 			pagesize.current = Math.ceil(resp_data.cnt / 50);
 			collection.current = resp_data;
+			colname.value = resp_data.cname;
 			items.current = resp_data.cdata;
 			if (pagesize.current == 1) {
 				noMore.current = true;
@@ -207,13 +216,26 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	const handlerScroll = useAnimatedScrollHandler((event) => {
+		"worklet";
+		scrollY.value = event.contentOffset.y;
+		console.log("%c Line:224 🥒 scrollY.value", "color:#33a5ff", scrollY.value);
+		if (event.contentOffset.y > 46) {
+			if (title == colname.value) return;
+			runOnJS(setTitle)(colname.value)
+		} else {
+			if (title == "香单") return;
+			runOnJS(setTitle)("香单")
+		}
+	})
+
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
 				title,
 				isShowSearch: false,
 				showmenu: collection.current.cuid == us.user.uid ? showmenu : false,
-				style: { zIndex: 0 },
+				style: { zIndex: 1, backgroundColor: "transparent", overflow: "hidden", },
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
 				}
@@ -238,15 +260,11 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					</> : <></>
 				)
 			}}>
-				<Animated.View style={[Globalstyles.header_bg_con, {
-					height: 300, transform: [{
-						translateY: scrollY.interpolate({
-							inputRange: [0, 163],
-							outputRange: [0, -163],
-							extrapolate: "clamp",
-						})
-					}]
-				}]}>
+				<Animated.View style={[
+					Globalstyles.header_bg_con,
+					useAnimatedStyle(() => ({ transform: [{ translateY: scrollY.value > 163 ? -163 : 0 - scrollY.value }] })),
+					{ height: 300 }
+				]}>
 					<View style={Globalstyles.header_bg_msk}></View>
 					<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
 				</Animated.View>
@@ -256,28 +274,33 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					size={18} onPress={() => { setShowMenu(val => !val) }}
 					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
 			</HeaderView>
-			<View style={{ flex: 1 }}>
+			<View style={{ flex: 1, zIndex: 0 }}>
+				<View style={[Globalstyles.header_bg_con, { height: 300, top: -(44 + insets.top) }]}>
+					<View style={Globalstyles.header_bg_msk}></View>
+					<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
+				</View>
+				<Animated.View style={[styles.list_head_con, styles.borderRadius, useAnimatedStyle(() => ({
+					top: withTiming(headerT.value === 1 ? 0 : (71 + insets.top)),
+					opacity: withTiming(headerT.value === 1 ? 1 : 0),
+					zIndex: withTiming(headerT.value === 1 ? 1 : -1),
+				}))]}>
+					<View style={styles.list_btn_con}>
+						<View style={Globalstyles.item_flex}>
+							<Icon name={isSelAll.current ? "radio1" : "radio1-outline"} size={25} color={theme.primary} />
+							<Text style={[styles.list_btn_text, { marginLeft: 5 }]}>{"全选"}</Text>
+						</View>
+						<Text style={styles.list_btn_text} onPress={() => { headerT.value = 0 }}>{"关闭"}</Text>
+					</View>
+					<View style={styles.list_cnt_con}>
+						<Text>{"共" + allcnt.current + "款"}</Text>
+						<Text>{"已选择" + selcnt.current + "款"}</Text>
+					</View>
+				</Animated.View>
 				<Animated.FlatList data={items.current}
-					// estimatedItemSize={100}
 					onEndReachedThreshold={0.1}
 					onEndReached={() => { }}
 					keyExtractor={(item: any) => item.iid}
-					onScroll={
-						Animated.event(
-							[{ nativeEvent: { contentOffset: { y: scrollY } } }],
-							{
-								useNativeDriver: true, listener: (e: any) => {
-									if (e.nativeEvent.contentOffset.y > 46) {
-										if (title == collection.current.cname) return;
-										setTitle(collection.current.cname);
-									} else {
-										if (title == "香单") return;
-										setTitle("香单");
-									}
-								}
-							}
-						)
-					}
+					onScroll={handlerScroll}
 					ListEmptyComponent={() => {
 						return (
 							<View style={[styles.empty_con, styles.borderRadius]}>
@@ -286,9 +309,12 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 							</View>
 						)
 					}}
+					style={[styles.list_con, styles.borderRadius, useAnimatedStyle(() => ({
+						top: withTiming(headerT.value === 1 ? -(71 + insets.top) : 0),
+					}))]}
 					ListHeaderComponent={() => {
 						return (
-							<View style={[styles.perfume_info_con]}>
+							<>
 								<View style={styles.info_con}>
 									<Pressable style={styles.info_image} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>
 										<Image style={{ width: "100%", height: "100%" }} source={{ uri: ENV.image + collection.current.cpic + "!l" }} />
@@ -322,7 +348,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 										<Icon name={like_.current[collection.current.cid] ? "heart1-checked" : "heart1"} size={15} color={theme.toolbarbg} />
 										<Text style={styles.btn_text}>{collection.current.favcnt}</Text>
 									</Pressable>
-									<Pressable style={styles.btn_con}>
+									<Pressable style={styles.btn_con} onPress={() => { headerT.value = 1 }}>
 										<Icon name="checkbox" size={14} color={theme.toolbarbg} />
 										<Text style={styles.btn_text}>{"多选"}</Text>
 									</Pressable>
@@ -331,7 +357,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 										<Text style={[styles.btn_text, iscanbuy.current && { color: "#EFB946" }]}>{"在售"}</Text>
 									</Pressable>
 								</View>
-							</View>
+							</>
 						)
 					}}
 					renderItem={({ item, index }: any) => {
@@ -366,14 +392,46 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
 				/>
+				<Animated.View style={[styles.footer_btn, useAnimatedStyle(() => ({
+					opacity: withTiming(headerT.value === 1 ? 1 : 0),
+					zIndex: withTiming(headerT.value === 1 ? 0 : -1),
+				}))]}>
+					<LinearButton text={"添加"} colors2={["#81B4EC", "#9BA6F5"]}
+						isShowColor={false} isRadius={false}
+						onPress={() => { console.log("添加") }} />
+				</Animated.View>
 			</View>
 		</View>
 	);
 })
 
 const styles = StyleSheet.create({
-	perfume_info_con: {
-
+	list_head_con: {
+		paddingTop: 12,
+		paddingLeft: 27,
+		paddingRight: 29,
+		backgroundColor: theme.toolbarbg,
+		zIndex: 1,
+	},
+	list_btn_text: {
+		fontSize: 15,
+		color: theme.tit2
+	},
+	list_btn_con: {
+		...Globalstyles.item_flex_between,
+		height: 40
+	},
+	list_cnt_con: {
+		...Globalstyles.item_flex_between,
+		height: 30
+	},
+	list_con: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		zIndex: 0,
 	},
 	info_con: {
 		flexDirection: "row",
@@ -393,7 +451,7 @@ const styles = StyleSheet.create({
 	},
 	info_name: {
 		fontSize: 15,
-		height: 36,
+		minHeight: 36,
 		color: theme.toolbarbg,
 	},
 	info_flex: {
@@ -444,7 +502,7 @@ const styles = StyleSheet.create({
 		minHeight: 120,
 		flexDirection: "row",
 		paddingHorizontal: 9,
-		backgroundColor: theme.toolbarbg
+		backgroundColor: theme.toolbarbg,
 	},
 	borderRadius: {
 		borderTopLeftRadius: 15,
@@ -495,6 +553,12 @@ const styles = StyleSheet.create({
 		width: 50,
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	footer_btn: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		bottom: 0,
 	}
 });
 

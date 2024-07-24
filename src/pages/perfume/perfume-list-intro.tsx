@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
 		width: 179,
 		height: 179,
 		borderRadius: 8,
+		overflow: "hidden",
 		marginHorizontal: "auto",
 	},
 	col_name: {

@@ -481,17 +481,6 @@ const Globalstyles: any = StyleSheet.create({
 		borderRadius: 8,
 		marginRight: 5,
 	},
-	// 弹窗内确定按钮
-	confirm_btn: {
-		width: "100%",
-		height: 46,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	confirm_btn_text: {
-		fontSize: 16,
-		color: theme.toolbarbg,
-	},
 	// 底部输入框图标
 	footer_icon_con: {
 		flexDirection: "row",

@@ -10,6 +10,7 @@ import { ModalPortal } from "../modals";
 import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
+import LinearButton from "../linearbutton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -50,19 +51,10 @@ function RulesPopover({ modalparams }: any): React.JSX.Element {
 				setBuiltInZoomControls={false}
 				scrollEnabled={false}
 				source={{ html: rule }} />
-			<Pressable style={{ width: "100%" }} onPress={() => {
-				ModalPortal.dismiss(modalkey);
-			}}>
-				<LinearGradient
-					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={Globalstyles.confirm_btn}
-				>
-					<Text style={Globalstyles.confirm_btn_text}>{"完成"}</Text>
-				</LinearGradient>
-			</Pressable>
+			<LinearButton containerStyle={{ width: "100%" }}
+				text={"完成"} colors2={["#81B4EC", "#9BA6F5"]}
+				isShowColor={false} isRadius={false}
+				onPress={() => { ModalPortal.dismiss(modalkey) }} />
 		</View>
 	);
 }

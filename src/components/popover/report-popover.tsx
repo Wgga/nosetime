@@ -14,6 +14,7 @@ import { Globalstyles } from "../../utils/globalmethod";
 
 import theme from "../../configs/theme";
 import { ENV } from "../../configs/ENV";
+import LinearButton from "../linearbutton";
 
 
 const { width, height } = Dimensions.get("window");
@@ -136,16 +137,10 @@ function ReportPopover({ modalparams }: any): React.JSX.Element {
 						placeholder={"请填写举报理由"} />
 				</View>
 			</ScrollView>
-			<Pressable style={{ width: "100%" }} onPress={report}>
-				<LinearGradient
-					colors={["#81B4EC", "#9BA6F5"]}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 1, y: 0 }}
-					locations={[0, 1]}
-					style={Globalstyles.confirm_btn}>
-					<Text style={Globalstyles.confirm_btn_text}>{"确定"}</Text>
-				</LinearGradient>
-			</Pressable>
+			<LinearButton containerStyle={{ width: "100%" }}
+				text={"确定"} colors2={["#81B4EC", "#9BA6F5"]}
+				isShowColor={false} isRadius={false}
+				onPress={report} />
 		</View>
 	);
 }
