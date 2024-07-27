@@ -29,6 +29,38 @@ import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
+const ListItem = React.memo(({ item, index, isbuy, canbuy }: any) => {
+	console.log("%c Line:33 🥛", "color:#42b983");
+	return (
+		<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
+			<View style={styles.item_order}>
+				<Text style={styles.order_text}>{index + 1}</Text>
+			</View>
+			<Pressable style={styles.item_image}>
+				<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
+					defaultSource={require("../../assets/images/noxx.png")}
+					source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
+			</Pressable>
+			<View style={styles.item_info}>
+				{item.cnname && <Text numberOfLines={1} style={styles.name_text}>{item.cnname}</Text>}
+				{item.enname && <Text numberOfLines={1} style={[styles.name_text, { color: theme.text1 }]}>{item.enname}</Text>}
+				<View style={styles.item_info_score}>
+					<Pressable onPress={() => { }}>
+						{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
+						{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
+					</Pressable>
+					{/* {(isbuy && isbuy[item.iid]) && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />} */}
+					{/* {(canbuy && canbuy[item.iid]) && !isbuy.cjurrent[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />} */}
+				</View>
+				{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
+			</View>
+			<Pressable style={styles.item_btn}>
+				<Icon name="sandian1" size={18} color={theme.fav} />
+			</Pressable>
+		</View>
+	)
+})
+
 const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 
 	// 控件
@@ -229,6 +261,10 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		}
 	})
 
+	const showMenu = React.useCallback(() => {
+		setShowMenu(val => !val)
+	}, [])
+
 	return (
 		<View style={Globalstyles.container}>
 			<HeaderView data={{
@@ -271,18 +307,18 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				{/* {(collection.current.cuid != us.user.uid) && <Icon name="share2" size={16}
 					onPress={() => { }} color={theme.toolbarbg} style={Globalstyles.title_icon} />} */}
 				{collection.current.cuid == us.user.uid && <Icon name="sandian"
-					size={18} onPress={() => { setShowMenu(val => !val) }}
+					size={18} onPress={showMenu}
 					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
 			</HeaderView>
-			<View style={{ flex: 1, zIndex: 0 }}>
-				<View style={[Globalstyles.header_bg_con, { height: 300, top: -(44 + insets.top) }]}>
-					<View style={Globalstyles.header_bg_msk}></View>
-					<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
-				</View>
+			<View style={[Globalstyles.header_bg_con, { height: 300 }]}>
+				<View style={Globalstyles.header_bg_msk}></View>
+				<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
+			</View>
+			<View style={[{ flex: 1, zIndex: 0 }, styles.borderRadius]}>
 				<Animated.View style={[styles.list_head_con, styles.borderRadius, useAnimatedStyle(() => ({
-					top: withTiming(headerT.value === 1 ? 0 : (71 + insets.top)),
-					opacity: withTiming(headerT.value === 1 ? 1 : 0),
-					zIndex: withTiming(headerT.value === 1 ? 1 : -1),
+					top: withTiming(headerT.value ? 0 : (71 + insets.top)),
+					opacity: withTiming(headerT.value),
+					zIndex: withTiming(headerT.value ? 1 : -1),
 				}))]}>
 					<View style={styles.list_btn_con}>
 						<View style={Globalstyles.item_flex}>
@@ -309,8 +345,8 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 							</View>
 						)
 					}}
-					style={[styles.list_con, styles.borderRadius, useAnimatedStyle(() => ({
-						top: withTiming(headerT.value === 1 ? -(71 + insets.top) : 0),
+					style={[styles.list_con, useAnimatedStyle(() => ({
+						top: withTiming(headerT.value ? -(72 + insets.top) : 0),
 					}))]}
 					ListHeaderComponent={() => {
 						return (
@@ -324,7 +360,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 										</View>}
 									</Pressable>
 									<View style={styles.info_msg}>
-										<Text numberOfLines={2} style={styles.info_name}>{collection.current.cname}</Text>
+										<Text numberOfLines={2} style={styles.info_name} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>{collection.current.cname}</Text>
 										<Pressable style={styles.info_flex} onPress={() => { gotodetail("perfume-list-intro", collection.current) }}>
 											{collection.current.cdesc && <Text numberOfLines={1} style={styles.desc_text}>{collection.current.cdesc}</Text>}
 											{(!collection.current.cdesc && collection.current.cuid == us.user.uid) && <Text style={styles.desc_text}>{"编辑香单"}</Text>}
@@ -362,39 +398,14 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					}}
 					renderItem={({ item, index }: any) => {
 						return (
-							<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
-								<View style={styles.item_order}>
-									<Text style={styles.order_text}>{index + 1}</Text>
-								</View>
-								<Pressable style={styles.item_image}>
-									<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
-										defaultSource={require("../../assets/images/noxx.png")}
-										source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
-								</Pressable>
-								<View style={styles.item_info}>
-									{item.cnname && <Text numberOfLines={1} style={styles.name_text}>{item.cnname}</Text>}
-									{item.enname && <Text numberOfLines={1} style={[styles.name_text, { color: theme.text1 }]}>{item.enname}</Text>}
-									<View style={styles.item_info_score}>
-										<Pressable onPress={() => { }}>
-											{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
-											{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
-										</Pressable>
-										{isbuy_.current[item.iid] && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />}
-										{canbuy_.current[item.iid] && !isbuy_.current[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />}
-									</View>
-									{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
-								</View>
-								<Pressable style={styles.item_btn}>
-									<Icon name="sandian1" size={18} color={theme.fav} />
-								</Pressable>
-							</View>
-						)
+							<ListItem item={item} index={index} isbuy={isbuy_.current} canbuy={canbuy_.current} />
+						);
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
 				/>
 				<Animated.View style={[styles.footer_btn, useAnimatedStyle(() => ({
-					opacity: withTiming(headerT.value === 1 ? 1 : 0),
-					zIndex: withTiming(headerT.value === 1 ? 0 : -1),
+					opacity: withTiming(headerT.value),
+					zIndex: withTiming(headerT.value ? 0 : -1),
 				}))]}>
 					<LinearButton text={"添加"} colors2={["#81B4EC", "#9BA6F5"]}
 						isShowColor={false} isRadius={false}
