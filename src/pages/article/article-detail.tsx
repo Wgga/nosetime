@@ -499,7 +499,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 			AlertCtrl.show({
 				header: "请先选择投票内容",
 				key: "empty_vitecon_alert",
-				message: "",
 				buttons: [{
 					text: "确定",
 					handler: () => {

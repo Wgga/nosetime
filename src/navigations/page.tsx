@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import ArticleDetail from "../pages/article/article-detail";
 
-import Search from "../pages/search/search";
+import Search from "../pages/search";
 import SearchResult from "../pages/search/search-result";
 import Scanner from "../pages/scanner";
 

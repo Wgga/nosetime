@@ -3,10 +3,15 @@ import React from "react";
 import { View, Text, StyleSheet, Pressable, Dimensions, Animated as RNAnimated, Image } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Animated, { runOnJS, runOnUI, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import HeaderView from "../../components/view/headerview";
 import ListBottomTip from "../../components/listbottomtip";
+import AlertCtrl from "../../components/controller/alertctrl";
+import ToastCtrl from "../../components/controller/toastctrl";
+import LinearButton from "../../components/linearbutton";
+import { ModalPortal } from "../../components/modals";
+import PerfumeListPopover from "../../components/popover/perfumelist-popover";
 
 import us from "../../services/user-service/user-service";
 
@@ -22,15 +27,33 @@ import { ENV } from "../../configs/ENV";
 import Icon from "../../assets/iconfont";
 import Yimai from "../../assets/svg/itemdetail/yimai.svg";
 import EmptyNose from "../../assets/svg/empty_nose.svg";
-import AlertCtrl from "../../components/controller/alertctrl";
-import ToastCtrl from "../../components/controller/toastctrl";
-import LinearButton from "../../components/linearbutton";
-import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 
-const ListItem = React.memo(({ item, index, isbuy, canbuy }: any) => {
-	console.log("%c Line:33 🥛", "color:#42b983");
+const ListItem = React.memo(({ data, method }: any) => {
+
+	// 参数
+	const { item, index, isbuy = {}, canbuy = {} } = data;
+	const { showpopover } = method;
+	// 变量
+	let items = React.useRef<any>({});
+	let loading = React.useRef<any>({});
+
+	React.useEffect(() => {
+		console.log("%c Line:38 🥥", "color:#3f7cff");
+	}, [])
+
+	const plus_item = (item: any) => {
+		if (items.current[item.iid]) {
+			showpopover(item, items.current[item.iid]);
+			return;
+		}
+		http.get(ENV.mall + "?method=getitem&id=" + item.iid).then((resp_data: any) => {
+			items.current[item.iid] = resp_data;
+			showpopover(item, resp_data);
+		})
+	}
+
 	return (
 		<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
 			<View style={styles.item_order}>
@@ -49,12 +72,12 @@ const ListItem = React.memo(({ item, index, isbuy, canbuy }: any) => {
 						{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
 						{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
 					</Pressable>
-					{/* {(isbuy && isbuy[item.iid]) && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />} */}
-					{/* {(canbuy && canbuy[item.iid]) && !isbuy.cjurrent[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />} */}
+					{isbuy[item.iid] && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />}
+					{canbuy[item.iid] && !isbuy[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />}
 				</View>
 				{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
 			</View>
-			<Pressable style={styles.item_btn}>
+			<Pressable style={styles.item_btn} onPress={() => { plus_item(item) }}>
 				<Icon name="sandian1" size={18} color={theme.fav} />
 			</Pressable>
 		</View>
@@ -75,7 +98,6 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let colname = useSharedValue<string>("");
 	let scrollY = useSharedValue<number>(0); // 顶部滚动动画
 	let headerT = useSharedValue<number>(0);
-	let headerH = React.useRef<number>(0);
 	// 数据
 	let collection = React.useRef<any>({ cdata: [], cuid: "", cid: "" });
 	let items = React.useRef<any>([]);
@@ -89,6 +111,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let iscanbuy = React.useRef<boolean>(false);
 	let nocanbuy = React.useRef<boolean>(false);
 	let isSelAll = React.useRef<boolean>(false);
+	let loading = React.useRef<boolean>(true);
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
@@ -102,31 +125,35 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	// 初始化
 	const init = () => {
 		http.get(ENV.collection + "?method=getcollectiondetail&id=" + id.current + "&v=2").then((resp_data: any) => {
-			for (var i in resp_data["cdata"]) {
-				if (resp_data["cdata"][i].udcontent && resp_data["cdata"][i].udcontent[0] != "“") {
-					if (resp_data["cdata"][i].udcontent.length > 50) {
-						resp_data["cdata"][i].udcontent = "“" + resp_data["cdata"][i].udcontent.slice(0, 52) + "...”";
-					} else {
-						resp_data["cdata"][i].udcontent = "“" + resp_data["cdata"][i].udcontent + "”";
-					}
-				}
-			}
-			allcnt.current = resp_data.cnt;
-			pagesize.current = Math.ceil(resp_data.cnt / 50);
-			collection.current = resp_data;
-			colname.value = resp_data.cname;
-			items.current = resp_data.cdata;
+			handlecontent(resp_data);
 			if (pagesize.current == 1) {
 				noMore.current = true;
 			}
-			//有可能cdata是空数组也有可能是null;
-			isempty.current = (!collection.current.cdata || collection.current.cdata.length == 0);
 			//不是自己的香单，不显示添加按钮
 			if (us.user.uid == collection.current.cuid) {
 				if (collection.current.cdata.length <= 3) showaddbtn.current = true;
 			}
 			like_buys();
 		});
+	}
+
+	// 处理香水评论内容
+	const handlecontent = (data: any) => {
+		for (var i in data["cdata"]) {
+			if (data["cdata"][i].udcontent && data["cdata"][i].udcontent[0] != "“") {
+				if (data["cdata"][i].udcontent.length > 50) {
+					data["cdata"][i].udcontent = "“" + data["cdata"][i].udcontent.slice(0, 52) + "...”";
+				} else {
+					data["cdata"][i].udcontent = "“" + data["cdata"][i].udcontent + "”";
+				}
+			}
+		}
+		allcnt.current = data.cnt;
+		pagesize.current = Math.ceil(data.cnt / 50);
+		collection.current = data;
+		colname.value = data.cname;
+		items.current = data.cdata;
+		isempty.current = (!collection.current.cdata || collection.current.cdata.length == 0);
 	}
 
 	// 查看当前香水是否购买过、可购买、收藏
@@ -143,6 +170,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		]).then(([isbuy, canbuy,]: any) => {
 			for (let i in isbuy) isbuy_.current[isbuy[i]] = 1;
 			for (let i in canbuy) canbuy_.current[canbuy[i]] = 1;
+			loading.current = false;
 			if (type != "nolike") {
 				http.post(ENV.collection, { method: "islike", uid: us.user.uid, ids: [id.current] }).then((islike: any) => {
 					for (let i in islike) like_.current[islike[i]] = 1;
@@ -212,12 +240,12 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		}
 	}
 
+	// 删除香单
 	const delete_col = () => {
 		setShowMenu(false);
 		AlertCtrl.show({
 			header: "确认删除这个香单吗？",
 			key: "del_col_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {
@@ -248,10 +276,10 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 头部滚动监听
 	const handlerScroll = useAnimatedScrollHandler((event) => {
 		"worklet";
 		scrollY.value = event.contentOffset.y;
-		console.log("%c Line:224 🥒 scrollY.value", "color:#33a5ff", scrollY.value);
 		if (event.contentOffset.y > 46) {
 			if (title == colname.value) return;
 			runOnJS(setTitle)(colname.value)
@@ -261,12 +289,192 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		}
 	})
 
-	const showMenu = React.useCallback(() => {
-		setShowMenu(val => !val)
-	}, [])
+	// 显示香水操作弹窗
+	const showpopover = (item: any, resp_data: any) => {
+		let buttons = [{
+			text: "加入香单",
+			handler: () => {
+				ModalPortal.dismiss("perfume_plus_alert");
+				join_perfume([item.iid]);
+			}
+		}, {
+			text: "添加到收藏",
+			handler: () => {
+				ModalPortal.dismiss("perfume_plus_alert");
+				navigation.push("Page", {
+					screen: "ItemVote",
+					params: { type: "wanted", optionaltype: "", id: item.iid, name: item.cnname, enname: item.enname, }
+				});
+			}
+		}, {
+			text: "加入购物车",
+			handler: () => {
+				ModalPortal.dismiss("perfume_plus_alert");
+				add_cart(item);
+			}
+		}, {
+			text: "删除",
+			handler: () => {
+				ModalPortal.dismiss("perfume_plus_alert");
+				delete_items(item);
+			}
+		}];
+
+		if (us.user.uid != collection.current.cuid) {
+			buttons.splice(3, 1);
+		}
+
+		if (!resp_data.try || !resp_data.trylist || resp_data.media.length == 0) {
+			buttons.splice(2, 1);
+		}
+
+		AlertCtrl.show({
+			key: "perfume_plus_alert",
+			isOnlybtn: true,
+			buttons,
+		})
+	}
+
+	// 香水加入香单
+	const join_perfume = (iids: any) => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
+		}
+
+		if (selcnt.current == 0 && iids.length == 0) {
+			ToastCtrl.show({ message: "请选择要操作的香水", duration: 1000, viewstyle: "medium_toast", key: "not_select_toast" });
+			return;
+		}
+		// if (!iid) {
+		// 	let iids = [];
+		// 	if (collection.current.cdata) {
+		// 		for (var i = 0; i < collection.current.cdata.length; i++) {
+		// 			if (collection.current.cdata[i].sel)
+		// 				iids.push(collection.current.cdata[i].iid);
+		// 		}
+		// 	}
+		// 	if (iids.length == 0) return;
+		// }
+		cache.getItem("usercollections" + us.user.uid).then((cacheobj) => {
+			if (cacheobj) {
+				joinpopover(iids, cacheobj);
+			}
+		}).catch(() => {
+			http.post(ENV.collection + "?method=getusercollections&page=1&uid=" + us.user.uid, { token: us.user.token }).then((resp_data: any) => {
+				//20240229 shibo:处理token失效
+				if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+					us.delUser();
+					return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
+				}
+				joinpopover(iids, resp_data);
+				cache.saveItem("usercollections" + us.user.uid, resp_data, 600);
+			})
+		})
+	}
+
+	// 香水加入香单弹窗
+	const joinpopover = (iids: any, data: any) => {
+		let params = { iids, cid: collection.current.cid, perfumeLists: data, src: "perfume-list-detail", key: "perfume_list_popover" }
+		ModalPortal.show((
+			<PerfumeListPopover data={params} />
+		), {
+			key: params.key,
+			width,
+			rounded: false,
+			useNativeDriver: true,
+			onTouchOutside: () => { ModalPortal.dismiss(params.key) },
+			onHardwareBackPress: () => {
+				ModalPortal.dismiss(params.key);
+				return true;
+			},
+			animationDuration: 300,
+			type: "bottomModal",
+			modalStyle: { backgroundColor: "transparent" },
+		})
+	}
+
+	// TODO
+	const add_cart = (item: any) => {
+
+	}
+
+	// 删除香单香水
+	const delete_items = (item: any) => {
+		if (!us.user.uid) {
+			return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
+		}
+
+		let coldata = Object.assign({}, collection.current);
+		let rmperfume: any = [];
+		coldata.cdata = [];
+		// 单个删除
+		if (item) {
+			for (let i in collection.current.cdata) {
+				if (collection.current.cdata[i].iid != item.iid) {
+					coldata.cdata.push(collection.current.cdata[i].iid);
+				} else {
+					rmperfume.push(collection.current.cdata[i].iid);
+				}
+			}
+		} else {// 多选删除
+			if (selcnt.current == 0) {
+				ToastCtrl.show({ message: "请选择要操作的香水", duration: 1000, viewstyle: "medium_toast", key: "not_select_toast" });
+				return;
+			}
+			for (let i in collection.current.cdata) {
+				if (!collection.current.cdata[i].sel) {
+					coldata.cdata.push(collection.current.cdata[i].iid);
+				} else {
+					rmperfume.push(collection.current.cdata[i].iid);
+				}
+			}
+		}
+
+		AlertCtrl.show({
+			header: "确认删除这个香水吗？",
+			key: "del_colperfume_alert",
+			buttons: [{
+				text: "取消",
+				handler: () => {
+					AlertCtrl.close("del_colperfume_alert");
+				}
+			}, {
+				text: "确定",
+				handler: () => {
+					_delete_items(coldata, rmperfume);
+				}
+			}],
+		})
+	}
+
+	// 删除香单香水
+	const _delete_items = (collection: any, rmperfume: any) => {
+		http.post(ENV.collection + "?uid=" + us.user.uid, {
+			method: "updatecollection", collection, rmperfume, token: us.user.token
+		}).then((resp_data: any) => {
+			ModalPortal.dismiss("del_colperfume_alert");
+			if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {
+				us.delUser();
+				return navigation.navigate("Page", { screen: "Login", params: { src: "App香单详情页面" } });
+			}
+			if (resp_data["cdata"]) {
+				handlecontent(resp_data);
+				headerT.value = 0;
+				events.publish("userGetusercollections");
+				selcnt.current = 0;
+				setIsRender(val => !val);
+				ToastCtrl.show({ message: "已删除", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
+			} else {
+				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "del_error_toast" });
+			}
+		})
+	}
 
 	return (
 		<View style={Globalstyles.container}>
+			{loading.current && <View style={Globalstyles.loading_con}>
+				<Image style={Globalstyles.loading_img} source={require("../../assets/images/loading.gif")} />
+			</View>}
 			<HeaderView data={{
 				title,
 				isShowSearch: false,
@@ -307,14 +515,21 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				{/* {(collection.current.cuid != us.user.uid) && <Icon name="share2" size={16}
 					onPress={() => { }} color={theme.toolbarbg} style={Globalstyles.title_icon} />} */}
 				{collection.current.cuid == us.user.uid && <Icon name="sandian"
-					size={18} onPress={showMenu}
+					size={18} onPress={() => { setShowMenu(val => !val) }}
 					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
 			</HeaderView>
-			<View style={[Globalstyles.header_bg_con, { height: 300 }]}>
+			<Animated.View style={[
+				Globalstyles.header_bg_con,
+				useAnimatedStyle(() => ({ transform: [{ translateY: scrollY.value > 163 ? -163 : 0 - scrollY.value }] })),
+				{ height: 300 }
+			]}>
 				<View style={Globalstyles.header_bg_msk}></View>
 				<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
-			</View>
-			<View style={[{ flex: 1, zIndex: 0 }, styles.borderRadius]}>
+			</Animated.View>
+			<Animated.View style={[{ flex: 1, zIndex: 0, overflow: "hidden" }, useAnimatedStyle(() => ({
+				borderTopLeftRadius: withTiming(headerT.value ? 15 : 0),
+				borderTopRightRadius: withTiming(headerT.value ? 15 : 0),
+			}))]}>
 				<Animated.View style={[styles.list_head_con, styles.borderRadius, useAnimatedStyle(() => ({
 					top: withTiming(headerT.value ? 0 : (71 + insets.top)),
 					opacity: withTiming(headerT.value),
@@ -398,7 +613,15 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					}}
 					renderItem={({ item, index }: any) => {
 						return (
-							<ListItem item={item} index={index} isbuy={isbuy_.current} canbuy={canbuy_.current} />
+							<ListItem data={{
+								item,
+								index,
+								isbuy: isbuy_.current,
+								canbuy: canbuy_.current,
+								collection: collection.current,
+							}} method={{
+								showpopover
+							}} />
 						);
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
@@ -411,7 +634,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 						isShowColor={false} isRadius={false}
 						onPress={() => { console.log("添加") }} />
 				</Animated.View>
-			</View>
+			</Animated.View>
 		</View>
 	);
 })

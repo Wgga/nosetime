@@ -6,6 +6,13 @@
   "description": "app专用",
   "glyphs": [
     {
+      "icon_id": "41276380",
+      "name": "plus3",
+      "font_class": "plus3",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
       "icon_id": "18954956",
       "name": "flashlight-off",
       "font_class": "flashlight-off",

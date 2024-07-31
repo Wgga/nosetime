@@ -587,7 +587,6 @@ const System = React.memo(({ navigation, copyrightyear }: any) => {
 		AlertCtrl.show({
 			header: "你确定要清除缓存吗？",
 			key: "clear_cache_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

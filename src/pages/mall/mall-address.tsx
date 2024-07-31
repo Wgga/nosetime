@@ -72,7 +72,6 @@ const MallAddress = React.memo(({ navigation }: any) => {
 		AlertCtrl.show({
 			header: "确定要删除该地址吗？",
 			key: "del_address_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

@@ -8,7 +8,7 @@ import Home from "../pages/home";
 import Smart from "../pages/smart";
 import Social from "../pages/social";
 import Mall from "../pages/mall";
-import User from "../pages/user/user";
+import User from "../pages/user";
 
 import us from "../services/user-service/user-service";
 

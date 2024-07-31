@@ -59,7 +59,6 @@ const ArticlePage = React.memo(({ navigation }: any) => {
 		AlertCtrl.show({
 			header: "确定要删除吗？",
 			key: "del_fav_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {
@@ -263,7 +262,6 @@ const WikiPage = React.memo(({ uid, navigation }: any) => {
 		AlertCtrl.show({
 			header: "确定要删除吗？",
 			key: "del_wiki_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

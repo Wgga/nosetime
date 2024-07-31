@@ -62,7 +62,6 @@ const PhotoPopover = React.memo(({ modalparams }: any) => {
 		AlertCtrl.show({
 			header: "确定要删除吗？",
 			key: "del_photo_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

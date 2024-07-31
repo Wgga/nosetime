@@ -171,7 +171,6 @@ const UserDiscuss = React.memo(({ navigation, route }: any) => {
 		AlertCtrl.show({
 			header: "确定要删除吗？",
 			key: "del_discuss_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

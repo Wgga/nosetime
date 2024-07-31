@@ -174,6 +174,7 @@ function User({ navigation }: any): React.JSX.Element {
 			},
 			onHardwareBackPress: () => {
 				ModalPortal.dismiss("giftcode_inputAlert");
+				giftcode.current = "";
 				return true;
 			},
 			animationDuration: 300,
@@ -185,6 +186,7 @@ function User({ navigation }: any): React.JSX.Element {
 	const exchange = () => {
 		let params = { giftcode: giftcode.current };
 		http.post(ENV.giftcode + "?uid=" + us.user.uid, { method: "exchange", token: us.user.token, data: params }).then((resp_data: any) => {
+			ModalPortal.dismiss("giftcode_inputAlert");
 			if (resp_data.msg == "OK") {
 				showgiftcodepopover(resp_data);
 			} else if (resp_data.msg == "TOKEN_ERR" || resp_data.msg == "TOKEN_EXPIRE") {

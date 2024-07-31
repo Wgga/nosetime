@@ -1938,10 +1938,10 @@
   resolved "https://registry.npmmirror.com/@react-navigation/elements/-/elements-1.3.31.tgz#28dd802a0787bb03fc0e5be296daf1804dbebbcf"
   integrity sha512-bUzP4Awlljx5RKEExw8WYtif8EuQni2glDaieYROKTnaxsu9kEIA515sXQgUDZU4Ob12VoL7+z70uO3qrlfXcQ==
 
-"@react-navigation/native-stack@^6.10.1":
-  version "6.10.1"
-  resolved "https://registry.npmmirror.com/@react-navigation/native-stack/-/native-stack-6.10.1.tgz#8ceea729b47af4ab18024d129e08ebd8888feeb9"
-  integrity sha512-MDTHtelO2EhY1sEbz4YMNw+1YoE0sWXSHLUYireQZFHUXKDfYiWYbxXg2Q08Ool0KEvnZjP0hh0Wm6/ZnvDCtw==
+"@react-navigation/native-stack@^6.11.0":
+  version "6.11.0"
+  resolved "https://registry.npmmirror.com/@react-navigation/native-stack/-/native-stack-6.11.0.tgz#a33f92cbd55dfe28fb0ba67df99aaa95240eb87c"
+  integrity sha512-U5EcUB9Q2NQspCFwYGGNJm0h6wBCOv7T30QjndmvlawLkNt7S7KWbpWyxS9XBHSIKF57RgWjfxuJNTgTstpXxw==
   dependencies:
     "@react-navigation/elements" "^1.3.31"
     warn-once "^0.1.0"
@@ -1962,6 +1962,16 @@
   integrity sha512-lTM8gSFHSfkJvQkxacGM6VJtBt61ip2XO54aNfswD+KMw6eeZ4oehl7m0me3CR9hnDE4+60iAZR8sAhvCiI3NA==
   dependencies:
     nanoid "^3.1.23"
+
+"@reduxjs/toolkit@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.npmmirror.com/@reduxjs/toolkit/-/toolkit-2.2.7.tgz#199e3d10ccb39267cb5aee92c0262fd9da7fdfb2"
+  integrity sha512-faI3cZbSdFb8yv9dhDTmGwclW0vk0z5o1cia+kf7gCbaCwHI5e+7tP57mJUv22pNcNbeA62GSrPpfrUfdXcQ6g==
+  dependencies:
+    immer "^10.0.3"
+    redux "^5.0.1"
+    redux-thunk "^3.1.0"
+    reselect "^5.1.0"
 
 "@rnx-kit/chromium-edge-launcher@^1.0.0":
   version "1.0.0"
@@ -2235,6 +2245,11 @@
   version "2.0.3"
   resolved "https://registry.npmmirror.com/@types/stack-utils/-/stack-utils-2.0.3.tgz#6209321eb2c1712a7e7466422b8cb1fc0d9dd5d8"
   integrity sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==
+
+"@types/use-sync-external-store@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.npmmirror.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.3.tgz#b6725d5f4af24ace33b36fafd295136e75509f43"
+  integrity sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==
 
 "@types/yargs-parser@*":
   version "21.0.3"
@@ -4198,10 +4213,10 @@ get-symbol-description@^1.0.2:
     es-errors "^1.3.0"
     get-intrinsic "^1.2.4"
 
-gifted-charts-core@^0.1.13:
-  version "0.1.13"
-  resolved "https://registry.npmmirror.com/gifted-charts-core/-/gifted-charts-core-0.1.13.tgz#e8da2fbdf4b1bc0c5dbfb5d5a07f57dc27a00257"
-  integrity sha512-fehek02jQqk205eV11z50MpfhCJ4xMGIoNNSROEVIxdmX4C24Ah7dB2pJSwDIpNyzDI33PhloDhGFHR6PhaOVg==
+gifted-charts-core@^0.1.21:
+  version "0.1.21"
+  resolved "https://registry.npmmirror.com/gifted-charts-core/-/gifted-charts-core-0.1.21.tgz#035244f57b6e6c03ac0086d94b7666813636a0f7"
+  integrity sha512-OtL9rv+Ul7h9Od3XszirvoVvIWPGzZ0NnDW06324GzWJjfn2bOh5dHhtgfQeCODDjuA+5pmrKQ33xKP7obNEhw==
 
 glob-parent@^5.1.2:
   version "5.1.2"
@@ -4428,6 +4443,11 @@ image-size@^1.0.2:
   integrity sha512-541xKlUw6jr/6gGuk92F+mYM5zaFAc5ahphvkqvNe2bQ6gVBkd6bfrmVJ2t4KDAfikAYZyIqTnktX3i6/aQDrQ==
   dependencies:
     queue "6.0.2"
+
+immer@^10.0.3:
+  version "10.1.1"
+  resolved "https://registry.npmmirror.com/immer/-/immer-10.1.1.tgz#206f344ea372d8ea176891545ee53ccc062db7bc"
+  integrity sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==
 
 import-fresh@^2.0.0:
   version "2.0.0"
@@ -6441,10 +6461,10 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-gesture-handler@^2.17.1:
-  version "2.17.1"
-  resolved "https://registry.npmmirror.com/react-native-gesture-handler/-/react-native-gesture-handler-2.17.1.tgz#f458a6099f09afac144f3e67add96667d859a88d"
-  integrity sha512-pWfniN6NuVKUq40KACuD3NCMe+bWNQCpD3cmxL6aLSCTwPKYmf7l4Lp0/E/almpjvxhybJZtFLU0w4tmxnIKaA==
+react-native-gesture-handler@^2.18.0:
+  version "2.18.0"
+  resolved "https://registry.npmmirror.com/react-native-gesture-handler/-/react-native-gesture-handler-2.18.0.tgz#0246ff3b6b1d26e2dc2e6990dfcb06e100a163de"
+  integrity sha512-NA77wlyTIXBZcPsZY2mUfvTrXp9/eTfwmIViakfDUGMYZTRdT/3cp9ugCIX44CHq5GlYdjy63mIjjCs1qMJ3Jg==
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
@@ -6456,12 +6476,12 @@ react-native-gif-player@^1.0.2:
   resolved "https://registry.npmmirror.com/react-native-gif-player/-/react-native-gif-player-1.0.2.tgz#b53770bbc236da9c58517562469a394fd15013b7"
   integrity sha512-FOFrailOmIamE8PR7Cpv1/RtbfGuw3ycA5QKgRJ188TfokURv4gHZ/qwJUMEqPuxH7ERs7gbXMkhKq66qaJVpw==
 
-react-native-gifted-charts@^1.4.16:
-  version "1.4.16"
-  resolved "https://registry.npmmirror.com/react-native-gifted-charts/-/react-native-gifted-charts-1.4.16.tgz#cd3ed402fcce0f469df0293c1a498a2e0a8fd6b2"
-  integrity sha512-gN05iLI5O+dG/YL+cOEkKJQSHLjGccU33zQbIn/7/DU616x6OHK2Qw+m1vPkme55VrjOy1DoRp7mfsgX1rsOPQ==
+react-native-gifted-charts@^1.4.22:
+  version "1.4.22"
+  resolved "https://registry.npmmirror.com/react-native-gifted-charts/-/react-native-gifted-charts-1.4.22.tgz#7ab8204cdd94de0250a0abc2f217102b8ff225d8"
+  integrity sha512-bfP4WTlt6iUf9ofRPoFx8hcW4IXio8pQTxhvNjnTTSMaVk+hPiZP0JBSy3hCLcGf+J5nZsvUMw7JwaxvuF6H+g==
   dependencies:
-    gifted-charts-core "^0.1.13"
+    gifted-charts-core "^0.1.21"
 
 react-native-image-crop-picker@^0.41.2:
   version "0.41.2"
@@ -6590,10 +6610,10 @@ react-native-vector-icons@^10.1.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native-video@6.4.2:
-  version "6.4.2"
-  resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.4.2.tgz#f1d8e7594d36aa513ba21aa86bcd6e11c2716915"
-  integrity sha512-8/8AVnamWJU80ZTWFFrLtpzfJeonSM8C8C8YycWAnjzro+FpJqpnQFFheVU2l2BSrnRTGA3eT2p4euXc+SByMw==
+react-native-video@6.4.3:
+  version "6.4.3"
+  resolved "https://registry.npmmirror.com/react-native-video/-/react-native-video-6.4.3.tgz#54ec38012a7a35a00da53b5eb9bdf9887cf5706b"
+  integrity sha512-KDuIz/JsD3mYT1Ma2oDBE3GIEHRO3a9GzMAEV8pKMtIh29j7X2DLr2L9oD4Kv94ggYag/+RuZpOtftxnDHDoXA==
 
 react-native-view-shot@^3.8.0:
   version "3.8.0"
@@ -6602,10 +6622,10 @@ react-native-view-shot@^3.8.0:
   dependencies:
     html2canvas "^1.4.1"
 
-react-native-vision-camera@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-4.5.0.tgz#47b475d12b3002baf18a2fbe9f4fd75c97f2cb00"
-  integrity sha512-WvfAad9uMgNmS7sndo+j4XInhwhgt6fpwGqVkt6oU4a2QS9r3DWK5lVm+5nGhMkSUZp5aoKPP0tQGALStNfZeQ==
+react-native-vision-camera@^4.5.1:
+  version "4.5.1"
+  resolved "https://registry.npmmirror.com/react-native-vision-camera/-/react-native-vision-camera-4.5.1.tgz#245a2b4b894b75c104342fd3e14e934462203d90"
+  integrity sha512-ob7gfBYin4lG2zlzRr5y4rYJN3NCCyJotFX1z3ul8V0N2GwkCGh31cko6hF9DXG4VocSPVYKt+K5W0CWLp3y0g==
 
 react-native-webview@^13.10.5:
   version "13.10.5"
@@ -6657,6 +6677,14 @@ react-native@0.74.1:
     whatwg-fetch "^3.0.0"
     ws "^6.2.2"
     yargs "^17.6.2"
+
+react-redux@^9.1.2:
+  version "9.1.2"
+  resolved "https://registry.npmmirror.com/react-redux/-/react-redux-9.1.2.tgz#deba38c64c3403e9abd0c3fbeab69ffd9d8a7e4b"
+  integrity sha512-0OA4dhM1W48l3uzmv6B7TXPCGmokUU4p1M44DGN2/D9a1FjVPukVjER1PcPX97jIg6aUeLq1XJo1IpfbgULn0w==
+  dependencies:
+    "@types/use-sync-external-store" "^0.0.3"
+    use-sync-external-store "^1.0.0"
 
 react-refresh@^0.14.0:
   version "0.14.2"
@@ -6732,6 +6760,16 @@ recyclerlistview@4.2.1:
     lodash.debounce "4.0.8"
     prop-types "15.8.1"
     ts-object-utils "0.0.5"
+
+redux-thunk@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmmirror.com/redux-thunk/-/redux-thunk-3.1.0.tgz#94aa6e04977c30e14e892eae84978c1af6058ff3"
+  integrity sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==
+
+redux@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmmirror.com/redux/-/redux-5.0.1.tgz#97fa26881ce5746500125585d5642c77b6e9447b"
+  integrity sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==
 
 reflect.getprototypeof@^1.0.4:
   version "1.0.6"
@@ -6823,6 +6861,11 @@ require-main-filename@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmmirror.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
+
+reselect@^5.1.0:
+  version "5.1.1"
+  resolved "https://registry.npmmirror.com/reselect/-/reselect-5.1.1.tgz#c766b1eb5d558291e5e550298adb0becc24bb72e"
+  integrity sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==
 
 resolve-cwd@^3.0.0:
   version "3.0.0"
@@ -7709,6 +7752,11 @@ use-latest-callback@^0.2.1:
   version "0.2.1"
   resolved "https://registry.npmmirror.com/use-latest-callback/-/use-latest-callback-0.2.1.tgz#4d4e6a9e4817b13142834850dcfa8d24ca4569cf"
   integrity sha512-QWlq8Is8BGWBf883QOEQP5HWYX/kMI+JTbJ5rdtvJLmXTIh9XoHIO3PQcmQl8BU44VKxow1kbQUHa6mQSMALDQ==
+
+use-sync-external-store@^1.0.0:
+  version "1.2.2"
+  resolved "https://registry.npmmirror.com/use-sync-external-store/-/use-sync-external-store-1.2.2.tgz#c3b6390f3a30eba13200d2302dcdf1e7b57b2ef9"
+  integrity sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==
 
 utf8@^3.0.0:
   version "3.0.0"

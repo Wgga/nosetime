@@ -137,7 +137,6 @@ function ItemVote({ navigation, route }: any): React.JSX.Element {
 		AlertCtrl.show({
 			header: "确定要删除吗？",
 			key: "del_img_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

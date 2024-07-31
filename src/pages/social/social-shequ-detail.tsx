@@ -420,7 +420,6 @@ const SocialShequDetail = React.memo(({ navigation, route }: any) => {
 		AlertCtrl.show({
 			header: "确认删除这条回复吗？",
 			key: "del_reply_alert",
-			message: "",
 			buttons: [{
 				text: "取消",
 				handler: () => {

@@ -34,7 +34,6 @@ const CareView = React.memo(({ data, method }: any) => {
 			AlertCtrl.show({
 				header: "确定要取消关注吗？",
 				key: "del_care_alert",
-				message: "",
 				buttons: [{
 					text: "取消",
 					handler: () => {

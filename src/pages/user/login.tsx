@@ -722,7 +722,6 @@ const Login = React.memo(({ route, navigation }: any) => {
 						AlertCtrl.show({
 							header: "用户名或密码错误",
 							key: "user_pwd_err_alert",
-							message: "",
 							buttons: [{
 								text: "确定",
 								handler: () => {
@@ -751,7 +750,6 @@ const Login = React.memo(({ route, navigation }: any) => {
 			AlertCtrl.show({
 				header: "用户名或密码错误",
 				key: "user_pwd_err_alert",
-				message: "",
 				buttons: [{
 					text: "确定",
 					handler: () => {

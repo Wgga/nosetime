@@ -10,10 +10,11 @@ const { width, height } = Dimensions.get("window");
 // 自定义Alert弹框
 class Alert {
 	private alert_data: any = {
-		header: "这是一个Alert组件",
+		header: "",
 		headstyle: {},
 		key: "alert",
-		message: "这是Alert组件的一串描述",
+		message: "",
+		isOnlybtn: false,
 		buttons: [],
 		btnbg: theme.text2,
 		onShow: () => { },
@@ -28,22 +29,28 @@ class Alert {
 		ModalPortal.show((
 			<View style={styles.containerView}>
 				<View style={styles.alert_wrapper}>
-					<View>
+					{(data.header || data.message) && <View>
 						{data.header && <Text style={[
 							styles.alert_head,
 							data.message ? styles.alert_showmsg_head : styles.alert_hidemsg_head,
 							data.headstyle && data.headstyle
 						]}>{data.header}</Text>}
 						{data.message && <Text style={styles.alert_message}>{data.message}</Text>}
-					</View>
-					<View style={styles.alert_button_group}>
+					</View>}
+					<View style={[
+						styles.alert_button_group,
+						!data.isOnlybtn && styles.button_top_border,
+						data.isOnlybtn && styles.alert_only_button_group
+					]}>
 						{
 							data.buttons && data.buttons.map((item: any, index: number) => {
 								return (
-									<TouchableHighlight key={index} style={[styles.alert_button, index == 1 && {
-										borderLeftWidth: 1,
-										borderLeftColor: "rgba(224,224,224,0.3333)",
-									}]}
+									<TouchableHighlight key={index} style={[
+										styles.alert_button,
+										(!data.isOnlybtn && index == 1) && styles.button_left_border,
+										(data.isOnlybtn && index >= 1) && styles.button_top_border,
+										data.isOnlybtn && styles.alert_only_button
+									]}
 										onPress={() => {
 											data.btnbg = theme.text2;
 											item.handler();
@@ -59,7 +66,7 @@ class Alert {
 						}
 					</View>
 				</View>
-			</View>
+			</View >
 		), {
 			key: data.key,
 			width: width,
@@ -123,8 +130,14 @@ const styles = StyleSheet.create({
 		width: "100%",
 		flexDirection: "row",
 		alignItems: "center",
+	},
+	button_top_border: {
 		borderTopWidth: 1,
-		borderTopColor: "rgba(224,224,224,0.3333)"
+		borderTopColor: "rgba(224,224,224, 0.3333)"
+	},
+	button_left_border: {
+		borderLeftWidth: 1,
+		borderLeftColor: "rgba(224,224,224, 0.3333)",
 	},
 	alert_button: {
 		flex: 1,
@@ -136,6 +149,13 @@ const styles = StyleSheet.create({
 		lineHeight: 44,
 		textAlign: "center",
 		fontSize: 15,
+	},
+	alert_only_button_group: {
+		flexDirection: "column",
+	},
+	alert_only_button: {
+		width: "100%",
+		flex: 0,
 	},
 })
 

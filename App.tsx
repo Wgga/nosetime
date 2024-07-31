@@ -15,6 +15,7 @@ import AndroidSystemBars from "react-native-system-bars";
 import { ModalPortal } from "./src/components/modals";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { registerApp } from "native-wechat";
+import { Provider } from "react-redux";
 
 import Route from "./src/navigations/route";
 

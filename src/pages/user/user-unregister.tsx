@@ -108,7 +108,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 		AlertCtrl.show({
 			header: type == "confirm" ? "确定要注销账户吗？" : "再次确定要注销账户吗？",
 			key: type + "_alert",
-			message: "",
 			buttons: type == "confirm" ? [{
 				text: "取消",
 				handler: () => {
@@ -195,7 +194,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 						AlertCtrl.show({
 							header: "用户名或密码错误",
 							key: "user_pwd_err_alert",
-							message: "",
 							buttons: [{
 								text: "确定",
 								handler: () => {
@@ -208,7 +206,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 						AlertCtrl.show({
 							header: "用户名或密码错误",
 							key: "user_pwd_err_alert",
-							message: "",
 							buttons: [{
 								text: "确定",
 								handler: () => {
@@ -235,7 +232,6 @@ const UserUnregister = React.memo(({ navigation }: any) => {
 			AlertCtrl.show({
 				header: "用户名或密码错误",
 				key: "user_pwd_err_alert",
-				message: "",
 				buttons: [{
 					text: "确定",
 					handler: () => {
