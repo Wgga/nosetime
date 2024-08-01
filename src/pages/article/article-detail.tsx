@@ -4,6 +4,7 @@ import { View, Text, StatusBar, Pressable, StyleSheet, Image, FlatList, Keyboard
 import { FlashList } from "@shopify/flash-list";
 import Orientation from "react-native-orientation-locker";
 import FastImage from "react-native-fast-image";
+import DeviceInfo from "react-native-device-info";
 import { useFocusEffect } from "@react-navigation/native";
 
 import HeaderView from "../../components/view/headerview";
@@ -370,7 +371,7 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 				}
 				if (e.nodeName != "A") return;
 				let href = e.getAttribute("href");
-				if (href.includes("taobao") || href.includes("weidian")) {
+				if (href.includes("taobao") || href.includes("weidian") || href.includes("com.nosetime.perfume")) {
 					window.ReactNativeWebView.postMessage(JSON.stringify({ data: href, type: "scheme" }));
 				} else {
 					let obj = href.substr(href.indexOf("?") + 1).replace(/%22/g, '"');
@@ -452,11 +453,25 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 							ToastCtrl.show({ message: "未安装淘宝", duration: 1000, viewstyle: "short_toast", key: "goto_fail_toast" });
 						}
 					});
+				} else if (scheme.includes("com.nosetime.perfume")) {
+					let brand = DeviceInfo.getBrand(), uri = "";
+					if (brand == "Xiaomi") {
+						uri = "mimarket://details?id=com.nosetime.perfume";
+					}
+					Linking.canOpenURL(uri).then((supported) => {
+						if (supported) {
+							Linking.openURL(uri);
+						} else {
+							ToastCtrl.show({ message: "未安装应用商城", duration: 1000, viewstyle: "short_toast", key: "goto_fail_toast" });
+						}
+					});
+					console.log("%c Line:458 🍪 os", "color:#42b983", DeviceInfo.getSystemVersion());
 				} else if (scheme.includes("https://weidian.com/item.html")) {
 					let match = scheme.match(/itemId=(\d+)/), path = "lib/shop/dist/pages/index/index";
 					if (match) {
 						path = `lib/item/dist/pages/index/index?feeSource=&itemId=${match[1]}&id=${match[1]}&vrk=&wfr=`;
 					}
+					// TODO 跳转微信小程序
 					console.log("%c Line:466 🥖 path", "color:#42b983", path);
 				}
 			} else if (data.type == "sel") {

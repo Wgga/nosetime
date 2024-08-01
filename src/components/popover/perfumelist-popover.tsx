@@ -21,7 +21,7 @@ import ToastCtrl from "../controller/toastctrl";
 
 const { width, height } = Dimensions.get("window");
 
-function PerfumeListPopover({ data }: any): React.JSX.Element {
+const PerfumeListPopover = React.memo(({ data }: any) => {
 
 	// 控件
 	// 参数
@@ -140,7 +140,7 @@ function PerfumeListPopover({ data }: any): React.JSX.Element {
 			</ScrollView>
 		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	perfume_list_con: {

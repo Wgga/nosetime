@@ -33,14 +33,15 @@ const { width, height } = Dimensions.get("window");
 const ListItem = React.memo(({ data, method }: any) => {
 
 	// 参数
-	const { item, index, isbuy = {}, canbuy = {} } = data;
+	const { item, index, isbuy = {}, canbuy = {}, isOpenMulti } = data;
 	const { showpopover } = method;
 	// 变量
 	let items = React.useRef<any>({});
-	let loading = React.useRef<any>({});
+	// 状态
+	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		console.log("%c Line:38 🥥", "color:#3f7cff");
+		console.log("%c Line:45 🍯", "color:#ed9ec7");
 	}, [])
 
 	const plus_item = (item: any) => {
@@ -57,7 +58,15 @@ const ListItem = React.memo(({ data, method }: any) => {
 	return (
 		<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
 			<View style={styles.item_order}>
-				<Text style={styles.order_text}>{index + 1}</Text>
+				<Animated.Text style={[styles.order_text, useAnimatedStyle(() => ({ opacity: withTiming(isOpenMulti.value ? 0 : 1) }))]}>{index + 1}</Animated.Text>
+				<Animated.View style={[{ position: "absolute" }, useAnimatedStyle(() => ({ opacity: withTiming(isOpenMulti.value) }))]}>
+					<Icon name={item.sel ? "radio1" : "radio1-outline"} size={25} color={theme.primary} onPress={() => {
+						if (isOpenMulti.value) {
+							item.sel = !item.sel;
+							setIsRender(val => !val);
+						}
+					}} />
+				</Animated.View>
 			</View>
 			<Pressable style={styles.item_image}>
 				<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
@@ -97,7 +106,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	const [title, setTitle] = React.useState<string>("香单");
 	let colname = useSharedValue<string>("");
 	let scrollY = useSharedValue<number>(0); // 顶部滚动动画
-	let headerT = useSharedValue<number>(0);
+	let isOpenMulti = useSharedValue<number>(0);
 	// 数据
 	let collection = React.useRef<any>({ cdata: [], cuid: "", cid: "" });
 	let items = React.useRef<any>([]);
@@ -393,7 +402,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
-	// TODO
+	// TODO 加入购物车
 	const add_cart = (item: any) => {
 
 	}
@@ -459,15 +468,20 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 			}
 			if (resp_data["cdata"]) {
 				handlecontent(resp_data);
-				headerT.value = 0;
+				isOpenMulti.value = 0;
 				events.publish("userGetusercollections");
 				selcnt.current = 0;
-				setIsRender(val => !val);
 				ToastCtrl.show({ message: "已删除", duration: 1000, viewstyle: "short_toast", key: "del_success_toast" });
 			} else {
 				ToastCtrl.show({ message: resp_data.msg, duration: 1000, viewstyle: "medium_toast", key: "del_error_toast" });
 			}
+			setIsRender(val => !val);
 		})
+	}
+
+	const toggleMulti = (num: number) => {
+		isOpenMulti.value = num;
+		events.publish("isOpenMulti", num);
 	}
 
 	return (
@@ -527,20 +541,20 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				<Image source={{ uri: ENV.image + collection.current.cpic + "!s" }} blurRadius={5} style={Globalstyles.header_bg_img} />
 			</Animated.View>
 			<Animated.View style={[{ flex: 1, zIndex: 0, overflow: "hidden" }, useAnimatedStyle(() => ({
-				borderTopLeftRadius: withTiming(headerT.value ? 15 : 0),
-				borderTopRightRadius: withTiming(headerT.value ? 15 : 0),
+				borderTopLeftRadius: withTiming(isOpenMulti.value ? 15 : 0),
+				borderTopRightRadius: withTiming(isOpenMulti.value ? 15 : 0),
 			}))]}>
 				<Animated.View style={[styles.list_head_con, styles.borderRadius, useAnimatedStyle(() => ({
-					top: withTiming(headerT.value ? 0 : (71 + insets.top)),
-					opacity: withTiming(headerT.value),
-					zIndex: withTiming(headerT.value ? 1 : -1),
+					top: withTiming(isOpenMulti.value ? 0 : (71 + insets.top)),
+					opacity: withTiming(isOpenMulti.value),
+					zIndex: withTiming(isOpenMulti.value ? 1 : -1),
 				}))]}>
 					<View style={styles.list_btn_con}>
 						<View style={Globalstyles.item_flex}>
 							<Icon name={isSelAll.current ? "radio1" : "radio1-outline"} size={25} color={theme.primary} />
 							<Text style={[styles.list_btn_text, { marginLeft: 5 }]}>{"全选"}</Text>
 						</View>
-						<Text style={styles.list_btn_text} onPress={() => { headerT.value = 0 }}>{"关闭"}</Text>
+						<Text style={styles.list_btn_text} onPress={() => { toggleMulti(0) }}>{"关闭"}</Text>
 					</View>
 					<View style={styles.list_cnt_con}>
 						<Text>{"共" + allcnt.current + "款"}</Text>
@@ -561,7 +575,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 						)
 					}}
 					style={[styles.list_con, useAnimatedStyle(() => ({
-						top: withTiming(headerT.value ? -(72 + insets.top) : 0),
+						top: withTiming(isOpenMulti.value ? -(72 + insets.top) : 0),
 					}))]}
 					ListHeaderComponent={() => {
 						return (
@@ -599,7 +613,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 										<Icon name={like_.current[collection.current.cid] ? "heart1-checked" : "heart1"} size={15} color={theme.toolbarbg} />
 										<Text style={styles.btn_text}>{collection.current.favcnt}</Text>
 									</Pressable>
-									<Pressable style={styles.btn_con} onPress={() => { headerT.value = 1 }}>
+									<Pressable style={styles.btn_con} onPress={() => { toggleMulti(1) }}>
 										<Icon name="checkbox" size={14} color={theme.toolbarbg} />
 										<Text style={styles.btn_text}>{"多选"}</Text>
 									</Pressable>
@@ -619,6 +633,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 								isbuy: isbuy_.current,
 								canbuy: canbuy_.current,
 								collection: collection.current,
+								isOpenMulti,
 							}} method={{
 								showpopover
 							}} />
@@ -627,8 +642,8 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
 				/>
 				<Animated.View style={[styles.footer_btn, useAnimatedStyle(() => ({
-					opacity: withTiming(headerT.value),
-					zIndex: withTiming(headerT.value ? 0 : -1),
+					opacity: withTiming(isOpenMulti.value),
+					zIndex: withTiming(isOpenMulti.value ? 0 : -1),
 				}))]}>
 					<LinearButton text={"添加"} colors2={["#81B4EC", "#9BA6F5"]}
 						isShowColor={false} isRadius={false}
@@ -642,8 +657,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 const styles = StyleSheet.create({
 	list_head_con: {
 		paddingTop: 12,
-		paddingLeft: 27,
-		paddingRight: 29,
+		paddingHorizontal: 9,
 		backgroundColor: theme.toolbarbg,
 		zIndex: 1,
 	},
@@ -653,11 +667,13 @@ const styles = StyleSheet.create({
 	},
 	list_btn_con: {
 		...Globalstyles.item_flex_between,
-		height: 40
+		height: 40,
+		marginHorizontal: 8,
 	},
 	list_cnt_con: {
 		...Globalstyles.item_flex_between,
-		height: 30
+		height: 30,
+		marginHorizontal: 8,
 	},
 	list_con: {
 		position: "absolute",
