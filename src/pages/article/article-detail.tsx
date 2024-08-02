@@ -453,19 +453,6 @@ const ArticleDetail = React.memo(({ navigation, route }: any) => {
 							ToastCtrl.show({ message: "未安装淘宝", duration: 1000, viewstyle: "short_toast", key: "goto_fail_toast" });
 						}
 					});
-				} else if (scheme.includes("com.nosetime.perfume")) {
-					let brand = DeviceInfo.getBrand(), uri = "";
-					if (brand == "Xiaomi") {
-						uri = "mimarket://details?id=com.nosetime.perfume";
-					}
-					Linking.canOpenURL(uri).then((supported) => {
-						if (supported) {
-							Linking.openURL(uri);
-						} else {
-							ToastCtrl.show({ message: "未安装应用商城", duration: 1000, viewstyle: "short_toast", key: "goto_fail_toast" });
-						}
-					});
-					console.log("%c Line:458 🍪 os", "color:#42b983", DeviceInfo.getSystemVersion());
 				} else if (scheme.includes("https://weidian.com/item.html")) {
 					let match = scheme.match(/itemId=(\d+)/), path = "lib/shop/dist/pages/index/index";
 					if (match) {

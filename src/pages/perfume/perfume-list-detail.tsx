@@ -1,6 +1,6 @@
 import React from "react";
 
-import { View, Text, StyleSheet, Pressable, Dimensions, Animated as RNAnimated, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable, Dimensions, Image } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { runOnJS, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -41,7 +41,7 @@ const ListItem = React.memo(({ data, method }: any) => {
 	const [isrender, setIsRender] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		console.log("%c Line:45 🍯", "color:#ed9ec7");
+		console.log("%c Line:45 🧀", "color:#fca650");
 	}, [])
 
 	const plus_item = (item: any) => {
@@ -107,6 +107,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let colname = useSharedValue<string>("");
 	let scrollY = useSharedValue<number>(0); // 顶部滚动动画
 	let isOpenMulti = useSharedValue<number>(0);
+	let curpage = React.useRef<number>(1);
 	// 数据
 	let collection = React.useRef<any>({ cdata: [], cuid: "", cid: "" });
 	let items = React.useRef<any>([]);
@@ -479,9 +480,23 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 		})
 	}
 
+	// 切换多选
 	const toggleMulti = (num: number) => {
 		isOpenMulti.value = num;
 		events.publish("isOpenMulti", num);
+	}
+
+	const loadMore = () => {
+		if (!noMore.current) return;
+		http.get(ENV.collection + "?method=getcollectiondata&id=" + id.current + "&page=" + curpage.current).then((resp_data: any) => {
+			collection.current.cdata = collection.current.cdata.concat(resp_data);
+			items.current = collection.current.cdata;
+			if (curpage.current == pagesize.current) {
+				noMore.current = false;
+			}
+			curpage.current += 1;
+			like_buys();
+		})
 	}
 
 	return (
@@ -563,7 +578,9 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				</Animated.View>
 				<Animated.FlatList data={items.current}
 					onEndReachedThreshold={0.1}
-					onEndReached={() => { }}
+					onEndReached={() => {
+						if (items.current.length > 0) loadMore();
+					}}
 					keyExtractor={(item: any) => item.iid}
 					onScroll={handlerScroll}
 					ListEmptyComponent={() => {
