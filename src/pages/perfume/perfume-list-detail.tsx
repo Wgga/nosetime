@@ -30,70 +30,7 @@ import EmptyNose from "../../assets/svg/empty_nose.svg";
 
 const { width, height } = Dimensions.get("window");
 
-const ListItem = React.memo(({ data, method }: any) => {
-
-	// 参数
-	const { item, index, isbuy = {}, canbuy = {}, isOpenMulti } = data;
-	const { showpopover } = method;
-	// 变量
-	let items = React.useRef<any>({});
-	// 状态
-	const [isrender, setIsRender] = React.useState<boolean>(false);
-
-	React.useEffect(() => {
-		console.log("%c Line:45 🧀", "color:#fca650");
-	}, [])
-
-	const plus_item = (item: any) => {
-		if (items.current[item.iid]) {
-			showpopover(item, items.current[item.iid]);
-			return;
-		}
-		http.get(ENV.mall + "?method=getitem&id=" + item.iid).then((resp_data: any) => {
-			items.current[item.iid] = resp_data;
-			showpopover(item, resp_data);
-		})
-	}
-
-	return (
-		<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
-			<View style={styles.item_order}>
-				<Animated.Text style={[styles.order_text, useAnimatedStyle(() => ({ opacity: withTiming(isOpenMulti.value ? 0 : 1) }))]}>{index + 1}</Animated.Text>
-				<Animated.View style={[{ position: "absolute" }, useAnimatedStyle(() => ({ opacity: withTiming(isOpenMulti.value) }))]}>
-					<Icon name={item.sel ? "radio1" : "radio1-outline"} size={25} color={theme.primary} onPress={() => {
-						if (isOpenMulti.value) {
-							item.sel = !item.sel;
-							setIsRender(val => !val);
-						}
-					}} />
-				</Animated.View>
-			</View>
-			<Pressable style={styles.item_image}>
-				<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
-					defaultSource={require("../../assets/images/noxx.png")}
-					source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
-			</Pressable>
-			<View style={styles.item_info}>
-				{item.cnname && <Text numberOfLines={1} style={styles.name_text}>{item.cnname}</Text>}
-				{item.enname && <Text numberOfLines={1} style={[styles.name_text, { color: theme.text1 }]}>{item.enname}</Text>}
-				<View style={styles.item_info_score}>
-					<Pressable onPress={() => { }}>
-						{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
-						{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
-					</Pressable>
-					{isbuy[item.iid] && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />}
-					{canbuy[item.iid] && !isbuy[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />}
-				</View>
-				{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
-			</View>
-			<Pressable style={styles.item_btn} onPress={() => { plus_item(item) }}>
-				<Icon name="sandian1" size={18} color={theme.fav} />
-			</Pressable>
-		</View>
-	)
-})
-
-const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
+function PerfumeListDetail({ navigation, route }: any): React.JSX.Element {
 
 	// 控件
 	const insets = useSafeAreaInsets();
@@ -122,7 +59,9 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	let nocanbuy = React.useRef<boolean>(false);
 	let isSelAll = React.useRef<boolean>(false);
 	let loading = React.useRef<boolean>(true);
+	let isloadMore = React.useRef<boolean>(false);
 	const [showmenu, setShowMenu] = React.useState<boolean>(false); // 是否显示菜单
+	const [showorder, setShowOrder] = React.useState<boolean>(false); // 是否显示菜单
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染数据
 
 	React.useEffect(() => {
@@ -169,7 +108,6 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	// 查看当前香水是否购买过、可购买、收藏
 	const like_buys = (type?: string) => {
 		if (!us.user.uid) return;
-
 		let ids = [];
 		for (let i in items.current) {
 			ids.push(items.current[i].iid)
@@ -483,20 +421,56 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 	// 切换多选
 	const toggleMulti = (num: number) => {
 		isOpenMulti.value = num;
-		events.publish("isOpenMulti", num);
+		setShowOrder(num == 1 ? true : false);
 	}
 
 	const loadMore = () => {
-		if (!noMore.current) return;
+		if (!isloadMore.current) {
+			isloadMore.current = true;
+			return;
+		}
+		if (noMore.current) return;
+		curpage.current += 1;
 		http.get(ENV.collection + "?method=getcollectiondata&id=" + id.current + "&page=" + curpage.current).then((resp_data: any) => {
 			collection.current.cdata = collection.current.cdata.concat(resp_data);
 			items.current = collection.current.cdata;
 			if (curpage.current == pagesize.current) {
-				noMore.current = false;
+				noMore.current = true;
 			}
-			curpage.current += 1;
 			like_buys();
 		})
+	}
+
+	const plus_item = (item: any) => {
+		if (items.current[item.iid]) {
+			showpopover(item, items.current[item.iid]);
+			return;
+		}
+		http.get(ENV.mall + "?method=getitem&id=" + item.iid).then((resp_data: any) => {
+			items.current[item.iid] = resp_data;
+			showpopover(item, resp_data);
+		})
+	}
+
+	const selitem = (item: any) => {
+		item.sel = !item.sel;
+		if (items.current) {
+			selcnt.current = items.current.filter((item: any) => item.sel).length;
+			if (selcnt.current == items.current.length && !isSelAll.current) isSelAll.current = true;
+			if (selcnt.current == 0 && isSelAll.current) isSelAll.current = false;
+		}
+		setIsRender(val => !val);
+	}
+
+	const selallitem = () => {
+		isSelAll.current = !isSelAll.current;
+		if (items.current) {
+			for (var i = 0; i < items.current.length; i++) {
+				items.current[i].sel = isSelAll.current;
+			}
+			selcnt.current = items.current.filter((item: any) => item.sel).length;
+		}
+		setIsRender(val => !val);
 	}
 
 	return (
@@ -507,14 +481,14 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 			<HeaderView data={{
 				title,
 				isShowSearch: false,
-				showmenu: collection.current.cuid == us.user.uid ? showmenu : false,
+				showmenu: collection.current.cuid != us.user.uid ? showmenu : false,
 				style: { zIndex: 1, backgroundColor: "transparent", overflow: "hidden", },
 				childrenstyle: {
 					headercolor: { color: theme.toolbarbg },
 				}
 			}} method={{ back: () => { navigation.goBack() } }} MenuChildren={() => {
 				return (
-					collection.current.cuid == us.user.uid ? <>
+					collection.current.cuid != us.user.uid ? <>
 						{/* <Pressable style={Globalstyles.menu_icon_con} onPress={() => { setShowMenu(false) }}>
 							<Icon style={Globalstyles.menu_icon} name="share2" size={13} color={theme.comment} />
 							<Text style={[Globalstyles.menu_text, { color: theme.text1 }]}>{"分享"}</Text>
@@ -543,7 +517,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				</Animated.View>
 				{/* {(collection.current.cuid != us.user.uid) && <Icon name="share2" size={16}
 					onPress={() => { }} color={theme.toolbarbg} style={Globalstyles.title_icon} />} */}
-				{collection.current.cuid == us.user.uid && <Icon name="sandian"
+				{collection.current.cuid != us.user.uid && <Icon name="sandian"
 					size={18} onPress={() => { setShowMenu(val => !val) }}
 					color={theme.toolbarbg} style={Globalstyles.title_icon} />}
 			</HeaderView>
@@ -565,10 +539,10 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 					zIndex: withTiming(isOpenMulti.value ? 1 : -1),
 				}))]}>
 					<View style={styles.list_btn_con}>
-						<View style={Globalstyles.item_flex}>
+						<Pressable style={Globalstyles.item_flex} onPress={selallitem}>
 							<Icon name={isSelAll.current ? "radio1" : "radio1-outline"} size={25} color={theme.primary} />
 							<Text style={[styles.list_btn_text, { marginLeft: 5 }]}>{"全选"}</Text>
-						</View>
+						</Pressable>
 						<Text style={styles.list_btn_text} onPress={() => { toggleMulti(0) }}>{"关闭"}</Text>
 					</View>
 					<View style={styles.list_cnt_con}>
@@ -578,9 +552,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 				</Animated.View>
 				<Animated.FlatList data={items.current}
 					onEndReachedThreshold={0.1}
-					onEndReached={() => {
-						if (items.current.length > 0) loadMore();
-					}}
+					onEndReached={loadMore}
 					keyExtractor={(item: any) => item.iid}
 					onScroll={handlerScroll}
 					ListEmptyComponent={() => {
@@ -642,19 +614,36 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 							</>
 						)
 					}}
-					renderItem={({ item, index }: any) => {
+					renderItem={({ item, index }) => {
 						return (
-							<ListItem data={{
-								item,
-								index,
-								isbuy: isbuy_.current,
-								canbuy: canbuy_.current,
-								collection: collection.current,
-								isOpenMulti,
-							}} method={{
-								showpopover
-							}} />
-						);
+							<View style={[styles.col_item, index == 0 && styles.borderRadius]}>
+								<View style={styles.item_order}>
+									{!showorder && <Text style={styles.order_text}>{index + 1}</Text>}
+									{showorder && <Icon style={{ position: "absolute" }} name={item.sel ? "radio1" : "radio1-outline"} size={25} color={theme.primary} onPress={() => { selitem(item) }} />}
+								</View>
+								<Pressable style={styles.item_image}>
+									<Image style={{ width: "100%", height: "100%" }} resizeMode="contain"
+										defaultSource={require("../../assets/images/noxx.png")}
+										source={{ uri: ENV.image + "/perfume/" + item.iid + ".jpg!l" }} />
+								</Pressable>
+								<View style={styles.item_info}>
+									{item.cnname && <Text numberOfLines={1} style={styles.name_text}>{item.cnname}</Text>}
+									{item.enname && <Text numberOfLines={1} style={[styles.name_text, { color: theme.text1 }]}>{item.enname}</Text>}
+									<View style={styles.item_info_score}>
+										<Pressable onPress={() => { }}>
+											{item.total >= 10 && <Text style={styles.score_text}>{"评分:" + item.score + "分"}</Text>}
+											{item.total < 10 && <Text style={styles.score_text}>{"评分过少"}</Text>}
+										</Pressable>
+										{isbuy_.current[item.iid] && <Yimai width={16} height={16} style={{ marginLeft: 5 }} onPress={() => { }} />}
+										{canbuy_.current[item.iid] && !isbuy_.current[item.iid] && <Icon name="shopcart" size={15} color={theme.placeholder2} style={{ marginLeft: 5 }} onPress={() => { }} />}
+									</View>
+									{item.udcontent && <Text numberOfLines={3} style={styles.item_info_desc}>{item.udcontent}</Text>}
+								</View>
+								<Pressable style={styles.item_btn} onPress={() => { plus_item(item) }}>
+									<Icon name="sandian1" size={18} color={theme.fav} />
+								</Pressable>
+							</View>
+						)
 					}}
 					ListFooterComponent={<ListBottomTip noMore={noMore.current} isShowTip={items.current.length > 0} />}
 				/>
@@ -669,7 +658,7 @@ const PerfumeListDetail = React.memo(({ navigation, route }: any) => {
 			</Animated.View>
 		</View>
 	);
-})
+}
 
 const styles = StyleSheet.create({
 	list_head_con: {
