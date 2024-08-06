@@ -107,7 +107,10 @@ function PerfumeListDetail({ navigation, route }: any): React.JSX.Element {
 
 	// 查看当前香水是否购买过、可购买、收藏
 	const like_buys = (type?: string) => {
-		if (!us.user.uid) return;
+		if (!us.user.uid) {
+			setIsRender(val => !val);
+			return;
+		}
 		let ids = [];
 		for (let i in items.current) {
 			ids.push(items.current[i].iid)

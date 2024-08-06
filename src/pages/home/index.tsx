@@ -251,7 +251,7 @@ const Home = React.memo(({ navigation }: any) => {
 					navigation.navigate("Page", { screen: "Search", params: { src: "home" } });
 				}}>
 					<Animated.View style={[{ backgroundColor: color }, styles.Searchbar]}>
-						<Icon name="scan" size={20} color="#adadad" style={{ marginRight: 13 }} onPress={scan} />
+						{/* <Icon name="scan" size={20} color="#adadad" style={{ marginRight: 13 }} onPress={scan} /> */}
 						<Text style={styles.placeholder}>搜索香水、品牌、气味、帖子</Text>
 						<Icon name="search" size={23} color={theme.placeholder2} style={{ marginRight: 13 }} />
 					</Animated.View>

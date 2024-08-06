@@ -1,7 +1,10 @@
 import React from "react";
-import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions, Linking } from "react-native";
+import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
+import Animated, { useSharedValue, withDecay, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { ShadowedView } from "react-native-fast-shadow";
 
 import Slider from "./slider";
 
@@ -18,7 +21,6 @@ const { width, height } = Dimensions.get("window");
 function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 
 	// 控件
-
 	// 参数
 	const imagelist = [
 		require("../../assets/images/discussBg/bac01.png"),
@@ -27,7 +29,6 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		require("../../assets/images/discussBg/bac04.png"),
 		require("../../assets/images/discussBg/bac05.png"),
 	];
-
 	// 状态
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 	let homedata = React.useRef<any>({
@@ -36,10 +37,14 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		smellitems: [],
 		hotvod: [],
 		newvod: {},
-		topiclist: []
+		topiclist: [],
+		knowledgeitems: [],
 	}); // 首页数据
-
 	// 变量
+	const initX = useSharedValue<number>(0); // 初始化位置
+	const initY = useSharedValue<number>(0); // 初始化位置
+	const prev_style = useSharedValue<number>(0);
+	const width = useSharedValue<number>(0);
 
 	// 获取顶部内容高度
 	const onLayout = (event: any) => {
@@ -92,6 +97,21 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		}
 	}
 
+	const pan = Gesture.Pan().onStart((event: any) => {
+		initX.value = event.absoluteX;
+		initY.value = event.absoluteY;
+	}).onChange((event: any) => {
+		let dis = event.absoluteX - initX.value;
+		let abs_dis = Math.abs(dis);
+		let rate = abs_dis / width.value;
+		prev_style.value = (6 + 27 * rate)
+		// console.log("%c Line:99 🥝 event", "color:#42b983", event);
+	});
+
+	const animatedStyles = useAnimatedStyle(() => ({
+		left: withTiming(prev_style.value),
+	}));
+
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
 	return (
 		<View onLayout={onLayout}>
@@ -130,6 +150,30 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 						)
 					}}
 				/>
+			</View>
+			<View style={styles.homepart} onLayout={(event: any) => { width.value = event.nativeEvent.layout.width }}>
+				<Text style={styles.title}>{"秒懂百科"}</Text>
+				<GestureDetector gesture={pan}>
+					<View style={styles.wiki_list_con}>
+						{homedata.current.knowledgeitems.length > 0 && homedata.current.knowledgeitems.map((item: any, index: number) => {
+							return (
+								<Animated.View key={item.id} style={[
+									styles.wiki_list_item,
+									animatedStyles,
+									index == 0 && styles.list_prev_item,
+									index == 1 && styles.list_cur_item,
+									index == 2 && styles.list_next_item,
+								]}>
+									<ShadowedView style={styles.item_shadowed}>
+										<Image style={styles.list_item_img} source={{ uri: ENV.image + item.pic + "!l" }} />
+										<Text numberOfLines={1} style={styles.list_item_tit}>{item.title2}</Text>
+										<Text style={[styles.list_item_tit, styles.list_item_tit2]}>{item.title3}</Text>
+									</ShadowedView>
+								</Animated.View>
+							)
+						})}
+					</View>
+				</GestureDetector>
 			</View>
 			<View style={styles.homepart}>
 				<Text style={styles.title}>{"本期视频"}</Text>
@@ -267,6 +311,64 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: theme.text2,
 		marginTop: 5,
+	},
+	wiki_list_con: {
+		width: "100%",
+		height: 260,
+	},
+	item_shadowed: {
+		borderRadius: 8,
+		overflow: "hidden",
+		shadowOpacity: 0.1,
+		shadowRadius: 10,
+		shadowOffset: {
+			width: 0,
+			height: 0,
+		},
+	},
+	wiki_list_item: {
+		position: "absolute",
+		top: 25,
+		width: 180,
+		backgroundColor: theme.toolbarbg,
+	},
+	list_prev_item: {
+		transform: [{ scale: 1 }],
+		// opacity: 0.7,
+		left: "6%",
+		zIndex: 1,
+	},
+	list_cur_item: {
+		transform: [{ scale: 1.25 }],
+		opacity: 1,
+		left: "27%",
+		zIndex: 2,
+	},
+	list_next_item: {
+		transform: [{ scale: 1 }],
+		// opacity: 0.7,
+		left: "48%",
+		zIndex: 1,
+	},
+	list_item_img: {
+		width: 180,
+		height: 138,
+	},
+	list_item_tit: {
+		fontSize: 12,
+		paddingVertical: 10,
+		paddingHorizontal: 8,
+		fontWeight: "500",
+		fontFamily: "PingFang SC",
+		color: theme.text2,
+		textAlign: "center",
+		backgroundColor: theme.toolbarbg,
+	},
+	list_item_tit2: {
+		fontSize: 10,
+		paddingTop: 0,
+		paddingBottom: 7,
+		color: theme.placeholder,
 	},
 	newvideoimg: {
 		width: width - 40,

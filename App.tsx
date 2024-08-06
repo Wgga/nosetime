@@ -48,11 +48,11 @@ function App(): React.JSX.Element {
 	const initializeApp = () => {
 		// 注册微信
 		// 沉浸式状态/导航栏
-		AndroidSystemBars.setSystemUIVisibility(
-			"SYSTEM_UI_FLAG_LAYOUT_STABLE",
-			"SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",
-			"SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION",
-		);
+		// AndroidSystemBars.setSystemUIVisibility(
+		// 	"SYSTEM_UI_FLAG_LAYOUT_STABLE",
+		// 	"SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN",
+		// 	"SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION",
+		// );
 		setTimeout(() => { checkUpdate() }, 500);
 	}
 
