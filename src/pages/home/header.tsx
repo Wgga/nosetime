@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-native";
 
 import FastImage from "react-native-fast-image";
-import Animated, { useSharedValue, withDecay, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, withDecay, useAnimatedStyle, withTiming, withSpring, Easing, ReduceMotion, runOnJS, runOnUI } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { ShadowedView } from "react-native-fast-shadow";
 
@@ -18,7 +18,7 @@ import theme from "../../configs/theme";
 
 const { width, height } = Dimensions.get("window");
 
-function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
+const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 
 	// 控件
 	// 参数
@@ -29,8 +29,16 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		require("../../assets/images/discussBg/bac04.png"),
 		require("../../assets/images/discussBg/bac05.png"),
 	];
-	// 状态
-	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
+	// 变量
+	const initX = useSharedValue<number>(0); // 初始化位置
+	const initY = useSharedValue<number>(0); // 初始化位置
+	const endX = useSharedValue<number>(0); // 结束位置
+	const rate = useSharedValue<number>(0);
+	const dis = useSharedValue<number>(0);
+	const width = useSharedValue<number>(0);
+	const carousel_arr = useSharedValue<any>([0, 1, 2]); //循环数组
+	const [carousel, setCarousel] = React.useState<any>([0, 1, 2]); //循环数组
+	// 数据
 	let homedata = React.useRef<any>({
 		banner: [],
 		newitem: {},
@@ -40,11 +48,9 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		topiclist: [],
 		knowledgeitems: [],
 	}); // 首页数据
-	// 变量
-	const initX = useSharedValue<number>(0); // 初始化位置
-	const initY = useSharedValue<number>(0); // 初始化位置
-	const prev_style = useSharedValue<number>(0);
-	const width = useSharedValue<number>(0);
+	// 状态
+	const [addTrans, setAddTrans] = React.useState<boolean>(true);
+	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	// 获取顶部内容高度
 	const onLayout = (event: any) => {
@@ -97,20 +103,59 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 		}
 	}
 
+	React.useEffect(() => {
+		console.log("%c Line:108 🍉 rate.value", "color:#465975", rate.value);
+		if (rate.value == 0) {
+			setIsRender(val => !val);
+		}
+	}, [rate.value])
+	const prevStyles = useAnimatedStyle(() => {
+		return {
+			left: rate.value == 0 ? width.value * 0.06 : width.value * ((6 + 27 * rate.value) / 100),
+			transform: dis.value < 0 ? [{ scale: 1 }] : [{ scale: (1 + 0.25 * rate.value) }],
+			zIndex: dis.value < 0 ? 1 : (0.25 * rate.value > 0.04 ? 3 : 1),
+		}
+	});
+	const curStyles = useAnimatedStyle(() => ({
+		left: dis.value < 0 ? width.value * ((28 - 27 * rate.value) / 100) : width.value * ((28 + 27 * rate.value) / 100),
+		transform: [{ scale: (1.25 - 0.25 * rate.value) }],
+		zIndex: 2,
+	}));
+	const nextStyles = useAnimatedStyle(() => ({
+		transform: dis.value < 0 ? [{ scale: (1 + 0.25 * rate.value) }] : [{ scale: 1 }],
+		left: dis.value < 0 ? width.value * ((48 - 27 * rate.value) / 100) : width.value * ((48 - 50 * rate.value) / 100),
+		zIndex: dis.value < 0 ? (0.25 * rate.value > 0.04 ? 3 : 1) : 1,
+	}));
+
+	const prevOptStyles = useAnimatedStyle(() => ({
+		opacity: dis.value < 0 ? 0.7 : (0.7 + 0.3 * rate.value),
+	}));
+	const curOptStyles = useAnimatedStyle(() => ({
+		opacity: (1 - 0.3 * rate.value),
+	}));
+	const nextOptStyles = useAnimatedStyle(() => ({
+		opacity: dis.value < 0 ? (0.7 + 0.3 * rate.value) : 0.7,
+	}));
+
 	const pan = Gesture.Pan().onStart((event: any) => {
 		initX.value = event.absoluteX;
 		initY.value = event.absoluteY;
 	}).onChange((event: any) => {
-		let dis = event.absoluteX - initX.value;
-		let abs_dis = Math.abs(dis);
-		let rate = abs_dis / width.value;
-		prev_style.value = (6 + 27 * rate)
-		// console.log("%c Line:99 🥝 event", "color:#42b983", event);
+		dis.value = event.absoluteX - initX.value;
+		rate.value = Math.abs(dis.value) / width.value;
+	}).onEnd((event: any) => {
+		dis.value = 0;
+		rate.value = 0;
+		endX.value = event.absoluteX;
+		if (initX.value - endX.value > 0) {
+			carousel_arr.value.push((carousel_arr.value[carousel_arr.value.length - 1] + 1) % 3); // 在末尾添加新元素
+			carousel_arr.value.shift();
+		} else {
+			carousel_arr.value.unshift((carousel_arr.value[0] - 1 + 3) % 3); // 在开头添加新元素
+			carousel_arr.value.pop();
+		}
+		// runOnJS(setCarousel)(carousel_arr.value);
 	});
-
-	const animatedStyles = useAnimatedStyle(() => ({
-		left: withTiming(prev_style.value),
-	}));
 
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
 	return (
@@ -151,6 +196,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 					}}
 				/>
 			</View>
+			<Text>{JSON.stringify(carousel_arr.value)}</Text>
 			<View style={styles.homepart} onLayout={(event: any) => { width.value = event.nativeEvent.layout.width }}>
 				<Text style={styles.title}>{"秒懂百科"}</Text>
 				<GestureDetector gesture={pan}>
@@ -159,15 +205,20 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 							return (
 								<Animated.View key={item.id} style={[
 									styles.wiki_list_item,
-									animatedStyles,
-									index == 0 && styles.list_prev_item,
-									index == 1 && styles.list_cur_item,
-									index == 2 && styles.list_next_item,
+									index == carousel_arr.value[0] && prevStyles,
+									index == carousel_arr.value[1] && curStyles,
+									index == carousel_arr.value[2] && nextStyles,
 								]}>
 									<ShadowedView style={styles.item_shadowed}>
-										<Image style={styles.list_item_img} source={{ uri: ENV.image + item.pic + "!l" }} />
-										<Text numberOfLines={1} style={styles.list_item_tit}>{item.title2}</Text>
-										<Text style={[styles.list_item_tit, styles.list_item_tit2]}>{item.title3}</Text>
+										<Animated.View style={[
+											index == carousel_arr.value[0] && prevOptStyles,
+											index == carousel_arr.value[1] && curOptStyles,
+											index == carousel_arr.value[2] && nextOptStyles,
+										]}>
+											<Image style={styles.list_item_img} source={{ uri: ENV.image + item.pic + "!l" }} />
+											<Text numberOfLines={1} style={styles.list_item_tit}>{item.title2}</Text>
+											<Text style={[styles.list_item_tit, styles.list_item_tit2]}>{item.title3}</Text>
+										</Animated.View>
 									</ShadowedView>
 								</Animated.View>
 							)
@@ -240,7 +291,7 @@ function Header({ navigation, setSliderHeight }: any): React.JSX.Element {
 			</View>
 		</View>
 	);
-}
+})
 
 const styles = StyleSheet.create({
 	homepart: {
@@ -319,7 +370,8 @@ const styles = StyleSheet.create({
 	item_shadowed: {
 		borderRadius: 8,
 		overflow: "hidden",
-		shadowOpacity: 0.1,
+		shadowColor: "red",
+		shadowOpacity: 1,
 		shadowRadius: 10,
 		shadowOffset: {
 			width: 0,
@@ -331,24 +383,20 @@ const styles = StyleSheet.create({
 		top: 25,
 		width: 180,
 		backgroundColor: theme.toolbarbg,
+		borderRadius: 8,
+		transform: [{ scale: 1 }],
+		zIndex: 1
 	},
 	list_prev_item: {
-		transform: [{ scale: 1 }],
-		// opacity: 0.7,
-		left: "6%",
-		zIndex: 1,
+		left: width * 0.06,
 	},
 	list_cur_item: {
 		transform: [{ scale: 1.25 }],
-		opacity: 1,
-		left: "27%",
-		zIndex: 2,
+		left: width * 0.27,
+		zIndex: 2
 	},
 	list_next_item: {
-		transform: [{ scale: 1 }],
-		// opacity: 0.7,
-		left: "48%",
-		zIndex: 1,
+		left: width * 0.48,
 	},
 	list_item_img: {
 		width: 180,
