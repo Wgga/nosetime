@@ -33,9 +33,22 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 	const initX = useSharedValue<number>(0); // 初始化位置
 	const initY = useSharedValue<number>(0); // 初始化位置
 	const endX = useSharedValue<number>(0); // 结束位置
-	const rate = useSharedValue<number>(0);
-	const dis = useSharedValue<number>(0);
 	const width = useSharedValue<number>(0);
+	let prevstyle = useSharedValue<any>({
+		left: 0,
+		transform: [{ scale: 1 }],
+		zIndex: 1,
+	});
+	let curtstyle = useSharedValue<any>({
+		left: 0,
+		transform: [{ scale: 1.25 }],
+		zIndex: 2,
+	});
+	let nextstyle = useSharedValue<any>({
+		left: 0,
+		transform: [{ scale: 1 }],
+		zIndex: 1,
+	});
 	const carousel_arr = useSharedValue<any>([0, 1, 2]); //循环数组
 	const [carousel, setCarousel] = React.useState<any>([0, 1, 2]); //循环数组
 	// 数据
@@ -49,7 +62,6 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 		knowledgeitems: [],
 	}); // 首页数据
 	// 状态
-	const [addTrans, setAddTrans] = React.useState<boolean>(true);
 	const [isrender, setIsRender] = React.useState<boolean>(false); // 是否渲染
 
 	// 获取顶部内容高度
@@ -103,31 +115,23 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 		}
 	}
 
-	React.useEffect(() => {
-		console.log("%c Line:108 🍉 rate.value", "color:#465975", rate.value);
-		if (rate.value == 0) {
-			setIsRender(val => !val);
-		}
-	}, [rate.value])
-	const prevStyles = useAnimatedStyle(() => {
-		return {
-			left: rate.value == 0 ? width.value * 0.06 : width.value * ((6 + 27 * rate.value) / 100),
-			transform: dis.value < 0 ? [{ scale: 1 }] : [{ scale: (1 + 0.25 * rate.value) }],
-			zIndex: dis.value < 0 ? 1 : (0.25 * rate.value > 0.04 ? 3 : 1),
-		}
-	});
-	const curStyles = useAnimatedStyle(() => ({
-		left: dis.value < 0 ? width.value * ((28 - 27 * rate.value) / 100) : width.value * ((28 + 27 * rate.value) / 100),
-		transform: [{ scale: (1.25 - 0.25 * rate.value) }],
-		zIndex: 2,
+	const prevStyles = useAnimatedStyle(() => ({
+		left: prevstyle.value.left,
+		transform: prevstyle.value.transform,
+		zIndex: prevstyle.value.zIndex,
+	}));
+	const curtStyles = useAnimatedStyle(() => ({
+		left: curtstyle.value.left,
+		transform: curtstyle.value.transform,
+		zIndex: curtstyle.value.zIndex,
 	}));
 	const nextStyles = useAnimatedStyle(() => ({
-		transform: dis.value < 0 ? [{ scale: (1 + 0.25 * rate.value) }] : [{ scale: 1 }],
-		left: dis.value < 0 ? width.value * ((48 - 27 * rate.value) / 100) : width.value * ((48 - 50 * rate.value) / 100),
-		zIndex: dis.value < 0 ? (0.25 * rate.value > 0.04 ? 3 : 1) : 1,
+		left: nextstyle.value.left,
+		transform: nextstyle.value.transform,
+		zIndex: nextstyle.value.zIndex,
 	}));
 
-	const prevOptStyles = useAnimatedStyle(() => ({
+	/* const prevOptStyles = useAnimatedStyle(() => ({
 		opacity: dis.value < 0 ? 0.7 : (0.7 + 0.3 * rate.value),
 	}));
 	const curOptStyles = useAnimatedStyle(() => ({
@@ -135,17 +139,48 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 	}));
 	const nextOptStyles = useAnimatedStyle(() => ({
 		opacity: dis.value < 0 ? (0.7 + 0.3 * rate.value) : 0.7,
-	}));
+	})); */
 
 	const pan = Gesture.Pan().onStart((event: any) => {
 		initX.value = event.absoluteX;
 		initY.value = event.absoluteY;
 	}).onChange((event: any) => {
-		dis.value = event.absoluteX - initX.value;
-		rate.value = Math.abs(dis.value) / width.value;
+		let dis = event.absoluteX - initX.value;
+		let rate = Math.abs(dis) / width.value;
+		if (dis < 0) {
+			prevstyle.value = {
+				left: width.value * ((6 + 27 * rate) / 100),
+				transform: [{ scale: 1 }],
+				zIndex: 1,
+			}
+			curtstyle.value = {
+				left: width.value * ((28 - 27 * rate) / 100),
+				transform: [{ scale: (1.25 - 0.25 * rate) }],
+				zIndex: 2,
+			}
+			nextstyle.value = {
+				left: width.value * ((48 - 27 * rate) / 100),
+				transform: [{ scale: (1 + 0.25 * rate) }],
+				zIndex: (0.25 * rate > 0.04 ? 3 : 1),
+			}
+		} else {
+			prevstyle.value = {
+				left: width.value * ((6 + 27 * rate) / 100),
+				transform: [{ scale: (1 + 0.25 * rate) }],
+				zIndex: (0.25 * rate > 0.04 ? 3 : 1),
+			}
+			curtstyle.value = {
+				left: width.value * ((28 + 27 * rate) / 100),
+				transform: [{ scale: (1.25 - 0.25 * rate) }],
+				zIndex: 2,
+			}
+			nextstyle.value = {
+				left: width.value * ((48 - 50 * rate) / 100),
+				transform: [{ scale: 1 }],
+				zIndex: 2,
+			}
+		}
 	}).onEnd((event: any) => {
-		dis.value = 0;
-		rate.value = 0;
 		endX.value = event.absoluteX;
 		if (initX.value - endX.value > 0) {
 			carousel_arr.value.push((carousel_arr.value[carousel_arr.value.length - 1] + 1) % 3); // 在末尾添加新元素
@@ -154,7 +189,22 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 			carousel_arr.value.unshift((carousel_arr.value[0] - 1 + 3) % 3); // 在开头添加新元素
 			carousel_arr.value.pop();
 		}
-		// runOnJS(setCarousel)(carousel_arr.value);
+		prevstyle.value = {
+			left: withTiming(width.value * 0.06, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+			transform: [{ scale: withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }) }],
+			zIndex: 1,
+		}
+		curtstyle.value = {
+			left: withTiming(width.value * 0.27, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+			transform: [{ scale: withTiming(1.25, { duration: 300, easing: Easing.inOut(Easing.ease) }) }],
+			zIndex: 2,
+		}
+		nextstyle.value = {
+			left: withTiming(width.value * 0.48, { duration: 300, easing: Easing.inOut(Easing.ease) }),
+			transform: [{ scale: withTiming(1, { duration: 300, easing: Easing.inOut(Easing.ease) }) }],
+			zIndex: 1,
+		}
+		runOnJS(setCarousel)(carousel_arr.value);
 	});
 
 	// 获取slider高度，用于开发顶部搜索框根据滑动距离显示背景颜色
@@ -197,7 +247,9 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 				/>
 			</View>
 			<Text>{JSON.stringify(carousel_arr.value)}</Text>
-			<View style={styles.homepart} onLayout={(event: any) => { width.value = event.nativeEvent.layout.width }}>
+			<View style={styles.homepart} onLayout={(event: any) => {
+				width.value = event.nativeEvent.layout.width;
+			}}>
 				<Text style={styles.title}>{"秒懂百科"}</Text>
 				<GestureDetector gesture={pan}>
 					<View style={styles.wiki_list_con}>
@@ -205,16 +257,12 @@ const Header = React.memo(({ navigation, setSliderHeight }: any) => {
 							return (
 								<Animated.View key={item.id} style={[
 									styles.wiki_list_item,
-									index == carousel_arr.value[0] && prevStyles,
-									index == carousel_arr.value[1] && curStyles,
-									index == carousel_arr.value[2] && nextStyles,
+									index == carousel[0] && prevStyles,
+									index == carousel[1] && curtStyles,
+									index == carousel[2] && nextStyles,
 								]}>
 									<ShadowedView style={styles.item_shadowed}>
-										<Animated.View style={[
-											index == carousel_arr.value[0] && prevOptStyles,
-											index == carousel_arr.value[1] && curOptStyles,
-											index == carousel_arr.value[2] && nextOptStyles,
-										]}>
+										<Animated.View>
 											<Image style={styles.list_item_img} source={{ uri: ENV.image + item.pic + "!l" }} />
 											<Text numberOfLines={1} style={styles.list_item_tit}>{item.title2}</Text>
 											<Text style={[styles.list_item_tit, styles.list_item_tit2]}>{item.title3}</Text>

@@ -14,7 +14,7 @@ import ListBottomTip from "../../components/listbottomtip";
 import ToastCtrl from "../../components/controller/toastctrl";
 import SharePopover from "../../components/popover/share-popover";
 import { ModalPortal } from "../../components/modals";
-import AutoHeightWebView from "../../components/autoHeightWebView";
+import AutoHeightWebView from "../../components/autoHeightWebview";
 import AlertCtrl from "../../components/controller/alertctrl";
 
 import us from "../../services/user-service/user-service";
